@@ -21,10 +21,9 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_DEVICES_APP}
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
 #     factory-reset: true
 #     quiet: true
-#     tags: [ble-wifi]
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     app-args: --discriminator 3840 --KVS /tmp/cnet_4_4_kvs --ble-controller 0 --wifi --interface-id -1
 #     script-args: >

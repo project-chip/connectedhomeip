@@ -38,7 +38,6 @@ from pathlib import Path
 
 import click
 import coloredlogs
-from chiptest.results import RunSummary, TestResult, TestStatus
 from colorama import Fore, Style
 
 from matter.testing.commissioning_types import CommissioningMethod
@@ -217,20 +216,26 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
-def run_commissioning_method(run: Metadata) -> str | None:
-    """Return the commissioning method from a test run's script arguments."""
+def run_commissioning_args(run: Metadata) -> tuple[str | None, str | None, str | None]:
+    """Return (commissioning_method, wifi_ssid, wifi_passphrase) from a test run's script arguments."""
     if run.script_args is None:
-        return None
+        return None, None, None
 
     parser = matter_test_args_parser()
     args, _ = parser.parse_known_args(shlex.split(run.script_args))
-    return args.commissioning_method or args.in_test_commissioning_method
+    return args.commissioning_method or args.in_test_commissioning_method, args.wifi_ssid, args.wifi_passphrase
 
 
 @contextlib.contextmanager
-def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
+def linux_ble_wifi_environment(
+    wifi_ssid: str | None = None,
+    wifi_passphrase: str | None = None,
+) -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
     """Provide isolated Linux app/tool networks with Bluetooth and WPA mocks."""
     from matter.testing.linux import BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, WpaSupplicantMock
+
+    ssid = wifi_ssid if wifi_ssid is not None else LINUX_WIFI_SSID
+    passphrase = wifi_passphrase if wifi_passphrase is not None else LINUX_WIFI_PASSPHRASE
 
     with contextlib.ExitStack() as stack:
         network = stack.enter_context(IsolatedNetworkNamespace(
@@ -242,8 +247,8 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
         stack.enter_context(BluetoothMock())
         stack.enter_context(WpaSupplicantMock(
             [CommissioningMethod.BLE_WIFI.app_link_name],
-            LINUX_WIFI_SSID,
-            LINUX_WIFI_PASSPHRASE,
+            ssid,
+            passphrase,
             network,
         ))
         yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
@@ -285,8 +290,6 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
-@click.option("--summary-file", type=click.Path(dir_okay=False, path_type=pathlib.Path), default=None,
-              help="Path to a summary JSON file to append test results to.")
 @click.option("--internal-inside-unshare", hidden=True, is_flag=True, default=False,
               help="Internal re-exec marker. ensure_namespace_availability passes it after entering a private "
                    "mount namespace, so the re-executed runner does not create another. Local and CI runs use "
@@ -295,7 +298,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], tags: tuple[str, ...],
          ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
-         summary_file: pathlib.Path | None, internal_inside_unshare: bool) -> None:
+         internal_inside_unshare: bool) -> None:
     """Run the configured Matter Python test."""
     if run and tags:
         raise click.BadOptionUsage("tags", "--run and --tag can't be combined: --run names the runs whatever their tags.")
@@ -365,8 +368,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         if pre_existing_fabric:
             run.pre_existing_fabric = pre_existing_fabric
 
-    runs_with_commissioning_method = [(run, run_commissioning_method(run)) for run in runs]
-    uses_linux_ble_wifi = any(method == CommissioningMethod.BLE_WIFI for _, method in runs_with_commissioning_method)
+    runs_with_commissioning_args = [(run, *run_commissioning_args(run)) for run in runs]
+    uses_linux_ble_wifi = any(
+        bool(run.app) and method == CommissioningMethod.BLE_WIFI
+        for run, method, _, _ in runs_with_commissioning_args
+    )
     if uses_linux_ble_wifi:
         if sys.platform != "linux":
             raise click.ClickException("BLE-WiFi commissioning is only supported on Linux")
@@ -376,17 +382,17 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             ensure_namespace_availability(isolate_root=True)
         ensure_private_state()
 
-    for run, commissioning_method in runs_with_commissioning_method:
+    for run, commissioning_method, wifi_ssid, wifi_passphrase in runs_with_commissioning_args:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        if commissioning_method == CommissioningMethod.BLE_WIFI:
-            environment = linux_ble_wifi_environment()
+        if bool(run.app) and commissioning_method == CommissioningMethod.BLE_WIFI:
+            environment = linux_ble_wifi_environment(wifi_ssid, wifi_passphrase)
         else:
             environment = contextlib.nullcontext(((), ()))
         with environment as (app_command_prefix, test_command_prefix):
             main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                       run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                       ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
-                      app_command_prefix, test_command_prefix, summary_file)
+                      app_command_prefix, test_command_prefix)
 
 
 class AppRestartMonitor:
@@ -459,8 +465,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
               run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
-              app_command_prefix: tuple[str, ...] = (), test_command_prefix: tuple[str, ...] = (),
-              summary_file: pathlib.Path | None = None):
+              app_command_prefix: tuple[str, ...] = (), test_command_prefix: tuple[str, ...] = ()):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -558,19 +563,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         commission_exit = commission_proc.wait(120)
         if commission_exit != 0:
             log.error("Commissioning run failed with exit code %d", commission_exit)
-            if summary_file is not None:
-                summary = (RunSummary.from_json(summary_file)
-                           if summary_file.exists()
-                           else RunSummary(iterations=1, tests_per_iteration=1))
-                summary.tests_per_iteration = max(summary.tests_per_iteration, len(summary.results) + 1)
-                summary.record(TestResult(
-                    name=os.path.basename(script),
-                    worker_id=0,
-                    iteration=0,
-                    status=TestStatus.FAILED,
-                    duration_seconds=0.0,
-                ))
-                summary.write_json(summary_file)
             sys.exit(commission_exit)
 
     script_command = [
@@ -592,7 +584,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     final_script_command = [*test_command_prefix, *(i.replace('|', ' ') for i in script_command)]
 
-    test_start_time = time.monotonic()
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
                                      output_cb=process_test_script_output,
                                      f_stdout=stream_output,
@@ -606,8 +597,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         except TimeoutError as e:
             log.exception("%r", e)
             test_script_exit_code = -1  # Trigger error codepath
-        finally:
-            test_duration = time.monotonic() - test_start_time
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
@@ -638,24 +627,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             else:
                 log.info("Test completed successfully")
-
-        if summary_file is not None:
-            summary = (RunSummary.from_json(summary_file)
-                       if summary_file.exists()
-                       else RunSummary(iterations=1, tests_per_iteration=1))
-            summary.tests_per_iteration = max(summary.tests_per_iteration, len(summary.results) + 1)
-            test_name = (os.path.basename(script)
-                         if run_name in ("cmd-run", "run1")
-                         else f"{os.path.basename(script)} ({run_name})")
-            status = TestStatus.PASSED if exit_code == 0 else TestStatus.FAILED
-            summary.record(TestResult(
-                name=test_name,
-                worker_id=0,
-                iteration=0,
-                status=status,
-                duration_seconds=round(test_duration, 3),
-            ))
-            summary.write_json(summary_file)
 
         if exit_code != 0:
             log.error("SUBPROCESS failure: ")

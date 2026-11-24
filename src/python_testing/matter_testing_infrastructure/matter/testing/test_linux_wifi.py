@@ -17,7 +17,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from matter.testing.linux.wifi import WpaSupplicantMock
+from matter.testing.linux.wifi import WLAN_REASON_IEEE_802_1X_AUTH_FAILED, WpaSupplicantMock
 
 
 class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
@@ -69,8 +69,8 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
         interface = WpaSupplicantMock.WpaInterface(mock, 0)
         await interface.AddNetwork({"ssid": ("s", "WrongSSID"), "psk": ("s", "MatterAPPassword")})
         await interface.SelectNetwork(interface.network.path)
-        if interface._associate_task:
-            await interface._associate_task
+        self.assertIsNotNone(interface._associate_task)
+        await interface._associate_task
         self.assertEqual(await interface.DisconnectReason.get_async(), 0)
         self.assertEqual(await interface.State.get_async(), "scanning")
         self.assertFalse(interface.associated)
@@ -79,9 +79,9 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
         interface = WpaSupplicantMock.WpaInterface(mock, 0)
         await interface.AddNetwork({"ssid": ("s", "MatterAP"), "psk": ("s", "WrongPassword")})
         await interface.SelectNetwork(interface.network.path)
-        if interface._associate_task:
-            await interface._associate_task
-        self.assertEqual(await interface.DisconnectReason.get_async(), -23)
+        self.assertIsNotNone(interface._associate_task)
+        await interface._associate_task
+        self.assertEqual(await interface.DisconnectReason.get_async(), -WLAN_REASON_IEEE_802_1X_AUTH_FAILED)
         self.assertEqual(await interface.State.get_async(), "disconnected")
         self.assertFalse(await interface.network.Enabled.get_async())
 
@@ -89,11 +89,30 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
         interface = WpaSupplicantMock.WpaInterface(mock, 0)
         await interface.AddNetwork({"ssid": ("s", "MatterAP"), "psk": ("s", "MatterAPPassword")})
         await interface.SelectNetwork(interface.network.path)
-        if interface._associate_task:
-            await interface._associate_task
+        self.assertIsNotNone(interface._associate_task)
+        await interface._associate_task
         self.assertEqual(await interface.DisconnectReason.get_async(), 0)
         self.assertEqual(await interface.State.get_async(), "completed")
         self.assertTrue(await interface.network.Enabled.get_async())
+
+    async def test_add_network_resets_omitted_credentials(self):
+        mock = SimpleNamespace(ssid="MatterAP", password="MatterAPPassword")
+        interface = WpaSupplicantMock.WpaInterface(mock, 0)
+
+        await interface.AddNetwork({"ssid": ("s", "CustomSSID"), "psk": ("s", "CustomPass")})
+        self.assertEqual(interface.configured_ssid, "CustomSSID")
+        self.assertEqual(interface.configured_psk, "CustomPass")
+        self.assertEqual(interface.network.ssid, "CustomSSID")
+
+        await interface.AddNetwork({"ssid": ("s", "OpenSSID")})
+        self.assertEqual(interface.configured_ssid, "OpenSSID")
+        self.assertIsNone(interface.configured_psk)
+        self.assertEqual(interface.network.ssid, "OpenSSID")
+
+        await interface.AddNetwork({})
+        self.assertIsNone(interface.configured_ssid)
+        self.assertIsNone(interface.configured_psk)
+        self.assertEqual(interface.network.ssid, "MatterAP")
 
 
 if __name__ == "__main__":

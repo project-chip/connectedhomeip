@@ -39,6 +39,10 @@ log = logging.getLogger(__name__)
 # signal that arrives first is dropped. A short delay keeps that order.
 DISCOVERY_DELAY_S = 0.1
 
+# IEEE 802.11 reason code for 802.1X authentication failure (see WirelessDefs.h).
+# wpa_supplicant negates locally generated disconnect reasons on D-Bus.
+WLAN_REASON_IEEE_802_1X_AUTH_FAILED = 23
+
 if TYPE_CHECKING:
     DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
                            | "DictVariantT")
@@ -454,11 +458,16 @@ class WpaSupplicantMock(TerminableThread):
                     ssid = ssid.decode("utf-8", errors="replace")
                 self.configured_ssid = str(ssid).strip('"')
                 self.network.ssid = self.configured_ssid
+            else:
+                self.configured_ssid = None
+                self.network.ssid = getattr(self.mock, "ssid", "")
             if "psk" in extracted:
                 psk = extracted["psk"]
                 if isinstance(psk, (bytes, bytearray)):
                     psk = psk.decode("utf-8", errors="replace")
                 self.configured_psk = str(psk).strip('"')
+            else:
+                self.configured_psk = None
             return self.network.path
 
         @sdbus.dbus_method_async("o")
@@ -494,7 +503,7 @@ class WpaSupplicantMock(TerminableThread):
                             mock_psk,
                         )
                         await self.State.set_async("associated")
-                        await self.DisconnectReason.set_async(-23)
+                        await self.DisconnectReason.set_async(-WLAN_REASON_IEEE_802_1X_AUTH_FAILED)
                         await self.State.set_async("disconnected")
                         await self.network.Enabled.set_async(False)
                         await self.CurrentNetwork.set_async("/")
