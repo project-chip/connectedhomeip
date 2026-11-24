@@ -121,6 +121,8 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering-controller",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering-controller:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/examples/all-devices-app/posix/app_options:device-type-parser",
     "${chip_root}/examples/all-devices-app/posix/named_pipe",

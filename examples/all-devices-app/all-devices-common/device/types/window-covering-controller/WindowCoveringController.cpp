@@ -17,28 +17,22 @@
 
 #include "WindowCoveringController.h"
 
-#include <app/clusters/bindings/BindingManager.h>
-#include <app/clusters/bindings/binding-table.h>
 #include <clusters/Groups/Ids.h>
 #include <clusters/Identify/Ids.h>
 #include <clusters/WindowCovering/Ids.h>
 #include <devices/Types.h>
-#include <platform/PlatformManager.h>
+
+#include <utility>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-namespace {
-const ClusterId kClientClusters[] = { WindowCovering::Id, Identify::Id, Groups::Id };
-} // namespace
-
-WindowCoveringController::WindowCoveringController(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCoveringController, 1)),
-    mTimerDelegate(timerDelegate)
+WindowCoveringController::WindowCoveringController(const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCoveringController, 1)), mConfig(config)
 {}
 
-CHIP_ERROR WindowCoveringController::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR WindowCoveringController::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
@@ -46,17 +40,20 @@ CHIP_ERROR WindowCoveringController::Register(chip::EndpointId endpoint, CodeDri
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-
     mBindingCluster.Create(
         BindingCluster::Context{
-            .bindingTable    = Binding::Table::GetInstance(),
-            .bindingManager  = Binding::Manager::GetInstance(),
-            .platformManager = DeviceLayer::PlatformMgr(),
+            .bindingTable    = mConfig.bindingTable,
+            .bindingManager  = mConfig.bindingManager,
+            .platformManager = mConfig.platformManager,
         },
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
+
+    if (mConfig.withIdentifyServer)
+    {
+        mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mConfig.timerDelegate));
+        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+    }
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -66,21 +63,54 @@ CHIP_ERROR WindowCoveringController::Register(chip::EndpointId endpoint, CodeDri
 void WindowCoveringController::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mBindingCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mBindingCluster.Cluster()));
-        mBindingCluster.Destroy();
-    }
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
+    if (mBindingCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mBindingCluster.Cluster()));
+        mBindingCluster.Destroy();
+    }
 }
 
 CHIP_ERROR WindowCoveringController::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
-    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+    ReturnErrorOnFailure(out.EnsureAppendCapacity(3));
+    ReturnErrorOnFailure(out.Append(WindowCovering::Id));
+    if (mConfig.withIdentifyClient)
+    {
+        ReturnErrorOnFailure(out.Append(Identify::Id));
+    }
+    if (mConfig.withGroupsClient)
+    {
+        ReturnErrorOnFailure(out.Append(Groups::Id));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WindowCoveringController::Dispatch(Platform::UniquePtr<BindingCommand> command)
+{
+    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsEnabledClientCluster(command->GetClusterId()), CHIP_ERROR_INVALID_ARGUMENT);
+    return mConfig.bindingHandler.Dispatch(mEndpointId, std::move(command));
+}
+
+bool WindowCoveringController::IsEnabledClientCluster(ClusterId clusterId) const
+{
+    switch (clusterId)
+    {
+    case WindowCovering::Id:
+        return true;
+    case Identify::Id:
+        return mConfig.withIdentifyClient;
+    case Groups::Id:
+        return mConfig.withGroupsClient;
+    default:
+        return false;
+    }
 }
 
 } // namespace chip::app

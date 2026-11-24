@@ -41,6 +41,7 @@
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>
 #include <device/types/water-valve/OOBAccessors.h>
+#include <device/types/window-covering-controller/OOBAccessors.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {

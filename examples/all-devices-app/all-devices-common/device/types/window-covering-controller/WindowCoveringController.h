@@ -18,31 +18,67 @@
 #pragma once
 
 #include <app/clusters/bindings/BindingCluster.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <binding-handler/BindingCommand.h>
+#include <binding-handler/BindingHandler.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/PlatformManager.h>
 
 namespace chip::app {
 
 class WindowCoveringController : public SingleEndpoint
 {
 public:
-    explicit WindowCoveringController(TimerDelegate & timerDelegate);
+    struct Config
+    {
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
+        DeviceLayer::PlatformManager & platformManager;
+        BindingHandler & bindingHandler;
+        TimerDelegate & timerDelegate;
+        bool withIdentifyServer = false;
+        bool withIdentifyClient = false;
+        bool withGroupsClient   = false;
+    };
+
+    explicit WindowCoveringController(const Config & config);
     ~WindowCoveringController() override = default;
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
-    Clusters::BindingCluster & BindingCluster() { return mBindingCluster.Cluster(); }
+    /// Sends `command` to every binding on this endpoint for command->GetClusterId().
+    ///
+    /// Returns CHIP_ERROR_INCORRECT_STATE if the device is not registered, and
+    /// CHIP_ERROR_INVALID_ARGUMENT if `command` is null or its cluster is not an enabled client cluster.
+    CHIP_ERROR Dispatch(Platform::UniquePtr<BindingCommand> command);
+
+    Clusters::BindingCluster & BindingCluster()
+    {
+        VerifyOrDie(mBindingCluster.IsConstructed());
+        return mBindingCluster.Cluster();
+    }
+
+    /// Only available when Config::withIdentifyServer is set.
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
 
 private:
-    TimerDelegate & mTimerDelegate;
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    bool IsEnabledClientCluster(ClusterId clusterId) const;
+
+    Config mConfig;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };
 
 } // namespace chip::app

@@ -1389,6 +1389,21 @@ private:
             }
             RegisterAlias("window-covering-simulated", "window-covering");
         }
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING_CONTROLLER)
+        {
+            RegisterCreator("window-covering-controller", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<WindowCoveringController>(WindowCoveringController::Config{
+                    .bindingTable       = mContext->bindingTable,
+                    .bindingManager     = mContext->bindingManager,
+                    .platformManager    = mContext->platformManager,
+                    .bindingHandler     = mContext->bindingHandler,
+                    .timerDelegate      = mContext->timerDelegate,
+                    .withIdentifyServer = true,
+                    .withIdentifyClient = true,
+                });
+            });
+        }
 
         // at least one device type MUST be enabled
         VerifyOrDie(!mRegistry.empty());
