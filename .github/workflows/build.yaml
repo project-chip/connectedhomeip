@@ -135,7 +135,7 @@ jobs:
               if: inputs.run-codeql != true && github.event.pull_request.number != null
               run: scripts/tests/gn_tests.sh
             - name: Uploading core files
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-gcc-debug
@@ -172,7 +172,7 @@ jobs:
                   sarif_file: "sarif-results/cpp.sarif"
             - name: Upload loc as a Build Artifact
               if: ${{ inputs.run-codeql }}
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: sarif-results
                   path: sarif-results
@@ -183,7 +183,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+            #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux-gcc-debug
@@ -366,7 +366,7 @@ jobs:
             #   linux build job above; the perform-codeql-analysis composite action was removed)
 
             - name: Uploading core files
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux
@@ -379,7 +379,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+            #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux
@@ -572,7 +572,7 @@ jobs:
                        check \
                     "
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin
