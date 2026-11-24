@@ -57,8 +57,7 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
             const size_t timeLength = std::strftime(timeChar, sizeof(timeChar), "%c", localTime);
             if (timeLength > 0)
             {
-                softwareFault.faultRecording.SetValue(
-                    ByteSpan(Uint8::from_const_char(timeChar), timeLength));
+                softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), timeLength));
             }
         }
     }

@@ -54,13 +54,13 @@ private:
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_SaveNvm        = 2,
-        kFunction_FactoryReset   = 3,
-        kFunction_ShortRelease   = 4,
-        kFunction_LongRelease    = 5,
-        kFunction_LongPress      = 6,
-        kFunction_InitialPress   = 7,
+        kFunction_NoneSelected = 0,
+        kFunction_SaveNvm      = 2,
+        kFunction_FactoryReset = 3,
+        kFunction_ShortRelease = 4,
+        kFunction_LongRelease  = 5,
+        kFunction_LongPress    = 6,
+        kFunction_InitialPress = 7,
 
         kFunction_Invalid
     } Function;

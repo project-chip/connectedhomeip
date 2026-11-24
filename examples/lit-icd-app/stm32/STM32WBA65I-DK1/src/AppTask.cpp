@@ -67,7 +67,6 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif /* (OTA_SUPPORT == 1) */
 
-
 #include "app_bsp.h"
 #include "app_conf.h"
 #include "stm32wba65i_discovery.h"
@@ -115,7 +114,6 @@ static bool sHaveFabric                   = false;
 static bool sGenericSwitchLongPressActive = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -234,12 +232,12 @@ CHIP_ERROR AppTask::Init()
     }
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler)== CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler) == CHIP_NO_ERROR);
 #if (OTA_SUPPORT == 1)
     static OTATestEventTriggerHandler sOTATestEventTriggerHandler;
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler)== CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif /* (OTA_SUPPORT == 1) */
-    
+
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -450,7 +448,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-
 void AppTask::UpdateNvmEventHandler(AppEvent * aEvent)
 {
     uint8_t err = 0;
@@ -538,8 +535,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
     case DeviceEventType::kCommissioningComplete: {
-        sFabricNeedSaved = true;
-        sHaveFabric      = true;
+        sFabricNeedSaved   = true;
+        sHaveFabric        = true;
         sFailCommissioning = false;
 
         if (sHaveBLEConnections == false)

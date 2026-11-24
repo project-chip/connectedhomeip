@@ -116,7 +116,7 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
             {
                 switchCluster->OnInitialPress(currentPosition);
             }
@@ -139,7 +139,7 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
             {
                 switchCluster->OnShortRelease(previousPosition);
             }
@@ -152,9 +152,9 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
             {
-               switchCluster->OnLongRelease(previousPosition);
+                switchCluster->OnLongRelease(previousPosition);
             }
         }
         break;

@@ -37,17 +37,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == Switch::Id)
     {
-        if ((value != nullptr) && (size > 0)) {
+        if ((value != nullptr) && (size > 0))
+        {
             ChipLogProgress(Zcl, "Generic Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                             ChipLogValueMEI(attributeId), type, *value, size);
         }
     }
     else if (clusterId == Identify::Id)
     {
-        if ((value != nullptr) && (size > 0)) {
+        if ((value != nullptr) && (size > 0))
+        {
             ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+                            ChipLogValueMEI(attributeId), type, *value, size);
         }
     }
 }
-
