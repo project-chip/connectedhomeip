@@ -1807,7 +1807,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             else:
                 # Retrieved data check if is valida data.
                 if received_update_token is not None and len(received_update_token) > 0 and received_software_version is not None and received_software_version > 0:
-                    logger.info("%s - Retrieved data from named pipe at Attempt #%d",step_number_s10, attempt)
+                    logger.info("%s - Retrieved data from named pipe at Attempt #%d", step_number_s10, attempt)
                     break
             finally:
                 # Wait some time to then try again.
@@ -1816,7 +1816,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                     logger.warning(
                         '%s: Step #10.1 - Unable to read the named pipe after %d seconds on Attempt #%s', step_number_s10, pool_command_timeout_sec, attempt)
                     break
-                await asyncio.sleep(min(poll_command_interval_sec,remaining))
+                await asyncio.sleep(min(poll_command_interval_sec, remaining))
 
         # Compare the UpdateToken and Software Version with previously stored values.
         asserts.assert_equal(
@@ -1843,7 +1843,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             )
             logger.info("%s Device BootReason value: %d", step_number_s11, boot_reason)
             asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted,
-                                "BootReason is not SoftwareUpdateCompleted")
+                                 "BootReason is not SoftwareUpdateCompleted")
         else:
             logger.info("%s Attribute BootReason (optional) from GeneralDiagnostics not found. Skipping step.", step_number_s11)
             self.mark_current_step_skipped()
