@@ -21,22 +21,16 @@
 # and CHIPEndDevice.
 
 import asyncio
-import logging
 import os
 import sys
 
 import base
 import click
 import coloredlogs
-from base import DEFAULT_REPL_STORAGE_PATH, BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
+from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
 
-import matter.CertificateAuthority
 import matter.clusters as Clusters
-import matter.FabricAdmin
-import matter.native
-from matter.ChipStack import ChipStack
 from matter.clusters.Types import NullValue
-from matter.storage import PersistentStorageJSON
 from matter.tracing import TracingContext
 
 TEST_THREAD_NETWORK_DATASET_TLV = (
@@ -50,7 +44,6 @@ TEST_THREAD_NETWORK_DATASET_TLV = (
     + "0102d252"
     + "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
 )
-TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 DEFAULT_WIFI_SSID = "CHIP-VirtualWiFi-AP"
 DEFAULT_WIFI_PSK = "ChipWiFiPassword123"
 TEST_DISCRIMINATOR = 3840
@@ -73,46 +66,11 @@ def _extract_thread_extpanid(dataset_bytes: bytes) -> bytes:
         if tag == 0x02 and length == 8:
             return dataset_bytes[idx + 2:idx + 2 + length]
         idx += 2 + length
-    return bytes.fromhex(TEST_THREAD_NETWORK_ID)
-
-
-class BleTestHelper(BaseTestHelper):
-
-    def __init__(
-        self,
-        nodeId: int,
-        paaTrustStorePath: str,
-        bleAdapter: int = 0,
-        testCommissioner: bool = False,
-    ):
-        matter.native.Init(bluetoothAdapter=bleAdapter)
-
-        self.chipStack = ChipStack(
-            PersistentStorageJSON(DEFAULT_REPL_STORAGE_PATH),
-            enableServerInteractions=True,
-        )
-        self.certificateAuthorityManager = (
-            matter.CertificateAuthority.CertificateAuthorityManager(
-                chipStack=self.chipStack
-            )
-        )
-        self.certificateAuthority = (
-            self.certificateAuthorityManager.NewCertificateAuthority()
-        )
-        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(
-            vendorId=0xFFF1, fabricId=1
-        )
-        self.devCtrl = self.fabricAdmin.NewController(
-            nodeId, paaTrustStorePath, testCommissioner
-        )
-        self.controllerNodeId = nodeId
-        self.logger = logger
-        self.paaTrustStorePath = paaTrustStorePath
-        logging.getLogger().setLevel(logging.DEBUG)
+    raise ValueError("Thread operational dataset TLV is missing an 8-byte Extended PAN ID (tag 0x02)")
 
 
 async def _verify_network_commissioning_attributes(
-    test: BleTestHelper,
+    test: BaseTestHelper,
     device_nodeid: int,
     expected_net_id: bytes,
     network_label: str,
@@ -167,7 +125,7 @@ async def _verify_network_commissioning_attributes(
 
 
 async def _verify_thread_commissioning_cluster(
-    test: BleTestHelper, device_nodeid: int, dataset_bytes: bytes
+    test: BaseTestHelper, device_nodeid: int, dataset_bytes: bytes
 ):
     expected_net_id = _extract_thread_extpanid(dataset_bytes)
     await _verify_network_commissioning_attributes(
@@ -176,7 +134,7 @@ async def _verify_thread_commissioning_cluster(
 
 
 async def _verify_wifi_commissioning_cluster(
-    test: BleTestHelper, device_nodeid: int, ssid: str
+    test: BaseTestHelper, device_nodeid: int, ssid: str
 ):
     await _verify_network_commissioning_attributes(
         test, device_nodeid, ssid.encode("utf-8"), "Wi-Fi"
@@ -184,7 +142,7 @@ async def _verify_wifi_commissioning_cluster(
 
 
 async def _verify_wifi_diagnostics_cluster(
-    test: BleTestHelper, device_nodeid: int
+    test: BaseTestHelper, device_nodeid: int
 ):
     logger.info(
         "Verifying WiFiNetworkDiagnostics cluster state over Wi-Fi CASE session"
@@ -210,7 +168,7 @@ async def _verify_wifi_diagnostics_cluster(
 
 
 async def ble_thread_commissioning(
-    test: BleTestHelper,
+    test: BaseTestHelper,
     discriminator: int,
     setup_pin: int,
     device_nodeid: int,
@@ -243,7 +201,7 @@ async def ble_thread_commissioning(
 
 
 async def ble_wifi_commissioning(
-    test: BleTestHelper,
+    test: BaseTestHelper,
     discriminator: int,
     setup_pin: int,
     device_nodeid: int,
@@ -279,7 +237,7 @@ async def ble_wifi_commissioning(
 
 
 @base.test_case
-def TestDatamodel(test: BleTestHelper, device_nodeid: int):
+def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing datamodel functions over operational CASE")
 
     logger.info("Testing on off cluster")
@@ -337,10 +295,10 @@ def do_tests(config: dict):
 
     device_nodeid = config["device_nodeid"]
     network = config["network"].lower()
-    test = BleTestHelper(
+    test = BaseTestHelper(
         nodeId=config["controller_nodeid"],
         paaTrustStorePath=config["paa_trust_store_path"],
-        bleAdapter=config["ble_adapter"],
+        bluetoothAdapter=config["ble_adapter"],
     )
 
     if network == "thread":
@@ -379,9 +337,6 @@ def do_tests(config: dict):
 
     timeoutTicker.stop()
     logger.info("BLE MobileDevice Test finished")
-    sys.stdout.flush()
-    sys.stderr.flush()
-    os._exit(0)
 
 
 @click.command()
@@ -494,6 +449,10 @@ def run(**kwargs):
             tracing_ctx.StartFromString(destination)
 
         do_tests(kwargs)
+
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0)
 
 
 if __name__ == "__main__":

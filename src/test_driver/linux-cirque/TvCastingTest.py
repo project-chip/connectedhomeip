@@ -71,16 +71,6 @@ class TestTvCasting(CHIPVirtualHome):
     def test_routine(self):
         self.run_tv_casting_test()
 
-    def run_checked_device_cmd(self, device_id, command, description):
-        ret = self.execute_device_cmd(device_id, command)
-        self.assertEqual(
-            str(ret.get('return_code')),
-            '0',
-            f"{description} failed on {self.get_device_pretty_id(device_id)} "
-            f"(return_code={ret.get('return_code')}): {ret.get('output', '')}",
-        )
-        return ret
-
     def start_app_with_stdin_fifo(self, device_id, app_esc):
         # The FIFO is opened read-write so the app never sees EOF on stdin
         # between commands.
@@ -113,8 +103,8 @@ class TestTvCasting(CHIPVirtualHome):
         self.start_app_with_stdin_fifo(casting_app_id, CHIP_TV_CASTING_APP_ESC)
         self.wait_for_log(casting_app_id, "Server Listening", 30, "tv-casting-app did not start")
 
-        # Commissioner discovery over DNS-SD (_matterd._udp).
-        self.send_shell_command(casting_app_id, "cast discover")
+        # chip-tv-casting-app automatically starts DNS-SD (_matterd._udp)
+        # commissioner discovery on boot when invoked with no arguments.
         self.wait_for_log(casting_app_id, "Discovered Commissioner #0", 60, "tv-app was not discovered")
 
         # User Directed Commissioning request; the tv-app asks the user to approve.

@@ -41,19 +41,23 @@ gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args out/debug --args='targe
 echo "Build: Ninja build"
 time ninja -C out/debug all check
 
-# Wi-Fi is enabled so BleMobileDeviceTest (--network wifi) can provision the app over BLE.
-ALL_CLUSTERS_ARGS=(
+# Disable Thread MeshCoP proxy (third_party/ot-commissioner + libevent) since
+# Cirque Linux E2E apps do not use it.
+STANDALONE_APP_ARGS=(
     chip_inet_config_enable_ipv4=false
     'chip_logging_backend="stdio"'
-    'chip_enable_wifi=true'
     'chip_build_tests=false'
     'chip_im_force_fabric_quota_check=true'
     'chip_support_thread_meshcop=false'
 )
 
 echo "Build: Build all-clusters-app which has different configs than some other samples above."
-./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/debug/standalone "${ALL_CLUSTERS_ARGS[@]}"
+# Enable Wi-Fi so BleMobileDeviceTest (--network wifi) can provision the app over BLE.
+./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/debug/standalone "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=true'
 
 echo "Build: Build tv-app and tv-casting-app for TvCastingTest."
-./scripts/examples/gn_build_example.sh examples/tv-app/linux/ out/debug/tv-app "${ALL_CLUSTERS_ARGS[@]}" 'chip_crypto="mbedtls"'
-./scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/debug/tv-casting-app "${ALL_CLUSTERS_ARGS[@]}" 'chip_crypto="mbedtls"'
+# Disable Wi-Fi for tv-app and tv-casting-app, which communicate over IP/mDNS
+# and do not need Wi-Fi commissioning; both use the default Linux OpenSSL
+# crypto backend matching all-clusters-app in chip-cirque-device-base.
+./scripts/examples/gn_build_example.sh examples/tv-app/linux/ out/debug/tv-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'
+./scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/debug/tv-casting-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'

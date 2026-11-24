@@ -106,9 +106,6 @@ def build_device_config(network: str) -> dict:
     raise ValueError(f"Unsupported network: {network}")
 
 
-DEVICE_CONFIG = build_device_config("thread")
-
-
 class TestBleMobileDevice(CHIPVirtualHome):
     def __init__(self, device_config=None, network: str = "thread"):
         if device_config is None:
@@ -124,9 +121,17 @@ class TestBleMobileDevice(CHIPVirtualHome):
         self.run_ble_commissioning_test()
 
     def isolate_eth0(self, device_id):
-        self.execute_device_cmd(device_id, 'sh -c "ip addr flush dev eth0; ip link set eth0 down"')
+        self.run_checked_device_cmd(
+            device_id,
+            'sh -c "ip addr flush dev eth0 && ip link set eth0 down"',
+            "eth0 isolation",
+        )
         # Restart avahi so it advertises on wlan0 only.
-        self.execute_device_cmd(device_id, 'sh -c "service dbus start; service avahi-daemon restart"')
+        self.run_checked_device_cmd(
+            device_id,
+            'sh -c "(service dbus status >/dev/null 2>&1 || service dbus start) && service avahi-daemon restart"',
+            "avahi restart",
+        )
 
     def _device_ids_by_type(self, device_type: str) -> list[str]:
         return [d['id'] for d in self.non_ap_devices if d['type'] == device_type]
@@ -159,9 +164,8 @@ class TestBleMobileDevice(CHIPVirtualHome):
                 f'CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex "set pagination off" -ex run '
                 f'-ex "thread apply all bt" --args {CHIP_ALL_CLUSTERS_APP_ESC} {app_net_flag} '
                 f'--ble-controller {self.get_device_ble_adapter_id(server)} --discriminator {TEST_DISCRIMINATOR}')
-            if self.network == "wifi":
-                self.assertTrue(self.wait_for_device_output(server, "BLE advertisement started successfully", 30),
-                                "CHIPEndDevice did not start BLE advertising")
+            self.assertTrue(self.wait_for_device_output(server, "BLE advertisement started successfully", 30),
+                            "CHIPEndDevice did not start BLE advertising")
 
         if self.network == "thread":
             self.reset_thread_devices(server_ids)
@@ -171,7 +175,8 @@ class TestBleMobileDevice(CHIPVirtualHome):
             extra_ctrl_args = f" --ssid {shlex.quote(TEST_WIFI_SSID)} --wifi-password {shlex.quote(TEST_WIFI_PSK)}"
 
         command = (f'gdb -batch -return-child-result -q -ex run -ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} '
-                   f'-t 300 --network {self.network} --ble-adapter {self.get_device_ble_adapter_id(req_device_id)} '
+                   f'-t 300 --network {self.network} --discriminator {TEST_DISCRIMINATOR} '
+                   f'--ble-adapter {self.get_device_ble_adapter_id(req_device_id)} '
                    f'--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC}{extra_ctrl_args}')
         ret = self.execute_device_cmd(req_device_id, command)
 

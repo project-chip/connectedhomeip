@@ -33,6 +33,9 @@ import requests
 # the controller scripts run through device_cmd, but avoids hanging forever if
 # the service stops responding.
 REQUEST_TIMEOUT_SEC = 600
+# Bounded timeout for cleanup calls after SIGTERM so logs/destroy_home finish
+# before cirque_tests.sh's --kill-after=30s sends SIGKILL.
+CLEANUP_TIMEOUT_SEC = 10
 
 
 class TestResult(IntEnum):
@@ -102,16 +105,18 @@ class CHIPVirtualHome:
             # Other errors indicate a failure in system.
             test_ret = TestResult.SYSTEM_FAILURE
             traceback.print_exc(file=sys.stderr)
+        cleanup_timeout = CLEANUP_TIMEOUT_SEC if terminated else REQUEST_TIMEOUT_SEC
         if save_logs:
             try:
-                self.save_device_logs()
+                self.save_device_logs(timeout=cleanup_timeout)
             except _TestTerminated:
                 terminated = True
+                cleanup_timeout = CLEANUP_TIMEOUT_SEC
             except Exception:
                 test_ret = TestResult.SYSTEM_FAILURE
                 traceback.print_exc(file=sys.stderr)
         try:
-            self.destroy_home()
+            self.destroy_home(timeout=cleanup_timeout)
         except _TestTerminated:
             terminated = True
         except requests.exceptions.RequestException:
@@ -119,8 +124,8 @@ class CHIPVirtualHome:
             traceback.print_exc(file=sys.stderr)
         return test_ret, terminated
 
-    def query_api(self, end_point, args=[], binary=False):
-        ret = requests.get(self._build_request_url(end_point, args), timeout=REQUEST_TIMEOUT_SEC)
+    def query_api(self, end_point, args=[], binary=False, timeout=REQUEST_TIMEOUT_SEC):
+        ret = requests.get(self._build_request_url(end_point, args), timeout=timeout)
         if binary:
             return ret.content
         return ret.json()
@@ -149,6 +154,16 @@ class CHIPVirtualHome:
             raise Exception("cannot get command output")
         self.logger.info("command output: \n%s", ret_struct.get('output', ''))
         return ret_struct
+
+    def run_checked_device_cmd(self, device_id, command, description):
+        ret = self.execute_device_cmd(device_id, command)
+        self.assertEqual(
+            str(ret.get('return_code')),
+            '0',
+            f"{description} failed on {self.get_device_pretty_id(device_id)} "
+            f"(return_code={ret.get('return_code')}): {ret.get('output', '')}",
+        )
+        return ret
 
     def sequenceMatch(self, string, patterns):
         last_find = 0
@@ -300,16 +315,25 @@ class CHIPVirtualHome:
                 pass
         return None
 
-    def get_device_log(self, device_id):
-        return self.query_api('device_log', [self.home_id, device_id], binary=True)
+    def get_device_log(self, device_id, timeout=REQUEST_TIMEOUT_SEC):
+        return self.query_api('device_log', [self.home_id, device_id], binary=True, timeout=timeout)
 
     def wait_for_device_output(self, device_id, pattern, timeout=1):
         due = time.time() + timeout
         while True:
-            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern]):
+            remaining = due - time.time()
+            try:
+                log_bytes = self.get_device_log(
+                    device_id,
+                    timeout=min(REQUEST_TIMEOUT_SEC, max(0.1, remaining)),
+                )
+            except requests.exceptions.Timeout:
+                break
+            if self.sequenceMatch(log_bytes.decode(), [pattern]):
                 return True
-            if time.time() < due:
-                time.sleep(1)
+            remaining = due - time.time()
+            if remaining > 0:
+                time.sleep(min(1, remaining))
             else:
                 break
         return False
@@ -348,14 +372,14 @@ class CHIPVirtualHome:
             return urljoin(self.cirque_url, end_point)
         return urljoin(self.cirque_url, "{}/{}".format(end_point, '/'.join([str(argv) for argv in args])))
 
-    def destroy_home(self):
+    def destroy_home(self, timeout=REQUEST_TIMEOUT_SEC):
         if self.home_id is None:
             # setup() failed before a home was created.
             return
         home_id = self.home_id
         self.home_id = None
         self.logger.info("destroying home: %s", home_id)
-        self.query_api('destroy_home', [home_id])
+        self.query_api('destroy_home', [home_id], timeout=timeout)
 
     def initialize_home(self):
         # create_home is not idempotent, so it is sent once and not retried.
@@ -363,12 +387,15 @@ class CHIPVirtualHome:
             self._build_request_url('create_home'), json=self.device_config, timeout=REQUEST_TIMEOUT_SEC).json()
 
         self.logger.info("home id: %s created!", home_id)
+        if not home_id:
+            raise AssertionError("create_home returned empty home_id")
+        # Assign home_id immediately so destroy_home() cleans it up if any
+        # subsequent setup verification step fails.
+        self.home_id = home_id
 
         self.assertTrue(home_id in
                         list(self.query_api('get_homes')),
                         "created home_id did not match id from get_homes!!")
-
-        self.home_id = home_id
 
         device_types = set()
         created_devices = self.query_api('home_devices', [home_id])
@@ -395,14 +422,14 @@ class CHIPVirtualHome:
         self.ap_devices = [device for device in self.device_config.values()
                            if device['type'] == 'wifi_ap']
 
-    def save_device_logs(self):
+    def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC):
         timestamp = int(time.time())
         log_dir = os.environ.get("DEVICE_LOG_DIR")
         if log_dir is not None and not os.path.exists(log_dir):
             os.makedirs("logs")
 
         for device in self.non_ap_devices:
-            ret_log = self.get_device_log(device['id'])
+            ret_log = self.get_device_log(device['id'], timeout=timeout)
             # Use this format for easier sort
             f_name = f"{device['type']}-{timestamp}-{device['id'][:8]}.log"
             self.logger.debug("device log name: \n%s", f_name)

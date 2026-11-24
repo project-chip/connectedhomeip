@@ -73,12 +73,73 @@ BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
+function __cirquetest_port_5000_open() {
+    python3 -c '
+import socket, sys
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.settimeout(1.0)
+    sys.exit(0 if s.connect_ex(("127.0.0.1", 5000)) == 0 else 1)
+'
+}
+
+function __cirquetest_pid_owns_port_5000() {
+    python3 -c '
+import os, sys
+
+pid = sys.argv[1]
+listen_locals_v4 = {"0100007F:1388", "00000000:1388"}
+listen_locals_v6 = {
+    "00000000000000000000000001000000:1388",
+    "00000000000000000000000000000000:1388",
+    "0000000000000000FFFF00000100007F:1388",
+}
+
+inodes = set()
+for path, locals_set in (
+    ("/proc/net/tcp", listen_locals_v4),
+    ("/proc/net/tcp6", listen_locals_v6),
+):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            next(fh, None)
+            for line in fh:
+                parts = line.split()
+                if len(parts) >= 10 and parts[3] == "0A" and parts[1].upper() in locals_set:
+                    inodes.add(f"socket:[{parts[9]}]")
+    except OSError:
+        continue
+
+if not inodes:
+    sys.exit(1)
+
+fd_dir = f"/proc/{pid}/fd"
+try:
+    for entry in os.listdir(fd_dir):
+        try:
+            if os.readlink(os.path.join(fd_dir, entry)) in inodes:
+                sys.exit(0)
+        except OSError:
+            continue
+except OSError:
+    sys.exit(1)
+
+sys.exit(1)
+' "$1"
+}
+
 function __cirquetest_start_flask() {
     echo 'Start Flask'
+    FLASK_PID=""
+    FLASK_CLEANED=0
+    if __cirquetest_port_5000_open; then
+        echo "Port 5000 on 127.0.0.1 is already in use; refusing to probe a stale Flask instance" >&2
+        return 1
+    fi
     cd "$REPO_DIR"/third_party/cirque/repo
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
     # This is not expected. Start a new session to prevent it from receiving signals
-    setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
+    setsid bash -c 'exec env FLASK_APP=cirque/restservice/service.py \
+        FLASK_DEBUG=0 \
         CIRQUE_DOCKER_LABELS="'"$CIRQUE_RUN_LABEL"'" \
         CIRQUE_SKIP_GLOBAL_PRUNE="1" \
         PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
@@ -90,7 +151,8 @@ function __cirquetest_start_flask() {
             echo "Flask process $FLASK_PID exited before becoming ready"
             return 1
         fi
-        if curl -sf --max-time 5 http://127.0.0.1:5000/get_homes >/dev/null 2>&1; then
+        if __cirquetest_pid_owns_port_5000 "$FLASK_PID" \
+            && curl -sf --max-time 5 http://127.0.0.1:5000/get_homes >/dev/null 2>&1; then
             return 0
         fi
         sleep 1
@@ -100,9 +162,14 @@ function __cirquetest_start_flask() {
 }
 
 function __cirquetest_clean_flask() {
+    if [[ "${FLASK_CLEANED:-0}" = "1" ]]; then
+        return 0
+    fi
+    FLASK_CLEANED=1
+    local timed_out="${1:-0}"
     echo "Cleanup Flask pid $FLASK_PID"
     local cid
-    if [[ -n "$DEVICE_LOG_DIR" && -d "$DEVICE_LOG_DIR" ]]; then
+    if [[ "$timed_out" = "1" && -n "$DEVICE_LOG_DIR" && -d "$DEVICE_LOG_DIR" ]]; then
         while IFS= read -r cid; do
             [[ -n "$cid" ]] || continue
             docker logs "$cid" >"$DEVICE_LOG_DIR/timeout_${cid:0:12}.log" 2>&1 || true
@@ -141,13 +208,49 @@ if isinstance(data, (dict, list)):
         wait "$FLASK_PID" 2>/dev/null || true
     fi
     # Remove containers left behind by this run (e.g. when a test timed out
-    # or Flask exited before destroying its home).
-    docker ps -aq --filter "label=$CIRQUE_RUN_LABEL" | xargs -r docker rm -f >/dev/null 2>&1 || true
+    # or Flask exited before destroying its home) along with any non-default
+    # Docker networks attached to them.
+    local labeled_cids net_name
+    local -a networks_to_remove=()
+    labeled_cids=$(docker ps -aq --filter "label=$CIRQUE_RUN_LABEL" 2>/dev/null || true)
+    if [[ -n "$labeled_cids" ]]; then
+        while IFS= read -r net_name; do
+            case "$net_name" in
+                "" | bridge | host | none) ;;
+                *) networks_to_remove+=("$net_name") ;;
+            esac
+        done < <(
+            # shellcheck disable=SC2086
+            docker inspect --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' $labeled_cids 2>/dev/null |
+                tr ' ' '\n' | sort -u || true
+        )
+        # shellcheck disable=SC2086
+        docker rm -f $labeled_cids >/dev/null 2>&1 || true
+        if ((${#networks_to_remove[@]} > 0)); then
+            docker network rm "${networks_to_remove[@]}" >/dev/null 2>&1 || true
+        fi
+    fi
+    FLASK_PID=""
     if [[ -f "$LOG_DIR/$CURRENT_TEST"/flask.log ]]; then
         mv "$LOG_DIR/$CURRENT_TEST"/flask.log "$LOG_DIR/$CURRENT_TEST"/flask.log.old
         cat "$LOG_DIR/$CURRENT_TEST"/flask.log.old | sed 's/\\n/\n/g' | sed 's/\\t/ /g' >"$LOG_DIR/$CURRENT_TEST"/flask.log
         rm "$LOG_DIR/$CURRENT_TEST"/flask.log.old
     fi
+}
+
+function __cirquetest_on_interrupt() {
+    local sig="$1"
+    local child_pid="${2:-}"
+    trap - EXIT INT TERM
+    if [[ -n "$child_pid" ]] && kill -0 "$child_pid" >/dev/null 2>&1; then
+        kill -"$sig" "$child_pid" >/dev/null 2>&1 || true
+        wait "$child_pid" 2>/dev/null || true
+    fi
+    __cirquetest_clean_flask 0
+    if [[ "$sig" = "TERM" ]]; then
+        exit 143
+    fi
+    exit 130
 }
 
 function __cirquetest_build_ot() {
@@ -270,29 +373,41 @@ function cirquetest_run_test() {
     fi
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
     mkdir -p "$DEVICE_LOG_DIR"
+    FLASK_PID=""
+    FLASK_CLEANED=0
+    trap '__cirquetest_on_interrupt INT' INT
+    trap '__cirquetest_on_interrupt TERM' TERM
+    trap '__cirquetest_clean_flask 0' EXIT
     if ! __cirquetest_start_flask; then
+        trap - EXIT INT TERM
         exitcode=1
-        __cirquetest_clean_flask
+        __cirquetest_clean_flask 0
         echo "Test log can be found at $DEVICE_LOG_DIR"
         return 1
     fi
+    local test_child_pid=""
     CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" \
-        timeout --kill-after=30s "${CIRQUE_TEST_TIMEOUT}s" "$TEST_DIR/$test_script.py" "${extra_args[@]}" "$@"
+        timeout --kill-after=30s "${CIRQUE_TEST_TIMEOUT}s" "$TEST_DIR/$test_script.py" "${extra_args[@]}" "$@" &
+    test_child_pid=$!
+    trap '__cirquetest_on_interrupt INT "'"$test_child_pid"'"' INT
+    trap '__cirquetest_on_interrupt TERM "'"$test_child_pid"'"' TERM
+    wait "$test_child_pid"
     exitcode=$?
+    local timed_out=0
     if [[ $exitcode -eq 124 || $exitcode -eq 137 ]]; then
         echo "$CURRENT_TEST timed out after ${CIRQUE_TEST_TIMEOUT}s"
+        timed_out=1
     fi
-    __cirquetest_clean_flask
-    # TODO: Do docker system prune, we cannot filter which container
-    # is created by cirque now. This will be implemented later. Currently, only do this on CI
+    trap - EXIT INT TERM
+    __cirquetest_clean_flask "$timed_out"
 
-    # After test finished, the container is perserved and networks will not be deleted
-    # This is useful when running tests on local workstation, but not for CI.
+    # After test finished, the container is preserved and networks will not be deleted
+    # when running locally, which aids debugging, while CI sets CLEANUP_DOCKER_FOR_CI=1.
     if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker network prune"
-        # Cirque does not attach CIRQUE_DOCKER_LABELS to Docker networks, so
-        # prune unused networks unfiltered after __cirquetest_clean_flask has
-        # removed this run's containers.
+        # Cirque creates HomeLan networks before attaching containers and does not
+        # apply CIRQUE_DOCKER_LABELS to Docker networks, so prune any remaining
+        # unattached networks in CI after __cirquetest_clean_flask removes containers.
         docker network prune -f >/dev/null 2>&1
     fi
     echo "Test log can be found at $DEVICE_LOG_DIR"
