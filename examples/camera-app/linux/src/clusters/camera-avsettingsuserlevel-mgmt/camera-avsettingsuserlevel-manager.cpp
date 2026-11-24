@@ -149,10 +149,10 @@ ViewportLimits GetViewportLimits(const VideoResolutionStruct & streamRes, const 
 
     ViewportLimits limits;
     limits.minWidth  = std::max<int>(static_cast<int>(minResolution.width),
-                                     (static_cast<int>(minResolution.height) * streamWidth + streamHeight - 1) / streamHeight);
+                                    (static_cast<int>(minResolution.height) * streamWidth + streamHeight - 1) / streamHeight);
     limits.minHeight = (limits.minWidth * streamHeight + streamWidth - 1) / streamWidth;
     limits.maxWidth  = std::min<int>(static_cast<int>(sensorParms.sensorWidth),
-                                     static_cast<int>(sensorParms.sensorHeight) * streamWidth / streamHeight);
+                                    static_cast<int>(sensorParms.sensorHeight) * streamWidth / streamHeight);
     limits.maxHeight = (limits.maxWidth * streamHeight + streamWidth - 1) / streamWidth;
 
     // A minimum that does not fit inside the sensor at the stream aspect ratio is limited to the
@@ -181,9 +181,9 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
             uint16_t requestedHeight            = aViewport.y2 - aViewport.y1;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
-            const ViewportLimits limits         = GetViewportLimits(stream.videoStreamParams.maxResolution, minResolution, sensorParms);
-            if ((requestedWidth < limits.minWidth) || (requestedHeight < limits.minHeight) ||
-                (requestedWidth > limits.maxWidth) || (requestedHeight > limits.maxHeight))
+            const ViewportLimits limits = GetViewportLimits(stream.videoStreamParams.maxResolution, minResolution, sensorParms);
+            if ((requestedWidth < limits.minWidth) || (requestedHeight < limits.minHeight) || (requestedWidth > limits.maxWidth) ||
+                (requestedHeight > limits.maxHeight))
             {
                 ChipLogError(Camera, "CameraApp: DPTZSetViewport with invalid viewport dimensions");
                 return Status::ConstraintError;
