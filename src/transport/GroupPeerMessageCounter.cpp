@@ -150,8 +150,8 @@ CHIP_ERROR FindOrAddPeerInFabric(GroupFabric & groupFabric, KeysetId keysetId, N
 {
     static_assert(CHIP_CONFIG_MAX_GROUP_DATA_PEERS >= 2 && CHIP_CONFIG_MAX_GROUP_DATA_PEERS <= UINT8_MAX,
                   "CHIP_CONFIG_MAX_GROUP_DATA_PEERS must be in [2, 255]");
-    static_assert(CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS >= 1 && CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS <= UINT8_MAX,
-                  "CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS must be in [1, 255]");
+    static_assert(CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS >= 2 && CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS <= UINT8_MAX,
+                  "CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS must be in [2, 255]");
 
     if (isControl)
     {

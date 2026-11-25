@@ -2374,6 +2374,48 @@ void GroupDataProviderImpl::GroupSessionIteratorImpl::Release()
     mProvider.mGroupSessionsIterator.ReleaseObject(this);
 }
 
+void GroupDataProvider::SetListener(GroupListener * listener)
+{
+    if (listener == nullptr)
+    {
+        return;
+    }
+
+    GroupListener ** freeSlot = nullptr;
+    for (auto & slot : mListeners)
+    {
+        if (slot == listener)
+        {
+            return;
+        }
+        if (slot == nullptr && freeSlot == nullptr)
+        {
+            freeSlot = &slot;
+        }
+    }
+
+    if (freeSlot != nullptr)
+    {
+        *freeSlot = listener;
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "GroupDataProvider: max listeners (%u) reached", static_cast<unsigned>(kMaxListeners));
+    }
+}
+
+void GroupDataProvider::RemoveListener(GroupListener * listener)
+{
+    for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+    {
+        if (listener == mListeners[i])
+        {
+            mListeners[i] = nullptr;
+            return;
+        }
+    }
+}
+
 namespace {
 
 GroupDataProvider * gGroupsProvider = nullptr;

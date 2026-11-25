@@ -26,7 +26,6 @@
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Credentials {
@@ -398,46 +397,8 @@ public:
      * already-registered listener is a no-op; registrations beyond kMaxListeners
      * are logged and ignored.
      */
-    void SetListener(GroupListener * listener)
-    {
-        if (listener == nullptr)
-        {
-            return;
-        }
-
-        GroupListener ** freeSlot = nullptr;
-        for (auto & slot : mListeners)
-        {
-            if (slot == listener)
-            {
-                return;
-            }
-            if (slot == nullptr && freeSlot == nullptr)
-            {
-                freeSlot = &slot;
-            }
-        }
-
-        if (freeSlot != nullptr)
-        {
-            *freeSlot = listener;
-        }
-        else
-        {
-            ChipLogError(NotSpecified, "GroupDataProvider: max listeners (%u) reached", static_cast<unsigned>(kMaxListeners));
-        }
-    }
-    void RemoveListener(GroupListener * listener)
-    {
-        for (size_t i = 0; listener && (i < kMaxListeners); ++i)
-        {
-            if (listener == mListeners[i])
-            {
-                mListeners[i] = nullptr;
-                return;
-            }
-        }
-    }
+    void SetListener(GroupListener * listener);
+    void RemoveListener(GroupListener * listener);
 
     void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
 

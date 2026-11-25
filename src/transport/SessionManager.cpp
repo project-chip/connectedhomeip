@@ -133,11 +133,27 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     // Ensure MessageStats struct is at default state on Init
     mMessageStats = MessageStats();
 
+    mRegisteredGroupProvider = nullptr;
+    EnsureGroupPeerTableListenerRegistered(Credentials::GetGroupDataProvider());
+
     return CHIP_NO_ERROR;
+}
+
+void SessionManager::EnsureGroupPeerTableListenerRegistered(Credentials::GroupDataProvider * groups)
+{
+    if (groups == nullptr || groups == mRegisteredGroupProvider)
+    {
+        return;
+    }
+
+    groups->SetListener(&gGroupPeerTable.get());
+    mRegisteredGroupProvider = groups;
 }
 
 void SessionManager::Shutdown()
 {
+    mRegisteredGroupProvider = nullptr;
+
     if (mFabricTable != nullptr)
     {
         mFabricTable->RemoveFabricDelegate(this);
@@ -1294,7 +1310,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
     Transport::PeerMessageCounter * counter = nullptr;
-    groups->SetListener(&gGroupPeerTable.get());
+    EnsureGroupPeerTableListenerRegistered(groups);
 
     if (CHIP_NO_ERROR ==
         gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, groupContext.keyset_id,
