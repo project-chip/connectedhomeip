@@ -25,7 +25,10 @@
 #include <binding-handler/BindingHandler.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <device/types/device-energy-management/EnergyManagement.h>
+#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/heat-pump/HeatPump.h>
+#include <device/types/power-source/WiredPowerSource.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DeviceInfoProvider.h>
@@ -36,9 +39,21 @@
 namespace chip {
 namespace app {
 
+/// Owns the mandatory Heat Pump parts. A base class of SimulatedHeatPump so the parts are constructed
+/// before HeatPump stores references to them.
+class SimulatedHeatPumpParts
+{
+protected:
+    SimulatedHeatPumpParts(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate);
+
+    WiredPowerSource mPowerSource;
+    EnergyManagement mEnergyManagement;
+    SimulatedElectricalSensor mElectricalSensor;
+};
+
 /// Heat Pump with a simulated grid electrical sensor and Identify on the heat pump endpoint.
 /// ThermostatControl selects how the device meets the Thermostat requirement of the spec.
-class SimulatedHeatPump : public HeatPump
+class SimulatedHeatPump : private SimulatedHeatPumpParts, public HeatPump
 {
 public:
     enum class ThermostatControl : uint8_t
@@ -64,7 +79,7 @@ public:
         BindingHandler & bindingHandler;
     };
 
-    SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl, const Config & config = {});
+    SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl);
     ~SimulatedHeatPump() override = default;
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;

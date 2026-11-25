@@ -34,13 +34,9 @@ const EndpointComposition::SemanticTag kGridPowerSourceTag[] = {
 
 } // namespace
 
-HeatPump::HeatPump(const Config & config, Parts parts) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHeatPump, 1)), mConfig(config),
-    mPowerSource(std::move(parts.powerSource)), mEnergyManagement(std::move(parts.energyManagement)),
-    mElectricalSensor(std::move(parts.electricalSensor))
-{
-    VerifyOrDie(mPowerSource != nullptr && mEnergyManagement != nullptr && mElectricalSensor != nullptr);
-}
+HeatPump::HeatPump(const Parts & parts) :
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHeatPump, 1)), mParts(parts)
+{}
 
 CHIP_ERROR HeatPump::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                               EndpointComposition composition)
@@ -51,9 +47,9 @@ CHIP_ERROR HeatPump::Register(EndpointIdAllocator & allocator, CodeDrivenDataMod
 
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    Span<const EndpointComposition::SemanticTag> tags = composition.tagList.empty() ? mConfig.tags : composition.tagList;
     ReturnErrorOnFailure(RegisterDescriptor(
-        endpoint, provider, EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, tags)));
+        endpoint, provider,
+        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
     mEndpointId = endpoint;
 
     ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
@@ -128,27 +124,27 @@ CHIP_ERROR HeatPump::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDa
 {
     const EndpointComposition child = EndpointComposition::WithParent(mEndpointId);
 
-    ReturnErrorOnFailure(mPowerSource->Register(
+    ReturnErrorOnFailure(mParts.powerSource.Register(
         allocator, provider,
         EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(kGridPowerSourceTag))));
-    ReturnErrorOnFailure(mEnergyManagement->Register(allocator, provider, child));
-    ReturnErrorOnFailure(mElectricalSensor->Register(allocator, provider, child));
+    ReturnErrorOnFailure(mParts.energyManagement.Register(allocator, provider, child));
+    ReturnErrorOnFailure(mParts.electricalSensor.Register(allocator, provider, child));
     return CHIP_NO_ERROR;
 }
 
 void HeatPump::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
-    if (mElectricalSensor->GetEndpointId() != kInvalidEndpointId)
+    if (mParts.electricalSensor.GetEndpointId() != kInvalidEndpointId)
     {
-        mElectricalSensor->Unregister(provider);
+        mParts.electricalSensor.Unregister(provider);
     }
-    if (mEnergyManagement->GetEndpointId() != kInvalidEndpointId)
+    if (mParts.energyManagement.GetEndpointId() != kInvalidEndpointId)
     {
-        mEnergyManagement->Unregister(provider);
+        mParts.energyManagement.Unregister(provider);
     }
-    if (mPowerSource->GetEndpointId() != kInvalidEndpointId)
+    if (mParts.powerSource.GetEndpointId() != kInvalidEndpointId)
     {
-        mPowerSource->Unregister(provider);
+        mParts.powerSource.Unregister(provider);
     }
 }
 

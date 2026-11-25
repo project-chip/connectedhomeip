@@ -19,8 +19,6 @@
 #include <device/api/Interface.h>
 #include <device/api/SingleEndpoint.h>
 
-#include <memory>
-
 namespace chip {
 namespace app {
 
@@ -34,20 +32,15 @@ namespace app {
 class HeatPump : public DeviceInterface
 {
 public:
-    struct Config
-    {
-        Span<const EndpointComposition::SemanticTag> tags = {};
-    };
-
-    /// Mandatory endpoints composed under the heat pump endpoint. None may be null.
+    /// Mandatory endpoints composed under the heat pump endpoint. Each part must outlive the HeatPump.
     struct Parts
     {
-        std::unique_ptr<SingleEndpoint> powerSource;
-        std::unique_ptr<SingleEndpoint> energyManagement;
-        std::unique_ptr<SingleEndpoint> electricalSensor;
+        SingleEndpoint & powerSource;
+        SingleEndpoint & energyManagement;
+        SingleEndpoint & electricalSensor;
     };
 
-    HeatPump(const Config & config, Parts parts);
+    explicit HeatPump(const Parts & parts);
     ~HeatPump() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -87,10 +80,7 @@ private:
     void UnregisterParts(CodeDrivenDataModelProvider & provider);
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    const Config mConfig;
-    std::unique_ptr<SingleEndpoint> mPowerSource;
-    std::unique_ptr<SingleEndpoint> mEnergyManagement;
-    std::unique_ptr<SingleEndpoint> mElectricalSensor;
+    const Parts mParts;
 };
 
 } // namespace app

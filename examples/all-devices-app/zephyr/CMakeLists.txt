@@ -87,6 +87,7 @@ endforeach()
 foreach(_variant_key
         FAN
         FLOW_SENSOR
+        HEAT_PUMP
         HUMIDITY_SENSOR
         LIGHT_SENSOR
         OVEN

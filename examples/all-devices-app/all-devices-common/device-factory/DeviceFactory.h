@@ -1203,20 +1203,20 @@ private:
             auto makeHeatPump = [this](SimulatedHeatPump::ThermostatControl thermostatControl,
                                        const EndpointComposition::SemanticTag & tag) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedHeatPump>(
-                    SimulatedHeatPump::Context{
-                        .timerDelegate            = mContext->timerDelegate,
-                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                        .identifyDelegate         = mContext->identifyDelegate,
-                        .fabricTable              = mContext->fabricTable,
-                        .deviceInfoProvider       = mContext->deviceInfoProvider,
-                        .groupDataProvider        = mContext->groupDataProvider,
-                        .platformManager          = mContext->platformManager,
-                        .bindingTable             = mContext->bindingTable,
-                        .bindingManager           = mContext->bindingManager,
-                        .bindingHandler           = mContext->bindingHandler,
-                    },
-                    thermostatControl, SimulatedHeatPump::Config{ .tags = Span(&tag, 1) });
+                return MakeDeviceWithTags<SimulatedHeatPump>(Span(&tag, 1),
+                                                             SimulatedHeatPump::Context{
+                                                                 .timerDelegate            = mContext->timerDelegate,
+                                                                 .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                                                                 .identifyDelegate         = mContext->identifyDelegate,
+                                                                 .fabricTable              = mContext->fabricTable,
+                                                                 .deviceInfoProvider       = mContext->deviceInfoProvider,
+                                                                 .groupDataProvider        = mContext->groupDataProvider,
+                                                                 .platformManager          = mContext->platformManager,
+                                                                 .bindingTable             = mContext->bindingTable,
+                                                                 .bindingManager           = mContext->bindingManager,
+                                                                 .bindingHandler           = mContext->bindingHandler,
+                                                             },
+                                                             thermostatControl);
             };
             RegisterCreator("heat-pump", [makeHeatPump]() {
                 return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint, kHeatPumpTag);

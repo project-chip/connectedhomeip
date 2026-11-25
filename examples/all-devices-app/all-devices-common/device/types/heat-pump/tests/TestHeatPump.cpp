@@ -279,13 +279,14 @@ TEST_F(TestHeatPump, ThermostatClientVariantAddsBindingAndClient)
     EXPECT_TRUE(GetEndpoints(mProvider).empty());
 }
 
-TEST_F(TestHeatPump, ConfigTagsAreExposedOnDescriptor)
+TEST_F(TestHeatPump, CompositionTagsAreExposedOnDescriptor)
 {
     const EndpointComposition::SemanticTag tag = { .namespaceID = 0x08, .tag = 0x02 };
-    SimulatedHeatPump heatPump(MakeContext(), ThermostatControl::kThermostatClient,
-                               SimulatedHeatPump::Config{ .tags = Span(&tag, 1) });
+    SimulatedHeatPump heatPump(MakeContext(), ThermostatControl::kThermostatClient);
     ConsecutiveEndpointIdAllocator allocator;
-    ASSERT_SUCCESS(heatPump.Register(allocator, mProvider));
+    ASSERT_SUCCESS(
+        heatPump.Register(allocator, mProvider,
+                          EndpointComposition(kInvalidEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(&tag, 1))));
 
     EXPECT_TRUE(HasTagList(mProvider, heatPump.GetEndpointId()));
 
@@ -295,13 +296,14 @@ TEST_F(TestHeatPump, ConfigTagsAreExposedOnDescriptor)
 TEST_F(TestHeatPump, RegisterFailsWithoutThermostatEndpointOrClient)
 {
     // The spec requires one or more Thermostat endpoints or a Thermostat client; this heat pump has neither.
-    HeatPump heatPump(
-        HeatPump::Config{},
-        HeatPump::Parts{
-            .powerSource      = std::make_unique<WiredPowerSource>("grid"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc),
-            .energyManagement = std::make_unique<EnergyManagement>(mTimerDelegate),
-            .electricalSensor = std::make_unique<SimulatedElectricalSensor>(mTimerDelegate, mTestEventTriggerDelegate),
-        });
+    WiredPowerSource powerSource("grid"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc);
+    EnergyManagement energyManagement(mTimerDelegate);
+    SimulatedElectricalSensor electricalSensor(mTimerDelegate, mTestEventTriggerDelegate);
+    HeatPump heatPump(HeatPump::Parts{
+        .powerSource      = powerSource,
+        .energyManagement = energyManagement,
+        .electricalSensor = electricalSensor,
+    });
     ConsecutiveEndpointIdAllocator allocator;
 
     EXPECT_EQ(heatPump.Register(allocator, mProvider), CHIP_ERROR_INCORRECT_STATE);
@@ -382,12 +384,19 @@ TEST_F(TestHeatPump, SetpointRaiseLowerAccessorValidatesPayload)
     InMemoryOOBAccessorRegistry registry;
     RegisterOOBAccessors(clientHeatPump, registry);
 
-    // Other endpoints are left to other accessors.
+    // A valid payload is parsed and handed to BindingHandler::Dispatch, which fails because the fixture's
+    // BindingHandler is not initialized.
+    EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, 0, -10).Span()),
+              CHIP_ERROR_INCORRECT_STATE);
+    // Other endpoints and other actions are left to other accessors.
     EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint + 100, 0, 10).Span()),
               CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.HandleAction("UnknownAction"_span, SetpointRaiseLowerPayload(endpoint, 0, 10).Span()), CHIP_ERROR_NOT_FOUND);
     // Mode 3 is outside SetpointRaiseLowerModeEnum (Heat, Cool, Both).
     EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, 3, 10).Span()),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, std::nullopt, 10).Span()),
+              CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, 0, std::nullopt).Span()),
               CHIP_ERROR_INVALID_ARGUMENT);
     clientHeatPump.Unregister(mProvider);

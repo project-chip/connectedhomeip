@@ -19,9 +19,6 @@
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <clusters/Thermostat/ClusterId.h>
 #include <clusters/shared/Enums.h>
-#include <device/types/device-energy-management/EnergyManagement.h>
-#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
-#include <device/types/power-source/WiredPowerSource.h>
 
 namespace chip {
 namespace app {
@@ -69,29 +66,25 @@ private:
     LazyRegisteredServerCluster<Clusters::UserLabelCluster> mUserLabelCluster;
 };
 
-HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context)
-{
-    HeatPump::Parts parts;
-    parts.powerSource =
-        std::make_unique<WiredPowerSource>("Heat pump grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc);
-    parts.energyManagement =
-        std::make_unique<EnergyManagement>(context.timerDelegate,
-                                           EnergyManagement::Config{
-                                               .featureFlags = BitMask<Clusters::DeviceEnergyManagement::Feature>(
-                                                   Clusters::DeviceEnergyManagement::Feature::kPowerAdjustment),
-                                               .esaType        = Clusters::DeviceEnergyManagement::ESATypeEnum::kSpaceHeating,
-                                               .esaCanGenerate = false,
-                                           });
-    parts.electricalSensor = std::make_unique<SimulatedElectricalSensor>(
-        context.timerDelegate, context.testEventTriggerDelegate, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type>(),
-        SimulatedElectricalSensorDelegate::Role::kGrid);
-    return parts;
-}
-
 } // namespace
 
-SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl, const Config & config) :
-    HeatPump(config, MakeParts(context)), mContext(context), mThermostatControl(thermostatControl)
+SimulatedHeatPumpParts::SimulatedHeatPumpParts(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate) :
+    mPowerSource("Heat pump grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc),
+    mEnergyManagement(timerDelegate,
+                      EnergyManagement::Config{
+                          .featureFlags = BitMask<Clusters::DeviceEnergyManagement::Feature>(
+                              Clusters::DeviceEnergyManagement::Feature::kPowerAdjustment),
+                          .esaType        = Clusters::DeviceEnergyManagement::ESATypeEnum::kSpaceHeating,
+                          .esaCanGenerate = false,
+                      }),
+    mElectricalSensor(timerDelegate, testEventTriggerDelegate, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type>(),
+                      SimulatedElectricalSensorDelegate::Role::kGrid)
+{}
+
+SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl) :
+    SimulatedHeatPumpParts(context.timerDelegate, context.testEventTriggerDelegate),
+    HeatPump(Parts{ .powerSource = mPowerSource, .energyManagement = mEnergyManagement, .electricalSensor = mElectricalSensor }),
+    mContext(context), mThermostatControl(thermostatControl)
 {
     if (mThermostatControl == ThermostatControl::kThermostatEndpoint)
     {
