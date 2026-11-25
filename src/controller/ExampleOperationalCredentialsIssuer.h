@@ -135,10 +135,10 @@ private:
     Crypto::P256Keypair mRootIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     uint8_t mIpkEpochKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = {};
-    bool mInitialized              = false;
-    uint32_t mRootIssuerId         = 1;
-    uint32_t mIntermediateIssuerId = 2;
-    uint32_t mNow                  = 0;
+    bool mInitialized                                                    = false;
+    uint32_t mRootIssuerId                                               = 1;
+    uint32_t mIntermediateIssuerId                                       = 2;
+    uint32_t mNow                                                        = 0;
 
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;

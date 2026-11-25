@@ -499,8 +499,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
         ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
 
-        ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex,
-                                                                         mCredIssuerCmds->GetIpkEpochKey(), compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(
+            &sGroupDataProvider, fabricIndex, mCredIssuerCmds->GetIpkEpochKey(), compressed_fabric_id_span));
     }
 
     mCommissioners[identity] = std::move(commissioner);
