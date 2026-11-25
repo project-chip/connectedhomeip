@@ -80,6 +80,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor:increasing",

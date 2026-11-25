@@ -140,3 +140,25 @@ harness machine. The app stays reachable over IP throughout.
 
 Per-Device Credentials are supported. The driver keeps no state across restarts,
 and supports a single network configuration (MaxNetworks is 1).
+
+## 4. On/Off Sensor Integration Coverage
+
+Identify attribute and timer tests (`Test_TC_I_2_1`, `Test_TC_I_2_2`) retain
+all-clusters runs and also run against `--device on-off-sensor:1`.
+`TC_I_2_4.py` adds a sensor run for Identify reporting. Device composition and
+conformance scripts also include dedicated sensor configurations.
+
+`TestOnOffSensor.py` starts a separate all-devices-app light, commissions the
+light onto the sensor's fabric, configures its ACL and the sensor's bindings,
+and verifies On/Off and Identify commands through peer attribute reports.
+The test uses two sensor endpoints to check that Binding lists remain separate.
+
+```bash
+./scripts/tests/local.py python-tests \
+    --test-filter TestOnOffSensor \
+    --override-binary-path ALL_DEVICES_APP ./out/linux-x64-all-devices-clang/all-devices-app
+```
+
+The binding test requires POSIX named pipes and two available Matter ports
+(5540 for the sensor and 5543 for the peer). The test exercises mandatory
+clients without enabling optional sensor clusters or commands.

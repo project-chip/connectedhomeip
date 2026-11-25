@@ -59,7 +59,7 @@ To update or validate this list manually, follow these steps:
 | 13        | Audio Output                                               | 1291 (0x050B) | No                 | No                  |                                                      |
 | 14        | Ballast Configuration                                      | 769 (0x0301)  | No                 | No                  |                                                      |
 | 15        | Basic Information                                          | 40 (0x0028)   | Yes                | Yes                 |                                                      |
-| 16        | Binding                                                    | 30 (0x001E)   | Yes                | Yes                 |                                                      |
+| 16        | Binding                                                    | 30 (0x001E)   | Yes                | Yes                 | On/Off Sensor                                        |
 | 17        | Boolean State                                              | 69 (0x0045)   | Yes                | Yes                 |                                                      |
 | 18        | Boolean State Configuration                                | 128 (0x0080)  | Yes                | No                  |                                                      |
 | 19        | Bridged Device Basic Information                           | 57 (0x0039)   | Yes                | Yes                 |                                                      |
@@ -80,7 +80,7 @@ To update or validate this list manually, follow these steps:
 | 34        | Content App Observer                                       | 1296 (0x0510) | No                 | No                  |                                                      |
 | 35        | Content Control                                            | 1295 (0x050F) | No                 | No                  |                                                      |
 | 36        | Content Launcher                                           | 1290 (0x050A) | No                 | No                  |                                                      |
-| 37        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 |                                                      |
+| 37        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 | On/Off Sensor                                        |
 | 38        | Device Energy Management                                   | 152 (0x0098)  | Yes                | Yes                 |                                                      |
 | 39        | Device Energy Management Mode                              | 159 (0x009F)  | Yes                | No                  | Instance of Mode Base                                |
 | 40        | Diagnostic Logs                                            | 50 (0x0032)   | Yes                | No                  |                                                      |
@@ -111,7 +111,7 @@ To update or validate this list manually, follow these steps:
 | 65        | HEPA Filter Monitoring                                     | 113 (0x0071)  | Yes                | No                  | Alias of Resource Monitoring                         |
 | 66        | Humidistat                                                 | 517 (0x0205)  | Yes                | Yes                 |                                                      |
 | 67        | ICD Management                                             | 70 (0x0046)   | Yes                | Yes                 |                                                      |
-| 68        | Identify                                                   | 3 (0x0003)    | Yes                | Yes                 |                                                      |
+| 68        | Identify                                                   | 3 (0x0003)    | Yes                | Yes                 | On/Off Sensor                                        |
 | 69        | Illuminance Measurement                                    | 1024 (0x0400) | Yes                | Yes                 |                                                      |
 | 70        | Joint Fabric Administrator                                 | 1875 (0x0753) | No                 | No                  |                                                      |
 | 71        | Joint Fabric Datastore                                     | 1874 (0x0752) | No                 | No                  |                                                      |

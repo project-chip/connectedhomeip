@@ -119,6 +119,7 @@ The application supports the following device types (specified via the
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
 -   `on-off-plug-with-sensors`
+-   `on-off-sensor`
 -   `oven`
 -   `oven-2`
 -   `power-source`
@@ -214,6 +215,9 @@ rm -rf /tmp/chip_*
 
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
+
+# On/Off Sensor with mandatory clusters only
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device on-off-sensor:1
 
 # Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
@@ -375,6 +379,26 @@ You can use `chip-tool` as a controller to interact with the `all-devices-app`.
 For detailed instructions on how to build and use `chip-tool` for commissioning
 and sending commands, please refer to the in-project
 [chip-tool documentation](../chip-tool/README.md).
+
+### On/Off Sensor
+
+`--device on-off-sensor:1` exposes the mandatory Identify and Binding servers,
+plus Identify and On/Off clients. Descriptor is provided by the endpoint base.
+The sensor sends commands through bindings using its C++ `SendOn`, `SendOff`,
+`SendToggle`, and `SendIdentify` methods. Optional clusters are not enabled.
+
+On POSIX, use the `--app-pipe` named pipe to send endpoint-scoped client commands:
+
+```json
+{"Name": "SensorOn", "EndpointId": 1}
+{"Name": "SensorOff", "EndpointId": 1}
+{"Name": "SensorToggle", "EndpointId": 1}
+{"Name": "SensorIdentify", "EndpointId": 1, "IdentifyTime": 60}
+```
+
+Configure the sensor's Binding list and the peer's ACL before sending commands.
+`SensorIdentify` takes an unsigned 16-bit duration in seconds; 0 stops identification.
+The actions send commands to bound peers and do not change local attributes.
 
 ### Example Interaction: Chime Device
 

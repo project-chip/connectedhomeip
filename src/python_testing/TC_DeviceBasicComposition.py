@@ -245,6 +245,18 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run22: # Mandatory-only On/Off Sensor
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-sensor:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --tests test_TC_IDM_12_1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
