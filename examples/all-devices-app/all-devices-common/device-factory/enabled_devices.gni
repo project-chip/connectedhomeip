@@ -151,6 +151,10 @@ _available_devices = [
     "GENERIC_SWITCH",
   ],
   [
+    "heat-pump",
+    "HEAT_PUMP",
+  ],
+  [
     "humidity-conditioner",
     "HUMIDITY_CONDITIONER",
   ],

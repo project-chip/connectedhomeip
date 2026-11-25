@@ -27,6 +27,7 @@
 #include <posix/named_pipe/translators/ClosureControllerTranslator.h>
 #include <posix/named_pipe/translators/DoorbellTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
+#include <posix/named_pipe/translators/HeatPumpTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffLightSwitchTranslator.h>
@@ -604,6 +605,48 @@ TEST_F(TestNamedPipeTranslators, OnOffSensorTranslator)
               CHIP_ERROR_INVALID_ARGUMENT);
     mMockAccessor->mResultToReturn = CHIP_ERROR_INCORRECT_STATE;
     EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorOn"})"), mRegistry), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestNamedPipeTranslators, HeatPumpTranslator)
+{
+    HeatPumpTranslator translator;
+    EXPECT_EQ(translator.GetActionNames().size(), 1U);
+
+    Json::Value json = ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 2, "Amount": -15})");
+    EXPECT_EQ(translator.TranslateAndExecute(3, json, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "HeatPumpSetpointRaiseLower");
+
+    TLV::TLVReader reader;
+    reader.Init(mMockAccessor->mLastData.data(), mMockAccessor->mLastData.size());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    TLV::TLVType outerType;
+    ASSERT_EQ(reader.EnterContainer(outerType), CHIP_NO_ERROR);
+    EndpointId endpointId = kInvalidEndpointId;
+    uint8_t mode          = 0;
+    int8_t amount         = 0;
+    ASSERT_EQ(reader.Next(TLV::ContextTag(1)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(endpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Next(TLV::ContextTag(2)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(mode), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Next(TLV::ContextTag(3)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(amount), CHIP_NO_ERROR);
+    EXPECT_EQ(endpointId, 3);
+    EXPECT_EQ(mode, 2);
+    EXPECT_EQ(amount, -15);
+
+    // Amount is an int8 step and Mode a uint8 enum: out-of-range or missing values are rejected.
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 200})"),
+                                             mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(
+                  3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 18446744073709551615})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": -1, "Amount": 5})"),
+                                             mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "UnknownAction"})"), mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestNamedPipeTranslators, ClosureControllerTranslator)

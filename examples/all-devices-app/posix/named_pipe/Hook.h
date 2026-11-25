@@ -27,6 +27,7 @@
 #include <device/types/dimmable-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/doorbell/NamedPipeTranslators.h>
 #include <device/types/electrical-sensor/NamedPipeTranslators.h>
+#include <device/types/heat-pump/impl/NamedPipeTranslators.h>
 #include <device/types/mode-select/NamedPipeTranslators.h>
 #include <device/types/mounted-dimmable-load-control/NamedPipeTranslators.h>
 #include <device/types/mounted-on-off-control/NamedPipeTranslators.h>
