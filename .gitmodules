@@ -174,6 +174,10 @@
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
 	branch = main
 	platforms = cc32xx
+[submodule "third_party/ti_simplelink_sdk/repo_cc35xx"]
+        path = third_party/ti_simplelink_sdk/repo_cc35xx
+        url = https://github.com/TexasInstruments/simplelink-wifi-sdk
+        platforms = cc35xx
 [submodule "third_party/openthread/ot-ti"]
 	path = third_party/openthread/ot-ti
 	url = https://github.com/TexasInstruments/ot-ti.git
