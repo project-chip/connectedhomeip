@@ -259,9 +259,10 @@ class WpaSupplicantMock(TerminableThread):
     and tool need separate interfaces.
 
     Network SSID and password need to be provided when creating the mock.
-    However, as for now, the password is not actually used for anything, so
-    any password will work and allow to perform AP association. During the
-    association process, between the "associated" and "completed" states,
+    During association, the mock validates the configured SSID and password:
+    an SSID mismatch leaves the interface in the "scanning" state, and a
+    password mismatch disconnects with `-WLAN_REASON_IEEE_802_1X_AUTH_FAILED`.
+    On matching credentials, between the "associated" and "completed" states,
     the provided IsolatedNetworkNamespace instance is used to bring up the
     link to simulate network connectivity.
 
@@ -445,6 +446,14 @@ class WpaSupplicantMock(TerminableThread):
             await self.Scanning.set_async(True)
             asyncio.create_task(scan())
 
+        @staticmethod
+        def _decode_credential(key: str, value: Any) -> str:
+            if isinstance(value, (bytes, bytearray)):
+                return value.decode("utf-8", errors="replace")
+            if isinstance(value, str):
+                return value
+            raise TypeError(f"Expected str or bytes for '{key}', got {type(value).__name__}")
+
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
             self.calls.append("AddNetwork")
@@ -453,19 +462,13 @@ class WpaSupplicantMock(TerminableThread):
                 raise WpaSupplicantMock.UnknownError("Injected AddNetwork failure")
             extracted = self._extract_variant_dict(args)
             if "ssid" in extracted:
-                ssid = extracted["ssid"]
-                if isinstance(ssid, (bytes, bytearray)):
-                    ssid = ssid.decode("utf-8", errors="replace")
-                self.configured_ssid = str(ssid).strip('"')
+                self.configured_ssid = self._decode_credential("ssid", extracted["ssid"])
                 self.network.ssid = self.configured_ssid
             else:
                 self.configured_ssid = None
                 self.network.ssid = getattr(self.mock, "ssid", "")
             if "psk" in extracted:
-                psk = extracted["psk"]
-                if isinstance(psk, (bytes, bytearray)):
-                    psk = psk.decode("utf-8", errors="replace")
-                self.configured_psk = str(psk).strip('"')
+                self.configured_psk = self._decode_credential("psk", extracted["psk"])
             else:
                 self.configured_psk = None
             return self.network.path
@@ -530,6 +533,7 @@ class WpaSupplicantMock(TerminableThread):
         async def RemoveNetwork(self, path: str) -> None:
             log.debug("Interface[%d] RemoveNetwork: path=%s", self.index, path)
             self.calls.append("RemoveNetwork")
+            self._associate_task = None
             await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
             self.configured_ssid = None
@@ -540,6 +544,7 @@ class WpaSupplicantMock(TerminableThread):
         async def RemoveAllNetworks(self) -> None:
             log.debug("Interface[%d] RemoveAllNetworks", self.index)
             self.calls.append("RemoveAllNetworks")
+            self._associate_task = None
             await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
             self.configured_ssid = None

@@ -555,8 +555,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         log.info(
             "Running python script to commission device on a pre-existing fabric and "
             "open commissioning window...")
-        log.info("Command: %s", ' '.join(commission_command))
         commission_command = [*test_command_prefix, *commission_command]
+        log.info("Command: %s", ' '.join(commission_command))
         commission_proc = Subprocess(commission_command[0], *commission_command[1:],
                                      output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
         commission_proc.start()

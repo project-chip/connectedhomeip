@@ -114,6 +114,18 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(interface.configured_psk)
         self.assertEqual(interface.network.ssid, "MatterAP")
 
+    async def test_add_network_preserves_quotes_and_rejects_invalid_types(self):
+        mock = SimpleNamespace(ssid="MatterAP", password="MatterAPPassword")
+        interface = WpaSupplicantMock.WpaInterface(mock, 0)
+
+        await interface.AddNetwork({"ssid": ("s", '"QuotedSSID"'), "psk": ("ay", b'"secret"')})
+        self.assertEqual(interface.configured_ssid, '"QuotedSSID"')
+        self.assertEqual(interface.configured_psk, '"secret"')
+        self.assertEqual(interface.network.ssid, '"QuotedSSID"')
+
+        with self.assertRaises(TypeError):
+            await interface.AddNetwork({"psk": ("i", 123)})
+
 
 if __name__ == "__main__":
     unittest.main()
