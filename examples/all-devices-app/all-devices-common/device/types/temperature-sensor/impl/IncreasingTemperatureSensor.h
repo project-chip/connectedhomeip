@@ -28,9 +28,9 @@ namespace app {
 /**
  * Simulated temperature sensor that increases the reported temperature over time.
  */
-class IncreasingTemperatureSensor : public TemperatureSensor,
+class IncreasingTemperatureSensor : public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
                                     public TimerContext,
-                                    public Clusters::ThermostatUserInterfaceConfiguration::Delegate
+                                    public TemperatureSensor
 {
 public:
     IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
@@ -53,7 +53,6 @@ protected:
     void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    DataModel::Nullable<int16_t> mTemperatureMeasuredValue;
     LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 

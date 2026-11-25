@@ -312,8 +312,9 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
     SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributeList, listSize));
 
     writeClient = Platform::New<app::WriteClient>(
-        device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
+        device->GetExchangeManager(), callback->GetChunkedWriteCallback(), device->GetSecureSession().Value(),
         convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
+    VerifyOrExit(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -492,7 +493,9 @@ CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jl
         goto exit;
     }
 
-    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                                      timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
     config.SetRemoteMaxPathsPerInvoke(device->GetSecureSession().Value()->GetRemoteSessionParameters().GetMaxPathsPerInvoke());
     SuccessOrExit(err = commandSender->SetCommandSenderConfig(config));
 
@@ -702,7 +705,9 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                                      timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));

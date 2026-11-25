@@ -64,6 +64,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/doorbell/Doorbell.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/ElectricalEnergyTariff.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
@@ -129,6 +131,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/PanelElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SolarPowerVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
@@ -214,6 +221,7 @@ foreach(_key
         dimmable-plug-in-unit
         dishwasher
         doorbell
+        electrical-energy-tariff
         electrical-sensor
         extended-color-light
         extractor-hood
@@ -245,6 +253,7 @@ foreach(_key
         room-air-conditioner
         smoke-co-alarm
         soil-sensor
+        solar-power
         speaker
         temperature-sensor
         thermostat

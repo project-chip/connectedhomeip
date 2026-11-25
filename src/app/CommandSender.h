@@ -34,6 +34,7 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/PendingResponseTrackerImpl.h>
+#include <app/RequestSession.h>
 #include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -314,23 +315,41 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
-     * If used in a groups setting, callbacks do not need to be passed.
-     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
+     * Group requests do not require callbacks. When provided, only OnDone is called for group requests.
+     *
+     * aSession identifies the destination used to encode the invoke. The SessionHandle reference is read only
+     * during construction. A unicast session is retained until completion or destruction; group requests
+     * copy the group ID and fabric index without retaining the group session.
+     *   - Passing the session allows CommandSender to optimize the encoding of the request based on
+     *     the information available from the session.
+     *   - Passing std::nullopt keeps an encoding that every receiver accepts. Use it when the session is not
+     *     known at construction time.
+     *   - Unicast must be sent on the same session as the one passed to the constructor, if a session was passed to the
+     * constructor.
+     *   - Groupcast must use the same group ID and fabric index as the session passed to the constructor, if a session was passed
+     * to the constructor.
+     *   - A mismatched destination when sending fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *   - An unavailable or released construction session causes encoding and sending to fail with
+     *     CHIP_ERROR_INCORRECT_STATE. A newer CASE session does not replace the construction session.
+     *   - A timed invoke cannot be sent on a group session: adding a command to a timed CommandSender created
+     *     for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
-    CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, const OptionalSessionHandleRef & aSession,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false);
+    CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, const OptionalSessionHandleRef & aSession,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aSession, aIsTimedRequest, aSuppressResponse,
+                      aAllowLargePayload)
     {}
-    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                  const OptionalSessionHandleRef & aSession, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
-                  bool aAllowLargePayload = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
+                  const OptionalSessionHandleRef & aSession, PendingResponseTracker * apPendingResponseTracker,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aSession, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -507,6 +526,7 @@ public:
     CHIP_ERROR SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout = NullOptional);
 
     // Sends a queued up group command request to the target encapsulated by the secureSession handle.
+    // Timed invokes are rejected with CHIP_ERROR_INVALID_ARGUMENT.
     //
     // If this function is successful, it will invoke the OnDone callback before returning to indicate
     // to the application that it can destroy and free this object.
@@ -673,6 +693,8 @@ private:
     uint16_t mInvokeResponseMessageCount = 0;
     uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
+
+    RequestSession mRequestSession;
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;

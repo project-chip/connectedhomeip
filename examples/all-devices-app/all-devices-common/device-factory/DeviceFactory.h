@@ -44,6 +44,7 @@
 #include <device/types/dimmable-plug-in-unit/impl/LoggingDimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/doorbell/Doorbell.h>
+#include <device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/impl/LoggingExtractorHood.h>
@@ -83,6 +84,7 @@
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
+#include <device/types/solar-power/impl/SolarPowerVariants.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -97,6 +99,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -314,6 +317,7 @@ public:
         BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     static DeviceFactory & GetInstance()
@@ -919,6 +923,23 @@ private:
                                                                         kDefaultSoilTemperatureConfig);
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_SOLAR_POWER)
+        {
+            for (const auto & variant : SolarPowerVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedSolarPower>(
+                        SimulatedSolarPower::Context{
+                            .timerDelegate            = mContext->timerDelegate,
+                            .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                            .fabricTable              = mContext->fabricTable,
+                            .deviceInfoProvider       = mContext->deviceInfoProvider,
+                        },
+                        makeConfig());
+                });
+            }
+        }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
@@ -980,6 +1001,13 @@ private:
                 });
             });
             RegisterAlias("thread-border-router", "thread-border-router-simulated");
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_ENERGY_TARIFF)
+        {
+            RegisterCreator("electrical-energy-tariff", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedElectricalEnergyTariff>();
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {

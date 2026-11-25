@@ -185,7 +185,7 @@ private:
         return mSendResultAfterRecording;
     }
 
-    CommandSender mSender{ nullptr, nullptr };
+    CommandSender mSender{ nullptr, nullptr, std::nullopt };
 };
 
 constexpr uint16_t kVideoStreamId = 42;
@@ -476,9 +476,11 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     RecordingCallback mCallback;
     FakePeerDelegate mPeerDelegate;
     StubRequestorDelegate mRequestorDelegate;
+    FabricTable mFabricTable;
     // Not endpoint 1: the offer's OriginatingEndpointID must come from this registration and not
     // from a plausible default
-    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate };
+    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate,
+                                                                                 mFabricTable };
     // Declared last: the client's destructor cancels through the delegate and the requestor
     // cluster, so they must still be alive. InterceptingWebRTCClient overrides EstablishSession.
     InterceptingWebRTCClient mClient;
@@ -1028,7 +1030,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CallbacksOfAnotherSenderAreIgnored)
     mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
 
     // A sender this request never used speaks up: none of it is this request's outcome
-    CommandSender stranger{ nullptr, nullptr };
+    CommandSender stranger{ nullptr, nullptr, std::nullopt };
     FeedOfferResponseFrom(&stranger, 99, kVideoStreamId);
     mClient.OnError(&stranger, StatusIB(Status::ResourceExhausted).ToChipError());
     mClient.OnDone(&stranger);

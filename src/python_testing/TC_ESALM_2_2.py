@@ -110,7 +110,7 @@ class TC_ESALM_2_2(MatterTestCommissionedDevice):
         return "[TC-ESALM-2.2] AdjustableThresholds feature functionality with Server as DUT"
 
     def pics_TC_ESALM_2_2(self) -> list[str]:
-        return ["ESALM.S", "ESALM.S.F20"]
+        return ["ESALM.S", "ESALM.S.F14"]
 
     def _pair_steps(self, base: int, over: str, under: str) -> list[TestStep]:
         """The fourteen steps of esalm_threshold_testcase.adoc, starting at `base`."""

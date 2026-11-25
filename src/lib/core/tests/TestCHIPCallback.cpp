@@ -646,6 +646,33 @@ TEST_F(TestCHIPCallback, OwnedInvokesTheCallbackDirectly)
     EXPECT_TRUE(acceptor.IsEmpty());
 }
 
+// A single-outcome callee unregisters the callback before invoking it and touches it no further,
+// so the caller may destroy the callback from within its own invocation.
+TEST_F(TestCHIPCallback, CallbackDestroyedFromWithinItsInvocation)
+{
+    struct SelfDeletingCallback : public Callback<>
+    {
+        int * mCounter;
+        explicit SelfDeletingCallback(int * counter) : Callback(&Run, this), mCounter(counter) {}
+        static void Run(void * context)
+        {
+            auto * self = static_cast<SelfDeletingCallback *>(context);
+            ++*self->mCounter;
+            chip::Platform::Delete(self);
+        }
+    };
+
+    int n = 0;
+    Acceptor::AcceptAndComplete(chip::Platform::New<SelfDeletingCallback>(&n));
+    EXPECT_EQ(n, 1);
+
+    Acceptor acceptor;
+    acceptor.Accept(chip::Platform::New<SelfDeletingCallback>(&n));
+    acceptor.InvokeAll();
+    EXPECT_EQ(n, 2);
+    EXPECT_TRUE(acceptor.IsEmpty());
+}
+
 TEST_F(TestCHIPCallback, OwnedOrNullAcceptsAMissingCallback)
 {
     int n = 0;
