@@ -40,7 +40,8 @@ class PendingNotificationContext
 public:
     PendingNotificationContext(void * context, PendingNotificationContextReleaseHandler contextReleaseHandler,
                                PendingCommandFailureHandler failureHandler = nullptr) :
-        mFailureHandler(failureHandler), mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
+        mFailureHandler(failureHandler),
+        mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
     {}
     ~PendingNotificationContext()
     {

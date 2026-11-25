@@ -31,16 +31,16 @@ CHIP_ERROR admission = sensor.SendToggle(options);
 An accepted command reports one completion per matching target. No matching
 bindings means success with no callbacks. Callbacks can run before `Send*`
 returns. The callback context must remain valid until every target completes;
-copy the target if retaining it after the callback. Callbacks may submit commands,
-but must not modify the binding table during dispatch.
+copy the target if retaining it after the callback. Callbacks may submit
+commands, but must not modify the binding table during dispatch.
 
 Unicast success means a successful Invoke response. Group success means the
-local group send succeeded; receivers do not acknowledge group commands.
-Pending CASE work expires after 30 seconds by default and cannot be sent after
-expiry. Removing a pending binding or its fabric reports `CHIP_ERROR_CANCELLED`.
-The separate response timeout also defaults to 30 seconds. A response timeout
-can occur after a peer executed the command, so callers must not automatically
-retry Toggle. No cancellation handle or FIFO command queue is provided.
+local group send succeeded; receivers do not acknowledge group commands. Pending
+CASE work expires after 30 seconds by default and cannot be sent after expiry.
+Removing a pending binding or its fabric reports `CHIP_ERROR_CANCELLED`. The
+separate response timeout also defaults to 30 seconds. A response timeout can
+occur after a peer executed the command, so callers must not automatically retry
+Toggle. No cancellation handle or FIFO command queue is provided.
 
 ## Running
 
