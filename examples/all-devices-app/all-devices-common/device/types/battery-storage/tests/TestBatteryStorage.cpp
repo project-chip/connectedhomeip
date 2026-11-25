@@ -321,9 +321,10 @@ TEST_F(BatteryStorageTestFixture, UsesInjectedSensorConfigurationsAndDelegates)
     using namespace Clusters::ElectricalPowerMeasurement;
     FixedElectricalReadings grid(PowerModeEnum::kAc, 230'000);
     FixedElectricalReadings battery(PowerModeEnum::kDc, 48'000);
-    ConfiguredBatteryStorage device({ .timerDelegate           = mTimerDelegate,
-                                      .gridElectricalSensor    = grid.GetConfig(mTimerDelegate, Feature::kAlternatingCurrent),
-                                      .batteryElectricalSensor = battery.GetConfig(mTimerDelegate, Feature::kDirectCurrent) });
+    ConfiguredBatteryStorage device({ .timerDelegate            = mTimerDelegate,
+                                      .testEventTriggerDelegate = mTestEventTriggerDelegate,
+                                      .gridElectricalSensor     = grid.GetConfig(mTimerDelegate, Feature::kAlternatingCurrent),
+                                      .batteryElectricalSensor  = battery.GetConfig(mTimerDelegate, Feature::kDirectCurrent) });
     ConsecutiveEndpointIdAllocator allocator;
     ASSERT_SUCCESS(device.Register(allocator, mProvider));
     ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));

@@ -88,6 +88,11 @@ public:
     const BitFlags<DeviceEnergyManagement::Feature> & Features() const { return mFeatureFlags; }
     DeviceEnergyManagement::Delegate & GetDelegate() { return mDelegate; }
 
+    /// The delegate decides when a power adjustment starts and ends, so the delegate (or the application) calls
+    /// these to emit the corresponding events. No event is emitted before Startup or after Shutdown.
+    void GenerateEvent(const DeviceEnergyManagement::Events::PowerAdjustStart::Type & event);
+    void GenerateEvent(const DeviceEnergyManagement::Events::PowerAdjustEnd::Type & event);
+
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

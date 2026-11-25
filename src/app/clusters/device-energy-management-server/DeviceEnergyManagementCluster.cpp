@@ -272,6 +272,18 @@ CHIP_ERROR DeviceEnergyManagementCluster::AcceptedCommands(const ConcreteCluster
     return CHIP_NO_ERROR;
 }
 
+void DeviceEnergyManagementCluster::GenerateEvent(const DeviceEnergyManagement::Events::PowerAdjustStart::Type & event)
+{
+    VerifyOrReturn(mContext != nullptr, ChipLogError(Zcl, "DEM: cluster not started, cannot generate PowerAdjustStart"));
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+void DeviceEnergyManagementCluster::GenerateEvent(const DeviceEnergyManagement::Events::PowerAdjustEnd::Type & event)
+{
+    VerifyOrReturn(mContext != nullptr, ChipLogError(Zcl, "DEM: cluster not started, cannot generate PowerAdjustEnd"));
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::AdjustmentCauseEnum adjustmentCause)
 {
