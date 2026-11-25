@@ -38,7 +38,8 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
-  private static final long BROWSE_SERVICE_TIMEOUT = 15000;
+  private static final long BROWSE_SERVICE_TIMEOUT =
+      Long.getLong("matter.casting.browseTimeoutMs", 5000L);
   private static final long RESOLVE_SERVICE_TIMEOUT = 15000;
 
   private static CastingApp sInstance;
@@ -90,7 +91,8 @@ public final class CastingApp {
     if (err.hasError()) {
       Log.e(
           TAG,
-          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on"
+              + " AndroidChipPlatform");
       return err;
     }
 
@@ -125,7 +127,8 @@ public final class CastingApp {
     if (!updated) {
       Log.e(
           TAG,
-          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to"
+              + " updateCommissionableDataProviderData() on AndroidChipPlatform");
       return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
     }
     return MatterError.NO_ERROR;
@@ -176,7 +179,9 @@ public final class CastingApp {
     return MatterError.NO_ERROR;
   }
 
-  /** @brief Tears down all active subscriptions. */
+  /**
+   * @brief Tears down all active subscriptions.
+   */
   public native MatterError shutdownAllSubscriptions();
 
   /**

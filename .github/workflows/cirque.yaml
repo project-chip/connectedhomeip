@@ -145,6 +145,7 @@ jobs:
         name: Cirque Android APKs
 
         runs-on: ubuntu-latest
+        timeout-minutes: 60
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -187,6 +188,7 @@ jobs:
             GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
+        timeout-minutes: 90
         if: github.actor != 'restyled-io[bot]'
 
         steps:
@@ -249,19 +251,20 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Build Binaries
-              run: |
-                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
-                    -- sh -c " \
-                       git config --global --add safe.directory '*' \
-                       && scripts/build/gn_gen_cirque.sh \
-                      "
             - name: Download Android APKs
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
               if: ${{ !env.ACT }}
               with:
                   name: cirque-android-apks
                   path: out
+            - name: Build Binaries
+              run: |
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/build/gn_gen_cirque.sh \
+                       && chown -R $(id -u):$(id -g) out \
+                      "
             - name: Set up Android emulator
               run: |
                   ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" \

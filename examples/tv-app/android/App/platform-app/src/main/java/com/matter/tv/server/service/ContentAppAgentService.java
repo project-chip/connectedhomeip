@@ -15,6 +15,7 @@ import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -83,11 +84,10 @@ public class ContentAppAgentService extends Service {
             // Make this call async so that even if the content apps make this call during command
             // processing and synchronously, the command processing thread will not block for the
             // chip stack lock.
-            executorService.execute(
-                () -> {
-                  AppPlatformService.get()
-                      .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
-                });
+            executorService.execute(() -> {
+              AppPlatformService.get()
+                  .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+            });
             return true;
           }
           Log.e(TAG, "No matter content app found for package " + pkg);
@@ -211,15 +211,24 @@ public class ContentAppAgentService extends Service {
     ackBackIntent.putExtra(EXTRA_RESPONSE_RECEIVING_PACKAGE, targetPackage);
     ackBackIntent.putExtra(EXTRA_RESPONSE_ID, responseId);
     return PendingIntent.getService(
-        context, 0, ackBackIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_MUTABLE);
+        context,
+        responseId,
+        ackBackIntent,
+        PendingIntent.FLAG_ONE_SHOT
+            | PendingIntent.FLAG_UPDATE_CURRENT
+            | PendingIntent.FLAG_MUTABLE);
   }
 
   @Override
   public int onStartCommand(final Intent intent, final int flags, final int startId) {
     if (intent != null && ACTION_MATTER_RESPONSE.equals(intent.getAction())) {
-      String response =
-          new String(intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD));
+      byte[] rawBytes = intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD);
       int messageId = intent.getIntExtra(EXTRA_RESPONSE_ID, Integer.MAX_VALUE);
+      if (rawBytes == null) {
+        Log.w(TAG, "Ignoring empty command response for message " + messageId);
+        return START_NOT_STICKY;
+      }
+      String response = new String(rawBytes, StandardCharsets.UTF_8);
       Log.d(TAG, "Response " + response + " received for message " + messageId);
       responseRegistry.receivedMessageResponse(messageId, response);
     }

@@ -26,8 +26,8 @@ from dataclasses import dataclass
 
 from cirque.virtual_wifi.lease import wait_for_device_wlan0_ipv4
 from helper.AndroidCirqueTestBase import (CHIPTOOL_FULL_LOGCAT_DUMP_CMD, DEFAULT_ANDROID_RUNNER_IMAGE, DEFAULT_BOOT_TIMEOUT_SEC,
-                                          DEFAULT_COMMISSION_TIMEOUT_SEC, AndroidCirqueTestBase, CommissioningInteractionResult,
-                                          check_android_preconditions)
+                                          DEFAULT_CIRQUE_URL, DEFAULT_COMMISSION_TIMEOUT_SEC, REQUEST_TIMEOUT_SEC,
+                                          AndroidCirqueTestBase, CommissioningInteractionResult, check_android_preconditions)
 from helper.paths import CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CHIP_TOOL_APK_PATH
 
 logger = logging.getLogger('AndroidBleThreadMobileDeviceTest')
@@ -37,7 +37,7 @@ sh = logging.StreamHandler()
 sh.setFormatter(logging.Formatter('%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CIRQUE_URL = 'http://localhost:5000'
+CIRQUE_URL = DEFAULT_CIRQUE_URL
 TEST_WIFI_SSID = 'CHIP-VirtualWiFi-AP'
 TEST_WIFI_PSK = 'ChipWiFiPassword123'
 TEST_EXTPANID = '1111111122222222'
@@ -106,8 +106,8 @@ EXPECTED_BLE_THREAD_DEVICE_MARKERS = [
 #     the ThreadBorderRouter runs `otbr-agent -I wpan0 -B wlan0` and publishes
 #     SRP services via OpenThread's native SRP Advertising Proxy over Avahi.
 #   - Android IPv6 routing: static fd11:22::3/64 nodad on wlan0;
-#     fdde:ad00:beef:0::/64 via fd11:22::2 in the main, wlan0 and eth0
-#     routing tables; ff02::fb/128 dev wlan0 in table eth0.
+#     fdde:ad00:beef:0::/64 and fd11:33::/64 via fd11:22::2 in the main, wlan0
+#     and eth0 routing tables; ff02::fb/128 dev wlan0 in table eth0.
 #   - CHIPEndDevice routing: chip-cirque-device-base v2 builds otbr-agent with
 #     OT_POSIX_INSTALL_EXTERNAL_ROUTES=ON so Network Data external routes are
 #     installed automatically; `fd11:22::/64 dev wpan0` is retained as a
@@ -130,7 +130,7 @@ def sh(cmd):
   for _ in range(3):
     try:
       raw = subprocess.check_output(
-          cmd, shell=True, stderr=subprocess.STDOUT
+          cmd, shell=True, stderr=subprocess.STDOUT, timeout=10
       )
       out = raw.decode("utf-8").strip()
       if "Connection reset by peer" not in out:
@@ -305,6 +305,16 @@ def _diag_spec_for_device(dev_type: str) -> tuple[tuple[str, ...], str] | None:
     return None
 
 
+def _strip_otctl_done(raw: str) -> str:
+    """Extracts the first payload line from ot-ctl output, stripping trailing Done."""
+    lines = [
+        line.strip()
+        for line in raw.splitlines()
+        if line.strip() and line.strip() != 'Done' and not line.strip().startswith('Error ')
+    ]
+    return lines[0] if lines else ''
+
+
 class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
 
     ONOFF_LOGCAT_CMD = CHIPTOOL_FULL_LOGCAT_DUMP_CMD
@@ -316,17 +326,29 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
     def _check_preconditions(self) -> bool:
         return _check_android_preconditions()
 
-    def _save_suite_diagnostics(self, timestamp: int, deadline=None) -> None:
-        self._save_thread_diagnostics(timestamp, deadline=deadline)
+    def _save_suite_diagnostics(
+        self, timestamp: int, timeout: float = REQUEST_TIMEOUT_SEC, deadline=None
+    ) -> None:
+        self._save_thread_diagnostics(timestamp, timeout=timeout, deadline=deadline)
 
-    def _collect_node_diag_chunks(self, dev_id: str, cmds: tuple[str, ...], deadline=None) -> list[bytes]:
+    def _collect_node_diag_chunks(
+        self, dev_id: str, cmds: tuple[str, ...], timeout: float = 15.0, deadline=None
+    ) -> list[bytes]:
         chunks: list[bytes] = []
+        per_cmd_timeout = min(timeout, 15.0)
         for cmd in cmds:
             if deadline is not None and time.monotonic() >= deadline:
                 break
             try:
-                resp = self.execute_device_cmd(dev_id, f'sh -c "{cmd} 2>&1"', stream=True)
-                out = resp.content if hasattr(resp, 'content') else b''
+                raw = self.query_api(
+                    'device_cmd',
+                    [self.home_id, dev_id, f'sh -c "{cmd} 2>&1"'],
+                    binary=True,
+                    timeout=per_cmd_timeout,
+                    deadline=deadline,
+                    params={'stream': True},
+                )
+                out = raw if isinstance(raw, bytes) else bytes(raw)
             except Exception as exc:  # pylint: disable=broad-except
                 out = f'<command failed: {exc}>'.encode()
             chunks.append(f'=== {cmd} ===\n'.encode() + out + b'\n')
@@ -340,7 +362,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         except OSError as exc:
             self.logger.warning('Failed to save %s: %s', f_name, exc)
 
-    def _save_thread_diagnostics(self, timestamp, deadline=None):
+    def _save_thread_diagnostics(self, timestamp, timeout: float = REQUEST_TIMEOUT_SEC, deadline=None):
         """Saves Thread data-path state of each node into DEVICE_LOG_DIR."""
         log_dir = os.environ.get('DEVICE_LOG_DIR')
         if not log_dir:
@@ -354,7 +376,9 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             if spec is None:
                 continue
             cmds, suffix = spec
-            chunks = self._collect_node_diag_chunks(device['id'], cmds, deadline=deadline)
+            chunks = self._collect_node_diag_chunks(
+                device['id'], cmds, timeout=timeout, deadline=deadline
+            )
             if chunks:
                 f_name = f'{dev_type}-{timestamp}-{device["id"][:8]}-{suffix}.log'
                 self._write_thread_diag_file(log_dir, f_name, chunks)
@@ -378,11 +402,10 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             dev_id,
             'sh -c "ip addr flush dev eth0 2>/dev/null || true;'
             ' ip link set eth0 down 2>/dev/null || true;'
-            ' killall avahi-daemon dbus-daemon 2>/dev/null || true;'
+            ' kill -9 $(pidof avahi-daemon dbus-daemon 2>/dev/null) 2>/dev/null || true;'
+            ' rm -f /var/run/avahi-daemon/pid /var/run/dbus/pid 2>/dev/null || true;'
             ' mkdir -p /var/run/dbus;'
-            ' dbus-daemon --system 2>/dev/null || true;'
-            ' sleep 1;'
-            ' avahi-daemon --no-drop-root -D 2>/dev/null || true;'
+            ' dbus-daemon --system --fork 2>/dev/null || true;'
             ' sysctl -w net.ipv6.conf.all.forwarding=1 >/dev/null 2>&1 || true;'
             ' sysctl -w net.ipv6.conf.vwifi_phy.disable_ipv6=1 >/dev/null 2>&1 || true;'
             ' ip addr flush dev vwifi_phy 2>/dev/null || true"',
@@ -404,10 +427,10 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             " '/^\\[server\\]/a disable-unicast-responses=yes'"
             ' /etc/avahi/avahi-daemon.conf; mkdir -p /var/run/dbus; if ! pidof'
             ' dbus-daemon >/dev/null; then dbus-daemon --system --fork'
-            ' 2>/dev/null || true; fi; if ! pidof avahi-daemon >/dev/null; then'
-            ' avahi-daemon --daemonize --no-drop-root 2>/dev/null || true; else'
-            ' kill -HUP $(cat /var/run/avahi-daemon/pid 2>/dev/null)'
             ' 2>/dev/null || true; fi;'
+            ' avahi-daemon -k 2>/dev/null || kill -9 $(pidof avahi-daemon 2>/dev/null) 2>/dev/null || true;'
+            ' rm -f /var/run/avahi-daemon/pid 2>/dev/null || true;'
+            ' avahi-daemon --daemonize --no-drop-root 2>/dev/null || true;'
             ' kill -9 $(pidof otbr-agent 2>/dev/null) 2>/dev/null || true;'
             ' sleep 0.5;'
             ' otbr-agent -I wpan0 -B wlan0 -d 6 -v -s'
@@ -429,11 +452,13 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             " s/.*use-ipv6=.*/use-ipv6=yes/' /etc/avahi/avahi-daemon.conf"
             ' 2>/dev/null || true; mkdir -p /var/run/dbus; if ! pidof'
             ' dbus-daemon >/dev/null; then dbus-daemon --system --fork'
-            ' 2>/dev/null || true; fi; if ! pidof avahi-daemon >/dev/null; then'
-            ' avahi-daemon --daemonize --no-drop-root 2>/dev/null || true; else'
-            ' kill -HUP $(cat /var/run/avahi-daemon/pid 2>/dev/null)'
-            ' 2>/dev/null || true; fi; killall -9 ot-rcp otbr-agent 2>/dev/null'
-            ' || true; otbr-agent -I wpan0 spinel+hdlc+uart:///dev/ttyUSB0'
+            ' 2>/dev/null || true; fi;'
+            ' avahi-daemon -k 2>/dev/null || kill -9 $(pidof avahi-daemon 2>/dev/null) 2>/dev/null || true;'
+            ' rm -f /var/run/avahi-daemon/pid 2>/dev/null || true;'
+            ' avahi-daemon --daemonize --no-drop-root 2>/dev/null || true;'
+            ' kill -9 $(pidof ot-rcp otbr-agent 2>/dev/null) 2>/dev/null || true;'
+            ' sleep 0.5;'
+            " otbr-agent -I wpan0 -B eth0 spinel+hdlc+uart:/''/''/dev/ttyUSB0"
             ' >/tmp/otbr-agent.log 2>&1 &"',
         )
 
@@ -541,6 +566,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         return active_dataset
 
     def _start_ble_thread_end_devices(self, server_devices, host_libs_dir=None):
+        self._ensure_host_runtime_libs()
         if host_libs_dir is None:
             host_libs_dir = shlex.quote(f'{CHIP_REPO_STR}/out/host_libs')
         b64_joiner = base64.b64encode(THREAD_END_DEVICE_JOINER_HELPER.encode('utf-8')).decode('ascii')
@@ -588,6 +614,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
                 ['docker', 'ps', '--format', '{{.Names}}'],
                 capture_output=True,
                 text=True,
+                timeout=15,
                 check=False,
             )
             container_name = next(
@@ -598,6 +625,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
                 host_apk_path = f'{CHIP_REPO_STR}/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk'
                 subprocess.run(
                     ['docker', 'cp', host_apk_path, f'{container_name}:/tmp/CHIPTool.apk'],
+                    timeout=30,
                     check=False,
                 )
                 self.logger.info('Copied APK to %s:/tmp/CHIPTool.apk', container_name)
@@ -612,6 +640,10 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         self.execute_device_cmd(
             req_device_id,
             'adb shell su root ip -6 route add fdde:ad00:beef:0::/64 via fd11:22::2 dev wlan0 2>/dev/null || true',
+        )
+        self.execute_device_cmd(
+            req_device_id,
+            'adb shell su root ip -6 route add fd11:33::/64 via fd11:22::2 dev wlan0 2>/dev/null || true',
         )
         time.sleep(1.0)
 
@@ -666,21 +698,30 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             commissioned=comm_ok,
             toggled=toggle_read.toggle_ok,
             read_verified=toggle_read.read_ok,
+            require_toggle_marker=toggle_read.require_toggle_marker,
         )
+
+    def _replace_edit_text_field(self, req_device_id: str, x: int, y: int, text_value: str) -> None:
+        self.execute_device_cmd(req_device_id, f'adb shell input tap {x} {y}')
+        time.sleep(0.3)
+        self.execute_device_cmd(
+            req_device_id,
+            'adb shell "input keyevent 123 && input keyevent 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67"',
+        )
+        time.sleep(0.2)
+        self.execute_device_cmd(req_device_id, f'adb shell input text {shlex.quote(text_value)}')
 
     def _enter_thread_ui_credentials(self, req_device_id: str, tbr_dataset: dict | None) -> None:
         if not tbr_dataset:
             return
         chan = tbr_dataset.get('channel')
-        if chan is not None and str(chan) != '15':
-            self.execute_device_cmd(req_device_id, 'adb shell input tap 540 650')
-            time.sleep(0.5)
-            self.execute_device_cmd(req_device_id, f'adb shell input text {chan}')
+        if chan is not None and str(chan).strip() != '15':
+            self._replace_edit_text_field(req_device_id, 540, 650, str(chan).strip())
         pan = tbr_dataset.get('pan_id')
-        if pan is not None and str(pan) != '1234':
-            self.execute_device_cmd(req_device_id, 'adb shell input tap 540 800')
-            time.sleep(0.5)
-            self.execute_device_cmd(req_device_id, f'adb shell input text {pan}')
+        if pan is not None:
+            pan_hex = str(pan).strip().removeprefix('0x').removeprefix('0X').upper()
+            if pan_hex and pan_hex != '1234':
+                self._replace_edit_text_field(req_device_id, 540, 800, pan_hex)
 
     def _provision_thread_network_via_adb_and_otctl(self, req_device_id, tbr_dataset=None) -> bool:
         self._start_ui_video(req_device_id, '2_ble_thread_commissioning_fallback.mp4')
@@ -697,7 +738,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             self._enter_thread_ui_credentials(req_device_id, tbr_dataset)
             self.execute_device_cmd(req_device_id, 'adb shell input tap 858 2227')
             self.logger.info('Polling adb logcat for Thread commissioning completion...')
-            return self._poll_commissioning_logcat(req_device_id, timeout_sec=60.0)
+            return self._poll_commissioning_logcat(req_device_id, timeout_sec=ANDROID_COMMISSION_TIMEOUT_SEC)
         finally:
             self._stop_ui_video(req_device_id)
 
@@ -708,20 +749,23 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
 
         ld_out = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl leaderdata'))
         part_m = re.search(r'Partition ID:\s*(\d+)', ld_out)
-        rloc_raw = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl rloc16')).strip()
-        rloc16 = rloc_raw.replace('\r', '').replace('\nDone', '').replace('Done', '').strip()
-        net_name = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl networkname')).strip()
-        ext_pan = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl extpanid')).strip()
+        partition_id = part_m.group(1) if part_m else None
+        rloc16 = _strip_otctl_done(self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl rloc16')))
+        net_name = _strip_otctl_done(self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl networkname')))
+        ext_pan = _strip_otctl_done(self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl extpanid')))
+        self.assertTrue(bool(partition_id), f'TBR {tbr_id} missing Partition ID in leaderdata: {ld_out}')
+        self.assertTrue(bool(rloc16), f'TBR {tbr_id} missing RLOC16')
+        self.assertTrue(bool(net_name), f'TBR {tbr_id} missing Thread network name')
+        self.assertTrue(bool(ext_pan), f'TBR {tbr_id} missing Thread Ext PAN ID')
         return ThreadMeshSnapshot(
-            partition_id=part_m.group(1) if part_m else None,
+            partition_id=partition_id,
             rloc16=rloc16,
             network_name=net_name,
             ext_pan_id=ext_pan,
         )
 
     def _assert_tbr_rloc_visible(self, server_id: str, snapshot: ThreadMeshSnapshot) -> None:
-        if not snapshot.rloc16:
-            return
+        self.assertTrue(bool(snapshot.rloc16), 'Expected non-empty TBR RLOC16 in mesh snapshot')
         parent_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl parent'))
         neighbor_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl neighbor table'))
         rlocs = {int(v, 16) for v in re.findall(r'Rloc:\s*([0-9a-fA-F]+)', parent_out)}
@@ -738,16 +782,21 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             end_state in ('child', 'router'),
             f'CHIPEndDevice {server_id} expected child/router state, got {end_state}',
         )
-        if snapshot.has_partition:
-            ld_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl leaderdata'))
-            part_m = re.search(r'Partition ID:\s*(\d+)', ld_out)
-            self.assertEqual(part_m.group(1) if part_m else None, snapshot.partition_id, 'Partition ID mismatch')
-        if snapshot.network_name:
-            nn_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl networkname')).strip()
-            self.assertEqual(nn_out, snapshot.network_name, 'Network name mismatch')
-        if snapshot.ext_pan_id:
-            ep_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl extpanid')).strip()
-            self.assertEqual(ep_out, snapshot.ext_pan_id, 'Extpanid mismatch')
+        self.assertTrue(snapshot.has_partition, 'Expected non-empty TBR Partition ID in mesh snapshot')
+        self.assertTrue(bool(snapshot.network_name), 'Expected non-empty TBR network name in mesh snapshot')
+        self.assertTrue(bool(snapshot.ext_pan_id), 'Expected non-empty TBR Ext PAN ID in mesh snapshot')
+
+        ld_out = self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl leaderdata'))
+        part_m = re.search(r'Partition ID:\s*(\d+)', ld_out)
+        self.assertEqual(part_m.group(1) if part_m else None, snapshot.partition_id, 'Partition ID mismatch')
+
+        nn_out = _strip_otctl_done(self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl networkname')))
+        self.assertTrue(bool(nn_out), f'EndDevice {server_id} returned empty Thread network name')
+        self.assertEqual(nn_out, snapshot.network_name, 'Network name mismatch')
+
+        ep_out = _strip_otctl_done(self._cmd_output_str(self.execute_device_cmd(server_id, 'ot-ctl extpanid')))
+        self.assertTrue(bool(ep_out), f'EndDevice {server_id} returned empty Thread Ext PAN ID')
+        self.assertEqual(ep_out.lower(), snapshot.ext_pan_id.lower(), 'Extpanid mismatch')
         self._assert_tbr_rloc_visible(server_id, snapshot)
 
     def _verify_post_commissioning_thread_state(self, tbr_ids, server_ids):
@@ -792,12 +841,15 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
     def _inject_android_thread_ipv6_routes(self, req_device_id: str) -> None:
         self.logger.info('Android IPv6 Address:')
         self.logger.info(self.execute_device_cmd(req_device_id, 'adb shell ip -6 addr'))
-        self.logger.info('Injecting static route for fdde:ad00:beef:0::/64 on Android')
+        self.logger.info('Injecting static routes for fdde:ad00:beef:0::/64 and fd11:33::/64 on Android')
         route_cmds = (
             'adb shell su root ip -6 addr add fd11:22::3/64 dev wlan0 nodad 2>/dev/null || true',
             'adb shell su root ip -6 route add fdde:ad00:beef:0::/64 via fd11:22::2 dev wlan0 2>/dev/null || true',
             'adb shell su root ip -6 route add fdde:ad00:beef:0::/64 via fd11:22::2 dev wlan0 table wlan0 2>/dev/null || true',
             'adb shell su root ip -6 route add fdde:ad00:beef:0::/64 via fd11:22::2 dev wlan0 table eth0 2>/dev/null || true',
+            'adb shell su root ip -6 route add fd11:33::/64 via fd11:22::2 dev wlan0 2>/dev/null || true',
+            'adb shell su root ip -6 route add fd11:33::/64 via fd11:22::2 dev wlan0 table wlan0 2>/dev/null || true',
+            'adb shell su root ip -6 route add fd11:33::/64 via fd11:22::2 dev wlan0 table eth0 2>/dev/null || true',
             'adb shell su root ip -6 route add ff02::fb/128 dev wlan0 table eth0 2>/dev/null || true',
         )
         for cmd in route_cmds:
@@ -806,8 +858,9 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         self.logger.info(self.execute_device_cmd(req_device_id, 'adb shell ip -6 route'))
         self.logger.info('Pinging TBR fd11:22::2 from Android:')
         self.logger.info(self.execute_device_cmd(req_device_id, 'adb shell ping6 -c 3 fd11:22::2'))
-        self.logger.info('Checking route to EndDevice fdde:ad00:beef:0:: prefix:')
+        self.logger.info('Checking routes to EndDevice Thread prefixes:')
         self.logger.info(self.execute_device_cmd(req_device_id, 'adb shell ip -6 route get fdde:ad00:beef:0:1:2:3:4'))
+        self.logger.info(self.execute_device_cmd(req_device_id, 'adb shell ip -6 route get fd11:33::1'))
 
     def run_android_ble_thread_commissioning_test(self):
         topo = self._resolve_thread_topology()

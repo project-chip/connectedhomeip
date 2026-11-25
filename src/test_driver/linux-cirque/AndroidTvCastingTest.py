@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import copy
 import logging
 import os
 import re
@@ -28,8 +29,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 
 from cirque.nodes.androiddockernode import UiAutomatorHelper
-from helper.AndroidCirqueTestBase import (DEFAULT_BOOT_TIMEOUT_SEC, DEFAULT_COMMISSION_TIMEOUT_SEC, AndroidCirqueTestBase,
-                                          check_android_preconditions)
+from helper.AndroidCirqueTestBase import (DEFAULT_ANDROID_RUNNER_IMAGE, DEFAULT_BOOT_TIMEOUT_SEC, DEFAULT_CIRQUE_URL,
+                                          DEFAULT_COMMISSION_TIMEOUT_SEC, AndroidCirqueTestBase, check_android_preconditions)
 from helper.CHIPTestBase import TestResult
 from helper.paths import CHIP_REPO_STR
 
@@ -40,7 +41,7 @@ sh = logging.StreamHandler()
 sh.setFormatter(logging.Formatter('%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CIRQUE_URL = os.environ.get('CIRQUE_URL', 'http://localhost:5000')
+CIRQUE_URL = DEFAULT_CIRQUE_URL
 TEST_WIFI_SSID = 'CHIP-VirtualWiFi-AP'
 TEST_WIFI_PSK = 'ChipWiFiPassword123'
 
@@ -56,7 +57,7 @@ CONTENT_APP_APK_PATH = os.path.join(
 CASTING_APP_APK_PATH = os.path.join(
     CHIP_REPO_STR, 'out', 'android-x64-tv-casting-app', 'outputs', 'apk', 'debug', 'app-debug.apk'
 )
-ANDROID_RUNNER_IMAGE = os.environ.get('CIRQUE_ANDROID_RUNNER_IMAGE', 'cirque-android-runner:latest')
+ANDROID_RUNNER_IMAGE = DEFAULT_ANDROID_RUNNER_IMAGE
 
 DEVICE_CONFIG = {
     'device0': {
@@ -102,6 +103,34 @@ DEVICE_CONFIG = {
         'mount_pairs': [[CHIP_REPO_STR, CHIP_REPO_STR]],
     },
 }
+
+TV_MDNS_LOGCAT_PATTERN = (
+    r'InitCommissioner|initCommissioner|MdnsAdvertiser|MdnsInterfaceSocket|'
+    r'NsdManagerServiceResolver|publish serviceName=|publish: replacing|'
+    r'by NsdManager|onServiceRegistered|onServiceUnregistered|'
+    r'onRegistrationFailed|_matterd\._udp'
+)
+NSD_PUBLISH_SERVICE_RE = re.compile(
+    r'\bpublish\s+serviceName=(\S+)\s+type=([^\s,]+)'
+)
+NSD_PUBLISH_LISTENER_RE = re.compile(r'\bpublish\s+(\S+@\w+)\s+count\s*=')
+NSD_REPLACING_REG_RE = re.compile(
+    r'\bpublish:\s+replacing\s+changed\s+registration\s+for\s+([^:\s]+):(\S+)'
+)
+NSD_RENAME_SERVICE_RE = re.compile(
+    r"\bservice\s+'([^']+)'\s+was\s+renamed\s+to\s+'([^']+)'\s+by\s+"
+    r'NsdManager\b'
+)
+NSD_REMOVE_LISTENER_RE = re.compile(r'\bRemove\s+(\S+@\w+)\b')
+NSD_SERVICE_REGISTERED_RE = re.compile(
+    r'\bservice\s+([^\r\n(]+?)\(([^()\s]+)\)\s+onServiceRegistered\b'
+)
+NSD_SERVICE_UNREGISTERED_RE = re.compile(
+    r'\bservice\s+([^\r\n(]+?)\(([^()\s]+)\)\s+onServiceUnregistered\b'
+)
+NSD_REGISTRATION_FAILED_RE = re.compile(
+    r'\bservice\s+([^\r\n]+?)\s+onRegistrationFailed\s*:'
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -215,6 +244,48 @@ class _CastingEndpoints:
         ) and _endpoint_matches(udp.dst_ip, udp.dst_mac, expected_ip=self.tv_ip, expected_mac=self.tv_mac)
 
 
+@dataclass(frozen=True, slots=True)
+class _GuestNetSpec:
+    """Snapshotted guest Wi-Fi IPv4 and MAC configuration for an emulator node."""
+
+    ipv4_addr: str | None = None
+    mac_address: str | None = None
+    chiptool_apk: str | None = None
+
+
+def _guest_net_spec_from_entry(entry: object) -> _GuestNetSpec | None:
+    if not isinstance(entry, dict):
+        return None
+    desc = entry.get('description') if isinstance(entry.get('description'), dict) else {}
+    ip4 = entry.get('ipv4_addr') or desc.get('ipv4_addr')
+    mac = entry.get('mac_address') or desc.get('mac_address')
+    apk = entry.get('chiptool_apk') or desc.get('chiptool_apk')
+    if not (ip4 or mac):
+        return None
+    return _GuestNetSpec(
+        ipv4_addr=str(ip4) if ip4 else None,
+        mac_address=str(mac) if mac else None,
+        chiptool_apk=str(apk) if apk else None,
+    )
+
+
+def _snapshot_guest_endpoints(
+    device_config: object,
+) -> tuple[dict[str, _GuestNetSpec], dict[str, _GuestNetSpec]]:
+    by_id: dict[str, _GuestNetSpec] = {}
+    by_apk: dict[str, _GuestNetSpec] = {}
+    if not isinstance(device_config, dict):
+        return by_id, by_apk
+    for cfg_key, entry in device_config.items():
+        spec = _guest_net_spec_from_entry(entry)
+        if spec is None:
+            continue
+        by_id[str(cfg_key)] = spec
+        if spec.chiptool_apk:
+            by_apk[spec.chiptool_apk] = spec
+    return by_id, by_apk
+
+
 def _parse_ui_hierarchy_root(xml_content: str) -> ET.Element | None:
     start = xml_content.find('<?xml')
     end = xml_content.rfind('</hierarchy>')
@@ -269,6 +340,143 @@ def connectivity_has_wifi_connected(dumpsys_output):
     )
 
 
+@dataclass(slots=True)
+class _NsdPublishedService:
+    """Tracks an NsdManagerServiceResolver registration and confirmation."""
+
+    service_type: str
+    requested_name: str
+    effective_name: str
+    listener: str | None = None
+    active: bool = True
+    confirmed: bool = False
+
+    def matches_replacement(self, rep_type: str, rep_name: str) -> bool:
+        if not self.active or self.service_type != rep_type:
+            return False
+        return self.requested_name == rep_name or rep_type == '_matterd._udp'
+
+    def matches_failure(self, fail_key: str) -> bool:
+        if not self.active or self.confirmed:
+            return False
+        map_key = f'{self.service_type}:{self.requested_name}'
+        return fail_key in (self.effective_name, self.requested_name, map_key)
+
+
+def _deactivate_matching_listener(
+    entries: list[_NsdPublishedService],
+    confirmed_by_name: dict[str, set[str]],
+    listener: str,
+) -> None:
+    for entry in entries:
+        if entry.listener == listener:
+            entry.active = False
+            entry.confirmed = False
+    for listeners in confirmed_by_name.values():
+        listeners.discard(listener)
+
+
+def _apply_nsd_publish_line(
+    line: str, entries: list[_NsdPublishedService]
+) -> bool:
+    pub = NSD_PUBLISH_SERVICE_RE.search(line)
+    if pub:
+        name, svc_type = pub.group(1), pub.group(2)
+        entries.append(
+            _NsdPublishedService(
+                service_type=svc_type,
+                requested_name=name,
+                effective_name=name,
+            )
+        )
+        return True
+    lst = NSD_PUBLISH_LISTENER_RE.search(line)
+    if lst:
+        if entries and entries[-1].listener is None and entries[-1].active:
+            entries[-1].listener = lst.group(1)
+        return True
+    rep = NSD_REPLACING_REG_RE.search(line)
+    if rep:
+        rep_type, rep_name = rep.group(1), rep.group(2)
+        for entry in reversed(entries):
+            if entry.matches_replacement(rep_type, rep_name):
+                entry.active = False
+                entry.confirmed = False
+                break
+        return True
+    ren = NSD_RENAME_SERVICE_RE.search(line)
+    if ren:
+        old_name, new_name = ren.group(1), ren.group(2)
+        for entry in reversed(entries):
+            if entry.active and entry.requested_name == old_name:
+                entry.effective_name = new_name
+                break
+        return True
+    return False
+
+
+def _apply_nsd_callback_line(
+    line: str,
+    entries: list[_NsdPublishedService],
+    confirmed_by_name: dict[str, set[str]],
+) -> None:
+    rem = NSD_REMOVE_LISTENER_RE.search(line)
+    if rem:
+        _deactivate_matching_listener(entries, confirmed_by_name, rem.group(1))
+        return
+    unreg = NSD_SERVICE_UNREGISTERED_RE.search(line)
+    if unreg:
+        unreg_name, listener = unreg.group(1).strip(), unreg.group(2)
+        _deactivate_matching_listener(entries, confirmed_by_name, listener)
+        listeners = confirmed_by_name.get(unreg_name)
+        if listeners is not None:
+            listeners.discard(listener)
+        return
+    fail = NSD_REGISTRATION_FAILED_RE.search(line)
+    if fail:
+        fail_key = fail.group(1).strip()
+        for entry in entries:
+            if entry.matches_failure(fail_key):
+                entry.active = False
+                break
+        return
+    reg = NSD_SERVICE_REGISTERED_RE.search(line)
+    if reg:
+        reg_name, listener = reg.group(1).strip(), reg.group(2)
+        confirmed_by_name.setdefault(reg_name, set()).add(listener)
+        for entry in entries:
+            if entry.active and entry.listener == listener:
+                entry.confirmed = True
+
+
+def tv_mdns_has_registered_matterd(log_output: str) -> bool:
+    """Returns True iff an active _matterd._udp service is registered."""
+    entries: list[_NsdPublishedService] = []
+    confirmed_by_name: dict[str, set[str]] = {}
+    for line in log_output.splitlines():
+        if not _apply_nsd_publish_line(line, entries):
+            _apply_nsd_callback_line(line, entries, confirmed_by_name)
+
+    active_matterd = [
+        e for e in entries if e.active and e.service_type == '_matterd._udp'
+    ]
+    if not active_matterd:
+        return False
+    latest = active_matterd[-1]
+    if latest.listener is not None:
+        return latest.confirmed
+    target_name = latest.effective_name
+    same_name_active = [
+        e
+        for e in entries
+        if e.active
+        and e.listener is None
+        and target_name in (e.requested_name, e.effective_name)
+    ]
+    confirmed_count = len(confirmed_by_name.get(target_name, set()))
+    return confirmed_count > 0 and confirmed_count >= len(same_name_active)
+
+
 def _decode_dns_name(buf, offset):
     """Decodes an RFC 1035 domain name, returning (name, next_offset) or ('', -1)."""
     labels = []
@@ -317,11 +525,11 @@ def _mdns_response_has_service(dns_payload, service_name='_matterd._udp.local'):
         rr_name, pos = _decode_dns_name(dns_payload, pos)
         if pos < 0 or pos + 10 > len(dns_payload):
             break
-        rr_type, rr_class, _ttl, rdlen = struct.unpack('!HHIH', dns_payload[pos:pos + 10])
+        rr_type, rr_class, ttl, rdlen = struct.unpack('!HHIH', dns_payload[pos:pos + 10])
         rdata_start, rdata_end = pos + 10, pos + 10 + rdlen
         if rdata_end > len(dns_payload):
             break
-        if rr_type == 12 and (rr_class & 0x7FFF) == 1 and rr_name.rstrip('.').lower() == expected:
+        if rr_type == 12 and (rr_class & 0x7FFF) == 1 and ttl > 0 and rr_name.rstrip('.').lower() == expected:
             ptr_target, next_pos = _decode_dns_name(dns_payload, rdata_start)
             if next_pos == rdata_end and ptr_target:
                 return True
@@ -457,7 +665,7 @@ def _classify_matter_udp_payload(payload):
     if pos > len(payload):
         return None
     if vendor_id == 0x0000 and protocol_id == 0x0003 and opcode == 0x00:
-        return 'udc'
+        return 'udc' if len(payload) - pos >= 17 else None
     if vendor_id == 0x0000 and protocol_id == 0x0000:
         return 'secure_channel'
     return None
@@ -558,8 +766,26 @@ def _check_android_preconditions() -> bool:
 class AndroidTvCastingTest(AndroidCirqueTestBase):
 
     def __init__(self, device_config=None):
-        super().__init__(CIRQUE_URL, DEVICE_CONFIG if device_config is None else device_config)
+        raw_cfg = copy.deepcopy(DEVICE_CONFIG if device_config is None else device_config)
+        self._guest_net_by_id, self._guest_net_by_apk = _snapshot_guest_endpoints(raw_cfg)
+        super().__init__(CIRQUE_URL, raw_cfg)
         self.logger = logger
+
+    def _resolve_guest_endpoint(
+        self, dev: dict, default_ip: str | None = None, default_mac: str | None = None
+    ) -> _GuestNetSpec:
+        desc = dev.get('description') if isinstance(dev.get('description'), dict) else {}
+        dev_id = str(dev.get('id', ''))
+        apk = str(dev.get('chiptool_apk') or desc.get('chiptool_apk') or '')
+        snap = self._guest_net_by_id.get(dev_id) or self._guest_net_by_apk.get(apk)
+        desc_ip = desc.get('ipv4_addr')
+        guest_ip = (
+            (snap.ipv4_addr if snap else None)
+            or (desc_ip if isinstance(desc_ip, str) and desc_ip.startswith('10.0.1.') else None)
+            or default_ip
+        )
+        guest_mac = (snap.mac_address if snap else None) or desc.get('mac_address') or default_mac
+        return _GuestNetSpec(ipv4_addr=guest_ip, mac_address=guest_mac, chiptool_apk=apk or None)
 
     def _check_preconditions(self) -> bool:
         return _check_android_preconditions()
@@ -650,20 +876,14 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         return False
 
     def _wait_for_tv_mdns_ready(self, container_id, timeout_sec=45.0, settle_sec=3.0):
-        pattern = r'InitCommissioner|initCommissioner|MdnsAdvertiser|MdnsInterfaceSocket|_matterd\._udp'
-        logcat_cmd = f'adb logcat -d -e {shlex.quote(pattern)}'
+        logcat_cmd = f'adb logcat -d -e {shlex.quote(TV_MDNS_LOGCAT_PATTERN)}'
         start_time = time.time()
         prev_adv_events = None
         while time.time() - start_time < timeout_sec:
             log_res = self.execute_device_cmd(container_id, logcat_cmd)
             log_output = str(log_res.get('output', '')) if str(log_res.get('return_code')) == '0' else ''
             has_commissioner = bool(re.search(r'InitCommissioner|initCommissioner', log_output))
-            has_matterd = bool(
-                re.search(
-                    r'Adding service[^\n]*_matterd\._udp|Registering service[^\n]*_matterd\._udp|_matterd\._udp',
-                    log_output,
-                )
-            )
+            has_matterd = tv_mdns_has_registered_matterd(log_output)
             if not (has_commissioner and has_matterd):
                 prev_adv_events = None
                 time.sleep(2)
@@ -690,11 +910,14 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         return False
 
     def _retrigger_casting_discovery(self, container_id: str) -> None:
-        self.logger.info('Re-triggering CastingPlayer mDNS browse via startDiscoveryButton')
+        self.logger.info('Re-triggering CastingPlayer mDNS browse via stop/start discovery buttons')
+        if not self._click_ui_element(container_id, resource_id='stopDiscoveryButton'):
+            self._click_ui_element(container_id, text='Stop Discovery')
+        time.sleep(1)
         if not self._click_ui_element(container_id, resource_id='startDiscoveryButton'):
             self._click_ui_element(container_id, text='Start Discovery')
 
-    def _wait_for_casting_discovery(self, container_id, timeout_sec, rediscover_interval_sec=20.0):
+    def _wait_for_casting_discovery(self, container_id, timeout_sec, rediscover_interval_sec=35.0):
         pattern = r'Discovered CastingPlayer deviceId:'
         logcat_cmd = f'adb logcat -d -e {shlex.quote(pattern)}'
         dump_cmd = 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
@@ -744,7 +967,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         dump_res = self.execute_device_cmd(container_id, dump_cmd)
         return str(dump_res['return_code']) == '0' and casting_ui_shows_connected(dump_res['output'])
 
-    def _wait_for_casting_connection(self, container_id, timeout_sec):
+    def _wait_for_casting_connection(self, container_id, timeout_sec, tv_id: str | None = None):
         pattern = r'Successfully connected to CastingPlayer'
         logcat_cmd = f'adb logcat -d -e {shlex.quote(pattern)}'
         dump_cmd = 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
@@ -756,6 +979,8 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
                 self.logger.info('CastingPlayer connection success matched via logcat')
                 return True
             poll += 1
+            if tv_id is not None and poll % 2 == 0:
+                self._accept_tv_commissioning_dialog_if_shown(tv_id, initial_wait_sec=0.0)
             if poll % 3 == 0 and self._ui_shows_casting_connected(container_id, dump_cmd):
                 self.logger.info('CastingPlayer connection success matched via ui')
                 return True
@@ -782,19 +1007,18 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         tap_res = self.execute_device_cmd(container_id, f'adb shell input tap {x} {y}')
         return str(tap_res.get('return_code')) == '0'
 
-    def _accept_tv_commissioning_dialog_if_shown(self, tv_id: str) -> None:
-        self.logger.info('Waiting for TV App dialog to inflate')
-        time.sleep(5)
+    def _accept_tv_commissioning_dialog_if_shown(self, tv_id: str, initial_wait_sec: float = 5.0) -> bool:
+        if initial_wait_sec > 0:
+            self.logger.info('Waiting for TV App dialog to inflate')
+            time.sleep(initial_wait_sec)
         tv_dump = self.execute_device_cmd(
             tv_id, 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
         )
-        dump_out = tv_dump['output']
+        dump_out = str(tv_dump.get('output', '')) if isinstance(tv_dump, dict) else ''
         if 'dialog_title' not in dump_out and 'ALLOW' not in dump_out.upper() and 'OK' not in dump_out.upper():
-            return
+            return False
         self.logger.info('TV App dialog found, trying to accept')
-        for label in ('Allow', 'ALLOW', 'OK'):
-            if self._click_ui_element(tv_id, text=label):
-                return
+        return any(self._click_ui_element(tv_id, text=label) for label in ('Allow', 'ALLOW', 'OK'))
 
     def _exercise_launch_url_and_read_vendor_id(self, tv_id: str, casting_id: str) -> None:
         time.sleep(2)
@@ -846,12 +1070,12 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.logger.info('Starting TV App')
         self.execute_device_cmd(tv_id, 'adb shell logcat -G 16M')
         self.execute_device_cmd(tv_id, disable_bt_cmd)
+        self.execute_device_cmd(tv_id, 'adb shell appops set com.matter.tv.server SYSTEM_ALERT_WINDOW allow')
         self.execute_device_cmd(tv_id, 'adb shell am start -n com.matter.tv.server/.MainActivity')
         self.assertTrue(self._wait_for_tv_mdns_ready(tv_id), 'TV app mDNS advertisement did not become ready')
 
-        casting_wifi_ready = self._ensure_emulator_wifi_ready(
-            casting_id, expected_ip=casting_client.get('description', {}).get('ipv4_addr')
-        )
+        casting_expected_ip = self._resolve_guest_endpoint(casting_client, default_ip='10.0.1.12').ipv4_addr
+        casting_wifi_ready = self._ensure_emulator_wifi_ready(casting_id, expected_ip=casting_expected_ip)
         self.assertTrue(casting_wifi_ready, f'Casting client Wi-Fi not ready before launch on {casting_id}')
 
         self.logger.info('Starting Casting App')
@@ -872,7 +1096,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
 
         self._accept_tv_commissioning_dialog_if_shown(tv_id)
         self.assertTrue(
-            self._wait_for_casting_connection(casting_id, ANDROID_COMMISSION_TIMEOUT_SEC),
+            self._wait_for_casting_connection(casting_id, ANDROID_COMMISSION_TIMEOUT_SEC, tv_id=tv_id),
             'Failed to connect to CastingPlayer',
         )
         self._exercise_launch_url_and_read_vendor_id(tv_id, casting_id)
@@ -896,7 +1120,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
                 self.assertTrue(False, f'REST init_android_emulator returned: {init_res}')
 
         for dev in devices:
-            expected_ip = dev.get('description', {}).get('ipv4_addr')
+            expected_ip = self._resolve_guest_endpoint(dev).ipv4_addr
             wifi_ready = self._ensure_emulator_wifi_ready(dev['id'], expected_ip=expected_ip)
             self.assertTrue(wifi_ready, f"Failed to verify WIFI CONNECTED state on {dev['id']}")
 
@@ -909,14 +1133,18 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.assertTrue(os.path.isfile(pcap_path), f'wifi_medium.pcap not found in {pcap_dir}')
 
         active_ips = self._active_ips if hasattr(self, '_active_ips') else {}
-        tv_desc = tv_server.get('description', {})
-        casting_desc = casting_client.get('description', {})
+        tv_spec = self._resolve_guest_endpoint(
+            tv_server, default_ip='10.0.1.11', default_mac='02:15:b2:00:00:01'
+        )
+        casting_spec = self._resolve_guest_endpoint(
+            casting_client, default_ip='10.0.1.12', default_mac='02:15:b2:00:00:02'
+        )
         oracles = _scan_wifi_pcap_oracles(
             pcap_path,
-            tv_ip=active_ips.get(tv_server['id']) or tv_desc.get('ipv4_addr', '10.0.1.11'),
-            casting_ip=active_ips.get(casting_client['id']) or casting_desc.get('ipv4_addr', '10.0.1.12'),
-            tv_mac=tv_desc.get('mac_address', '02:15:b2:00:00:01'),
-            casting_mac=casting_desc.get('mac_address', '02:15:b2:00:00:02'),
+            tv_ip=active_ips.get(tv_server['id']) or tv_spec.ipv4_addr,
+            casting_ip=active_ips.get(casting_client['id']) or casting_spec.ipv4_addr,
+            tv_mac=tv_spec.mac_address,
+            casting_mac=casting_spec.mac_address,
         )
         self.logger.info(
             'wifi_medium.pcap oracles: _matterd._udp mDNS PTR answers=%d,'
@@ -927,6 +1155,10 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         )
         self.assertTrue(oracles.mdns_answers > 0, 'No _matterd._udp mDNS answer found from TV in pcap')
         self.assertTrue(oracles.udc_datagrams > 0, 'No UDC datagram found from Casting App to TV')
+        self.assertTrue(
+            oracles.operational_datagrams > 0,
+            'No operational Matter UDP datagram found between Casting App and TV in pcap',
+        )
 
     def test_routine(self):
         tv_server = next(

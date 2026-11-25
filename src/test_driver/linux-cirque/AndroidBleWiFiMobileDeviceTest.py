@@ -15,16 +15,14 @@ limitations under the License.
 """
 
 import logging
-import os
 import shlex
-import shutil
 import sys
 import time
 
 from cirque.virtual_wifi.lease import get_device_wlan0_ipv6, wait_for_device_wlan0_ipv4
 from helper.AndroidCirqueTestBase import (CHIPTOOL_LOGCAT_FILTER_CMD, DEFAULT_ANDROID_RUNNER_IMAGE, DEFAULT_BOOT_TIMEOUT_SEC,
-                                          DEFAULT_COMMISSION_TIMEOUT_SEC, ON_OFF_VALUE_RE, TOGGLE_SUCCESS_RE, AndroidCirqueTestBase,
-                                          CommissioningInteractionResult, check_android_preconditions,
+                                          DEFAULT_CIRQUE_URL, DEFAULT_COMMISSION_TIMEOUT_SEC, ON_OFF_VALUE_RE, TOGGLE_SUCCESS_RE,
+                                          AndroidCirqueTestBase, CommissioningInteractionResult, check_android_preconditions,
                                           find_nonzero_commissioning_error, ping_has_zero_packet_loss)
 from helper.paths import CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CHIP_TOOL_APK_PATH
 
@@ -35,7 +33,7 @@ sh = logging.StreamHandler()
 sh.setFormatter(logging.Formatter('%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CIRQUE_URL = 'http://localhost:5000'
+CIRQUE_URL = DEFAULT_CIRQUE_URL
 TEST_WIFI_SSID = 'CHIP-VirtualWiFi-AP'
 TEST_WIFI_PSK = 'ChipWiFiPassword123'
 TEST_DISCRIMINATOR = 3840
@@ -169,21 +167,6 @@ class TestAndroidBleWiFiMobileDevice(AndroidCirqueTestBase):
                 ' service avahi-daemon restart 2>/dev/null || avahi-daemon -D 2>/dev/null || true"',
             )
 
-    def _copy_missing_host_lib(self, host_libs_path: str, lib_name: str) -> None:
-        src_lib = os.path.join('/usr/lib/x86_64-linux-gnu', lib_name)
-        dst_lib = os.path.join(host_libs_path, lib_name)
-        if os.path.isfile(src_lib) and not os.path.isfile(dst_lib):
-            shutil.copy2(src_lib, dst_lib)
-
-    def _ensure_host_runtime_libs(self):
-        host_libs_path = os.path.join(CHIP_REPO_STR, 'out', 'host_libs')
-        try:
-            os.makedirs(host_libs_path, exist_ok=True)
-            for lib_name in ('libcrypto.so.3', 'libstdc++.so.6'):
-                self._copy_missing_host_lib(host_libs_path, lib_name)
-        except OSError as exc:
-            self.logger.debug('Skipping host_libs population: %s', exc)
-
     def _start_wifi_end_devices(self, server_devices, host_libs_dir):
         self._ensure_host_runtime_libs()
         gdb_wrapper = (
@@ -249,7 +232,9 @@ class TestAndroidBleWiFiMobileDevice(AndroidCirqueTestBase):
             )
             self.execute_device_cmd(req_device_id, intent_cmd)
             self.logger.info('Polling adb logcat for commissioning completion...')
-            comm_success = self._poll_commissioning_logcat(req_device_id, timeout_sec=60.0)
+            comm_success = self._poll_commissioning_logcat(
+                req_device_id, timeout_sec=ANDROID_COMMISSION_TIMEOUT_SEC
+            )
             self.assertTrue(comm_success, 'CHIPTool commissioning failed to complete within timeout')
             return comm_success
         finally:
@@ -280,6 +265,7 @@ class TestAndroidBleWiFiMobileDevice(AndroidCirqueTestBase):
             commissioned=comm_ok,
             toggled=toggle_read.toggle_ok,
             read_verified=toggle_read.read_ok,
+            require_toggle_marker=toggle_read.require_toggle_marker,
         )
 
     def _assert_ble_wifi_device_logs(self, server_ids):

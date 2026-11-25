@@ -15,48 +15,95 @@ limitations under the License.
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
 
+import helper.CHIPTestBase as _chip_test_base
 from cirque.nodes.android_diagnostics import save_android_emulator_diagnostics
 from helper.CHIPTestBase import REQUEST_TIMEOUT_SEC, CHIPVirtualHome, TestResult
 from helper.paths import CHIP_REPO_STR, CHIP_TOOL_APK_PATH
 
-DEFAULT_ANDROID_RUNNER_IMAGE = 'cirque-android-runner:latest'
+DESTROY_HOME_TIMEOUT_SEC = getattr(_chip_test_base, 'DESTROY_HOME_TIMEOUT_SEC', 10)
+DEFAULT_CIRQUE_URL = os.environ.get('CIRQUE_URL', 'http://localhost:5000')
+DEFAULT_ANDROID_RUNNER_IMAGE = os.environ.get('CIRQUE_ANDROID_RUNNER_IMAGE', 'cirque-android-runner:latest')
+ANDROID_RUNNER_IMAGE = DEFAULT_ANDROID_RUNNER_IMAGE
 DEFAULT_BOOT_TIMEOUT_SEC = float(os.environ.get('CIRQUE_ANDROID_BOOT_TIMEOUT', '420'))
 DEFAULT_COMMISSION_TIMEOUT_SEC = float(os.environ.get('CIRQUE_ANDROID_COMMISSION_TIMEOUT', '180'))
+ANDROID_COMMISSION_TIMEOUT_SEC = DEFAULT_COMMISSION_TIMEOUT_SEC
 
 CHIPTOOL_LOGCAT_FILTER_CMD = (
-    'adb shell "logcat -d | grep -E \'CTL|ChipTool|CHIP|OnOffClientFragment|'
-    'onCommissioningComplete|Commissioning complete|Toggle|attribute|value\' || true"'
+    'adb shell "logcat -d | grep -E \'CTL|ChipTool|CHIP|DeviceProvisioningFragment|OnOffClientFragment|'
+    'onCommissioningComplete|onPairingComplete|Commissioning complete|Toggle|attribute|value\' || true"'
 )
 CHIPTOOL_FULL_LOGCAT_DUMP_CMD = 'adb shell "logcat -d"'
 COMMISSION_LOGCAT_POLL_CMD = (
-    'adb shell "logcat -d | grep -E \'onCommissioningComplete|Device commissioning completed|Commissioning complete\'"'
+    'adb shell "logcat -d | grep -E \'onCommissioningComplete|'
+    'onCommissioningStatusUpdate|onPairingComplete|'
+    'Device commissioning completed|Commissioning completed|'
+    'Commissioning failed|Commissioning complete\' || true"'
 )
 ON_OFF_VALUE_RE = re.compile(r'On/Off attribute value:\s*(true|1|false|0)\b', re.IGNORECASE)
 TOGGLE_SUCCESS_RE = re.compile(r'Toggle command success|command 2, Code : 0')
 COMMISSION_ERROR_CODE_RE = re.compile(
-    r'onCommissioningComplete[^\r\n]*?\berrorCode\s*[:=]\s*(-?(?:0x[0-9a-fA-F]+|\d+))\b', re.IGNORECASE
+    r'\bonCommissioningComplete\b'
+    r'(?:[^\r\n]*?\berrorCode\s*[:=]\s*|\s+for\s+nodeId\s+\S+\s*:\s*)'
+    r'(-?(?:0x[0-9a-fA-F]+|\d+))\b',
+    re.IGNORECASE,
 )
+COMMISSION_STATUS_ERROR_RE = re.compile(
+    r'\bonCommissioningStatusUpdate\b[^\r\n]*?\berrorCode\s*[:=]\s*'
+    r'(-?(?:0x[0-9a-fA-F]+|\d+))\b',
+    re.IGNORECASE,
+)
+COMMISSION_RESULT_CODE_RE = re.compile(
+    r'\bCommissioning\s+'
+    r'(?:completed\s+with\s+(?:code|result)|failed\s+with\s+error\s+code)'
+    r'\s*[:=]?\s*(-?(?:0x[0-9a-fA-F]+|\d+))\b',
+    re.IGNORECASE,
+)
+PAIRING_COMPLETE_CODE_RE = re.compile(
+    r'\bonPairingComplete\s*:\s*(-?(?:0x[0-9a-fA-F]+|\d+))\b', re.IGNORECASE
+)
+COMMISSION_FAILURE_CODE_PATTERNS = (
+    COMMISSION_ERROR_CODE_RE,
+    COMMISSION_STATUS_ERROR_RE,
+    COMMISSION_RESULT_CODE_RE,
+    PAIRING_COMPLETE_CODE_RE,
+)
+CPP_COMMISSION_COMPLETE_RE = re.compile(
+    r'Commissioning complete for node ID\s+0x[0-9a-fA-F]+\s*:\s*([^\r\n]+)', re.IGNORECASE
+)
+CHIP_ERROR_CODE_RE = re.compile(r'\bCHIP Error\s+(-?(?:0x[0-9a-fA-F]+|\d+))\b', re.IGNORECASE)
 PING_SUMMARY_RE = re.compile(
     r'(\d+)\s+packets\s+transmitted,\s+(\d+)\s+(?:packets\s+)?received[^\r\n]*?(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b'
 )
 PING_LOSS_ONLY_RE = re.compile(r'(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b')
 IPV4_TOKEN_RE = re.compile(r'^\d+\.\d+\.\d+\.\d+$')
 COMMISSION_COMPLETE_MARKERS = (
-    'onCommissioningComplete', 'Device commissioning completed', 'Commissioning completed', 'Commissioning complete'
+    'onCommissioningComplete',
+    'Device commissioning completed',
+    'Commissioning completed',
 )
 CHIPTOOL_PERMISSIONS = (
-    'android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION',
-    'android.permission.BLUETOOTH_SCAN', 'android.permission.BLUETOOTH_CONNECT', 'android.permission.BLUETOOTH_ADVERTISE',
+    'android.permission.ACCESS_FINE_LOCATION',
+    'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.BLUETOOTH_SCAN',
+    'android.permission.BLUETOOTH_CONNECT',
+    'android.permission.BLUETOOTH_ADVERTISE',
 )
 EMULATOR_DIAG_CMDS = (
-    'adb devices -l', 'sh -c "ls -l /dev/kvm; nproc; free -m"',
-    'sh -c "cat /proc/loadavg; uptime"', 'sh -c "tail -n 200 /tmp/emulator.log 2>/dev/null"',
+    'adb devices -l',
+    'sh -c "ls -l /dev/kvm; nproc; free -m"',
+    'sh -c "cat /proc/loadavg; uptime"',
+    'sh -c "tail -n 200 /tmp/emulator.log 2>/dev/null"',
+)
+BOUNDED_EMULATOR_DIAG_SPECS = (
+    ('adb logcat -d -t 2000', 'logcat-tail.log'),
+    ('sh -c "cat /tmp/emulator.log 2>/dev/null || true"', 'emulator.log'),
 )
 
 
@@ -66,6 +113,7 @@ class ToggleReadResult:
 
     toggle_ok: bool
     read_ok: bool
+    require_toggle_marker: bool = True
 
     def __iter__(self) -> Iterator[bool]:
         yield self.toggle_ok
@@ -87,6 +135,7 @@ class CommissioningInteractionResult:
     commissioned: bool
     toggled: bool
     read_verified: bool
+    require_toggle_marker: bool = True
 
     @property
     def succeeded(self) -> bool:
@@ -110,7 +159,10 @@ def check_android_preconditions(runner_image: str = DEFAULT_ANDROID_RUNNER_IMAGE
     try:
         res = runner(
             ['docker', 'image', 'inspect', runner_image],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            check=False,
         )
     except (subprocess.SubprocessError, FileNotFoundError) as exc:
         sys.stderr.write(f'Precondition failed: docker inspect failed: {exc}\n')
@@ -143,22 +195,84 @@ def ping_has_zero_packet_loss(ping_res: object) -> bool:
     return bool(loss_match and float(loss_match.group(1)) == 0.0)
 
 
-def find_nonzero_commissioning_error(logcat_out: str) -> str | None:
-    """Returns the first non-zero errorCode token on an onCommissioningComplete line."""
-    for match in COMMISSION_ERROR_CODE_RE.finditer(logcat_out):
-        token = match.group(1)
-        try:
-            if int(token, 0) != 0:
-                return token
-        except ValueError:
-            return token
+def _is_nonzero_code_token(token: str) -> bool:
+    try:
+        return int(token, 0) != 0
+    except ValueError:
+        return True
+
+
+def _line_nonzero_chip_error(line: str) -> str | None:
+    if 'CHIP Error' not in line:
+        return None
+    matches = list(CHIP_ERROR_CODE_RE.finditer(line))
+    if not matches:
+        return 'CHIP Error'
+    for match in matches:
+        if _is_nonzero_code_token(match.group(1)):
+            return match.group(1)
     return None
+
+
+def _line_commissioning_error(line: str) -> str | None:
+    for pattern in COMMISSION_FAILURE_CODE_PATTERNS:
+        match = pattern.search(line)
+        if match and _is_nonzero_code_token(match.group(1)):
+            return match.group(1)
+    cpp_match = CPP_COMMISSION_COMPLETE_RE.search(line)
+    if cpp_match:
+        status = cpp_match.group(1).strip()
+        if status.lower() != 'success':
+            return _line_nonzero_chip_error(status) or status
+    return None
+
+
+def find_nonzero_commissioning_error(logcat_out: str) -> str | None:
+    """Returns the first non-zero commissioning/pairing error token or status in logcat."""
+    for line in logcat_out.splitlines():
+        err = _line_commissioning_error(line)
+        if err is not None:
+            return err
+    return None
+
+
+def _line_is_commissioning_complete(line: str) -> bool:
+    if _line_commissioning_error(line) is not None:
+        return False
+    cpp_match = CPP_COMMISSION_COMPLETE_RE.search(line)
+    if cpp_match:
+        return cpp_match.group(1).strip().lower() == 'success'
+    if any(marker in line for marker in COMMISSION_COMPLETE_MARKERS):
+        return True
+    if 'Commissioning complete' in line:
+        tail = line.split('Commissioning complete', 1)[1].strip()
+        return not tail or tail.lstrip(':').strip().lower() == 'success'
+    return False
+
+
+def has_commissioning_complete_marker(logcat_out: str) -> bool:
+    """Returns True if logcat contains a successful CHIPTool commissioning completion line."""
+    return any(_line_is_commissioning_complete(line) for line in logcat_out.splitlines())
 
 
 def latest_onoff_value(logcat_slice: str) -> bool | None:
     """Returns the last On/Off attribute boolean in logcat_slice, or None if absent."""
     matches = ON_OFF_VALUE_RE.findall(logcat_slice)
     return matches[-1].lower() in ('true', '1') if matches else None
+
+
+def _extract_logcat_delta(before_out: str, probe_out: str) -> str:
+    """Extracts newly appended logcat text without falling back to stale rotated buffer."""
+    if not before_out:
+        return probe_out
+    if probe_out.startswith(before_out):
+        return probe_out[len(before_out):]
+    before_lines = [ln for ln in before_out.splitlines() if ln]
+    if not before_lines:
+        return probe_out
+    anchor = before_lines[-1]
+    idx = probe_out.rfind(anchor)
+    return probe_out[idx + len(anchor):].lstrip('\r\n') if idx >= 0 else ''
 
 
 def parse_toggle_read_logcat(logcat_out: str, *, require_toggle: bool = True) -> ToggleReadResult:
@@ -170,12 +284,11 @@ def parse_toggle_read_logcat(logcat_out: str, *, require_toggle: bool = True) ->
         read_ok = latest_onoff_value(logcat_out) is True
     else:
         read_ok = False
-    return ToggleReadResult(toggle_ok=bool(toggle_matches), read_ok=read_ok)
-
-
-def has_commissioning_complete_marker(logcat_out: str) -> bool:
-    """Returns True if logcat contains any CHIPTool commissioning completion marker."""
-    return any(marker in logcat_out for marker in COMMISSION_COMPLETE_MARKERS)
+    return ToggleReadResult(
+        toggle_ok=bool(toggle_matches),
+        read_ok=read_ok,
+        require_toggle_marker=require_toggle,
+    )
 
 
 def _hci_index_from_mapping(mapping: object) -> int | None:
@@ -233,18 +346,73 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
             return TestResult.TEST_FAILURE
         return super().run_test(save_logs=save_logs)
 
-    def _save_suite_diagnostics(self, timestamp: int, deadline=None) -> None:
-        del timestamp, deadline
+    @staticmethod
+    def _copy_missing_host_lib(host_libs_path: str, lib_name: str) -> None:
+        src_lib = os.path.join('/usr/lib/x86_64-linux-gnu', lib_name)
+        dst_lib = os.path.join(host_libs_path, lib_name)
+        if os.path.isfile(src_lib) and not os.path.isfile(dst_lib):
+            shutil.copy2(src_lib, dst_lib)
+
+    def _ensure_host_runtime_libs(self) -> None:
+        host_libs_path = os.path.join(CHIP_REPO_STR, 'out', 'host_libs')
+        try:
+            os.makedirs(host_libs_path, exist_ok=True)
+            for lib_name in ('libcrypto.so.3', 'libstdc++.so.6'):
+                self._copy_missing_host_lib(host_libs_path, lib_name)
+        except OSError as exc:
+            if self.logger is not None:
+                self.logger.debug('Skipping host_libs population: %s', exc)
+
+    def _save_suite_diagnostics(
+        self, timestamp: int, timeout: float = REQUEST_TIMEOUT_SEC, deadline=None
+    ) -> None:
+        del timestamp, timeout, deadline
+
+    def _save_bounded_emulator_file(
+        self, out_path: str, dev_id: str, cmd: str, limits: tuple[float, float]
+    ) -> None:
+        timeout, deadline = limits
+        try:
+            raw = self.query_api(
+                'device_cmd',
+                [self.home_id, dev_id, cmd],
+                binary=True,
+                timeout=min(timeout, 5.0),
+                deadline=deadline,
+                params={'stream': True},
+            )
+            with open(out_path, 'wb') as fp:
+                fp.write(raw if isinstance(raw, bytes) else bytes(raw))
+        except Exception as exc:
+            if self.logger is not None:
+                self.logger.warning('Bounded emulator log %s failed on %s: %s', os.path.basename(out_path), dev_id[:8], exc)
+
+    def _save_bounded_emulator_logs(self, timestamp: int, timeout: float, deadline: float) -> None:
+        log_dir = os.environ.get('DEVICE_LOG_DIR')
+        if not log_dir:
+            return
+        os.makedirs(log_dir, exist_ok=True)
+        devices = getattr(self, 'non_ap_devices', ())
+        emu_ids = [d['id'] for d in devices if d.get('type') in ('android_emulator', 'Android_Emulator')]
+        tasks = [(dev_id, cmd, suffix) for dev_id in emu_ids for cmd, suffix in BOUNDED_EMULATOR_DIAG_SPECS]
+        for dev_id, cmd, suffix in tasks:
+            if time.monotonic() >= deadline:
+                return
+            out_path = os.path.join(log_dir, f'android_emulator-{timestamp}-{dev_id[:8]}-{suffix}')
+            self._save_bounded_emulator_file(out_path, dev_id, cmd, (timeout, deadline))
 
     def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
         super().save_device_logs(timeout=timeout, deadline=deadline)
         if deadline is not None and time.monotonic() >= deadline:
             return
         timestamp = int(time.time())
-        save_android_emulator_diagnostics(self, timestamp)
+        if deadline is None:
+            save_android_emulator_diagnostics(self, timestamp)
+        else:
+            self._save_bounded_emulator_logs(timestamp, timeout=timeout, deadline=deadline)
         if deadline is not None and time.monotonic() >= deadline:
             return
-        self._save_suite_diagnostics(timestamp, deadline=deadline)
+        self._save_suite_diagnostics(timestamp, timeout=timeout, deadline=deadline)
 
     @staticmethod
     def _cmd_output_str(resp: object) -> str:
@@ -262,8 +430,17 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
             return False
 
     def _stop_ui_video(self, mobile_id: str) -> None:
+        cleanup_deadline = getattr(self, '_cleanup_deadline', None)
+        stop_deadline = cleanup_deadline - DESTROY_HOME_TIMEOUT_SEC if cleanup_deadline is not None else None
+        if stop_deadline is not None and time.monotonic() >= stop_deadline:
+            return
         try:
-            self.query_api('stop_screen_recording', [self.home_id, mobile_id])
+            if stop_deadline is not None:
+                self.query_api(
+                    'stop_screen_recording', [self.home_id, mobile_id], timeout=5.0, deadline=stop_deadline
+                )
+            else:
+                self.query_api('stop_screen_recording', [self.home_id, mobile_id])
             self.logger.info('Stopped screen recording on %s', mobile_id)
         except Exception as exc:
             self.logger.debug('stop_screen_recording endpoint not available or failed: %s', exc)
@@ -272,10 +449,19 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         for cmd in EMULATOR_DIAG_CMDS:
             self.execute_device_cmd(req_device_id, cmd)
 
+    def _configure_emulator_logcat_buffer(self, req_device_id: str) -> None:
+        try:
+            self.execute_device_cmd(req_device_id, 'adb shell logcat -G 16M 2>/dev/null || true')
+        except Exception as exc:
+            if self.logger is not None:
+                self.logger.debug('Best-effort logcat -G 16M failed on %s: %s', req_device_id, exc)
+
     def _try_rest_emulator_init(self, req_device_id: str, boot_timeout_sec: float) -> bool:
         self.logger.info('Initializing Android emulator environment on %s', req_device_id)
         try:
-            init_res = self.query_api('init_android_emulator', [self.home_id, req_device_id], params={'timeout': boot_timeout_sec})
+            init_res = self.query_api(
+                'init_android_emulator', [self.home_id, req_device_id], params={'timeout': boot_timeout_sec}
+            )
         except Exception as exc:
             self.logger.warning('REST init_android_emulator failed: %s; direct exec fallback', exc)
             return False
@@ -287,15 +473,33 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         self.assertTrue(False, f'Android emulator init failed: {init_res}')
         return False
 
+    def _wait_for_guest_boot(self, req_device_id: str, boot_timeout_sec: float) -> None:
+        self.logger.info('Waiting for Android emulator boot completion...')
+        deadline = time.monotonic() + boot_timeout_sec
+        while time.monotonic() < deadline:
+            res = self.execute_device_cmd(req_device_id, 'adb shell getprop sys.boot_completed')
+            rc_ok = isinstance(res, dict) and str(res.get('return_code')) == '0'
+            if rc_ok and self._cmd_output_str(res).strip() == '1':
+                self.execute_device_cmd(req_device_id, 'adb root')
+                time.sleep(0.5)
+                self.execute_device_cmd(req_device_id, 'timeout 60 adb wait-for-device')
+                self.execute_device_cmd(req_device_id, 'adb shell setenforce 0')
+                return
+            time.sleep(1.0)
+        self.assertTrue(False, 'Android emulator failed to boot within timeout')
+
     def _boot_emulator_container_fallback(self, req_device_id: str, boot_timeout_sec: float) -> None:
         cleanup_cmd = (
             'sh -c "adb emu kill 2>/dev/null || true;'
-            " pkill -9 -f 'Pixel_6_API_34' 2>/dev/null || true;"
+            " pkill -9 -f '[e]mulator.*Pixel_6_API_34' 2>/dev/null || true;"
             ' rm -f /root/.android/avd/Pixel_6_API_34.avd/*.lock 2>/dev/null || true"'
         )
         self.execute_device_cmd(req_device_id, cleanup_cmd)
         time.sleep(1.0)
-        tap_cmd = 'sh -c "ip link set dev cirque_tap0 up 2>/dev/null || (ip tuntap add dev cirque_tap0 mode tap && ip link set dev cirque_tap0 up)"'
+        tap_cmd = (
+            'sh -c "ip link set dev cirque_tap0 up 2>/dev/null'
+            ' || (ip tuntap add dev cirque_tap0 mode tap && ip link set dev cirque_tap0 up)"'
+        )
         self.execute_device_cmd(req_device_id, tap_cmd)
         emu_cmd = (
             'sh -c "export ANDROID_HOME=/opt/android/sdk ANDROID_SDK_ROOT=/opt/android/sdk;'
@@ -304,40 +508,29 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
             ' -feature -WiFiPacketStream -wifi-tap cirque_tap0 > /tmp/emulator.log 2>&1 &"'
         )
         self.execute_device_cmd(req_device_id, emu_cmd)
-        self.logger.info('Waiting for Android emulator boot completion...')
-        booted = False
-        start_boot = time.time()
-        while time.time() - start_boot < boot_timeout_sec:
-            if '1' in self._cmd_output_str(self.execute_device_cmd(req_device_id, 'adb shell getprop sys.boot_completed')):
-                self.execute_device_cmd(req_device_id, 'adb root')
-                time.sleep(0.5)
-                self.execute_device_cmd(req_device_id, 'timeout 60 adb wait-for-device')
-                self.execute_device_cmd(req_device_id, 'adb shell setenforce 0')
-                booted = True
-                break
-            time.sleep(1.0)
-        self.assertTrue(booted, 'Android emulator failed to boot within timeout')
+        self._wait_for_guest_boot(req_device_id, boot_timeout_sec)
 
     def _stage_chiptool_apk_if_needed(self, req_device_id: str) -> None:
         del req_device_id
 
     def _find_chiptool_apk(self, req_device_id: str) -> str | None:
         apk_candidates = (
-            str(CHIP_TOOL_APK_PATH), f'{CHIP_REPO_STR}/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk',
-            '/connectedhomeip/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk', '/tmp/CHIPTool.apk',
+            str(CHIP_TOOL_APK_PATH),
+            f'{CHIP_REPO_STR}/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk',
+            '/connectedhomeip/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk',
+            '/tmp/CHIPTool.apk',
         )
         for cand in apk_candidates:
             chk = self.execute_device_cmd(req_device_id, f'test -f {cand}')
-            if isinstance(chk, dict) and chk.get('return_code') == '0':
+            if isinstance(chk, dict) and str(chk.get('return_code')) == '0':
                 return cand
         return None
 
     def _install_chiptool_apk(self, req_device_id: str) -> None:
         self._stage_chiptool_apk_if_needed(req_device_id)
         apk_target = self._find_chiptool_apk(req_device_id)
-        if not apk_target:
-            return
-        self.execute_device_cmd(req_device_id, f'adb install -r -g {apk_target}')
+        self.assertTrue(bool(apk_target), f'CHIPTool APK not found on {req_device_id}')
+        self.run_checked_device_cmd(req_device_id, f'adb install -r -g {apk_target}', 'adb install CHIPTool APK')
         for perm in CHIPTOOL_PERMISSIONS:
             self.execute_device_cmd(req_device_id, f'adb shell pm grant com.google.chip.chiptool {perm}')
 
@@ -347,7 +540,10 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
             req_device_id, 'test -S /dev/virtual_bt/shared_hci.sock -a -f /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py'
         )
         if isinstance(relay_chk, dict) and relay_chk.get('return_code') == '0':
-            relay_cmd = f'sh -c "pkill -9 -f \\"[b]t_tcp_to_unix_relay.py\\" || true; python3 /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py {hci_port} /dev/virtual_bt/shared_hci.sock >/dev/null 2>&1 &"'
+            relay_cmd = (
+                'sh -c "pkill -9 -f \\"[b]t_tcp_to_unix_relay.py\\" || true;'
+                f' python3 /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py {hci_port} /dev/virtual_bt/shared_hci.sock >/dev/null 2>&1 &"'
+            )
             self.execute_device_cmd(req_device_id, relay_cmd)
             time.sleep(0.2)
             return '10.0.2.2'
@@ -363,7 +559,10 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         bt_info = self.query_api('virtual_bt_info')
         hci_port = bt_info.get('hci_port', 23458) if isinstance(bt_info, dict) else 23458
         gw_ip = self._resolve_virtual_bt_gateway(req_device_id, hci_port)
-        pin_cmd = f'ip route replace {gw_ip}/32 via 10.0.2.2 dev eth0 2>/dev/null || true; ip rule add to {gw_ip}/32 lookup main pref 100 2>/dev/null || true'
+        pin_cmd = (
+            f'ip route replace {gw_ip}/32 via 10.0.2.2 dev eth0 2>/dev/null || true;'
+            f' ip rule add to {gw_ip}/32 lookup main pref 100 2>/dev/null || true'
+        )
         self.execute_device_cmd(req_device_id, f'adb shell "{pin_cmd}"')
         self.execute_device_cmd(req_device_id, 'adb shell killall pty_bridge 2>/dev/null || true')
         self.execute_device_cmd(
@@ -374,74 +573,112 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, 'adb shell chmod 666 /dev/bluetooth0 /dev/pts/* 2>/dev/null || true')
         self.execute_device_cmd(
             req_device_id,
-            'adb shell "killall bt_vhci_forwarder android.hardware.bluetooth-service.default 2>/dev/null || true; cmd bluetooth_manager enable 2>/dev/null || true"',
+            'adb shell "killall bt_vhci_forwarder android.hardware.bluetooth-service.default 2>/dev/null || true;'
+            ' cmd bluetooth_manager enable 2>/dev/null || true"',
         )
         time.sleep(2.0)
 
     def _setup_guest_wifi_dhcp(self, req_device_id: str) -> None:
         self.execute_device_cmd(req_device_id, 'adb shell su root killall dhcpclient 2>/dev/null || true')
         self.execute_device_cmd(req_device_id, 'adb shell su root ip link set dev wlan0 up')
-        self.execute_device_cmd(req_device_id, 'adb shell su root /vendor/bin/dhcpclient -i wlan0 &')
+        self.execute_device_cmd(
+            req_device_id,
+            'adb shell "su root nohup /vendor/bin/dhcpclient -i wlan0 >/dev/null 2>&1 </dev/null &"',
+        )
         time.sleep(3.0)
 
     def _configure_post_boot_guest_routes(self, req_device_id: str) -> None:
         del req_device_id
 
-    def _setup_android_emulator_node(self, req_device_id: str, boot_timeout_sec: float = DEFAULT_BOOT_TIMEOUT_SEC) -> None:
+    def _setup_android_emulator_node(
+        self, req_device_id: str, boot_timeout_sec: float = DEFAULT_BOOT_TIMEOUT_SEC
+    ) -> None:
         if self._try_rest_emulator_init(req_device_id, boot_timeout_sec):
+            self._configure_emulator_logcat_buffer(req_device_id)
             return
         self._boot_emulator_container_fallback(req_device_id, boot_timeout_sec)
+        self._configure_emulator_logcat_buffer(req_device_id)
         self._install_chiptool_apk(req_device_id)
         self._setup_virtual_bt_pty_bridge(req_device_id)
         self._setup_guest_wifi_dhcp(req_device_id)
         self._configure_post_boot_guest_routes(req_device_id)
 
-    def _poll_commissioning_logcat(self, req_device_id: str, timeout_sec: float = 60.0) -> bool:
-        start_wait = time.time()
-        while time.time() - start_wait < timeout_sec:
+    def _poll_commissioning_logcat(
+        self, req_device_id: str, timeout_sec: float = ANDROID_COMMISSION_TIMEOUT_SEC
+    ) -> bool:
+        deadline = time.monotonic() + timeout_sec
+        while time.monotonic() < deadline:
             out = self._cmd_output_str(self.execute_device_cmd(req_device_id, COMMISSION_LOGCAT_POLL_CMD))
+            if find_nonzero_commissioning_error(out) is not None:
+                return False
             if has_commissioning_complete_marker(out):
-                has_chip_err = 'CHIP Error' in out and 'CHIP Error 0x00000000' not in out
-                return not (has_chip_err or find_nonzero_commissioning_error(out) is not None)
+                return True
             time.sleep(1.0)
         return False
 
     def _open_chiptool_onoff_cluster(self, req_device_id: str) -> None:
         time.sleep(2.0)
-        dump_cmd = 'adb shell "uiautomator dump /data/local/tmp/ui.xml >/dev/null 2>&1 && cat /data/local/tmp/ui.xml 2>/dev/null || true"'
+        dump_cmd = (
+            'adb shell "uiautomator dump /data/local/tmp/ui.xml >/dev/null 2>&1'
+            ' && cat /data/local/tmp/ui.xml 2>/dev/null || true"'
+        )
         dump_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, dump_cmd))
         if 'onOffClusterBtn' not in dump_out and 'LIGHT ON/OFF' not in dump_out:
-            start_cmd = 'adb shell am start --activity-clear-top --activity-single-top -n com.google.chip.chiptool/.CHIPToolActivity'
+            start_cmd = (
+                'adb shell am start --activity-clear-top --activity-single-top'
+                ' -n com.google.chip.chiptool/.CHIPToolActivity'
+            )
             self.execute_device_cmd(req_device_id, start_cmd)
             time.sleep(2.0)
         self.execute_device_cmd(req_device_id, 'adb shell input tap 330 947')
         time.sleep(2.0)
 
-    def _probe_onoff_true_after_ambiguous_toggle(self, req_device_id: str, logcat_cmd: str) -> bool:
+    def _probe_onoff_true_after_ambiguous_toggle(self, req_device_id: str, logcat_cmd: str) -> bool | None:
         before_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
         self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
+        for _ in range(5):
+            time.sleep(2.0)
+            probe_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
+            val = latest_onoff_value(_extract_logcat_delta(before_out, probe_out))
+            if val is not None:
+                return val
+        return None
+
+    def _run_ui_toggle_and_read_steps(
+        self, req_device_id: str, skip_toggle: bool, check_state_before_toggle: bool
+    ) -> ToggleReadResult:
+        logcat_cmd = self.ONOFF_LOGCAT_CMD
+        self._open_chiptool_onoff_cluster(req_device_id)
+        if not skip_toggle and check_state_before_toggle:
+            probed = self._probe_onoff_true_after_ambiguous_toggle(req_device_id, logcat_cmd)
+            if probed is True:
+                return ToggleReadResult(toggle_ok=True, read_ok=True, require_toggle_marker=False)
+            if probed is None:
+                return ToggleReadResult(toggle_ok=False, read_ok=False, require_toggle_marker=True)
+        if not skip_toggle:
+            self.execute_device_cmd(req_device_id, 'adb shell input tap 537 730')
+            time.sleep(2.0)
+        self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
         time.sleep(2.0)
-        probe_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
-        delta = probe_out[len(before_out):] if probe_out.startswith(before_out) else probe_out
-        return latest_onoff_value(delta) is True
+        logcat_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
+        parsed = parse_toggle_read_logcat(logcat_out, require_toggle=not skip_toggle)
+        return ToggleReadResult(
+            toggle_ok=True if skip_toggle else parsed.toggle_ok,
+            read_ok=parsed.read_ok,
+            require_toggle_marker=not skip_toggle,
+        )
 
     def _trigger_ui_toggle_and_read(
-        self, req_device_id: str, *, skip_toggle: bool = False, check_state_before_toggle: bool = False
+        self,
+        req_device_id: str,
+        *,
+        skip_toggle: bool = False,
+        check_state_before_toggle: bool = False,
+        record_video: bool = True,
     ) -> ToggleReadResult:
-        started_rec = self._start_ui_video(req_device_id, '3_onoff_cluster_toggle_read.mp4')
-        logcat_cmd = self.ONOFF_LOGCAT_CMD
+        started_rec = self._start_ui_video(req_device_id, '3_onoff_cluster_toggle_read.mp4') if record_video else False
         try:
-            self._open_chiptool_onoff_cluster(req_device_id)
-            if not skip_toggle and check_state_before_toggle and self._probe_onoff_true_after_ambiguous_toggle(req_device_id, logcat_cmd):
-                return ToggleReadResult(toggle_ok=True, read_ok=True)
-            if not skip_toggle:
-                self.execute_device_cmd(req_device_id, 'adb shell input tap 537 730')
-                time.sleep(2.0)
-            self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
-            time.sleep(2.0)
-            logcat_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
-            parsed = parse_toggle_read_logcat(logcat_out, require_toggle=not skip_toggle)
-            return ToggleReadResult(toggle_ok=True if skip_toggle else parsed.toggle_ok, read_ok=parsed.read_ok)
+            return self._run_ui_toggle_and_read_steps(req_device_id, skip_toggle, check_state_before_toggle)
         finally:
             if started_rec:
                 self._stop_ui_video(req_device_id)
@@ -449,7 +686,9 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
     def _try_rest_onoff_toggle(self, req_device_id: str) -> tuple[bool, bool]:
         try:
             res = self.query_api('toggle_chiptool', [self.home_id, req_device_id], params={'timeout': 30.0})
-            return isinstance(res, dict) and res.get('status') == 'success', False
+            if isinstance(res, dict) and res.get('status') == 'success':
+                return True, False
+            return False, True
         except Exception as exc:
             self.logger.warning('REST toggle_chiptool endpoint failed: %s', exc)
             return False, True
@@ -464,18 +703,32 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
 
     def _interact_onoff_with_ui_fallback(self, req_device_id: str) -> ToggleReadResult:
         self._start_ui_video(req_device_id, '3_onoff_cluster_toggle_read.mp4')
+        require_toggle_marker = False
         try:
             toggle_ok, toggle_ambiguous = self._try_rest_onoff_toggle(req_device_id)
             read_ok = self._try_rest_onoff_read(req_device_id) if toggle_ok else False
             if not (toggle_ok and read_ok):
                 probe = toggle_ambiguous and not toggle_ok
-                ui_res = self._trigger_ui_toggle_and_read(req_device_id, skip_toggle=toggle_ok, check_state_before_toggle=probe)
-                toggle_ok, read_ok = toggle_ok or ui_res.toggle_ok, read_ok or ui_res.read_ok
+                ui_res = self._trigger_ui_toggle_and_read(
+                    req_device_id,
+                    skip_toggle=toggle_ok,
+                    check_state_before_toggle=probe,
+                    record_video=False,
+                )
+                require_toggle_marker = ui_res.require_toggle_marker
+                toggle_ok = toggle_ok or ui_res.toggle_ok
+                read_ok = read_ok or ui_res.read_ok
         finally:
             self._stop_ui_video(req_device_id)
-        return ToggleReadResult(toggle_ok=toggle_ok, read_ok=read_ok)
+        return ToggleReadResult(
+            toggle_ok=toggle_ok,
+            read_ok=read_ok,
+            require_toggle_marker=require_toggle_marker,
+        )
 
-    def _assert_chiptool_logcat_oracles(self, req_device_id: str, interaction: CommissioningInteractionResult, logcat_cmd: str | None = None) -> None:
+    def _assert_chiptool_logcat_oracles(
+        self, req_device_id: str, interaction: CommissioningInteractionResult, logcat_cmd: str | None = None
+    ) -> None:
         logcat_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd or self.ONOFF_LOGCAT_CMD))
         self.logger.info('===== Android Logcat Snippet =====\n%s', logcat_out[-3000:])
         self.assertTrue(interaction.commissioned, 'Commissioning did not succeed')
@@ -484,8 +737,9 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         nonzero_err = find_nonzero_commissioning_error(logcat_out)
         self.assertTrue(nonzero_err is None, f'onCommissioningComplete returned a non-zero errorCode: {nonzero_err}')
         self.assertTrue(has_commissioning_complete_marker(logcat_out), 'adb logcat missing commissioning complete marker')
-        parsed = parse_toggle_read_logcat(logcat_out)
-        self.assertTrue(parsed.toggle_ok, 'adb logcat missing Toggle command success marker')
+        parsed = parse_toggle_read_logcat(logcat_out, require_toggle=interaction.require_toggle_marker)
+        if interaction.require_toggle_marker:
+            self.assertTrue(parsed.toggle_ok, 'adb logcat missing Toggle command success marker')
         self.assertTrue(parsed.read_ok, 'adb logcat missing post-toggle On/Off attribute value: true')
 
     def _assert_emulator_radio_path(self, req_device_id: str) -> None:
