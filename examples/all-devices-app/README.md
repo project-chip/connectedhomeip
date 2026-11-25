@@ -388,7 +388,8 @@ plus Identify and On/Off clients. Descriptor is provided by the endpoint base.
 The sensor sends commands through bindings using its C++ `SendOn`, `SendOff`,
 `SendToggle`, and `SendIdentify` methods. Optional clusters are not enabled.
 
-On POSIX, use the `--app-pipe` named pipe to send endpoint-scoped client commands:
+On POSIX, use the `--app-pipe` named pipe to send endpoint-scoped client
+commands:
 
 ```json
 {"Name": "SensorOn", "EndpointId": 1}
@@ -398,8 +399,9 @@ On POSIX, use the `--app-pipe` named pipe to send endpoint-scoped client command
 ```
 
 Configure the sensor's Binding list and the peer's ACL before sending commands.
-`SensorIdentify` takes an unsigned 16-bit duration in seconds; 0 stops identification.
-The actions send commands to bound peers and do not change local attributes.
+`SensorIdentify` takes an unsigned 16-bit duration in seconds; 0 stops
+identification. The actions send commands to bound peers and do not change local
+attributes.
 
 ### Example Interaction: Chime Device
 
