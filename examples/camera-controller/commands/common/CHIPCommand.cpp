@@ -484,7 +484,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         commissionerParams.enableServerInteractions     = NeedsOperationalAdvertising();
     }
 
-    // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1);
 
@@ -500,11 +499,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
         ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
 
-        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
-        // key is the same, but the derived keys will be different for each fabric.
-        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-        ReturnLogErrorOnFailure(
-            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex,
+                                                                         mCredIssuerCmds->GetIpkEpochKey(), compressed_fabric_id_span));
     }
 
     mCommissioners[identity] = std::move(commissioner);

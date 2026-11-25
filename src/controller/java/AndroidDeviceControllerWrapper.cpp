@@ -372,10 +372,23 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         JniByteArray jniIpk(env, ipkEpochKey);
         ipkBuffer = std::vector<uint8_t>(jniIpk.byteSpan().begin(), jniIpk.byteSpan().end());
         ipkSpan   = chip::ByteSpan(ipkBuffer.data(), ipkBuffer.size());
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+        if (ipkSpan.size() != chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+        // The issuer sends this IPK in AddNOC, so it must match the controller's key set 0.
+        opCredsIssuer->SetIpkEpochKey(chip::Crypto::IdentityProtectionKeySpan(ipkSpan.data()));
+#endif
     }
     else
     {
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+        ipkSpan = opCredsIssuer->GetIpkEpochKey();
+#else
         ipkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+#endif
     }
 
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(

@@ -53,7 +53,7 @@ public:
     // It is recommended that this index track the fabric index within which this issuer is operating.
     //
     ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
-    ~ExampleOperationalCredentialsIssuer() override {}
+    ~ExampleOperationalCredentialsIssuer() override { Crypto::ClearSecretData(mIpkEpochKey); }
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -75,8 +75,12 @@ public:
     void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
 
     /**
-     * @brief Initialize the issuer with the keypair in the storage.
-     *        If the storage doesn't have one, it'll create one, and it to the storage.
+     * @brief Initialize the issuer with the keypair and IPK epoch key in the storage.
+     *        If the storage doesn't have one, it'll create one, and save it to the storage.
+     *
+     *        The IPK epoch key is random and saved in the storage, so it is reused across restarts.
+     *        For backward compatibility, storage that holds a root keypair but no IPK epoch key keeps
+     *        the default IPK, which older versions always sent.
      *
      * @param[in] storage  A reference to the storage, where the keypair is stored.
      *                     The object of ExampleOperationalCredentialsIssuer doesn't hold
@@ -86,6 +90,20 @@ public:
      **/
     [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
     Initialize(PersistentStorageDelegate & storage);
+
+    /**
+     * The IPK epoch key sent in AddNOC for this issuer's fabrics. A controller using this issuer
+     * must install the same epoch key in its own key set 0, or CASE to the nodes it commissions fails.
+     *
+     * Only valid after a successful Initialize().
+     */
+    Crypto::IdentityProtectionKeySpan GetIpkEpochKey() const { return Crypto::IdentityProtectionKeySpan(mIpkEpochKey); }
+
+    /**
+     * Use `key` as the IPK epoch key for this issuer, for a fabric whose IPK was set by another
+     * administrator. The key is not persisted; call this after every Initialize().
+     */
+    void SetIpkEpochKey(Crypto::IdentityProtectionKeySpan key) { memcpy(mIpkEpochKey, key.data(), sizeof(mIpkEpochKey)); }
 
     void SetIssuerId(uint32_t id) { mRootIssuerId = id; }
 
@@ -112,8 +130,11 @@ public:
                                                MutableByteSpan & noc);
 
 private:
+    CHIP_ERROR LoadOrCreateIpkEpochKey(PersistentStorageDelegate & storage, bool rootKeypairWasStored);
+
     Crypto::P256Keypair mRootIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
+    uint8_t mIpkEpochKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = {};
     bool mInitialized              = false;
     uint32_t mRootIssuerId         = 1;
     uint32_t mIntermediateIssuerId = 2;

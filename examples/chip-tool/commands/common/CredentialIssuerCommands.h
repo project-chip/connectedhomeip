@@ -20,9 +20,11 @@
 
 #include <app/util/basic-types.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/TestGroupData.h>
 #include <vector>
 
 namespace chip {
@@ -76,6 +78,15 @@ public:
     virtual CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) = 0;
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
+
+    /**
+     * @brief The IPK epoch key that GetCredentialIssuer() sends in AddNOC. The controller installs the same epoch key in its
+     *        own key set 0, so that CASE to the nodes it commissions succeeds. Only valid after InitializeCredentialsIssuer().
+     */
+    virtual chip::Crypto::IdentityProtectionKeySpan GetIpkEpochKey()
+    {
+        return chip::Crypto::IdentityProtectionKeySpan(chip::GroupTesting::DefaultIpkValue::GetDefaultIpk().data());
+    }
 
     virtual void SetCredentialIssuerCATValues(chip::CATValues cats) = 0;
 

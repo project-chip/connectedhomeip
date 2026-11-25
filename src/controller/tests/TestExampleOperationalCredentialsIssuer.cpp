@@ -23,9 +23,11 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/PersistentStorageMacros.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -39,8 +41,20 @@ namespace {
 static constexpr size_t kNodeId   = 999;
 static constexpr size_t kFabricId = 1000;
 
+constexpr char kOperationalCredentialsIssuerKeypairStorage[]           = "ExampleOpCredsCAKey";
 constexpr char kOperationalCredentialsRootCertificateStorage[]         = "ExampleCARootCert";
 constexpr char kOperationalCredentialsIntermediateCertificateStorage[] = "ExampleCAIntermediateCert";
+constexpr char kOperationalCredentialsIpkEpochKeyStorage[]             = "ExampleOpCredsIPK";
+
+bool IsDefaultIpk(Crypto::IdentityProtectionKeySpan ipk)
+{
+    return ipk.data_equal(GroupTesting::DefaultIpkValue::GetDefaultIpk());
+}
+
+bool IsAllZero(Crypto::IdentityProtectionKeySpan ipk)
+{
+    return std::all_of(ipk.begin(), ipk.end(), [](uint8_t b) { return b == 0; });
+}
 
 class ExampleOperationalCredentialsIssuerTest : public ::testing::Test
 {
@@ -150,6 +164,127 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
                                                           rcacSpan, icacSpan, nocSpan);
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, FreshStorageGetsRandomPersistedIpkEpochKey)
+{
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+    Crypto::IdentityProtectionKeySpan ipk = mCredsIssuer.GetIpkEpochKey();
+    EXPECT_FALSE(IsDefaultIpk(ipk));
+    EXPECT_FALSE(IsAllZero(ipk));
+
+    ExampleOperationalCredentialsIssuer reloaded{ ::kFabricId };
+    EXPECT_SUCCESS(reloaded.Initialize(mPersistentStorageDelegate));
+    EXPECT_TRUE(reloaded.GetIpkEpochKey().data_equal(ipk));
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, SeparateStoragesGetDistinctIpkEpochKeys)
+{
+    TestPersistentStorageDelegate otherStorage;
+    ExampleOperationalCredentialsIssuer otherIssuer{ ::kFabricId };
+
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+    EXPECT_SUCCESS(otherIssuer.Initialize(otherStorage));
+    EXPECT_FALSE(mCredsIssuer.GetIpkEpochKey().data_equal(otherIssuer.GetIpkEpochKey()));
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, SeparateIndexesGetDistinctIpkEpochKeys)
+{
+    ExampleOperationalCredentialsIssuer otherIndexIssuer{ ::kFabricId + 1 };
+
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+    EXPECT_SUCCESS(otherIndexIssuer.Initialize(mPersistentStorageDelegate));
+    EXPECT_FALSE(mCredsIssuer.GetIpkEpochKey().data_equal(otherIndexIssuer.GetIpkEpochKey()));
+}
+
+// Storage written before the IPK epoch key was persisted holds a root keypair and no IPK entry.
+// Nodes commissioned from it hold the default IPK, so the issuer must keep using it.
+TEST_F(ExampleOperationalCredentialsIssuerTest, StorageWithRootKeypairButNoIpkKeepsDefaultIpkEpochKey)
+{
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(uint64_t{ ::kFabricId }, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      err = mPersistentStorageDelegate.SyncDeleteKeyValue(key));
+    ASSERT_SUCCESS(err);
+
+    ExampleOperationalCredentialsIssuer legacy{ ::kFabricId };
+    EXPECT_SUCCESS(legacy.Initialize(mPersistentStorageDelegate));
+    EXPECT_TRUE(IsDefaultIpk(legacy.GetIpkEpochKey()));
+
+    ExampleOperationalCredentialsIssuer reloaded{ ::kFabricId };
+    EXPECT_SUCCESS(reloaded.Initialize(mPersistentStorageDelegate));
+    EXPECT_TRUE(IsDefaultIpk(reloaded.GetIpkEpochKey()));
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, WrongSizeStoredIpkEpochKeyFailsInitialize)
+{
+    const uint8_t shortKey[4] = { 1, 2, 3, 4 };
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(uint64_t{ ::kFabricId }, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      err = mPersistentStorageDelegate.SyncSetKeyValue(key, shortKey, sizeof(shortKey)));
+    ASSERT_SUCCESS(err);
+
+    EXPECT_NE(mCredsIssuer.Initialize(mPersistentStorageDelegate), CHIP_NO_ERROR);
+}
+
+// A first Initialize() that fails to save the IPK epoch key must not leave storage that later reads as
+// pre-IPK storage, which would select the default IPK.
+TEST_F(ExampleOperationalCredentialsIssuerTest, FailedIpkEpochKeySaveDoesNotSelectDefaultIpk)
+{
+    char ipkStorageKey[sizeof(kOperationalCredentialsIpkEpochKeyStorage) + 2 * sizeof(NodeId) + 1];
+    PERSISTENT_KEY_OP(uint64_t{ ::kFabricId }, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      Platform::CopyString(ipkStorageKey, key));
+
+    constexpr int kAlwaysSucceed = -1;
+    constexpr int kAlwaysFail    = 0;
+    mPersistentStorageDelegate.AddPoisonKey(ipkStorageKey, kAlwaysSucceed, kAlwaysFail);
+    EXPECT_NE(mCredsIssuer.Initialize(mPersistentStorageDelegate), CHIP_NO_ERROR);
+
+    mPersistentStorageDelegate.ClearPoisonKeys();
+    ExampleOperationalCredentialsIssuer retried{ ::kFabricId };
+    EXPECT_SUCCESS(retried.Initialize(mPersistentStorageDelegate));
+    EXPECT_FALSE(IsDefaultIpk(retried.GetIpkEpochKey()));
+}
+
+// A root keypair that exists but cannot be read must not be replaced, and must not get a new IPK epoch key.
+TEST_F(ExampleOperationalCredentialsIssuerTest, RootKeypairReadErrorFailsInitialize)
+{
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(uint64_t{ ::kFabricId }, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      err = mPersistentStorageDelegate.SyncDeleteKeyValue(key));
+    ASSERT_SUCCESS(err);
+
+    char rootKeypairStorageKey[sizeof(kOperationalCredentialsIssuerKeypairStorage) + 2 * sizeof(NodeId) + 1];
+    PERSISTENT_KEY_OP(uint64_t{ ::kFabricId }, kOperationalCredentialsIssuerKeypairStorage, key,
+                      Platform::CopyString(rootKeypairStorageKey, key));
+
+    constexpr int kAlwaysSucceed = -1;
+    constexpr int kAlwaysFail    = 0;
+    mPersistentStorageDelegate.AddPoisonKey(rootKeypairStorageKey, kAlwaysFail, kAlwaysSucceed);
+    ExampleOperationalCredentialsIssuer failing{ ::kFabricId };
+    EXPECT_NE(failing.Initialize(mPersistentStorageDelegate), CHIP_NO_ERROR);
+
+    mPersistentStorageDelegate.ClearPoisonKeys();
+    ExampleOperationalCredentialsIssuer recovered{ ::kFabricId };
+    EXPECT_SUCCESS(recovered.Initialize(mPersistentStorageDelegate));
+    EXPECT_TRUE(IsDefaultIpk(recovered.GetIpkEpochKey()));
+}
+
+TEST_F(ExampleOperationalCredentialsIssuerTest, SetIpkEpochKeyOverridesWithoutPersisting)
+{
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
+    std::array<uint8_t, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES> storedIpk;
+    memcpy(storedIpk.data(), mCredsIssuer.GetIpkEpochKey().data(), storedIpk.size());
+
+    mCredsIssuer.SetIpkEpochKey(Crypto::IdentityProtectionKeySpan(GroupTesting::DefaultIpkValue::GetDefaultIpk().data()));
+    EXPECT_TRUE(IsDefaultIpk(mCredsIssuer.GetIpkEpochKey()));
+
+    ExampleOperationalCredentialsIssuer reloaded{ ::kFabricId };
+    EXPECT_SUCCESS(reloaded.Initialize(mPersistentStorageDelegate));
+    EXPECT_TRUE(reloaded.GetIpkEpochKey().data_equal(Crypto::IdentityProtectionKeySpan(storedIpk.data())));
 }
 
 } // namespace

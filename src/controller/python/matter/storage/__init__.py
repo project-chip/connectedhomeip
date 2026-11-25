@@ -246,7 +246,8 @@ class VolatileTemporaryPersistentStorage(PersistentStorageBase):
 
 
 # Regular expression to match CA keys.
-_caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
+_caKeyMatch = re.compile(
+    r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey|ExampleOpCredsIPK)(\d+)')
 
 
 class PersistentStorageJSON(PersistentStorageBase):
