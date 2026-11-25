@@ -59,11 +59,11 @@ the cluster.
 
 ## Effective modes
 
-| OperationMode    | EffectiveControlMode                                                                                                                                             | Delegate call           |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| OperationMode    | EffectiveControlMode                                                                                                                                                                                                      | Delegate call           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | Normal           | Remote sensor mode if `GetRemoteSensorType` reports a sensor, otherwise ControlMode. When no sensor is reported and ControlMode is Automatic or disabled, the application may override it with `SetEffectiveControlMode`. | `GetRemoteSensorType`   |
-| Minimum, Maximum | ConstantSpeed                                                                                                                                                    | `OnOperationModeMinMax` |
-| Local            | ControlMode. The application may override it with `SetEffectiveControlMode`.                                                                                     | none                    |
+| Minimum, Maximum | ConstantSpeed                                                                                                                                                                                                             | `OnOperationModeMinMax` |
+| Local            | ControlMode. The application may override it with `SetEffectiveControlMode`.                                                                                                                                              | none                    |
 
 EffectiveOperationMode is set to OperationMode when OperationMode changes.
 EffectiveControlMode is computed when OperationMode or ControlMode changes, and
@@ -158,18 +158,18 @@ more include:
 PumpConfigurationAndControl::Attributes::PumpStatus::Set(endpointId, pumpStatus);
 ```
 
-| Before                                                                  | After                                                                                                                        |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Attributes::<Name>::Get/Set/SetNull` for non-fixed attributes          | Same call, with the `CodegenIntegration.h` include                                                                           |
-| `Attributes::Max*/Min*::Set` at runtime                                 | Not available. Use ZAP default values, or `Config::fixedAttributes`                                                          |
-| `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`          | Not available. The setters report changes                                                                                    |
-| `MatterReportingAttributeChangeCallback` after a setter                 | Not needed. The setters report changes                                                                                       |
-| `MatterPostAttributeChangeCallback` for this cluster                    | Not called. Use `ApplicationDelegate::OnAttributeChanged`                                                                    |
-| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next OperationMode change sets it back to OperationMode, and it is not restored after a reboot |
+| Before                                                                  | After                                                                                                                                                                                        |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Attributes::<Name>::Get/Set/SetNull` for non-fixed attributes          | Same call, with the `CodegenIntegration.h` include                                                                                                                                           |
+| `Attributes::Max*/Min*::Set` at runtime                                 | Not available. Use ZAP default values, or `Config::fixedAttributes`                                                                                                                          |
+| `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`          | Not available. The setters report changes                                                                                                                                                    |
+| `MatterReportingAttributeChangeCallback` after a setter                 | Not needed. The setters report changes                                                                                                                                                       |
+| `MatterPostAttributeChangeCallback` for this cluster                    | Not called. Use `ApplicationDelegate::OnAttributeChanged`                                                                                                                                    |
+| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next OperationMode change sets it back to OperationMode, and it is not restored after a reboot                                             |
 | `Attributes::EffectiveControlMode::Set`                                 | Same call (validated against the FeatureMap). Returns `InvalidInState` when the cluster computes EffectiveControlMode (see [Effective modes](#effective-modes)). Not restored after a reboot |
-| `Attributes::ClusterRevision::Get`                                      | Not available. Use `PumpConfigurationAndControl::kRevision`                                                                  |
-| `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)`         | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`                                                         |
-| Remote sensor detection (not supported before)                          | `ApplicationDelegate::GetRemoteSensorType` and `OnRemoteSensorChanged`                                                       |
+| `Attributes::ClusterRevision::Get`                                      | Not available. Use `PumpConfigurationAndControl::kRevision`                                                                                                                                  |
+| `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)`         | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`                                                                                                                         |
+| Remote sensor detection (not supported before)                          | `ApplicationDelegate::GetRemoteSensorType` and `OnRemoteSensorChanged`                                                                                                                       |
 
 The accessors return `UnsupportedEndpoint` if the endpoint has no cluster and
 `UnsupportedAttribute` if the attribute is not enabled, as the generated
