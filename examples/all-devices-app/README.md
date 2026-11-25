@@ -94,6 +94,7 @@ The application supports the following device types (specified via the
 -   `dimmable-plug-in-unit`
 -   `dishwasher-simulated`
 -   `doorbell`
+-   `electrical-energy-tariff`
 -   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
