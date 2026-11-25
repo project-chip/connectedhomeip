@@ -151,6 +151,10 @@ public:
     /// OperationMode or ControlMode change, or a remote sensor change reported with
     /// OnRemoteSensorChanged) overwrites it.
     ///
+    /// The value is not persisted: Startup computes EffectiveControlMode from OperationMode,
+    /// ControlMode and the remote sensor, so the application sets the override again after a
+    /// restart.
+    ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
     /// Returns InvalidInState if the application does not own EffectiveControlMode.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
@@ -227,20 +231,27 @@ private:
                                                       BitMask<OptionalAttributes> optionalAttributes);
 
     /// Assigns `value` to `dest` and, if the value changed, reports the change and calls
-    /// Delegate::OnAttributeChanged. Returns true if the value changed.
+    /// Delegate::OnAttributeChanged.
     ///
     /// Only for setters where this is the last state change: the delegate may call back into
     /// the cluster.
     template <typename T, typename U>
-    bool UpdateAttribute(T & dest, const U & value, AttributeId attributeId)
+    void UpdateAttribute(T & dest, const U & value, AttributeId attributeId)
     {
-        VerifyOrReturnValue(SetAttributeValue(dest, value, attributeId), false);
+        VerifyOrReturn(SetAttributeValue(dest, value, attributeId));
         mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
-        return true;
     }
 
+    /// Same as UpdateAttribute, and also stores the new value in the attribute persistence provider.
     template <typename T>
-    bool UpdateQuietAttribute(QuieterReportingAttribute<T> & attr, const DataModel::Nullable<T> & value, AttributeId attributeId);
+    void UpdatePersistedAttribute(T & dest, const T & value, AttributeId attributeId);
+
+    template <typename T>
+    void UpdateQuietAttribute(QuieterReportingAttribute<T> & attr, const DataModel::Nullable<T> & value, AttributeId attributeId);
+
+    /// Stores `value` for `attributeId`. Does nothing before Startup. Failures are logged.
+    template <typename T>
+    void StoreAttribute(AttributeId attributeId, const T & value);
 
     bool IsOperationModeSupported(PumpConfigurationAndControl::OperationModeEnum operationMode) const;
     bool IsControlModeSupported(PumpConfigurationAndControl::ControlModeEnum controlMode) const;
@@ -249,39 +260,18 @@ private:
     PumpConfigurationAndControl::ControlModeEnum
     SelectInitialControlMode(std::optional<PumpConfigurationAndControl::ControlModeEnum> configured) const;
 
-    /// Attributes changed by one mode update. The delegate is told about them only after all
-    /// values of the update are written.
-    class ChangedAttributes
-    {
-    public:
-        void Add(AttributeId attributeId)
-        {
-            VerifyOrDie(mCount < kMaxCount);
-            mAttributeIds[mCount++] = attributeId;
-        }
-        const AttributeId * begin() const { return mAttributeIds; }
-        const AttributeId * end() const { return mAttributeIds + mCount; }
-
-    private:
-        // The mode attribute that triggered the update, EffectiveOperationMode,
-        // EffectiveControlMode and PumpStatus.
-        static constexpr size_t kMaxCount = 4;
-        AttributeId mAttributeIds[kMaxCount];
-        size_t mCount = 0;
-    };
-
-    /// Recomputes EffectiveControlMode and the remote sensor bits of PumpStatus for `sensorType`
-    /// (the result of GetActiveRemoteSensor), then calls the delegate: OnOperationModeMinMax if
-    /// applicable, then OnAttributeChanged for `changed` and for every attribute changed here.
+    /// Recomputes the values that depend on OperationMode, ControlMode and the remote sensor
+    /// `sensorType` (the result of GetActiveRemoteSensor): EffectiveOperationMode (only when
+    /// `trigger` is OperationMode), EffectiveControlMode and the remote sensor bits of PumpStatus.
+    /// Then calls the delegate: OnOperationModeMinMax when OperationMode changed to Minimum or
+    /// Maximum, then OnAttributeChanged for `trigger` (unless kInvalidAttributeId) and for every
+    /// attribute changed here.
     ///
     /// The delegate is called only after all values are written, and the state is not modified
     /// after the first delegate call. A delegate that calls back into the cluster (e.g.
     /// OnRemoteSensorChanged from OnAttributeChanged) therefore starts from a consistent state,
     /// and its update is not overwritten by this one.
-    void UpdateEffectiveModes(ChangedAttributes & changed, PumpConfigurationAndControl::RemoteSensorType sensorType);
-
-    /// Invalidates any persisted EffectiveControlMode override.
-    void ClearStoredEffectiveControlModeOverride();
+    void UpdateEffectiveModes(AttributeId trigger, PumpConfigurationAndControl::RemoteSensorType sensorType);
 
     const BitFlags<PumpConfigurationAndControl::Feature> mFeatures;
     const EnabledAttributeSet mEnabledOptionalAttributes;
@@ -293,9 +283,8 @@ private:
     PumpConfigurationAndControl::ControlModeEnum mControlMode;
     PumpConfigurationAndControl::OperationModeEnum mEffectiveOperationMode;
     PumpConfigurationAndControl::ControlModeEnum mEffectiveControlMode;
-    bool mHasStoredEffectiveControlModeOverride = false;
     /// Remote sensor used for the last EffectiveControlMode computation. kNoSensor unless
-    /// OperationMode is Normal.
+    /// OperationMode is Normal. The remote sensor bits of mPumpStatus always match this value.
     PumpConfigurationAndControl::RemoteSensorType mActiveRemoteSensor = PumpConfigurationAndControl::RemoteSensorType::kNoSensor;
     PumpStatusBitMask mPumpStatus{ 0 };
     QuieterReportingAttribute<int16_t> mCapacity{ DataModel::NullNullable };

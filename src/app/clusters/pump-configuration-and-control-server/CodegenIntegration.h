@@ -30,8 +30,8 @@ namespace chip::app::Clusters::PumpConfigurationAndControl {
 /// Optional application hooks for a cluster created from the ZAP configuration.
 ///
 /// The integration always gives the cluster its own Delegate. That delegate forwards the calls below
-/// to the ApplicationDelegate installed with SetApplicationDelegate. While OperationMode is Minimum or
-/// Maximum, it also sets the Level Control CurrentLevel on the same endpoint to MinLevel (at least 1)
+/// to the ApplicationDelegate installed with SetApplicationDelegate. When OperationMode changes to Minimum
+/// or Maximum, it also sets the Level Control CurrentLevel on the same endpoint to MinLevel (at least 1)
 /// or MaxLevel, if the application includes the Level Control cluster.
 class ApplicationDelegate
 {

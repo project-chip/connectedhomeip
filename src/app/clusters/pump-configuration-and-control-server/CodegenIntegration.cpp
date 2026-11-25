@@ -49,7 +49,7 @@ static_assert(kPumpConfigurationAndControlMaxClusterCount < kEmberInvalidEndpoin
 /// Delegate of each cluster created from the ZAP configuration.
 ///
 /// It forwards the remote sensor query and the attribute change notifications to the
-/// ApplicationDelegate, if one is installed. While OperationMode is Minimum or Maximum it sets the
+/// ApplicationDelegate, if one is installed. When OperationMode changes to Minimum or Maximum, it sets the
 /// Level Control CurrentLevel on the same endpoint to MinLevel (at least 1) or MaxLevel.
 class CodegenDelegate : public PumpConfigurationAndControl::Delegate
 {

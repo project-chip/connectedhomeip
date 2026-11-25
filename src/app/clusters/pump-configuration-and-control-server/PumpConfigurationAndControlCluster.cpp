@@ -36,13 +36,21 @@ constexpr uint32_t kMaxNullableInt24u = 0xFFFFFE;
 /// Minimum valid value for MinConstTemp and MaxConstTemp (-273.15 °C in 0.01 °C steps).
 constexpr int16_t kMinConstTempValue = -27315;
 
+using PumpStatusBitMask = PumpConfigurationAndControlCluster::PumpStatusBitMask;
+
 /// Bits defined by PumpStatusBitmap.
-constexpr uint16_t kPumpStatusDefinedBits = 0x01FF;
+constexpr PumpStatusBitMask kPumpStatusDefinedBits(PumpStatusBitmap::kDeviceFault, PumpStatusBitmap::kSupplyFault,
+                                                   PumpStatusBitmap::kSpeedLow, PumpStatusBitmap::kSpeedHigh,
+                                                   PumpStatusBitmap::kLocalOverride, PumpStatusBitmap::kRunning,
+                                                   PumpStatusBitmap::kRemotePressure, PumpStatusBitmap::kRemoteFlow,
+                                                   PumpStatusBitmap::kRemoteTemperature);
 
 /// Remote sensor bits of PumpStatusBitmap, owned by the cluster.
-constexpr PumpConfigurationAndControlCluster::PumpStatusBitMask kRemoteSensorStatusBits(PumpStatusBitmap::kRemotePressure,
-                                                                                        PumpStatusBitmap::kRemoteFlow,
-                                                                                        PumpStatusBitmap::kRemoteTemperature);
+constexpr PumpStatusBitMask kRemoteSensorStatusBits(PumpStatusBitmap::kRemotePressure, PumpStatusBitmap::kRemoteFlow,
+                                                    PumpStatusBitmap::kRemoteTemperature);
+
+/// Minimum time between two reportable changes of a quieter reporting attribute.
+constexpr System::Clock::Milliseconds64 kQuietReportingInterval(1000);
 
 bool IsValidNullableInt24u(const DataModel::Nullable<uint32_t> & value)
 {
@@ -55,83 +63,84 @@ bool IsValidNullable(const DataModel::Nullable<T> & value)
     return value.IsNull() || value.ExistingValueInEncodableRange();
 }
 
+/// Sets `value` to null if `isValid` is false. The spec requires invalid fixed values to read as null.
 template <typename T>
-void NullIfInvalid(DataModel::Nullable<T> & value)
+void NullIfInvalid(DataModel::Nullable<T> & value, bool isValid, AttributeId attributeId)
 {
-    if (!IsValidNullable(value))
-    {
-        value.SetNull();
-    }
+    VerifyOrReturn(!isValid);
+    ChipLogError(Zcl, "PCC: invalid value for fixed attribute 0x%" PRIx32 ", using null", attributeId);
+    value.SetNull();
+}
+
+template <typename T>
+void NullIfInvalid(DataModel::Nullable<T> & value, AttributeId attributeId)
+{
+    NullIfInvalid(value, IsValidNullable(value), attributeId);
 }
 
 PumpConfigurationAndControlCluster::FixedAttributes
 SanitizeFixedAttributes(PumpConfigurationAndControlCluster::FixedAttributes fixed)
 {
-    NullIfInvalid(fixed.maxPressure);
-    NullIfInvalid(fixed.maxSpeed);
-    NullIfInvalid(fixed.maxFlow);
-    NullIfInvalid(fixed.minConstPressure);
-    NullIfInvalid(fixed.maxConstPressure);
-    NullIfInvalid(fixed.minCompPressure);
-    NullIfInvalid(fixed.maxCompPressure);
-    NullIfInvalid(fixed.minConstSpeed);
-    NullIfInvalid(fixed.maxConstSpeed);
-    NullIfInvalid(fixed.minConstFlow);
-    NullIfInvalid(fixed.maxConstFlow);
-    if (!fixed.minConstTemp.IsNull() && fixed.minConstTemp.Value() < kMinConstTempValue)
-    {
-        fixed.minConstTemp.SetNull();
-    }
-    if (!fixed.maxConstTemp.IsNull() &&
-        (fixed.maxConstTemp.Value() < kMinConstTempValue ||
-         (!fixed.minConstTemp.IsNull() && fixed.maxConstTemp.Value() < fixed.minConstTemp.Value())))
-    {
-        fixed.maxConstTemp.SetNull();
-    }
+    NullIfInvalid(fixed.maxPressure, MaxPressure::Id);
+    NullIfInvalid(fixed.maxSpeed, MaxSpeed::Id);
+    NullIfInvalid(fixed.maxFlow, MaxFlow::Id);
+    NullIfInvalid(fixed.minConstPressure, MinConstPressure::Id);
+    NullIfInvalid(fixed.maxConstPressure, MaxConstPressure::Id);
+    NullIfInvalid(fixed.minCompPressure, MinCompPressure::Id);
+    NullIfInvalid(fixed.maxCompPressure, MaxCompPressure::Id);
+    NullIfInvalid(fixed.minConstSpeed, MinConstSpeed::Id);
+    NullIfInvalid(fixed.maxConstSpeed, MaxConstSpeed::Id);
+    NullIfInvalid(fixed.minConstFlow, MinConstFlow::Id);
+    NullIfInvalid(fixed.maxConstFlow, MaxConstFlow::Id);
+    NullIfInvalid(fixed.minConstTemp, fixed.minConstTemp.IsNull() || fixed.minConstTemp.Value() >= kMinConstTempValue,
+                  MinConstTemp::Id);
+    // The spec also requires MaxConstTemp >= MinConstTemp.
+    NullIfInvalid(fixed.maxConstTemp,
+                  fixed.maxConstTemp.IsNull() ||
+                      (fixed.maxConstTemp.Value() >= kMinConstTempValue &&
+                       (fixed.minConstTemp.IsNull() || fixed.maxConstTemp.Value() >= fixed.minConstTemp.Value())),
+                  MaxConstTemp::Id);
     return fixed;
 }
 
+/// `sensorType` is the active remote sensor, which is kNoSensor unless `operationMode` is Normal.
 ControlModeEnum ComputeEffectiveControlMode(OperationModeEnum operationMode, ControlModeEnum controlMode,
                                             RemoteSensorType sensorType)
 {
-    switch (operationMode)
+    if (operationMode == OperationModeEnum::kMinimum || operationMode == OperationModeEnum::kMaximum)
     {
-    case OperationModeEnum::kMinimum:
-    case OperationModeEnum::kMaximum:
         return ControlModeEnum::kConstantSpeed;
-    case OperationModeEnum::kNormal:
-        switch (sensorType)
-        {
-        case RemoteSensorType::kFlowSensor:
-            return ControlModeEnum::kConstantFlow;
-        case RemoteSensorType::kPressureSensor:
-            return ControlModeEnum::kConstantPressure;
-        case RemoteSensorType::kTemperatureSensor:
-            return ControlModeEnum::kConstantTemperature;
-        case RemoteSensorType::kNoSensor:
-            break;
-        }
-        return controlMode;
-    default:
-        // In Local mode the application owns EffectiveControlMode and may override it.
-        return controlMode;
     }
-}
-
-PumpConfigurationAndControlCluster::PumpStatusBitMask RemoteSensorStatusBits(RemoteSensorType sensorType)
-{
     switch (sensorType)
     {
     case RemoteSensorType::kFlowSensor:
-        return PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRemoteFlow);
+        return ControlModeEnum::kConstantFlow;
     case RemoteSensorType::kPressureSensor:
-        return PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRemotePressure);
+        return ControlModeEnum::kConstantPressure;
     case RemoteSensorType::kTemperatureSensor:
-        return PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRemoteTemperature);
+        return ControlModeEnum::kConstantTemperature;
     case RemoteSensorType::kNoSensor:
         break;
     }
-    return PumpConfigurationAndControlCluster::PumpStatusBitMask();
+    return controlMode;
+}
+
+/// Returns `status` with the remote sensor bits set for `sensorType`.
+PumpStatusBitMask WithRemoteSensorBits(PumpStatusBitMask status, RemoteSensorType sensorType)
+{
+    status.Clear(kRemoteSensorStatusBits);
+    switch (sensorType)
+    {
+    case RemoteSensorType::kFlowSensor:
+        return status.Set(PumpStatusBitmap::kRemoteFlow);
+    case RemoteSensorType::kPressureSensor:
+        return status.Set(PumpStatusBitmap::kRemotePressure);
+    case RemoteSensorType::kTemperatureSensor:
+        return status.Set(PumpStatusBitmap::kRemoteTemperature);
+    case RemoteSensorType::kNoSensor:
+        break;
+    }
+    return status;
 }
 
 /// Loads a LifetimeRunningHours value stored in the 3-byte int24u attribute format (0xFFFFFF is
@@ -155,20 +164,27 @@ bool LoadInt24uLifetimeRunningHours(AttributePersistenceProvider & provider, con
     return true;
 }
 
+} // namespace
+
 template <typename T>
-void StoreAttribute(ServerClusterContext * context, const ConcreteClusterPath & clusterPath, AttributeId attributeId,
-                    const T & value)
+void PumpConfigurationAndControlCluster::StoreAttribute(AttributeId attributeId, const T & value)
 {
-    VerifyOrReturn(context != nullptr);
-    AttributePersistence persistence(context->attributeStorage);
-    CHIP_ERROR err = persistence.StoreNativeEndianValue({ clusterPath.mEndpointId, clusterPath.mClusterId, attributeId }, value);
+    VerifyOrReturn(mContext != nullptr);
+    AttributePersistence persistence(mContext->attributeStorage);
+    CHIP_ERROR err = persistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, attributeId }, value);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "PCC: failed to store attribute 0x%" PRIx32 ": %" CHIP_ERROR_FORMAT, attributeId, err.Format());
     }
 }
 
-} // namespace
+template <typename T>
+void PumpConfigurationAndControlCluster::UpdatePersistedAttribute(T & dest, const T & value, AttributeId attributeId)
+{
+    VerifyOrReturn(SetAttributeValue(dest, value, attributeId));
+    StoreAttribute(attributeId, dest);
+    mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+}
 
 PumpConfigurationAndControlCluster::EnabledAttributeSet
 PumpConfigurationAndControlCluster::BuildEnabledAttributes(BitFlags<Feature> features,
@@ -248,35 +264,15 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
         }
     }
 
-    // Derived effective modes are rebuilt from the restored modes instead of persisted. Only an
-    // explicit application override of EffectiveControlMode (in Local mode, or in Normal mode
-    // without an active remote sensor when ControlMode is Automatic or disabled) is persisted and
-    // restored. The delegate is not notified: it may not be ready yet, and Level Control may not be
-    // initialized.
-    ControlModeEnum storedEffectiveControlMode = ControlModeEnum::kUnknownEnumValue;
-    const bool hasStoredEntry                  = persistence.LoadNativeEndianValue(
-        { endpointId, clusterId, EffectiveControlMode::Id }, storedEffectiveControlMode, ControlModeEnum::kUnknownEnumValue);
-
-    const RemoteSensorType sensorType = GetActiveRemoteSensor();
-    mActiveRemoteSensor               = sensorType;
-    mEffectiveOperationMode           = mOperationMode;
-    if (CanApplicationOwnEffectiveControlMode(sensorType) && IsControlModeSupported(storedEffectiveControlMode))
-    {
-        mEffectiveControlMode                  = storedEffectiveControlMode;
-        mHasStoredEffectiveControlModeOverride = true;
-    }
-    else
-    {
-        mEffectiveControlMode                  = ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
-        mHasStoredEffectiveControlModeOverride = false;
-        if (hasStoredEntry && storedEffectiveControlMode != ControlModeEnum::kUnknownEnumValue)
-        {
-            StoreAttribute(mContext, mPath, EffectiveControlMode::Id, ControlModeEnum::kUnknownEnumValue);
-        }
-    }
+    // The effective modes are derived from the restored modes and the remote sensor, so they are
+    // not persisted. The delegate is not notified: it may not be ready yet, and Level Control may
+    // not be initialized.
+    mActiveRemoteSensor     = GetActiveRemoteSensor();
+    mEffectiveOperationMode = mOperationMode;
+    mEffectiveControlMode   = ComputeEffectiveControlMode(mOperationMode, mControlMode, mActiveRemoteSensor);
     if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
-        mPumpStatus.Clear(kRemoteSensorStatusBits).Set(RemoteSensorStatusBits(sensorType));
+        mPumpStatus = WithRemoteSensorBits(mPumpStatus, mActiveRemoteSensor);
     }
 
     if (mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id))
@@ -287,7 +283,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
             LoadInt24uLifetimeRunningHours(context.attributeStorage, path, mLifetimeRunningHours))
         {
             // Store the value in the current format, so that later loads do not need the conversion.
-            StoreAttribute(mContext, mPath, LifetimeRunningHours::Id, mLifetimeRunningHours);
+            StoreAttribute(LifetimeRunningHours::Id, mLifetimeRunningHours);
         }
         if (!IsValidNullableInt24u(mLifetimeRunningHours))
         {
@@ -430,15 +426,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnu
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(SetAttributeValue(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
-    StoreAttribute(mContext, mPath, OperationMode::Id, mOperationMode);
-
-    ChangedAttributes changed;
-    changed.Add(OperationMode::Id);
-    if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
-    {
-        changed.Add(EffectiveOperationMode::Id);
-    }
-    UpdateEffectiveModes(changed, GetActiveRemoteSensor());
+    StoreAttribute(OperationMode::Id, mOperationMode);
+    UpdateEffectiveModes(OperationMode::Id, GetActiveRemoteSensor());
     return CHIP_NO_ERROR;
 }
 
@@ -447,11 +436,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetControlMode(ControlModeEnum co
     VerifyOrReturnError(mControlModeEnabled, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(SetAttributeValue(mControlMode, controlMode, ControlMode::Id), CHIP_NO_ERROR);
-    StoreAttribute(mContext, mPath, ControlMode::Id, mControlMode);
-
-    ChangedAttributes changed;
-    changed.Add(ControlMode::Id);
-    UpdateEffectiveModes(changed, GetActiveRemoteSensor());
+    StoreAttribute(ControlMode::Id, mControlMode);
+    UpdateEffectiveModes(ControlMode::Id, GetActiveRemoteSensor());
     return CHIP_NO_ERROR;
 }
 
@@ -459,62 +445,37 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
 {
     VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(CanApplicationOwnEffectiveControlMode(mActiveRemoteSensor), CHIP_IM_GLOBAL_STATUS(InvalidInState));
-    const bool changed = SetAttributeValue(mEffectiveControlMode, controlMode, EffectiveControlMode::Id);
-    if (mContext != nullptr && (changed || !mHasStoredEffectiveControlModeOverride))
-    {
-        StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
-        mHasStoredEffectiveControlModeOverride = true;
-    }
-    if (changed)
-    {
-        mDelegate.OnAttributeChanged(mPath.mEndpointId, EffectiveControlMode::Id);
-    }
+    UpdateAttribute(mEffectiveControlMode, controlMode, EffectiveControlMode::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveOperationMode(OperationModeEnum operationMode)
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mEffectiveOperationMode, operationMode, EffectiveOperationMode::Id))
-    {
-        mDelegate.OnAttributeChanged(mPath.mEndpointId, EffectiveOperationMode::Id);
-    }
+    UpdateAttribute(mEffectiveOperationMode, operationMode, EffectiveOperationMode::Id);
     return CHIP_NO_ERROR;
-}
-
-void PumpConfigurationAndControlCluster::ClearStoredEffectiveControlModeOverride()
-{
-    VerifyOrReturn(mHasStoredEffectiveControlModeOverride);
-    mHasStoredEffectiveControlModeOverride = false;
-    StoreAttribute(mContext, mPath, EffectiveControlMode::Id, ControlModeEnum::kUnknownEnumValue);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask pumpStatus)
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(PumpStatus::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    VerifyOrReturnError((pumpStatus.Raw() & ~kPumpStatusDefinedBits) == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    const PumpStatusBitMask preservedRemoteBits(static_cast<uint16_t>(mPumpStatus.Raw() & kRemoteSensorStatusBits.Raw()));
-    pumpStatus.Clear(kRemoteSensorStatusBits).Set(preservedRemoteBits);
-    UpdateAttribute(mPumpStatus, pumpStatus, PumpStatus::Id);
+    VerifyOrReturnError((pumpStatus.Raw() & ~kPumpStatusDefinedBits.Raw()) == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    UpdateAttribute(mPumpStatus, WithRemoteSensorBits(pumpStatus, mActiveRemoteSensor), PumpStatus::Id);
     return CHIP_NO_ERROR;
 }
 
 template <typename T>
-bool PumpConfigurationAndControlCluster::UpdateQuietAttribute(QuieterReportingAttribute<T> & attr,
+void PumpConfigurationAndControlCluster::UpdateQuietAttribute(QuieterReportingAttribute<T> & attr,
                                                               const DataModel::Nullable<T> & value, AttributeId attributeId)
 {
-    VerifyOrReturnValue(attr.value() != value, false);
-    const AttributeDirtyState dirtyState = attr.SetValue(
-        value, System::SystemClock().GetMonotonicMilliseconds64(),
-        [](const typename QuieterReportingAttribute<T>::SufficientChangePredicateCandidate & candidate) {
-            return (candidate.lastDirtyValue != candidate.newValue) &&
-                ((candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= System::Clock::Milliseconds64(1000));
-        });
+    VerifyOrReturn(attr.value() != value);
+    const AttributeDirtyState dirtyState =
+        attr.SetValue(value, System::SystemClock().GetMonotonicMilliseconds64(),
+                      QuieterReportingAttribute<T>::GetPredicateForSufficientTimeSinceLastDirty(kQuietReportingInterval));
     NotifyAttributeChanged(attributeId,
                            dirtyState == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
                                                                           : DataModel::AttributeChangeType::kQuiet);
     mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
-    return true;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetCapacity(DataModel::Nullable<int16_t> capacity)
@@ -544,11 +505,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeRunningHours(DataModel
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullableInt24u(hours), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mLifetimeRunningHours, hours, LifetimeRunningHours::Id))
-    {
-        StoreAttribute(mContext, mPath, LifetimeRunningHours::Id, mLifetimeRunningHours);
-        mDelegate.OnAttributeChanged(mPath.mEndpointId, LifetimeRunningHours::Id);
-    }
+    UpdatePersistedAttribute(mLifetimeRunningHours, hours, LifetimeRunningHours::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -556,11 +513,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeEnergyConsumed(DataMod
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeEnergyConsumed::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullable(energy), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id))
-    {
-        StoreAttribute(mContext, mPath, LifetimeEnergyConsumed::Id, mLifetimeEnergyConsumed);
-        mDelegate.OnAttributeChanged(mPath.mEndpointId, LifetimeEnergyConsumed::Id);
-    }
+    UpdatePersistedAttribute(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -671,39 +624,42 @@ void PumpConfigurationAndControlCluster::OnRemoteSensorChanged()
 {
     const RemoteSensorType sensorType = GetActiveRemoteSensor();
     VerifyOrReturn(sensorType != mActiveRemoteSensor);
-    ChangedAttributes changed;
-    UpdateEffectiveModes(changed, sensorType);
+    UpdateEffectiveModes(kInvalidAttributeId, sensorType);
 }
 
-void PumpConfigurationAndControlCluster::UpdateEffectiveModes(ChangedAttributes & changed, RemoteSensorType sensorType)
+void PumpConfigurationAndControlCluster::UpdateEffectiveModes(AttributeId trigger, RemoteSensorType sensorType)
 {
-    const EndpointId endpointId = mPath.mEndpointId;
-    mActiveRemoteSensor         = sensorType;
+    const EndpointId endpointId     = mPath.mEndpointId;
+    const bool operationModeChanged = (trigger == OperationMode::Id);
+    mActiveRemoteSensor             = sensorType;
 
-    if (SetAttributeValue(mEffectiveControlMode, ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType),
-                          EffectiveControlMode::Id))
-    {
-        changed.Add(EffectiveControlMode::Id);
-    }
-    ClearStoredEffectiveControlModeOverride();
-    if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
-    {
-        PumpStatusBitMask pumpStatus = mPumpStatus;
-        pumpStatus.Clear(kRemoteSensorStatusBits).Set(RemoteSensorStatusBits(sensorType));
-        if (SetAttributeValue(mPumpStatus, pumpStatus, PumpStatus::Id))
-        {
-            changed.Add(PumpStatus::Id);
-        }
-    }
+    const bool effectiveOperationModeChanged =
+        operationModeChanged && SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id);
+    const bool effectiveControlModeChanged = SetAttributeValue(
+        mEffectiveControlMode, ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType), EffectiveControlMode::Id);
+    const bool pumpStatusChanged = mEnabledOptionalAttributes.IsSet(PumpStatus::Id) &&
+        SetAttributeValue(mPumpStatus, WithRemoteSensorBits(mPumpStatus, sensorType), PumpStatus::Id);
 
     // All values are written: delegate calls below may call back into the cluster.
-    if (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum)
+    if (operationModeChanged && (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum))
     {
         mDelegate.OnOperationModeMinMax(endpointId, mOperationMode);
     }
-    for (AttributeId attributeId : changed)
+    if (trigger != kInvalidAttributeId)
     {
-        mDelegate.OnAttributeChanged(endpointId, attributeId);
+        mDelegate.OnAttributeChanged(endpointId, trigger);
+    }
+    if (effectiveOperationModeChanged)
+    {
+        mDelegate.OnAttributeChanged(endpointId, EffectiveOperationMode::Id);
+    }
+    if (effectiveControlModeChanged)
+    {
+        mDelegate.OnAttributeChanged(endpointId, EffectiveControlMode::Id);
+    }
+    if (pumpStatusChanged)
+    {
+        mDelegate.OnAttributeChanged(endpointId, PumpStatus::Id);
     }
 }
 
