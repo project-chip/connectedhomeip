@@ -1389,6 +1389,7 @@ private:
             }
             RegisterAlias("window-covering-simulated", "window-covering");
         }
+
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING_CONTROLLER)
         {
             RegisterCreator("window-covering-controller", [this]() {

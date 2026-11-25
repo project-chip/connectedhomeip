@@ -153,6 +153,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCoveringVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/impl/SimulatedWindowCovering.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering-controller/WindowCoveringController.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
@@ -263,6 +264,7 @@ foreach(_key
         water-leak-detector
         water-valve
         window-covering
+        window-covering-controller
         # keep-sorted: end
     )
     string(REPLACE "-" "_" _suffix "${_key}")
