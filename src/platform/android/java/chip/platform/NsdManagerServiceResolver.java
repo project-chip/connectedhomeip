@@ -25,6 +25,7 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Build;
 import android.util.Log;
 import androidx.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private MulticastLock publishMulticastLock;
+  private final Object mRegistrationLock = new Object();
   private final Map<String, ActiveRegistration> mActiveRegistrations = new HashMap<>();
   private boolean mSetSubtypesUnavailableLogged = false;
   @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
@@ -74,6 +76,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     this.publishMulticastLock =
         ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipPublishMulticastLock");
+    // Held whenever mActiveRegistrations is non-empty; tracked explicitly instead of via refcount.
     this.publishMulticastLock.setReferenceCounted(false);
 
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
@@ -160,33 +163,11 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       String[] textEntriesKeys,
       byte[][] textEntriesDatas,
       String[] subTypes) {
-    Map<String, String> txtAttributes = new LinkedHashMap<>();
-    if (textEntriesKeys != null && textEntriesDatas != null) {
-      int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
-      for (int i = 0; i < cnt; i++) {
-        if (textEntriesKeys[i] == null) {
-          continue;
-        }
-        String value =
-            textEntriesDatas[i] != null
-                ? new String(textEntriesDatas[i], StandardCharsets.UTF_8)
-                : "";
-        txtAttributes.put(textEntriesKeys[i], value);
-      }
-    }
-
-    Set<String> subTypeSet = new LinkedHashSet<>();
-    if (subTypes != null) {
-      for (String subType : subTypes) {
-        if (subType != null && !subType.isEmpty()) {
-          subTypeSet.add(subType);
-        }
-      }
-    }
-
+    Map<String, String> txtAttributes = toTextEntriesMap(textEntriesKeys, textEntriesDatas);
+    Set<String> subTypeSet = toSubTypesSet(subTypes);
     String mapKey = type + ":" + serviceName;
 
-    synchronized (NsdManagerServiceResolver.this) {
+    synchronized (mRegistrationLock) {
       ActiveRegistration existing = mActiveRegistrations.get(mapKey);
       if (existing != null) {
         if (existing.matches(port, txtAttributes, subTypeSet)) {
@@ -239,9 +220,50 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     }
   }
 
+  private static Map<String, String> toTextEntriesMap(
+      @Nullable String[] textEntriesKeys, @Nullable byte[][] textEntriesDatas) {
+    Map<String, String> txtAttributes = new LinkedHashMap<>();
+    if (textEntriesKeys == null && textEntriesDatas == null) {
+      return txtAttributes;
+    }
+    if (textEntriesKeys == null
+        || textEntriesDatas == null
+        || textEntriesKeys.length != textEntriesDatas.length) {
+      throw new IllegalArgumentException(
+          "textEntriesKeys and textEntriesDatas must both be null or have equal length (got "
+              + (textEntriesKeys == null ? "null" : textEntriesKeys.length)
+              + " keys vs "
+              + (textEntriesDatas == null ? "null" : textEntriesDatas.length)
+              + " values)");
+    }
+    for (int i = 0; i < textEntriesKeys.length; i++) {
+      if (textEntriesKeys[i] == null) {
+        continue;
+      }
+      String value =
+          textEntriesDatas[i] != null
+              ? new String(textEntriesDatas[i], StandardCharsets.UTF_8)
+              : "";
+      txtAttributes.put(textEntriesKeys[i], value);
+    }
+    return txtAttributes;
+  }
+
+  private static Set<String> toSubTypesSet(@Nullable String[] subTypes) {
+    Set<String> subTypeSet = new LinkedHashSet<>();
+    if (subTypes != null) {
+      for (String subType : subTypes) {
+        if (subType != null && !subType.isEmpty()) {
+          subTypeSet.add(subType);
+        }
+      }
+    }
+    return subTypeSet;
+  }
+
   @Override
   public void removeServices() {
-    synchronized (NsdManagerServiceResolver.this) {
+    synchronized (mRegistrationLock) {
       Log.d(
           TAG, "removeServices: marking " + mActiveRegistrations.size() + " services for removal");
       for (ActiveRegistration reg : mActiveRegistrations.values()) {
@@ -252,7 +274,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
   @Override
   public void finalizeServiceUpdate() {
-    synchronized (NsdManagerServiceResolver.this) {
+    synchronized (mRegistrationLock) {
       Log.d(TAG, "finalizeServiceUpdate: active count = " + mActiveRegistrations.size());
       Iterator<Map.Entry<String, ActiveRegistration>> it =
           mActiveRegistrations.entrySet().iterator();
@@ -277,7 +299,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         try {
           Method setSubtypesMethod = NsdServiceInfo.class.getMethod("setSubtypes", Set.class);
           setSubtypesMethod.invoke(serviceInfo, subTypeSet);
-        } catch (ReflectiveOperationException e) {
+        } catch (NoSuchMethodException | IllegalAccessException e) {
           if (!mSetSubtypesUnavailableLogged) {
             mSetSubtypesUnavailableLogged = true;
             Log.w(
@@ -287,6 +309,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                     + ", publishing base service type only",
                 e);
           }
+        } catch (InvocationTargetException e) {
+          Throwable cause = e.getCause() != null ? e.getCause() : e;
+          Log.w(TAG, "NsdServiceInfo.setSubtypes failed for " + subTypeSet, cause);
         }
       }
     } else {
@@ -316,7 +341,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   }
 
   private void handleRegistrationFailed(String mapKey, ActiveRegistration reg) {
-    synchronized (NsdManagerServiceResolver.this) {
+    synchronized (mRegistrationLock) {
       if (mActiveRegistrations.get(mapKey) == reg) {
         mActiveRegistrations.remove(mapKey);
         releasePublishLockIfEmptyLocked();

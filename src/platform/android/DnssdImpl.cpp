@@ -71,24 +71,17 @@ void ChipDnssdShutdown()
 {
     if (sResolverObject.HasValidObjectRef())
     {
-        CHIP_ERROR err = ChipDnssdRemoveServices();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to remove services on Dnssd shutdown: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        err = ChipDnssdFinalizeServiceUpdate();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to finalize service update on Dnssd shutdown: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        SuccessOrLog(ChipDnssdRemoveServices(), Discovery, "Failed to remove services on Dnssd shutdown");
+        SuccessOrLog(ChipDnssdFinalizeServiceUpdate(), Discovery, "Failed to finalize service update on Dnssd shutdown");
     }
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-
     VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
+                        ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdRemoveServices"));
 
     {
         DeviceLayer::StackUnlock unlock;
