@@ -69,6 +69,7 @@ def _load_android_ble_thread_module():
         })
 
     with mock.patch.dict(sys.modules, stub_modules):
+        sys.modules.pop('helper.AndroidCirqueTestBase', None)
         spec = importlib.util.spec_from_file_location(
             'AndroidBleThreadMobileDeviceTest', TEST_MODULE_PATH
         )

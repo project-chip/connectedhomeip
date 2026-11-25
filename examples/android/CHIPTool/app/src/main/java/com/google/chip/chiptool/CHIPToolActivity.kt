@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.chip.chiptool.devicemanagement.CenterConnectionManager
+import com.google.chip.chiptool.devicemanagement.CommissionedNodeRegistry
 import com.google.chip.chiptool.devicemanagement.DeviceCenterFragment
 import com.google.chip.chiptool.devicemanagement.PostCommissioningDialogHelper
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
@@ -152,6 +153,39 @@ class CHIPToolActivity :
     }
   }
 
+  private fun resolveThreadDatasetBytes(intent: Intent): ByteArray? {
+    val rawDatasetHex = intent.getStringExtra(EXTRA_THREAD_OPERATIONAL_DATASET)
+    if (!rawDatasetHex.isNullOrBlank()) {
+      return decodeHexBytes(rawDatasetHex)
+    }
+    val channel = intent.getIntExtra(EXTRA_THREAD_CHANNEL, 15)
+    val panId = intent.getIntExtra(EXTRA_THREAD_PAN_ID, 0x1234)
+    val xpanIdStr = intent.getStringExtra(EXTRA_THREAD_XPAN_ID) ?: "11:11:11:11:22:22:22:22"
+    val masterKeyStr =
+      intent.getStringExtra(EXTRA_THREAD_MASTER_KEY)
+        ?: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
+    val xpanIdBytes = decodeHexBytes(xpanIdStr, expectedByteLength = 8) ?: return null
+    val masterKeyBytes = decodeHexBytes(masterKeyStr, expectedByteLength = 16) ?: return null
+    var dataset =
+      byteArrayOf(
+        0.toByte(),
+        3.toByte(),
+        0.toByte(),
+        (channel.shr(8) and 0xFF).toByte(),
+        (channel and 0xFF).toByte(),
+      )
+    dataset +=
+      byteArrayOf(
+        1.toByte(),
+        2.toByte(),
+        (panId.shr(8) and 0xFF).toByte(),
+        (panId and 0xFF).toByte(),
+      )
+    dataset += byteArrayOf(2.toByte(), 8.toByte()) + xpanIdBytes
+    dataset += byteArrayOf(5.toByte(), 16.toByte()) + masterKeyBytes
+    return dataset
+  }
+
   private fun onCommissionBleThreadIntent(intent: Intent) {
     val discriminator = intent.getIntExtra(EXTRA_DISCRIMINATOR, 3840)
     val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, 20202021L)
@@ -159,43 +193,7 @@ class CHIPToolActivity :
     // Defaults to true like CHIPDeviceInfo; tests pass false as a negative control.
     val isLIT = intent.getBooleanExtra(EXTRA_IS_LIT, true)
 
-    val rawDatasetHex = intent.getStringExtra(EXTRA_THREAD_OPERATIONAL_DATASET)
-    val datasetBytes: ByteArray? =
-      if (!rawDatasetHex.isNullOrBlank()) {
-        decodeHexBytes(rawDatasetHex)
-      } else {
-        val channel = intent.getIntExtra(EXTRA_THREAD_CHANNEL, 15)
-        val panId = intent.getIntExtra(EXTRA_THREAD_PAN_ID, 0x1234)
-        val xpanIdStr = intent.getStringExtra(EXTRA_THREAD_XPAN_ID) ?: "11:11:11:11:22:22:22:22"
-        val masterKeyStr =
-          intent.getStringExtra(EXTRA_THREAD_MASTER_KEY)
-            ?: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
-        val xpanIdBytes = decodeHexBytes(xpanIdStr, expectedByteLength = 8)
-        val masterKeyBytes = decodeHexBytes(masterKeyStr, expectedByteLength = 16)
-        if (xpanIdBytes == null || masterKeyBytes == null) {
-          null
-        } else {
-          var dataset =
-            byteArrayOf(
-              0.toByte(),
-              3.toByte(),
-              0.toByte(),
-              (channel.shr(8) and 0xFF).toByte(),
-              (channel and 0xFF).toByte(),
-            )
-          dataset +=
-            byteArrayOf(
-              1.toByte(),
-              2.toByte(),
-              (panId.shr(8) and 0xFF).toByte(),
-              (panId and 0xFF).toByte(),
-            )
-          dataset += byteArrayOf(2.toByte(), 8.toByte()) + xpanIdBytes
-          dataset += byteArrayOf(5.toByte(), 16.toByte()) + masterKeyBytes
-          dataset
-        }
-      }
-
+    val datasetBytes = resolveThreadDatasetBytes(intent)
     if (datasetBytes == null) {
       Log.e(TAG, "Invalid Thread operational dataset hex in commissioning intent")
       Toast.makeText(this, "Invalid Thread operational dataset", Toast.LENGTH_SHORT).show()
@@ -237,6 +235,32 @@ class CHIPToolActivity :
     }
   }
 
+  private fun openDeviceCenterIfActive() {
+    if (isFinishing || isDestroyed) return
+    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    showFragment(DeviceCenterFragment.newInstance())
+  }
+
+  private fun presentPostCommissioningDialog(
+    code: Long,
+    nodeId: Long,
+    registry: CommissionedNodeRegistry,
+  ) {
+    runOnUiThread {
+      Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
+        .show()
+      if (!isFinishing && !isDestroyed) {
+        PostCommissioningDialogHelper.showPostCommissioningDialog(
+          activity = this,
+          nodeId = nodeId,
+          registry = registry,
+          deviceInfo = deviceInfo,
+          onComplete = ::openDeviceCenterIfActive,
+        )
+      }
+    }
+  }
+
   override fun onCommissioningComplete(code: Long, nodeId: Long) {
     ChipClient.getDeviceController(this).close()
 
@@ -248,31 +272,7 @@ class CHIPToolActivity :
         !isAutomatedCommissioningIntent &&
           intent?.getBooleanExtra("show_post_commissioning_dialog", false) == true
       ) {
-        runOnUiThread {
-          Toast.makeText(
-              this,
-              getString(R.string.commissioning_completed, code),
-              Toast.LENGTH_SHORT,
-            )
-            .show()
-          if (!isFinishing && !isDestroyed) {
-            PostCommissioningDialogHelper.showPostCommissioningDialog(
-              activity = this,
-              nodeId = nodeId,
-              registry = registry,
-              deviceInfo = deviceInfo,
-              onComplete = {
-                if (!isFinishing && !isDestroyed) {
-                  supportFragmentManager.popBackStack(
-                    null,
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE,
-                  )
-                  showFragment(DeviceCenterFragment.newInstance())
-                }
-              },
-            )
-          }
-        }
+        presentPostCommissioningDialog(code, nodeId, registry)
         return
       }
     }
