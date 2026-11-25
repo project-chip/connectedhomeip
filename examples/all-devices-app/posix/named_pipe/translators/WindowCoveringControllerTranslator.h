@@ -37,11 +37,8 @@ public:
     static Span<const CharSpan> GetActionNames()
     {
         static constexpr CharSpan kNames[] = {
-            "WindowCoveringUpOrOpen"_span,
-            "WindowCoveringDownOrClose"_span,
-            "WindowCoveringStopMotion"_span,
-            "WindowCoveringGoToLiftPercentage"_span,
-            "WindowCoveringGoToTiltPercentage"_span,
+            "WindowCoveringUpOrOpen"_span,           "WindowCoveringDownOrClose"_span,        "WindowCoveringStopMotion"_span,
+            "WindowCoveringGoToLiftPercentage"_span, "WindowCoveringGoToTiltPercentage"_span,
         };
         return Span<const CharSpan>(kNames);
     }

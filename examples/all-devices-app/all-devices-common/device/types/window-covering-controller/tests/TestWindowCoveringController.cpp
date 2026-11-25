@@ -22,10 +22,10 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <binding-handler/BindingHandler.h>
 #include <binding-handler/SimpleBindingCommand.h>
-#include <app/data-model-provider/Provider.h>
 #include <clusters/Binding/Ids.h>
 #include <clusters/Descriptor/Ids.h>
 #include <clusters/Groups/Ids.h>
@@ -352,11 +352,13 @@ TEST_F(TestWindowCoveringController, OOBAccessorDispatchesActions)
     EXPECT_GT(loopback.mSentMessageCount, sentBefore);
 
     sentBefore = loopback.mSentMessageCount;
-    EXPECT_SUCCESS(mRegistry.HandleAction("WindowCoveringGoToLiftPercentage"_span, ActionPayload({ .percent100ths = 5000 }).Span()));
+    EXPECT_SUCCESS(
+        mRegistry.HandleAction("WindowCoveringGoToLiftPercentage"_span, ActionPayload({ .percent100ths = 5000 }).Span()));
     EXPECT_GT(loopback.mSentMessageCount, sentBefore);
 
     sentBefore = loopback.mSentMessageCount;
-    EXPECT_SUCCESS(mRegistry.HandleAction("WindowCoveringGoToTiltPercentage"_span, ActionPayload({ .percent100ths = 10000 }).Span()));
+    EXPECT_SUCCESS(
+        mRegistry.HandleAction("WindowCoveringGoToTiltPercentage"_span, ActionPayload({ .percent100ths = 10000 }).Span()));
     EXPECT_GT(loopback.mSentMessageCount, sentBefore);
 
     controller.Unregister(mProvider);

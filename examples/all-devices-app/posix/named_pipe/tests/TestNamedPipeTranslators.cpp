@@ -723,9 +723,10 @@ TEST_F(TestNamedPipeTranslators, WindowCoveringControllerTranslator)
     }
 
     // GoToLiftPercentage: LiftPercent100thsValue -> tag 2
-    EXPECT_EQ(translator.TranslateAndExecute(
-                  kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
+        CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "WindowCoveringGoToLiftPercentage");
     {
         std::optional<uint64_t> fields[3];
@@ -735,9 +736,10 @@ TEST_F(TestNamedPipeTranslators, WindowCoveringControllerTranslator)
     }
 
     // GoToTiltPercentage: TiltPercent100thsValue -> tag 2
-    EXPECT_EQ(translator.TranslateAndExecute(
-                  kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 10000})"), mRegistry),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 10000})"), mRegistry),
+        CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "WindowCoveringGoToTiltPercentage");
     {
         std::optional<uint64_t> fields[3];
@@ -749,16 +751,18 @@ TEST_F(TestNamedPipeTranslators, WindowCoveringControllerTranslator)
     // Missing value, value of the wrong type, out of the uint16_t range, and the other action's key.
     EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage"})"), mRegistry),
               CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(translator.TranslateAndExecute(
-                  kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": "half"})"),
-                  mRegistry),
-              CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(translator.TranslateAndExecute(
-                  kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 65536})"), mRegistry),
-              CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(translator.TranslateAndExecute(
-                  kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
-              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": "half"})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 65536})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
 
     // Missing Name
     EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, ParseJson(R"({})"), mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
