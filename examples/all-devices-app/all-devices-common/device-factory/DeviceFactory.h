@@ -71,6 +71,7 @@
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.h>
 #include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
+#include <device/types/on-off-sensor/OnOffSensor.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
@@ -783,6 +784,21 @@ private:
                     .identifyDelegate  = mContext->identifyDelegate,
                     .tagList           = Span(&kPlugWithSensorsTag, 1),
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_SENSOR)
+        {
+            RegisterCreator("on-off-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<OnOffSensor>(
+                    OnOffSensor::Context{
+                        .timerDelegate   = mContext->timerDelegate,
+                        .platformManager = mContext->platformManager,
+                        .bindingTable    = mContext->bindingTable,
+                        .bindingManager  = mContext->bindingManager,
+                        .bindingHandler  = mContext->bindingHandler,
+                    },
+                    mContext->identifyDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)
