@@ -364,8 +364,8 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         while True:
             wait_poll = True
             attempt += 1
-            self.write_to_app_pipe(apply_command, self.provider_app_pipe)
             try:
+                self.write_to_app_pipe(apply_command, self.provider_app_pipe)
                 apply_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
                 received_update_token = apply_response_data["Payload"]["UpdateToken"]
                 received_new_version = int(apply_response_data["Payload"]["NewVersion"])
