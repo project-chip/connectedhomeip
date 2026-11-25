@@ -483,11 +483,11 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     prevState                   = connection.mConnectionState;
     connection.mConnectionState = TCPState::kClosed;
 
+    ActiveTCPConnectionHandle holder(&connection);
     if (suppressCallback == SuppressCallback::No)
     {
         if (prevState == TCPState::kConnecting)
         {
-            ActiveTCPConnectionHandle holder(&connection);
             // Call upper layer connection attempt complete handler
             HandleConnectionAttemptComplete(holder, err);
         }
@@ -735,7 +735,9 @@ size_t TCPBase::UsedEndPointCount() const
     size_t count = 0;
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
-        if (mActiveConnections[i].InUse())
+        // Count slots that still hold an endpoint or are mid-teardown in CloseConnectionInternal
+        // (where mEndPoint has been released before callbacks run, and mPeerAddr is cleared by Free()).
+        if (mActiveConnections[i].InUse() || mActiveConnections[i].mPeerAddr.IsInitialized())
         {
             count++;
         }

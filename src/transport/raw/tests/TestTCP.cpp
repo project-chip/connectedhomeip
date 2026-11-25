@@ -1244,6 +1244,137 @@ TEST_F(TestTCP, MaxActiveConnectionsBoundary)
     syncEndPointManager.Shutdown();
 }
 
+TEST_F(TestTCP, ReconnectDuringHandleConnectionClosedDoesNotClobberClosingSlot)
+{
+    class ReconnectOnCloseDelegate : public chip::TransportMgrDelegate
+    {
+    public:
+        void OnMessageReceived(const Transport::PeerAddress &, System::PacketBufferHandle &&,
+                               Transport::MessageTransportContext *) override
+        {}
+        void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle &, CHIP_ERROR) override {}
+        void HandleConnectionReceived(ActiveTCPConnectionState &) override {}
+        void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR) override
+        {
+            if (mOnClosed)
+            {
+                mOnClosed(conn);
+            }
+        }
+
+        std::function<void(ActiveTCPConnectionState &)> mOnClosed;
+    };
+
+    Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+    ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+    auto shutdownManager = ScopeExit([&]() { syncEndPointManager.Shutdown(); });
+
+    TCPImpl syncTcp;
+    ASSERT_SUCCESS(syncTcp.Init(
+        Transport::TcpListenParameters(&syncEndPointManager).SetAddressType(IPAddressType::kIPv6).SetServerListenEnabled(false)));
+    auto closeTcp = ScopeExit([&]() { syncTcp.Close(); });
+
+    ReconnectOnCloseDelegate delegate;
+    TransportMgrBase syncTransportMgr;
+    syncTransportMgr.SetSessionManager(&delegate);
+    ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+
+    constexpr uint16_t kBasePort = 5640;
+
+    auto sendOversizedPrefixToClose = [&](const Transport::PeerAddress & peerAddr) {
+        TCPEndPointHandle endPoint;
+        {
+            // Scope `state` so its internal ActiveTCPConnectionHandle does not hold an extra reference
+            // during ProcessReceivedBuffer -> CloseConnectionInternal -> HandleConnectionClosed.
+            auto state = TestAccess::FindActiveConnection(syncTcp, const_cast<Transport::PeerAddress &>(peerAddr));
+            VerifyOrReturnValue(bool(state), CHIP_ERROR_INCORRECT_STATE);
+            endPoint = TestAccess::GetEndpoint(state);
+        }
+        uint8_t oversizedPrefix[kPacketSizeBytes];
+        Encoding::LittleEndian::Put32(oversizedPrefix, static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve));
+        System::PacketBufferHandle head = System::PacketBufferHandle::NewWithData(oversizedPrefix, sizeof(oversizedPrefix));
+        VerifyOrReturnValue(!head.IsNull(), CHIP_ERROR_NO_MEMORY);
+        return TestAccess::ProcessReceivedBuffer(syncTcp, endPoint, peerAddr, std::move(head));
+    };
+
+    // Case 1: Other slots are free when `conn0` closes via a raw-pointer path (ProcessReceivedBuffer).
+    // Dropping the last external handle and synchronously calling TCPConnect inside HandleConnectionClosed
+    // must allocate a distinct slot rather than reusing `conn0` and having `connection.Free()` wipe it.
+    {
+        ActiveTCPConnectionHandle conn0;
+        auto peerAddr0 = Transport::PeerAddress::TCP(addr, kBasePort);
+        ASSERT_EQ(syncTcp.TCPConnect(peerAddr0, nullptr, conn0), CHIP_NO_ERROR);
+        ASSERT_FALSE(conn0.IsNull());
+
+        ActiveTCPConnectionHandle reconnectedConn;
+        auto reconnectPeerAddr  = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + 10));
+        CHIP_ERROR reconnectErr = CHIP_ERROR_INTERNAL;
+        bool callbackInvoked    = false;
+
+        delegate.mOnClosed = [&](ActiveTCPConnectionState & closingConn) {
+            callbackInvoked = true;
+            conn0.Release();
+            reconnectErr = syncTcp.TCPConnect(reconnectPeerAddr, nullptr, reconnectedConn);
+            EXPECT_NE(&closingConn, static_cast<const void *>(reconnectedConn));
+        };
+
+        EXPECT_EQ(sendOversizedPrefixToClose(peerAddr0), CHIP_ERROR_MESSAGE_TOO_LONG);
+        delegate.mOnClosed = nullptr;
+
+        EXPECT_TRUE(callbackInvoked);
+        EXPECT_EQ(reconnectErr, CHIP_NO_ERROR);
+        ASSERT_FALSE(reconnectedConn.IsNull());
+        auto activeReconnected = TestAccess::FindActiveConnection(syncTcp, reconnectPeerAddr);
+        ASSERT_TRUE(bool(activeReconnected));
+        EXPECT_FALSE(TestAccess::GetEndpoint(activeReconnected).IsNull());
+
+        reconnectedConn.Release();
+    }
+
+    // Case 2: All active connection slots are occupied when `conns[0]` closes. While HandleConnectionClosed
+    // is still on the stack (before `connection.Free()` completes), UsedEndPointCount() still counts the
+    // closing slot as occupied, so a synchronous TCPConnect returns CHIP_ERROR_NO_MEMORY; once
+    // CloseConnectionInternal finishes `connection.Free()`, the slot becomes available for TCPConnect.
+    {
+        ActiveTCPConnectionHandle conns[kMaxTcpActiveConnectionCount];
+        for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+        {
+            auto peerAddr = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + i));
+            ASSERT_EQ(syncTcp.TCPConnect(peerAddr, nullptr, conns[i]), CHIP_NO_ERROR);
+            ASSERT_FALSE(conns[i].IsNull());
+        }
+
+        ActiveTCPConnectionHandle midCloseConn;
+        auto extraPeerAddr     = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + kMaxTcpActiveConnectionCount));
+        CHIP_ERROR midCloseErr = CHIP_NO_ERROR;
+
+        delegate.mOnClosed = [&](ActiveTCPConnectionState &) {
+            conns[0].Release();
+            midCloseErr = syncTcp.TCPConnect(extraPeerAddr, nullptr, midCloseConn);
+        };
+
+        auto peerAddr0 = Transport::PeerAddress::TCP(addr, kBasePort);
+        EXPECT_EQ(sendOversizedPrefixToClose(peerAddr0), CHIP_ERROR_MESSAGE_TOO_LONG);
+        delegate.mOnClosed = nullptr;
+
+        EXPECT_EQ(midCloseErr, CHIP_ERROR_NO_MEMORY);
+        EXPECT_TRUE(midCloseConn.IsNull());
+
+        // Now that CloseConnectionInternal has completed connection.Free(), the freed slot can be allocated.
+        EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, midCloseConn), CHIP_NO_ERROR);
+        EXPECT_FALSE(midCloseConn.IsNull());
+
+        midCloseConn.Release();
+        for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+        {
+            conns[i].Release();
+        }
+    }
+}
+
 TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
 {
     TCPImpl tcp;
