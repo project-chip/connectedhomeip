@@ -77,20 +77,6 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
-#   run4: # Mandatory-only On/Off Sensor
-#     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-sensor:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_3 test_TC_IDM_10_5 test_TC_IDM_10_6 test_TC_DESC_2_3
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
-#       --enable-spec-errata-ci-only-disallowed-for-certification
-#     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 from matter.testing.decorators import async_test_body

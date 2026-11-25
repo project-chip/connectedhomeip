@@ -96,15 +96,16 @@ class TestOnOffSensor(MatterTestCommissionedDevice):
                 Clusters.Binding, Clusters.Binding.Attributes.Binding, endpoint=endpoint)
             asserts.assert_equal([(b.node, b.endpoint, b.cluster) for b in binding],
                                  [(b.node, b.endpoint, b.cluster) for b in targets], "Binding targets differ")
+            other_endpoint = 2 if endpoint == 1 else 1
             other_binding = await self.read_single_attribute_check_success(
-                Clusters.Binding, Clusters.Binding.Attributes.Binding, endpoint=2)
-            asserts.assert_equal(other_binding, [], "Sensor 1's bindings leaked into sensor 2")
+                Clusters.Binding, Clusters.Binding.Attributes.Binding, endpoint=other_endpoint)
+            asserts.assert_equal(other_binding, [], f"Sensor {endpoint}'s bindings leaked into sensor {other_endpoint}")
 
             self.step(3, "Trigger On, Off, and Toggle and verify peer state reports")
             await self.default_controller.SendCommand(peer_node, peer_endpoint, Clusters.OnOff.Commands.Off())
             onoff = AttributeSubscriptionHandler(Clusters.OnOff, Clusters.OnOff.Attributes.OnOff)
-            cleanup.callback(onoff.cancel)
             await onoff.start(self.default_controller, peer_node, peer_endpoint, max_interval_sec=30)
+            cleanup.callback(onoff.cancel)
             for action, expected in [("SensorOn", True), ("SensorOff", False), ("SensorToggle", True),
                                      ("SensorToggle", False)]:
                 onoff.reset()
@@ -115,8 +116,8 @@ class TestOnOffSensor(MatterTestCommissionedDevice):
 
             self.step(4, "Trigger Identify start and stop and verify peer reports")
             identify = AttributeSubscriptionHandler(Clusters.Identify, Clusters.Identify.Attributes.IdentifyTime)
-            cleanup.callback(identify.cancel)
             await identify.start(self.default_controller, peer_node, peer_endpoint, max_interval_sec=30)
+            cleanup.callback(identify.cancel)
             for seconds in (60, 0):
                 identify.reset()
                 self.write_to_app_pipe({"Name": "SensorIdentify", "EndpointId": endpoint, "IdentifyTime": seconds})

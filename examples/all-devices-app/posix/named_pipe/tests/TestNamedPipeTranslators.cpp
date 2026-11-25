@@ -39,7 +39,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <json/json.h>

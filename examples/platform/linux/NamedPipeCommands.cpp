@@ -210,10 +210,6 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
     while (self->mRunning)
     {
         ssize_t numBytesRead = read(fd, readbuf, sizeof(readbuf) - 1);
-        if (!self->mRunning)
-        {
-            break;
-        }
         if (numBytesRead <= 0)
         {
             // If the read was interrupted by a signal before any data was available,

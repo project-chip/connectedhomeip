@@ -112,7 +112,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-sensor/OnOffSensor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-sensor/impl/LoggingOnOffSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"

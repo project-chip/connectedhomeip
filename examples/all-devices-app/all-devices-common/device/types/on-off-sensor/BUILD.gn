@@ -36,18 +36,6 @@ source_set("on-off-sensor") {
   ]
 }
 
-source_set("logging") {
-  sources = [
-    "impl/LoggingOnOffSensor.cpp",
-    "impl/LoggingOnOffSensor.h",
-  ]
-
-  public_deps = [
-    ":on-off-sensor",
-    "${chip_root}/src/lib/support",
-  ]
-}
-
 source_set("posix") {
   sources = [
     "NamedPipeTranslators.cpp",

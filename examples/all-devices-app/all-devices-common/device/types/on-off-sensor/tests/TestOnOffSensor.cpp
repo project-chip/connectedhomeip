@@ -17,7 +17,6 @@
 
 #include <device/types/on-off-sensor/OOBAccessors.h>
 #include <device/types/on-off-sensor/OnOffSensor.h>
-#include <device/types/on-off-sensor/impl/LoggingOnOffSensor.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/CASEClientPool.h>
@@ -100,7 +99,9 @@ public:
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override {}
     void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override {}
     void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override {}
-    bool IsTriggerEffectEnabled() const override { return false; }
+    bool IsTriggerEffectEnabled() const override { return triggerEffectEnabled; }
+
+    bool triggerEffectEnabled = false;
 };
 
 class FailingOnOffSensor : public OnOffSensor
@@ -378,19 +379,27 @@ TEST_F(TestOnOffSensor, PropagatesBindingErrors)
     EXPECT_EQ(mSensor.SendIdentify(10), CHIP_ERROR_INCORRECT_STATE);
 }
 
-TEST_F(TestOnOffSensor, LoggingImplementationRegistersWithoutOptionalClusters)
+TEST_F(TestOnOffSensor, InjectedDelegateControlsIdentifyCommandsWithoutAddingClusters)
 {
-    LoggingOnOffSensor sensor(MakeContext());
-    ASSERT_SUCCESS(sensor.Register(kSensorEndpoint, mProvider));
-    auto unregister = MakeDefer([&] { sensor.Unregister(mProvider); });
-    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> servers;
-    ASSERT_SUCCESS(mProvider.ServerClusters(kSensorEndpoint, servers));
-    EXPECT_EQ(servers.TakeBuffer().size(), 3u);
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commands;
-    ASSERT_SUCCESS(sensor.IdentifyCluster().AcceptedCommands({ kSensorEndpoint, Identify::Id }, commands));
-    auto accepted = commands.TakeBuffer();
-    ASSERT_EQ(accepted.size(), 1u);
-    EXPECT_EQ(accepted[0].commandId, Identify::Commands::Identify::Id);
+    for (bool triggerEffectEnabled : { false, true })
+    {
+        mIdentifyDelegate.triggerEffectEnabled = triggerEffectEnabled;
+        OnOffSensor sensor(MakeContext(), mIdentifyDelegate);
+        ASSERT_SUCCESS(sensor.Register(kSensorEndpoint, mProvider));
+        auto unregister = MakeDefer([&] { sensor.Unregister(mProvider); });
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> servers;
+        ASSERT_SUCCESS(mProvider.ServerClusters(kSensorEndpoint, servers));
+        EXPECT_EQ(servers.TakeBuffer().size(), 3u);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commands;
+        ASSERT_SUCCESS(sensor.IdentifyCluster().AcceptedCommands({ kSensorEndpoint, Identify::Id }, commands));
+        auto accepted = commands.TakeBuffer();
+        ASSERT_EQ(accepted.size(), triggerEffectEnabled ? 2u : 1u);
+        EXPECT_EQ(accepted[0].commandId, Identify::Commands::Identify::Id);
+        if (triggerEffectEnabled)
+        {
+            EXPECT_EQ(accepted[1].commandId, Identify::Commands::TriggerEffect::Id);
+        }
+    }
 }
 
 TEST_F(TestOnOffSensor, OOBDispatchesOnlyToSelectedSensor)
