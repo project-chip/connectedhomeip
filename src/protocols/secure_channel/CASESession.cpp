@@ -1498,10 +1498,11 @@ CHIP_ERROR CASESession::ParseSigma2Resume(ContiguousBufferTLVReader & tlvReader,
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
-    mState         = State::kSendSigma3Pending;
     CHIP_ERROR err = HandleSigma2(std::move(msg));
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
     SuccessOrExit(err);
+
+    mState = State::kSendSigma3Pending;
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma3);
     err = SendSigma3a();
