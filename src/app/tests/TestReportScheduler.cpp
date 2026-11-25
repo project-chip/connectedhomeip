@@ -159,7 +159,7 @@ public:
         context->TimerFired();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
-    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Milliseconds64 aTimeout) override
     {
         return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
@@ -204,7 +204,7 @@ public:
         TimerContext * context = static_cast<TimerContext *>(aAppState);
         context->TimerFired();
     }
-    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Milliseconds64 aTimeout) override
     {
         if (nullptr == context)
         {
