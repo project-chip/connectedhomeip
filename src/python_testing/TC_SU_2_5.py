@@ -183,13 +183,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         return [
             TestStep(0, "Commissioning, already done"),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to \"UpdateAvailable\". Set ImageURI to the location where the image is located."
-                     "After the DUT transfers the image, the DUT should send ApplyUpdateRequest to the OTA-P, OTA-P/TH sends the ApplyUpdateResponse Command to the DUT."
-                     "Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 1 minute. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.",
-                     "Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
-                     "Verify that the ApplyUpdateRequest received on the OTA-P has the following mandatory fields."
-                     "UpdateToken - verify that it is same as the one sent in the QueryImageResponse."
-                     "NewVersion - verify that this is the same as the software version that was downloaded."
-                     "Verify that the DUT does not apply the software update within this time."),
+                    "After the DUT transfers the image, the DUT should send ApplyUpdateRequest to the OTA-P, OTA-P/TH sends the ApplyUpdateResponse Command to the DUT."
+                    "Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 1 minute. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.",
+                    "Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
+                    "Verify that the ApplyUpdateRequest received on the OTA-P has the following mandatory fields."
+                    "UpdateToken - verify that it is same as the one sent in the QueryImageResponse."
+                    "NewVersion - verify that this is the same as the software version that was downloaded."
+                    "Verify that the DUT does not apply the software update within this time."),
             TestStep(2, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 3 minutes. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.", "Verify that the DUT waits for 3 minutes before sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
                      "Verify that the DUT does not apply the software update within this time."),
             TestStep(3, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"Discontinue\".", "Verify that the DUT clears its previously downloaded software image, and resets the UpdateState Attribute to Idle."
@@ -352,7 +352,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         poll_command_timeout_sec = 30
         poll_command_interval_sec = 1
         poll_command_deadline = time.time() + poll_command_timeout_sec
-        poll_start_time = time.time()
         attempt = 0
         # Variables to retrieve values from named pipes
         received_update_token = None
@@ -393,7 +392,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 break
             if wait_poll:
                 await asyncio.sleep(min(poll_command_interval_sec, remaining))
-        poll_end_time = time.time()
         # END
         logger.info("%s Provider pipe status after kDelayedOnApply %s", step_number_s1, pipe_data)
         # Assert the values from the Provider named pipes
