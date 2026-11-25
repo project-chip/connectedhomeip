@@ -185,8 +185,8 @@ class TestTimeout(threading.Thread):
 
 class BaseTestHelper:
     def __init__(self, nodeId: int, paaTrustStorePath: str, testCommissioner: bool = False,
-                 keypair: p256keypair.P256Keypair = None):
-        matter.native.Init()
+                 keypair: p256keypair.P256Keypair = None, bluetoothAdapter: int | None = None):
+        matter.native.Init(bluetoothAdapter=bluetoothAdapter)
 
         self.chipStack = ChipStack(PersistentStorageJSON(DEFAULT_REPL_STORAGE_PATH), enableServerInteractions=True)
         self.certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
