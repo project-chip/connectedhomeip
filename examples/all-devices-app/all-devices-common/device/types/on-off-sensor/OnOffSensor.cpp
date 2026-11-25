@@ -86,30 +86,30 @@ CHIP_ERROR OnOffSensor::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) c
 }
 
 template <typename CommandType>
-CHIP_ERROR OnOffSensor::SendCommand(const CommandType & command)
+CHIP_ERROR OnOffSensor::SendCommand(const CommandType & command, BindingCommandOptions options)
 {
     VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    return mContext.bindingHandler.DispatchSimple(mEndpointId, command);
+    return mContext.bindingHandler.DispatchSimple(mEndpointId, command, options);
 }
 
-CHIP_ERROR OnOffSensor::SendOn()
+CHIP_ERROR OnOffSensor::SendOn(BindingCommandOptions options)
 {
-    return SendCommand(OnOff::Commands::On::Type{});
+    return SendCommand(OnOff::Commands::On::Type{}, options);
 }
 
-CHIP_ERROR OnOffSensor::SendOff()
+CHIP_ERROR OnOffSensor::SendOff(BindingCommandOptions options)
 {
-    return SendCommand(OnOff::Commands::Off::Type{});
+    return SendCommand(OnOff::Commands::Off::Type{}, options);
 }
 
-CHIP_ERROR OnOffSensor::SendToggle()
+CHIP_ERROR OnOffSensor::SendToggle(BindingCommandOptions options)
 {
-    return SendCommand(OnOff::Commands::Toggle::Type{});
+    return SendCommand(OnOff::Commands::Toggle::Type{}, options);
 }
 
-CHIP_ERROR OnOffSensor::SendIdentify(uint16_t identifyTimeSeconds)
+CHIP_ERROR OnOffSensor::SendIdentify(uint16_t identifyTimeSeconds, BindingCommandOptions options)
 {
-    return SendCommand(Identify::Commands::Identify::Type{ .identifyTime = identifyTimeSeconds });
+    return SendCommand(Identify::Commands::Identify::Type{ .identifyTime = identifyTimeSeconds }, options);
 }
 
 } // namespace chip::app

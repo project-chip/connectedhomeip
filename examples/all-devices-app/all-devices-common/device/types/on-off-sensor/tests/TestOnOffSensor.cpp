@@ -369,6 +369,48 @@ TEST_F(TestOnOffSensor, SendsCommandsToBoundPeer)
     EXPECT_EQ(mRecorder.identifyTime, std::optional<uint16_t>(123));
 }
 
+TEST_F(TestOnOffSensor, SendOptionsReportResponsesForEveryCommand)
+{
+    struct Record
+    {
+        int count        = 0;
+        CHIP_ERROR error = CHIP_NO_ERROR;
+    } record;
+    BindingCommandOptions options;
+    options.onComplete = {
+        [](void * context, const Binding::TableEntry & binding, CHIP_ERROR error) {
+            auto & result = *static_cast<Record *>(context);
+            ++result.count;
+            result.error = error;
+            EXPECT_EQ(binding.local, kSensorEndpoint);
+            EXPECT_EQ(binding.remote, kPeerEndpoint);
+        },
+        &record,
+    };
+    EXPECT_EQ(mSensor.SendToggle(options), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(record.count, 0);
+    ASSERT_SUCCESS(mSensor.Register(kSensorEndpoint, mProvider));
+    ASSERT_SUCCESS(mSensor.SendToggle(options));
+    EXPECT_EQ(record.count, 0);
+    AddBinding(kSensorEndpoint, OnOff::Id);
+    AddBinding(kSensorEndpoint, Identify::Id);
+    VerifyOrReturn(!HasFailure());
+    // The fixture peer returns Failure so every response must report a target failure after acceptance.
+    ASSERT_SUCCESS(mSensor.SendOn(options));
+    ExpectCommand(OnOff::Id, OnOff::Commands::On::Id, 1);
+    EXPECT_EQ(record.count, 1);
+    EXPECT_NE(record.error, CHIP_NO_ERROR);
+    ASSERT_SUCCESS(mSensor.SendOff(options));
+    ExpectCommand(OnOff::Id, OnOff::Commands::Off::Id, 2);
+    EXPECT_EQ(record.count, 2);
+    ASSERT_SUCCESS(mSensor.SendToggle(options));
+    ExpectCommand(OnOff::Id, OnOff::Commands::Toggle::Id, 3);
+    EXPECT_EQ(record.count, 3);
+    ASSERT_SUCCESS(mSensor.SendIdentify(10, options));
+    ExpectCommand(Identify::Id, Identify::Commands::Identify::Id, 4);
+    EXPECT_EQ(record.count, 4);
+}
+
 TEST_F(TestOnOffSensor, PropagatesBindingErrors)
 {
     ASSERT_SUCCESS(mSensor.Register(kSensorEndpoint, mProvider));

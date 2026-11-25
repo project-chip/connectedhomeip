@@ -22,6 +22,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
 
@@ -105,6 +106,41 @@ protected:
     Binding::Manager mManager;
     int mContext = 0;
 };
+
+class FailingTimerLayer : public System::Layer
+{
+public:
+    CriticalFailure Init() override { return CHIP_NO_ERROR; }
+    void Shutdown() override {}
+    bool IsInitialized() const override { return true; }
+    CriticalFailure StartTimer(System::Clock::Timeout, System::TimerCompleteCallback, void *) override
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    CHIP_ERROR ExtendTimerTo(System::Clock::Timeout, System::TimerCompleteCallback, void *) override
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bool IsTimerActive(System::TimerCompleteCallback, void *) override { return false; }
+    System::Clock::Timeout GetRemainingTime(System::TimerCompleteCallback, void *) override { return System::Clock::kZero; }
+    void CancelTimer(System::TimerCompleteCallback, void *) override {}
+    CriticalFailure ScheduleWork(System::TimerCompleteCallback, void *) override { return CHIP_ERROR_NO_MEMORY; }
+};
+
+TEST_F(TestBindingManager, TimerAllocationFailureRejectsBeforeSendingAndDoesNotTakeContext)
+{
+    FailingTimerLayer layer;
+    auto & table = mManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(kUnknownFabric, 1, kLocalEndpoint, kTestClusterId)));
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForNode(kUnknownFabric, 0x1234, kLocalEndpoint, 2, kTestClusterId)));
+    auto failure = +[](const Binding::TableEntry &, void *, CHIP_ERROR) { ADD_FAILURE(); };
+    EXPECT_EQ(mManager.DispatchCommand(kLocalEndpoint, kTestClusterId, &mContext, failure, layer), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(gRecord.changedCount, 0);
+    EXPECT_EQ(gRecord.releaseCount, 0);
+    // Removing the binding must not release a rejected context either.
+    EXPECT_SUCCESS(mManager.UnicastBindingRemoved((++table.begin()).GetIndex()));
+    EXPECT_EQ(gRecord.releaseCount, 0);
+}
 
 TEST_F(TestBindingManager, NotInitializedDoesNotTakeContext)
 {

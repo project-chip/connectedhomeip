@@ -18,15 +18,50 @@
 
 #pragma once
 
+#include <app/clusters/bindings/binding-table.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
+#include <system/SystemClock.h>
 #include <transport/Session.h>
 
 #include <variant>
 
 namespace chip {
 namespace app {
+
+/** Per-target completion; copy the binding if retaining it beyond the callback.
+ * Unicast success means an Invoke response succeeded. Group success means the local send succeeded.
+ * BindingHandler supplies the original binding; direct SimpleBindingCommand dispatch without a binding
+ * uses kInvalidEndpointId for the local endpoint. Callbacks run in the Matter context.
+ * The context must outlive all target callbacks, including callbacks after the command object is released.
+ */
+struct BindingCommandCallback
+{
+    using Handler   = void (*)(void * context, const Clusters::Binding::TableEntry & target, CHIP_ERROR error);
+    Handler handler = nullptr;
+    void * context  = nullptr;
+
+    void operator()(const Clusters::Binding::TableEntry & target, CHIP_ERROR error) const
+    {
+        if (handler != nullptr)
+        {
+            handler(context, target, error);
+        }
+    }
+};
+
+/** Both timeouts must be positive. CASE timeout only limits the wait before Invoke starts.
+ * Response timeout limits the subsequent Invoke wait and cannot establish whether the peer executed it.
+ * Callers must not automatically retry non-idempotent commands such as Toggle after a response timeout.
+ */
+struct BindingCommandOptions
+{
+    BindingCommandCallback onComplete;
+    System::Clock::Timeout caseTimeout     = System::Clock::Seconds16(30);
+    System::Clock::Timeout responseTimeout = System::Clock::Seconds16(30);
+};
 
 /**
  * Destination of a unicast binding, resolved once the CASE session to the peer is established.
@@ -39,6 +74,7 @@ struct UnicastBindingTarget
     const SessionHandle & session;
     /** Endpoint on the bound peer node. */
     EndpointId endpoint;
+    const Clusters::Binding::TableEntry * binding = nullptr;
 };
 
 /**
@@ -50,6 +86,7 @@ struct GroupBindingTarget
     Messaging::ExchangeManager & exchangeManager;
     FabricIndex fabricIndex;
     GroupId groupId;
+    const Clusters::Binding::TableEntry * binding = nullptr;
 };
 
 /**
@@ -82,6 +119,12 @@ public:
      * Sends the command to @p target. Called once per matching binding, on the Matter event loop.
      */
     virtual void Dispatch(const BindingTarget & target) = 0;
+
+    /// Called instead of Dispatch when a pending target expires or its binding is removed.
+    virtual void Failed(const Clusters::Binding::TableEntry & target, CHIP_ERROR error)
+    {
+        ChipLogError(AppServer, "Pending binding command failed: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 };
 
 } // namespace app

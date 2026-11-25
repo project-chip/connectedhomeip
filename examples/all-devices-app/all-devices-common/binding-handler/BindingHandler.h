@@ -84,32 +84,30 @@ public:
      * (e.g. the Doorbell endpoint for Chime commands). A binding matches when its local endpoint is
      * @p localEndpointId and its cluster is either unset or equal to command->GetClusterId().
      *
-     * If no binding matches, CHIP_NO_ERROR is returned and @p command is released without being sent.
-     * Group commands are sent synchronously. Unicast commands are sent when the CASE session to the peer
-     * is established; delivery failures are only logged.
-     *
-     * Custom commands are passed as a base pointer, e.g.
-     * `Platform::UniquePtr<BindingCommand>(Platform::New<MyCommand>(...))`.
-     *
-     * Ownership of @p command is always transferred to this handler:
-     *  - If an error is returned, @p command was neither sent nor queued, and it is destroyed before
-     *    returning.
-     *  - If CHIP_NO_ERROR is returned, @p command is destroyed once the Binding::Manager no longer
-     *    needs it (possibly before returning). A unicast command whose CASE session could not be
-     *    started stays queued and is sent if a session to the peer is established later.
+     * A conflicting pending unicast target rejects the entire submission with CHIP_ERROR_BUSY before
+     * any send. Errors transfer no ownership to the manager and invoke no completion callbacks.
+     * Success transfers ownership; each target is dispatched or fails within caseTimeout (default 30s).
+     * No matching bindings is a successful no-op with no target callbacks.
+     * Removal of a pending binding reports CHIP_ERROR_CANCELLED. Shutdown does not cancel accepted work.
+     * DispatchSimple reports each target's response or local group send via options.onComplete, possibly
+     * before returning. Response timeouts cannot guarantee that the peer did not execute a command.
+     * Custom commands own their response callbacks; their Failed method receives pre-send failures.
+     * Ownership of command always transfers; command may be destroyed before returning or before responses.
      */
-    CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command);
+    CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command,
+                        System::Clock::Timeout caseTimeout = System::Clock::Seconds16(30));
 
     /**
      * Wraps a standard cluster command struct in a SimpleBindingCommand and calls Dispatch.
      * Same contract as Dispatch.
      */
     template <typename CommandType>
-    CHIP_ERROR DispatchSimple(EndpointId localEndpointId, const CommandType & commandPayload)
+    CHIP_ERROR DispatchSimple(EndpointId localEndpointId, const CommandType & commandPayload, BindingCommandOptions options = {})
     {
-        Platform::UniquePtr<BindingCommand> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
+        VerifyOrReturnError(options.caseTimeout.count() > 0 && options.responseTimeout.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+        Platform::UniquePtr<BindingCommand> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload, options));
         VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
-        return Dispatch(localEndpointId, std::move(command));
+        return Dispatch(localEndpointId, std::move(command), options.caseTimeout);
     }
 
 private:
@@ -118,6 +116,7 @@ private:
 
     static void HandleBoundDeviceChanged(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
                                          void * context);
+    static void HandleCommandFailure(const Clusters::Binding::TableEntry & binding, void * context, CHIP_ERROR error);
     static void ReleaseContext(void * context);
 
     Clusters::Binding::Manager * mBindingManager  = nullptr;

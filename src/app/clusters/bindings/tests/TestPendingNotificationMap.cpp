@@ -31,6 +31,8 @@ namespace {
 class TestPendingNotificationMap : public ::testing::Test
 {
 public:
+    void SetUp() override { ASSERT_SUCCESS(Platform::MemoryInit()); }
+    void TearDown() override { Platform::MemoryShutdown(); }
     static void SetUpTestSuite()
     {
         static chip::TestPersistentStorageDelegate storage;
@@ -53,6 +55,96 @@ void CreateDefaultFullBindingTable(Binding::Table & table)
     {
         EXPECT_SUCCESS(table.Add(Binding::TableEntry(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i))));
     }
+}
+
+struct PendingRecord
+{
+    int releases     = 0;
+    int failures     = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    static void Release(void * context) { ++static_cast<PendingRecord *>(context)->releases; }
+    static void Failed(const TableEntry &, void * context, CHIP_ERROR error)
+    {
+        auto & record = *static_cast<PendingRecord *>(context);
+        ++record.failures;
+        record.error = error;
+    }
+};
+
+TEST_F(TestPendingNotificationMap, CommandsCannotReplaceOrBeReplaced)
+{
+    TestPersistentStorageDelegate storage;
+    Table table;
+    table.SetPersistentStorage(&storage);
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 2, 6)));
+    PendingRecord first;
+    PendingRecord rejected;
+    {
+        PendingNotificationMap map(table);
+        map.RegisterPendingNotificationContextReleaseHandler(PendingRecord::Release);
+        auto * command = map.NewPendingNotificationContext(&first, PendingRecord::Failed);
+        ASSERT_NE(command, nullptr);
+        ASSERT_SUCCESS(map.AddPendingNotification(0, command));
+        auto * other = map.NewPendingNotificationContext(&rejected, PendingRecord::Failed);
+        ASSERT_NE(other, nullptr);
+        EXPECT_EQ(map.AddPendingNotification(0, other), CHIP_ERROR_BUSY);
+        EXPECT_EQ(map.AddPendingNotification(0, nullptr), CHIP_ERROR_BUSY);
+        EXPECT_EQ(first.releases, 0);
+        EXPECT_EQ(first.failures, 0);
+        Platform::Delete(other);
+        ScopedNodeId peer;
+        EXPECT_EQ(map.FindLRUConnectPeer(peer), CHIP_ERROR_NOT_FOUND);
+    }
+    EXPECT_EQ(first.releases, 1);
+    EXPECT_EQ(first.failures, 1);
+    EXPECT_EQ(first.error, CHIP_ERROR_CANCELLED);
+    EXPECT_EQ(rejected.releases, 0);
+    EXPECT_EQ(rejected.failures, 0);
+}
+
+TEST_F(TestPendingNotificationMap, NotificationsStillCoalesceAndCommandsCannotReplaceThem)
+{
+    TestPersistentStorageDelegate storage;
+    Table table;
+    table.SetPersistentStorage(&storage);
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 2, 6)));
+    PendingRecord record;
+    PendingNotificationMap map(table);
+    map.RegisterPendingNotificationContextReleaseHandler(PendingRecord::Release);
+    auto * notification = map.NewPendingNotificationContext(&record);
+    ASSERT_NE(notification, nullptr);
+    ASSERT_SUCCESS(map.AddPendingNotification(0, notification));
+    auto * command = map.NewPendingNotificationContext(&record, PendingRecord::Failed);
+    ASSERT_NE(command, nullptr);
+    EXPECT_EQ(map.AddPendingNotification(0, command), CHIP_ERROR_BUSY);
+    Platform::Delete(command);
+    EXPECT_EQ(record.releases, 0);
+    ASSERT_SUCCESS(map.AddPendingNotification(0, nullptr));
+    EXPECT_EQ(record.releases, 1);
+    EXPECT_EQ(record.failures, 0);
+}
+
+TEST_F(TestPendingNotificationMap, LruExcludesAllBindingsForPeerWithPendingCommand)
+{
+    TestPersistentStorageDelegate storage;
+    Table table;
+    table.SetPersistentStorage(&storage);
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 2, 6)));
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 3, 6)));
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 456, 1, 4, 6)));
+    PendingRecord record;
+    PendingNotificationMap map(table);
+    auto * command = map.NewPendingNotificationContext(&record, PendingRecord::Failed);
+    ASSERT_NE(command, nullptr);
+    ASSERT_SUCCESS(map.AddPendingNotification(0, command));
+    ASSERT_SUCCESS(map.AddPendingNotification(1, nullptr));
+    ASSERT_SUCCESS(map.AddPendingNotification(2, nullptr));
+    ScopedNodeId peer;
+    EXPECT_SUCCESS(map.FindLRUConnectPeer(peer));
+    EXPECT_EQ(peer, ScopedNodeId(456, 1));
+    map.RemoveAllEntriesForNode(peer);
+    EXPECT_TRUE(map.HasPendingNotification(0, true));
+    EXPECT_EQ(map.FindLRUConnectPeer(peer), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestPendingNotificationMap, TestEmptyMap)

@@ -18,6 +18,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace app {
@@ -30,12 +31,40 @@ namespace Binding {
  */
 using PendingNotificationContextReleaseHandler = void (*)(void * context);
 
+using PendingCommandFailureHandler = void (*)(const TableEntry & binding, void * context, CHIP_ERROR error);
+
+class PendingNotificationMap;
+
 class PendingNotificationContext
 {
 public:
-    PendingNotificationContext(void * context, PendingNotificationContextReleaseHandler contextReleaseHandler) :
-        mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
+    PendingNotificationContext(void * context, PendingNotificationContextReleaseHandler contextReleaseHandler,
+                               PendingCommandFailureHandler failureHandler = nullptr) :
+        mFailureHandler(failureHandler), mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
     {}
+    ~PendingNotificationContext()
+    {
+        if (mSystemLayer != nullptr)
+        {
+            mSystemLayer->CancelTimer(HandleTimeout, this);
+        }
+    }
+    bool HasExpired() const { return IsCommand() && System::SystemClock().GetMonotonicTimestamp() >= mDeadline; }
+    bool IsCommand() const { return mFailureHandler != nullptr; }
+    void Failed(const TableEntry & binding, CHIP_ERROR error)
+    {
+        if (mFailureHandler != nullptr && error != CHIP_NO_ERROR)
+        {
+            mFailureHandler(binding, mContext, error);
+        }
+    }
+    CHIP_ERROR StartTimer(PendingNotificationMap & map, System::Layer & layer, System::Clock::Timeout timeout)
+    {
+        mDeadline    = System::SystemClock().GetMonotonicTimestamp() + timeout;
+        mMap         = &map;
+        mSystemLayer = &layer;
+        return layer.StartTimer(timeout, HandleTimeout, this);
+    }
     void * GetContext() { return mContext; };
     uint32_t GetConsumersNumber() { return mConsumersNumber; }
     void IncrementConsumersNumber() { mConsumersNumber++; }
@@ -54,6 +83,11 @@ public:
     }
 
 private:
+    System::Clock::Timestamp mDeadline = System::Clock::kZero;
+    PendingNotificationMap * mMap      = nullptr;
+    System::Layer * mSystemLayer       = nullptr;
+    static void HandleTimeout(System::Layer *, void * state);
+    PendingCommandFailureHandler mFailureHandler = nullptr;
     void * mContext;
     uint32_t mConsumersNumber = 0;
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
@@ -73,6 +107,11 @@ public:
     static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
     PendingNotificationMap(Table & bindingTable) : mBindingTable(bindingTable) {}
+    ~PendingNotificationMap() { Shutdown(); }
+    void Shutdown();
+    PendingNotificationMap(const PendingNotificationMap &)             = delete;
+    PendingNotificationMap & operator=(const PendingNotificationMap &) = delete;
+    bool IsShuttingDown() const { return mIsShuttingDown; }
 
     friend class Iterator;
 
@@ -107,9 +146,12 @@ public:
 
     CHIP_ERROR FindLRUConnectPeer(ScopedNodeId & nodeId);
 
+    /// Coalesces notifications, but returns BUSY without changing either context if either entry is a command.
     CHIP_ERROR AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
 
-    void RemoveEntry(uint8_t bindingEntryId);
+    bool HasPendingNotification(uint8_t bindingEntryId, bool commandsOnly = false) const;
+    void RemoveEntry(uint8_t bindingEntryId, CHIP_ERROR error = CHIP_ERROR_CANCELLED);
+    void RemoveContext(PendingNotificationContext * context, CHIP_ERROR error);
 
     void RemoveAllEntriesForNode(const ScopedNodeId & nodeId);
 
@@ -120,19 +162,21 @@ public:
         mPendingNotificationContextReleaseHandler = handler;
     }
 
-    PendingNotificationContext * NewPendingNotificationContext(void * context)
+    PendingNotificationContext * NewPendingNotificationContext(void * context,
+                                                               PendingCommandFailureHandler failureHandler = nullptr)
     {
-        return Platform::New<PendingNotificationContext>(context, mPendingNotificationContextReleaseHandler);
+        return Platform::New<PendingNotificationContext>(context, mPendingNotificationContextReleaseHandler, failureHandler);
     };
 
 private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
     PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
-    PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
+    PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler = nullptr;
 
     Table & mBindingTable;
 
-    uint8_t mNumEntries = 0;
+    uint8_t mNumEntries  = 0;
+    bool mIsShuttingDown = false;
 };
 
 } // namespace Binding

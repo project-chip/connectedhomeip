@@ -77,6 +77,7 @@ class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}
+    ~Manager() override { mPendingNotificationMap.Shutdown(); }
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -134,6 +135,8 @@ public:
      * @retval CHIP_ERROR_INCORRECT_STATE if the BindingManager is not initialized.
      * @retval CHIP_ERROR_HANDLER_NOT_SET if no BoundDeviceChangedHandler is registered.
      * @retval CHIP_ERROR_NO_MEMORY if the internal notification context cannot be allocated.
+     * @retval CHIP_ERROR_BUSY if a matching unicast binding has an accepted individual command pending.
+     *         No notifications are sent or replaced on this rejection.
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
@@ -147,6 +150,21 @@ public:
      * @param entry binding to add
      */
     CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
+
+    /**
+     * Accepts an individual command without coalescing. Rejects with CHIP_ERROR_BUSY if any matching
+     * unicast binding is pending; rejection has no side effects and leaves context owned by the caller.
+     * On error, no target is dispatched or queued and no callbacks run for context.
+     * On success, each target calls the registered changed handler or failureHandler exactly once.
+     * failureHandler must be non-null. The release handler releases context after all targets finish.
+     * The CASE wait is bounded by a positive timeout; layer must outlive pending commands. Invoke response lifetime
+     * and completion belong to the changed handler. All callbacks may run before this call returns.
+     * Existing state notifications retain their coalescing behavior and cannot replace commands.
+     * Callbacks may submit commands, but must not modify the binding table during dispatch.
+     * Submissions during binding or fabric removal are rejected with CHIP_ERROR_INCORRECT_STATE.
+     */
+    CHIP_ERROR DispatchCommand(EndpointId endpoint, ClusterId cluster, void * context, PendingCommandFailureHandler failureHandler,
+                               System::Layer & layer, System::Clock::Timeout timeout = System::Clock::Seconds16(30));
 
     Table & GetBindingTable() { return mBindingTable; }
 
@@ -196,6 +214,7 @@ private:
 
     void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
+        FabricRemoved(fabricIndex);
         auto & bindingTable = GetBindingTable();
         auto iter           = bindingTable.begin();
         while (iter != bindingTable.end())
@@ -209,7 +228,6 @@ private:
                 ++iter;
             }
         }
-        FabricRemoved(fabricIndex);
     }
 
     static Manager sBindingManager;
@@ -218,8 +236,9 @@ private:
 
     Table mBindingTable;
     PendingNotificationMap mPendingNotificationMap{ mBindingTable };
-    BoundDeviceChangedHandler mBoundDeviceChangedHandler;
+    BoundDeviceChangedHandler mBoundDeviceChangedHandler = nullptr;
     ManagerInitParams mInitParams;
+    bool mRemovingBindings = false;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
