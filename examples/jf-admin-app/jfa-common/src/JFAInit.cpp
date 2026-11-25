@@ -90,6 +90,7 @@ CHIP_ERROR JFAInitialize(Server & server)
 {
     ReturnErrorOnFailure(JFAMgr().Init(server));
     ReturnErrorOnFailure(JFADSync().Init(server));
+    ReturnErrorOnFailure(server.GetJointFabricDatastore().Init(&server.GetPersistentStorage()));
 
     TEMPORARY_RETURN_IGNORED server.GetJointFabricAdministrator().SetDelegate(&JFAMgr());
     TEMPORARY_RETURN_IGNORED server.GetJointFabricDatastore().SetDelegate(&JFADSync());

@@ -27,6 +27,7 @@
 #include "JFAPlatform.h"
 
 #include <controller/CHIPCluster.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -48,7 +49,33 @@ CHIP_ERROR JFAManagerBase::Init(Server & server)
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
 
+    // Restore jfFabricIndex from the persisted fabric table after a reboot.
+    for (const auto & fabricInfo : mServer->GetFabricTable())
+    {
+        FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
+        CATValues cats;
+        if (mServer->GetFabricTable().FetchCATs(fabricIndex, cats) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
+        {
+            jfFabricIndex = fabricIndex;
+            ChipLogProgress(JointFabric, "Restored JF fabric index %u from persisted fabric table", fabricIndex);
+            break;
+        }
+    }
+
     return CHIP_NO_ERROR;
+}
+
+void JFAManagerBase::RemovePendingNodeOnFailure(OnConnectedAction action, NodeId nodeId)
+{
+    // Only the standard commissioning flow adds a Pending node in FinalizeCommissioning.
+    if (action == kStandardCommissioningComplete)
+    {
+        LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().RemoveNode(nodeId));
+    }
 }
 
 CHIP_ERROR JFAManagerBase::GetJointFabricMode(uint8_t & jointFabricMode)
@@ -74,6 +101,22 @@ CHIP_ERROR JFAManagerBase::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256
     peerAdminJFAdminClusterEndpointId = endpointId;
     peerAdminICACPubKey               = trustedIcacPublicKeyB;
     ScopedNodeId scopedNodeId         = ScopedNodeId(nodeId, jfFabricIndex);
+
+    // The node is added to the Datastore as Pending before commissioning completes.
+    // OnCommissioningCompleteResponse refreshes it, and each failure path removes it.
+    if (!isJCM)
+    {
+        auto & datastore = Server::GetInstance().GetJointFabricDatastore();
+
+        StringBuilder<32> friendlyName;
+        friendlyName.AddFormat("node-0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+        // A previous aborted attempt can leave a Pending entry, which would make AddPendingNode fail.
+        // RemoveNode returns an error when there is no entry, which is the normal case.
+        (void) datastore.RemoveNode(nodeId);
+        ReturnErrorOnFailure(datastore.AddPendingNode(nodeId, CharSpan::fromCharString(friendlyName.c_str())));
+    }
+
     ConnectToNode(scopedNodeId, isJCM ? kJCMCommissioning : kStandardCommissioningComplete);
 
     return CHIP_NO_ERROR;
@@ -332,6 +375,7 @@ void JFAManagerBase::OnConnectionFailure(void * context, const ScopedNodeId & pe
     ChipLogError(JointFabric, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
 
+    RemovePendingNodeOnFailure(jfaManager->mOnConnectedAction, peerId.GetNodeId());
     jfaManager->ReleaseSession();
 }
 
@@ -440,6 +484,7 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
     {
         ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u", jfaManager->mNodeId,
                         jfaManager->mOnConnectedAction == kJCMCommissioning, to_underlying(data.errorCode));
+        RemovePendingNodeOnFailure(jfaManager->mOnConnectedAction, jfaManager->mNodeId);
     }
     else
     {
@@ -449,7 +494,12 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
             ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
             // Let subclasses react to a successfully onboarded commissionee; default implementation is a no-op.
             jfaManager->OnCommissioneeOnboarded(ScopedNodeId(jfaManager->mNodeId, jfaManager->jfFabricIndex));
-            break;
+
+            // Release the commissioning session before RefreshNode, which opens its own sessions to the node.
+            jfaManager->ReleaseSession();
+            // Reads the node's state into its Pending entry and marks it Committed.
+            LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().RefreshNode(jfaManager->mNodeId));
+            return;
         }
         case kJCMCommissioning: {
             ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", jfaManager->mNodeId);
@@ -467,6 +517,7 @@ void JFAManagerBase::OnCommissioningCompleteFailure(void * context, CHIP_ERROR e
 {
     JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
+    RemovePendingNodeOnFailure(jfaManagerCore->mOnConnectedAction, jfaManagerCore->mNodeId);
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
