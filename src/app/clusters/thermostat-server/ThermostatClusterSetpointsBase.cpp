@@ -21,7 +21,12 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/support/Assertions.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
+
+#include <algorithm>
+#include <cstdint>
 
 #include "Setpoint.h"
 #include "Temperature.h"
@@ -94,6 +99,119 @@ void ThermostatSetpointsBase::NotifyAttributesChanged(const SetpointAttributes &
     }
 }
 
+bool ThermostatSetpointsBase::IsOperationalSetpointAttribute(AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+    case UnoccupiedHeatingSetpoint::Id:
+    case OccupiedCoolingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
+        return true;
+    default:
+        return false;
+    }
+}
+
+void ThermostatSetpointsBase::UpdateSetpointChangeAttributes(const Setpoints & oldSetpoints, const Setpoints & newSetpoints,
+                                                             const SetpointAttributes & changedAttributes,
+                                                             bool initiatedByOperationalSetpointWrite,
+                                                             std::optional<AttributeId> initiatingAttributeId)
+{
+    // A setpoint *limit* write (or a deadband adjustment) can indirectly clamp an operational setpoint via
+    // Setpoints::Fix(), which would otherwise show up in `changedAttributes` exactly like a direct write. Only a
+    // direct write to (or SetpointRaiseLower command targeting) an operational setpoint counts as a setpoint
+    // change for tracking purposes.
+    if (!initiatedByOperationalSetpointWrite)
+    {
+        return;
+    }
+
+    const auto & optionalAttributes = GetOptionalAttributes();
+    if (!optionalAttributes.SetpointChangeSource && !optionalAttributes.SetpointChangeAmount &&
+        !optionalAttributes.SetpointChangeSourceTimestamp)
+    {
+        return;
+    }
+
+    const Setpoint * oldOperationalSetpoints[] = { &oldSetpoints.occupiedRange.heating, &oldSetpoints.occupiedRange.cooling,
+                                                   &oldSetpoints.unoccupiedRange.heating, &oldSetpoints.unoccupiedRange.cooling };
+    const Setpoint * newOperationalSetpoints[] = { &newSetpoints.occupiedRange.heating, &newSetpoints.occupiedRange.cooling,
+                                                   &newSetpoints.unoccupiedRange.heating, &newSetpoints.unoccupiedRange.cooling };
+
+    const Setpoint * changedOldSetpoint = nullptr;
+    const Setpoint * changedNewSetpoint = nullptr;
+    if (initiatingAttributeId.has_value())
+    {
+        // A single operational setpoint was directly targeted by this operation. `changedAttributes` may also
+        // contain a second operational setpoint that was merely cascaded into by Setpoints::Fix() (e.g. an
+        // auto-mode deadband adjustment triggered by this write) - that cascade must not shadow the setpoint the
+        // caller actually asked to change.
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(newOperationalSetpoints); ++i)
+        {
+            if (newOperationalSetpoints[i]->AttributeId() == *initiatingAttributeId)
+            {
+                if (changedAttributes.Has(*initiatingAttributeId))
+                {
+                    changedOldSetpoint = oldOperationalSetpoints[i];
+                    changedNewSetpoint = newOperationalSetpoints[i];
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        // More than one operational setpoint was intentionally targeted by the same operation (a SetpointRaiseLower
+        // command with mode kBoth). Report the delta of the first one, in a fixed order. Summing signed deltas
+        // across multiple setpoints could cancel out (opposite-direction changes) or double-count (same-direction
+        // changes), either of which would misrepresent how much the setpoint actually moved.
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(newOperationalSetpoints); ++i)
+        {
+            if (changedAttributes.Has(newOperationalSetpoints[i]->AttributeId()))
+            {
+                changedOldSetpoint = oldOperationalSetpoints[i];
+                changedNewSetpoint = newOperationalSetpoints[i];
+                break;
+            }
+        }
+    }
+
+    if (changedNewSetpoint == nullptr)
+    {
+        return;
+    }
+
+    if (optionalAttributes.SetpointChangeSource)
+    {
+        mSetpointChangeSource = mCluster.mDelegate.GetSetpointChangeSource();
+        mCluster.NotifyAttributeChanged(Attributes::SetpointChangeSource::Id);
+    }
+
+    if (optionalAttributes.SetpointChangeAmount)
+    {
+        int32_t amount =
+            static_cast<int32_t>(changedNewSetpoint->Temperature()) - static_cast<int32_t>(changedOldSetpoint->Temperature());
+        amount = std::clamp(amount, static_cast<int32_t>(INT16_MIN), static_cast<int32_t>(INT16_MAX));
+        mSetpointChangeAmount.SetNonNull(static_cast<int16_t>(amount));
+        mCluster.NotifyAttributeChanged(Attributes::SetpointChangeAmount::Id);
+    }
+
+    if (optionalAttributes.SetpointChangeSourceTimestamp)
+    {
+        uint32_t matterEpochS;
+        if (System::Clock::GetClock_MatterEpochS(matterEpochS) == CHIP_NO_ERROR)
+        {
+            mSetpointChangeSourceTimestamp = matterEpochS;
+            mCluster.NotifyAttributeChanged(Attributes::SetpointChangeSourceTimestamp::Id);
+        }
+        else
+        {
+            ChipLogError(Zcl, "Failed to read the current time while updating SetpointChangeSourceTimestamp; leaving it stale");
+        }
+    }
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                     TLV::TLVReader & input_arguments,
                                                                                     CommandHandler * handler)
@@ -115,6 +233,9 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
 
         chip::Optional<temperature> heat;
         chip::Optional<temperature> cool;
+        // Which single operational setpoint this command targeted, for SetpointChange tracking purposes. Left
+        // unset for mode kBoth, which intentionally targets both the heating and cooling setpoints at once.
+        std::optional<AttributeId> initiatingAttributeId;
 
         switch (request_data.mode)
         {
@@ -132,12 +253,14 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
             if (setpoints.heatSupported)
             {
                 heat.SetValue(static_cast<temperature>(range.heating.Temperature() + delta));
+                initiatingAttributeId = range.heating.AttributeId();
             }
             break;
         case SetpointRaiseLowerModeEnum::kCool:
             if (setpoints.coolSupported)
             {
                 cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + delta));
+                initiatingAttributeId = range.cooling.AttributeId();
             }
             break;
         default:
@@ -154,7 +277,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
         {
             return status;
         }
-        return SaveSetpoints(setpoints, changedAttributes);
+        return SaveSetpoints(setpoints, changedAttributes, /* initiatedByOperationalSetpointWrite = */ true, initiatingAttributeId);
     }
     }
 
