@@ -74,25 +74,25 @@ class CHIPToolActivity :
         .beginTransaction()
         .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
         .commit()
+
+      if (intent?.action == ACTION_COMMISSION_BLE_WIFI) {
+        onCommissionBleWifiIntent(intent)
+      } else if (intent?.action == ACTION_COMMISSION_BLE_THREAD) {
+        onCommissionBleThreadIntent(intent)
+      }
     } else {
       networkType =
         ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
       @Suppress("DEPRECATION")
       deviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO)
+      isAutomatedCommissioningIntent =
+        savedInstanceState.getBoolean(ARG_IS_AUTOMATED_COMMISSIONING_INTENT, false)
     }
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED) onNfcIntent(intent)
 
     if (Intent.ACTION_VIEW == intent?.action) {
       onReturnIntent(intent)
-    }
-
-    if (intent?.action == ACTION_COMMISSION_BLE_WIFI) {
-      onCommissionBleWifiIntent(intent)
-    }
-
-    if (intent?.action == ACTION_COMMISSION_BLE_THREAD) {
-      onCommissionBleThreadIntent(intent)
     }
   }
 
@@ -110,17 +110,24 @@ class CHIPToolActivity :
     } else if (
       intent.action != NfcAdapter.ACTION_NDEF_DISCOVERED && intent.action != Intent.ACTION_VIEW
     ) {
+      isAutomatedCommissioningIntent = false
       supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
       showFragment(SelectActionFragment.newInstance(), false)
     }
   }
 
   private fun onCommissionBleWifiIntent(intent: Intent) {
+    val ssid = intent.getStringExtra(EXTRA_WIFI_SSID)
+    if (ssid.isNullOrEmpty()) {
+      Log.e(TAG, "Missing Wi-Fi SSID in commissioning intent")
+      Toast.makeText(this, "Wi-Fi SSID required", Toast.LENGTH_SHORT).show()
+      return
+    }
+
     isAutomatedCommissioningIntent = true
     val discriminator = intent.getIntExtra(EXTRA_DISCRIMINATOR, 3840)
     val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, 20202021L)
-    val ssid = intent.getStringExtra(EXTRA_WIFI_SSID)
-    val psk = intent.getStringExtra(EXTRA_WIFI_PASSWORD)
+    val psk = intent.getStringExtra(EXTRA_WIFI_PASSWORD) ?: ""
     val devInfo = CHIPDeviceInfo(discriminator = discriminator, setupPinCode = setupPinCode)
     this.deviceInfo = devInfo
     val networkCreds =
@@ -128,58 +135,77 @@ class CHIPToolActivity :
     showFragment(DeviceProvisioningFragment.newInstance(devInfo, networkCreds), false)
   }
 
+  private fun decodeHexBytes(hex: String, expectedByteLength: Int? = null): ByteArray? {
+    val normalized = hex.filterNot { it == ':' || it == ' ' }
+    if (normalized.isEmpty() || normalized.length % 2 != 0) {
+      return null
+    }
+    if (expectedByteLength != null && normalized.length != expectedByteLength * 2) {
+      return null
+    }
+    return try {
+      ByteArray(normalized.length / 2) { idx ->
+        normalized.substring(idx * 2, idx * 2 + 2).toUByte(16).toByte()
+      }
+    } catch (_: NumberFormatException) {
+      null
+    }
+  }
+
   private fun onCommissionBleThreadIntent(intent: Intent) {
-    isAutomatedCommissioningIntent = true
     val discriminator = intent.getIntExtra(EXTRA_DISCRIMINATOR, 3840)
     val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, 20202021L)
     // LIT ICD registration (ICD Management RegisterClient during commissioning).
     // Defaults to true like CHIPDeviceInfo; tests pass false as a negative control.
     val isLIT = intent.getBooleanExtra(EXTRA_IS_LIT, true)
-    val devInfo =
-      CHIPDeviceInfo(discriminator = discriminator, setupPinCode = setupPinCode, isLIT = isLIT)
-    this.deviceInfo = devInfo
 
     val rawDatasetHex = intent.getStringExtra(EXTRA_THREAD_OPERATIONAL_DATASET)
-    val datasetBytes =
+    val datasetBytes: ByteArray? =
       if (!rawDatasetHex.isNullOrBlank()) {
-        rawDatasetHex
-          .filterNot { it == ':' || it == ' ' }
-          .chunked(2)
-          .map { it.toUByte(16).toByte() }
-          .toByteArray()
+        decodeHexBytes(rawDatasetHex)
       } else {
         val channel = intent.getIntExtra(EXTRA_THREAD_CHANNEL, 15)
         val panId = intent.getIntExtra(EXTRA_THREAD_PAN_ID, 0x1234)
-        val xpanIdStr =
-          (intent.getStringExtra(EXTRA_THREAD_XPAN_ID) ?: "11:11:11:11:22:22:22:22").filterNot {
-            it == ':' || it == ' '
-          }
+        val xpanIdStr = intent.getStringExtra(EXTRA_THREAD_XPAN_ID) ?: "11:11:11:11:22:22:22:22"
         val masterKeyStr =
-          (intent.getStringExtra(EXTRA_THREAD_MASTER_KEY)
-              ?: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF")
-            .filterNot { it == ':' || it == ' ' }
-        val xpanIdBytes = xpanIdStr.chunked(2).map { it.toUByte(16).toByte() }.toByteArray()
-        val masterKeyBytes = masterKeyStr.chunked(2).map { it.toUByte(16).toByte() }.toByteArray()
-
-        var dataset =
-          byteArrayOf(
-            0.toByte(),
-            3.toByte(),
-            0.toByte(),
-            (channel.shr(8) and 0xFF).toByte(),
-            (channel and 0xFF).toByte(),
-          )
-        dataset +=
-          byteArrayOf(
-            1.toByte(),
-            2.toByte(),
-            (panId.shr(8) and 0xFF).toByte(),
-            (panId and 0xFF).toByte(),
-          )
-        dataset += byteArrayOf(2.toByte(), 8.toByte()) + xpanIdBytes
-        dataset += byteArrayOf(5.toByte(), 16.toByte()) + masterKeyBytes
-        dataset
+          intent.getStringExtra(EXTRA_THREAD_MASTER_KEY)
+            ?: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
+        val xpanIdBytes = decodeHexBytes(xpanIdStr, expectedByteLength = 8)
+        val masterKeyBytes = decodeHexBytes(masterKeyStr, expectedByteLength = 16)
+        if (xpanIdBytes == null || masterKeyBytes == null) {
+          null
+        } else {
+          var dataset =
+            byteArrayOf(
+              0.toByte(),
+              3.toByte(),
+              0.toByte(),
+              (channel.shr(8) and 0xFF).toByte(),
+              (channel and 0xFF).toByte(),
+            )
+          dataset +=
+            byteArrayOf(
+              1.toByte(),
+              2.toByte(),
+              (panId.shr(8) and 0xFF).toByte(),
+              (panId and 0xFF).toByte(),
+            )
+          dataset += byteArrayOf(2.toByte(), 8.toByte()) + xpanIdBytes
+          dataset += byteArrayOf(5.toByte(), 16.toByte()) + masterKeyBytes
+          dataset
+        }
       }
+
+    if (datasetBytes == null) {
+      Log.e(TAG, "Invalid Thread operational dataset hex in commissioning intent")
+      Toast.makeText(this, "Invalid Thread operational dataset", Toast.LENGTH_SHORT).show()
+      return
+    }
+
+    isAutomatedCommissioningIntent = true
+    val devInfo =
+      CHIPDeviceInfo(discriminator = discriminator, setupPinCode = setupPinCode, isLIT = isLIT)
+    this.deviceInfo = devInfo
 
     val networkCreds =
       NetworkCredentialsParcelable.forThread(
@@ -191,6 +217,7 @@ class CHIPToolActivity :
   override fun onSaveInstanceState(outState: Bundle) {
     outState.putString(ARG_PROVISION_NETWORK_TYPE, networkType?.name)
     outState.putParcelable(ARG_DEVICE_INFO, deviceInfo)
+    outState.putBoolean(ARG_IS_AUTOMATED_COMMISSIONING_INTENT, isAutomatedCommissioningIntent)
 
     super.onSaveInstanceState(outState)
   }
@@ -418,6 +445,7 @@ class CHIPToolActivity :
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
     private const val ARG_DEVICE_INFO = "device_info"
+    private const val ARG_IS_AUTOMATED_COMMISSIONING_INTENT = "is_automated_commissioning_intent"
 
     const val ACTION_COMMISSION_BLE_WIFI = "com.google.chip.chiptool.action.COMMISSION_BLE_WIFI"
     const val EXTRA_DISCRIMINATOR = "discriminator"

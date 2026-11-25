@@ -25,7 +25,7 @@ import time
 
 from cirque.nodes.android_diagnostics import save_android_emulator_diagnostics
 from cirque.virtual_wifi.lease import get_device_wlan0_ipv6, wait_for_device_wlan0_ipv4
-from helper.CHIPTestBase import CHIPVirtualHome, TestResult
+from helper.CHIPTestBase import REQUEST_TIMEOUT_SEC, CHIPVirtualHome, TestResult
 from helper.paths import CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CHIP_TOOL_APK_PATH
 
 logger = logging.getLogger('AndroidBleWiFiMobileDeviceTest')
@@ -53,7 +53,52 @@ ANDROID_COMMISSION_TIMEOUT_SEC = float(
     os.environ.get('CIRQUE_ANDROID_COMMISSION_TIMEOUT', '180')
 )
 # CHIPTool OnOffClientFragment read result after the Toggle (state 0 -> 1).
-ON_OFF_TRUE_RE = re.compile(r'On/Off attribute value:\s*(?:true|1)\b')
+ON_OFF_TRUE_RE = re.compile(r'On/Off attribute value:\s*(?:true|1)\b', re.IGNORECASE)
+ON_OFF_VALUE_RE = re.compile(
+    r'On/Off attribute value:\s*(true|1|false|0)\b', re.IGNORECASE
+)
+TOGGLE_SUCCESS_RE = re.compile(r'Toggle command success|command 2, Code : 0')
+PING_SUMMARY_RE = re.compile(
+    r'(\d+)\s+packets\s+transmitted,\s+(\d+)\s+(?:packets\s+)?received'
+    r'[^\r\n]*?(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b'
+)
+
+
+def _ping_has_zero_packet_loss(ping_res) -> bool:
+    """Returns True iff ping exited cleanly with >0 replies and 0% packet loss."""
+    if isinstance(ping_res, dict):
+        rc = ping_res.get('return_code')
+        if rc is not None and str(rc) != '0':
+            return False
+        ping_out = str(ping_res.get('output', ''))
+    else:
+        ping_out = str(ping_res)
+
+    summary = PING_SUMMARY_RE.search(ping_out)
+    if summary:
+        tx = int(summary.group(1))
+        rx = int(summary.group(2))
+        loss = float(summary.group(3))
+        return tx > 0 and rx == tx and loss == 0.0
+
+    loss_match = re.search(r'(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b', ping_out)
+    return bool(loss_match and float(loss_match.group(1)) == 0.0)
+
+
+def _find_nonzero_commissioning_error(logcat_out: str):
+    """Returns the first non-zero errorCode token on an onCommissioningComplete line, or None."""
+    line_re = re.compile(
+        r'onCommissioningComplete[^\r\n]*?\berrorCode\s*[:=]\s*(-?(?:0x[0-9a-fA-F]+|\d+))\b',
+        re.IGNORECASE,
+    )
+    for match in line_re.finditer(logcat_out):
+        token = match.group(1)
+        try:
+            if int(token, 0) != 0:
+                return token
+        except ValueError:
+            return token
+    return None
 
 # SIMULATION-DISCLOSURE: shims present in this test path. They provide
 # transport and addressing only; every verdict below is asserted from
@@ -71,6 +116,7 @@ ON_OFF_TRUE_RE = re.compile(r'On/Off attribute value:\s*(?:true|1)\b')
 #   - CHIPEndDevice addressing: eth0 is flushed and downed, global IPv6 and
 #     router advertisements on wlan0 are suppressed by a background loop,
 #     and avahi-daemon is restricted to wlan0 over IPv4.
+
 
 DEVICE_CONFIG = {
     'device0': {
@@ -165,8 +211,10 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
             return TestResult.TEST_FAILURE
         return super().run_test(save_logs=save_logs)
 
-    def save_device_logs(self):
-        super().save_device_logs()
+    def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
+        super().save_device_logs(timeout=timeout, deadline=deadline)
+        if deadline is not None and time.monotonic() >= deadline:
+            return
         timestamp = int(time.time())
         save_android_emulator_diagnostics(self, timestamp)
 
@@ -300,7 +348,15 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
             self._dump_emulator_diagnostics(req_device_id)
             self.assertTrue(False, f'Android emulator init failed: {init_res}')
 
-        # Direct container fallback:
+        # Direct container fallback: ensure any half-started guest on the same
+        # AVD from an ambiguous REST timeout is stopped before launching anew.
+        self.execute_device_cmd(
+            req_device_id,
+            'sh -c "adb emu kill 2>/dev/null || true;'
+            " pkill -9 -f 'Pixel_6_API_34' 2>/dev/null || true;"
+            ' rm -f /root/.android/avd/Pixel_6_API_34.avd/*.lock 2>/dev/null || true"',
+        )
+        time.sleep(1.0)
         # 1. Setup tap interface
         self.execute_device_cmd(
             req_device_id,
@@ -554,7 +610,9 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
                         or 'Commissioning completed' in out
                         or 'Commissioning complete' in out
                     ):
-                        if 'CHIP Error' in out and 'CHIP Error 0x00000000' not in out:
+                        if (
+                            'CHIP Error' in out and 'CHIP Error 0x00000000' not in out
+                        ) or _find_nonzero_commissioning_error(out) is not None:
                             comm_success = False
                             break
                         comm_success = True
@@ -576,6 +634,7 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
                 v6_addrs,
             )
         toggle_ok = False
+        toggle_ambiguous = False
         read_ok = False
         self._start_ui_video(req_device_id, '3_onoff_cluster_toggle_read.mp4')
         try:
@@ -585,28 +644,40 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
                     [self.home_id, req_device_id],
                     params={'timeout': 30.0},
                 )
-                read_res = self.query_api(
-                    'read_chiptool',
-                    [self.home_id, req_device_id],
-                    params={'timeout': 30.0},
-                )
                 toggle_ok = (
                     isinstance(toggle_res, dict)
                     and toggle_res.get('status') == 'success'
                 )
-                read_ok = (
-                    isinstance(read_res, dict) and read_res.get('status') == 'success'
-                )
             except Exception as e:
+                toggle_ambiguous = True
                 self.logger.warning(
-                    'REST toggle/read endpoint failed: %s; falling back to UI'
-                    ' toggle/read',
+                    'REST toggle_chiptool endpoint failed: %s',
                     e,
                 )
+
+            if toggle_ok:
+                try:
+                    read_res = self.query_api(
+                        'read_chiptool',
+                        [self.home_id, req_device_id],
+                        params={'timeout': 30.0},
+                    )
+                    read_ok = (
+                        isinstance(read_res, dict)
+                        and read_res.get('status') == 'success'
+                    )
+                except Exception as e:
+                    self.logger.warning(
+                        'REST read_chiptool endpoint failed: %s; retrying Read via UI',
+                        e,
+                    )
+
             if not (toggle_ok and read_ok):
                 # Fall back ONLY to UI toggle/read, never re-running commissioning!
                 ui_toggle_ok, ui_read_ok = self._trigger_ui_toggle_and_read(
-                    req_device_id
+                    req_device_id,
+                    skip_toggle=toggle_ok,
+                    check_state_before_toggle=toggle_ambiguous and not toggle_ok,
                 )
                 toggle_ok = toggle_ok or ui_toggle_ok
                 read_ok = read_ok or ui_read_ok
@@ -614,10 +685,20 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
             self._stop_ui_video(req_device_id)
         return comm_ok, toggle_ok, read_ok
 
-    def _trigger_ui_toggle_and_read(self, req_device_id):
-        # Toggle On/Off cluster via UI
+    def _trigger_ui_toggle_and_read(
+        self,
+        req_device_id,
+        skip_toggle: bool = False,
+        check_state_before_toggle: bool = False,
+    ):
+        # Toggle On/Off cluster via UI (skipping Toggle if REST Toggle already succeeded)
         started_rec = self._start_ui_video(
             req_device_id, '3_onoff_cluster_toggle_read.mp4'
+        )
+        logcat_filter_cmd = (
+            'adb shell "logcat -d | grep -E '
+            "'CTL|ChipTool|CHIP|OnOffClientFragment|onCommissioningComplete|"
+            'Commissioning complete|Toggle|attribute|value\' || true"'
         )
         try:
             time.sleep(2.0)
@@ -644,37 +725,66 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
             # Tap LIGHT ON/OFF & LEVEL CLUSTER (bounds [21,884][639,1010] -> 330, 947)
             self.execute_device_cmd(req_device_id, 'adb shell input tap 330 947')
             time.sleep(2.0)
-            # Tap TOGGLE button (bounds [429,667][645,793] -> 537, 730)
-            self.execute_device_cmd(req_device_id, 'adb shell input tap 537 730')
-            time.sleep(2.0)
+
+            already_toggled = skip_toggle
+            if not already_toggled and check_state_before_toggle:
+                before_out = str(
+                    self.execute_device_cmd(req_device_id, logcat_filter_cmd).get(
+                        'output', ''
+                    )
+                )
+                self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
+                time.sleep(2.0)
+                probe_out = str(
+                    self.execute_device_cmd(req_device_id, logcat_filter_cmd).get(
+                        'output', ''
+                    )
+                )
+                delta = (
+                    probe_out[len(before_out):]
+                    if probe_out.startswith(before_out)
+                    else probe_out
+                )
+                probe_vals = ON_OFF_VALUE_RE.findall(delta)
+                if probe_vals and probe_vals[-1].lower() in ('true', '1'):
+                    return True, True
+
+            if not already_toggled:
+                # Tap TOGGLE button (bounds [429,667][645,793] -> 537, 730)
+                self.execute_device_cmd(req_device_id, 'adb shell input tap 537 730')
+                time.sleep(2.0)
             # Tap READ button (bounds [61,821][271,947] -> 166, 884)
             self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
             time.sleep(2.0)
 
-            logcat_filter_cmd = (
-                'adb shell "logcat -d | grep -E '
-                "'CTL|ChipTool|CHIP|OnOffClientFragment|onCommissioningComplete|"
-                'Commissioning complete|Toggle|attribute|value\' || true"'
-            )
             log_check = self.execute_device_cmd(req_device_id, logcat_filter_cmd)
             logcat_out = log_check.get('output', '')
-            return self._parse_toggle_read_logcat(logcat_out)
+            toggle_ok, read_ok = self._parse_toggle_read_logcat(
+                logcat_out, require_toggle=not already_toggled
+            )
+            return (True if already_toggled else toggle_ok), read_ok
         finally:
             if started_rec:
                 self._stop_ui_video(req_device_id)
 
     @staticmethod
-    def _parse_toggle_read_logcat(logcat_out):
+    def _parse_toggle_read_logcat(logcat_out, require_toggle: bool = True):
         """Returns (toggle_ok, read_ok) from CHIPTool OnOffClientFragment logcat.
 
         Only the full Toggle (command 2) response with status 0 and an On/Off
-        read value of true count.
+        read value of true appearing after the last Toggle marker count.
         """
-        toggle_ok = (
-            'Toggle command success' in logcat_out
-            or 'command 2, Code : 0' in logcat_out
-        )
-        read_ok = bool(ON_OFF_TRUE_RE.search(logcat_out))
+        toggle_matches = list(TOGGLE_SUCCESS_RE.finditer(logcat_out))
+        toggle_ok = bool(toggle_matches)
+        if toggle_matches:
+            post_toggle = logcat_out[toggle_matches[-1].end():]
+            vals = ON_OFF_VALUE_RE.findall(post_toggle)
+            read_ok = bool(vals and vals[-1].lower() in ('true', '1'))
+        elif not require_toggle:
+            vals = ON_OFF_VALUE_RE.findall(logcat_out)
+            read_ok = bool(vals and vals[-1].lower() in ('true', '1'))
+        else:
+            read_ok = False
         return toggle_ok, read_ok
 
     def _assert_ble_wifi_device_logs(self, server_ids):
@@ -755,6 +865,11 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
         self.assertTrue(comm_ok, 'Commissioning did not succeed')
         self.assertTrue(toggle_ok, 'Toggle command was not observed in logcat')
         self.assertTrue(read_ok, 'Read command was not observed in logcat')
+        nonzero_err = _find_nonzero_commissioning_error(logcat_out)
+        self.assertTrue(
+            nonzero_err is None,
+            f'onCommissioningComplete returned a non-zero errorCode: {nonzero_err}',
+        )
         self.assertTrue(
             'onCommissioningComplete' in logcat_out
             or 'Device commissioning completed' in logcat_out
@@ -790,12 +905,17 @@ class TestAndroidBleWiFiMobileDevice(CHIPVirtualHome):
             req_device_id, f'adb shell ping -I wlan0 -c 2 {dev_ip}'
         )
         ping_out = ping_res.get('output', '')
+        ping_rc = ping_res.get('return_code')
         self.logger.info(
-            'Ping output from Android wlan0 -> %s:\n%s', dev_ip, ping_out
+            'Ping output from Android wlan0 -> %s (rc=%s):\n%s',
+            dev_ip,
+            ping_rc,
+            ping_out,
         )
         self.assertTrue(
-            '0% packet loss' in ping_out,
-            'Expected 0% packet loss ping from guest wlan0 to CHIPEndDevice',
+            _ping_has_zero_packet_loss(ping_res),
+            f'Expected 0% packet loss ping from guest wlan0 to CHIPEndDevice'
+            f' (rc={ping_rc}): {ping_out}',
         )
 
         # 4. Assert the emulator radios are pinned to cirque: the running

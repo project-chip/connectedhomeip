@@ -61,6 +61,7 @@ def _load_android_ble_thread_module():
             pass
 
         chip_test_base.CHIPVirtualHome = _FakeCHIPVirtualHome
+        chip_test_base.REQUEST_TIMEOUT_SEC = 600
         chip_test_base.TestResult = _FakeTestResult
         stub_modules.update({
             'helper': helper_pkg,

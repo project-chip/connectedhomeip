@@ -41,7 +41,7 @@ import java.util.Optional;
 
 public class DiscoveryExampleFragment extends Fragment {
   private static final String TAG = DiscoveryExampleFragment.class.getSimpleName();
-  // 35 represents device type of Matter Casting Player
+  // Browse _matterd._udp without filtering on a specific device-type subtype.
   private static final Long DISCOVERY_TARGET_DEVICE_TYPE = null;
   private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;

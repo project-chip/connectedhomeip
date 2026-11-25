@@ -59,16 +59,19 @@ The Android emulator tests (`AndroidBleWiFiMobileDeviceTest`,
 `AndroidBleThreadMobileDeviceTest`, `AndroidTvCastingTest`) need:
 
 -   KVM hardware acceleration (`/dev/kvm`)
--   the `cirque-android-runner:latest` image:
+-   an Android SDK with a `Pixel_6_API_34` AVD (`ANDROID_HOME`,
+    `ANDROID_AVD_HOME`) and an Android NDK (`ANDROID_NDK_HOME`)
+-   the `pty_bridge` guest HCI forwarder and `cirque-android-runner:latest`
+    image:
 
     ```bash
+    ANDROID_NDK_HOME=/path/to/ndk \
+        third_party/cirque/repo/cirque/virtual_bt/android/build_pty_bridge.sh
     docker build -t cirque-android-runner:latest \
         -f third_party/cirque/repo/cirque/nodes/Dockerfile.android_runner \
         third_party/cirque/repo/cirque/nodes
     ```
 
--   an Android SDK with a `Pixel_6_API_34` AVD (`ANDROID_HOME`,
-    `ANDROID_AVD_HOME`)
 -   the APKs built by `scripts/build/build_examples.py` for the
     `android-x64-chip-tool`, `android-x64-tv-server` and
     `android-x64-tv-casting-app` targets

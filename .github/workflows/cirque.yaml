@@ -166,7 +166,7 @@ jobs:
                        --target android-x64-tv-casting-app \
                        build"
             - name: Upload Android APKs
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ !env.ACT }}
               with:
                   name: cirque-android-apks
@@ -257,7 +257,7 @@ jobs:
                        && scripts/build/gn_gen_cirque.sh \
                       "
             - name: Download Android APKs
-              uses: actions/download-artifact@v8
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
               if: ${{ !env.ACT }}
               with:
                   name: cirque-android-apks
@@ -300,7 +300,7 @@ jobs:
                       "
 
             - name: Uploading Logs
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_android_log-${{steps.outsuffix.outputs.value}}-logs

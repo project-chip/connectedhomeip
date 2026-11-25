@@ -18,14 +18,16 @@ import logging
 import os
 import re
 import shlex
+import socket
 import struct
+import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
 
 from cirque.nodes.android_diagnostics import save_android_emulator_diagnostics
 from cirque.nodes.androiddockernode import UiAutomatorHelper
-from helper.CHIPTestBase import CHIPVirtualHome, TestResult
+from helper.CHIPTestBase import REQUEST_TIMEOUT_SEC, CHIPVirtualHome, TestResult
 from helper.paths import CHIP_REPO_STR
 
 logger = logging.getLogger('AndroidTvCastingTest')
@@ -53,6 +55,9 @@ TV_APP_APK_PATH = os.path.join(CHIP_REPO_STR, 'out', 'android-x64-tv-server', 'p
 CONTENT_APP_APK_PATH = os.path.join(CHIP_REPO_STR, 'out', 'android-x64-tv-server', 'content-app',
                                     'outputs', 'apk', 'debug', 'content-app-debug.apk')
 CASTING_APP_APK_PATH = os.path.join(CHIP_REPO_STR, 'out', 'android-x64-tv-casting-app', 'outputs', 'apk', 'debug', 'app-debug.apk')
+ANDROID_RUNNER_IMAGE = os.environ.get(
+    'CIRQUE_ANDROID_RUNNER_IMAGE', 'cirque-android-runner:latest'
+)
 
 DEVICE_CONFIG = {
     'device0': {
@@ -66,7 +71,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'android_emulator',
-        'base_image': 'cirque-android-runner:latest',
+        'base_image': ANDROID_RUNNER_IMAGE,
         'capability': ['Bluetooth', 'WiFi', 'Mount'],
         'use_virtual_bt_tcp': True,
         'use_virtual_wifi_tcp': True,
@@ -83,7 +88,7 @@ DEVICE_CONFIG = {
     },
     'device2': {
         'type': 'android_emulator',
-        'base_image': 'cirque-android-runner:latest',
+        'base_image': ANDROID_RUNNER_IMAGE,
         'capability': ['Bluetooth', 'WiFi', 'Mount'],
         'use_virtual_bt_tcp': True,
         'use_virtual_wifi_tcp': True,
@@ -187,42 +192,55 @@ def _decode_dns_name(buf, offset):
         pos += 1 + length
 
 
-def _mdns_response_has_service(dns_payload, service_substr):
-    """Returns True if a DNS response contains an RR owner name matching service_substr."""
+def _mdns_response_has_service(dns_payload, service_name='_matterd._udp.local'):
+    """Returns True if a DNS response has an Answer-section PTR RR for service_name."""
     if len(dns_payload) < 12:
         return False
-    _txid, flags, qdcount, ancount, nscount, arcount = struct.unpack(
+    _txid, flags, qdcount, ancount, _nscount, _arcount = struct.unpack(
         '!HHHHHH', dns_payload[:12]
     )
-    rr_total = ancount + nscount + arcount
-    if (flags & 0x8000) == 0 or rr_total == 0:
+    if (flags & 0x8000) == 0 or ancount == 0:
         return False
+    expected = service_name.rstrip('.').lower()
+    if not expected.endswith('.local'):
+        expected = f'{expected}.local'
     pos = 12
     for _ in range(qdcount):
         _, pos = _decode_dns_name(dns_payload, pos)
         if pos < 0 or pos + 4 > len(dns_payload):
             return False
         pos += 4
-    needle = service_substr.lower()
-    for _ in range(rr_total):
+    for _ in range(ancount):
         if pos >= len(dns_payload):
             break
         rr_name, pos = _decode_dns_name(dns_payload, pos)
         if pos < 0 or pos + 10 > len(dns_payload):
             break
-        if needle in rr_name.lower():
-            return True
-        rdlen = struct.unpack('!H', dns_payload[pos + 8:pos + 10])[0]
-        pos += 10 + rdlen
-        if pos > len(dns_payload):
+        rr_type, rr_class, _ttl, rdlen = struct.unpack(
+            '!HHIH', dns_payload[pos:pos + 10]
+        )
+        rdata_start = pos + 10
+        rdata_end = rdata_start + rdlen
+        if rdata_end > len(dns_payload):
             break
+        if (
+            rr_type == 12
+            and (rr_class & 0x7FFF) == 1
+            and rr_name.rstrip('.').lower() == expected
+        ):
+            ptr_target, next_pos = _decode_dns_name(dns_payload, rdata_start)
+            if next_pos == rdata_end and ptr_target:
+                return True
+        pos = rdata_end
     return False
 
 
 def _extract_udp_segment(eth_frame):
-    """Extracts (src_port, dst_port, payload) from an Ethernet II IPv4/IPv6 UDP frame."""
+    """Extracts (src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, payload) from Ethernet UDP."""
     if len(eth_frame) < 14:
         return None
+    dst_mac = ':'.join(f'{b:02x}' for b in eth_frame[0:6])
+    src_mac = ':'.join(f'{b:02x}' for b in eth_frame[6:12])
     ethertype = struct.unpack('!H', eth_frame[12:14])[0]
     l3_off = 14
     while ethertype in (0x8100, 0x88A8) and len(eth_frame) >= l3_off + 4:
@@ -238,11 +256,19 @@ def _extract_udp_segment(eth_frame):
         if (frag & 0x1FFF) != 0:
             return None
         proto = eth_frame[l3_off + 9]
+        src_ip = socket.inet_ntoa(eth_frame[l3_off + 12:l3_off + 16])
+        dst_ip = socket.inet_ntoa(eth_frame[l3_off + 16:l3_off + 20])
         l4_off = l3_off + ihl
     elif ethertype == 0x86DD:
         if len(eth_frame) < l3_off + 40 or (eth_frame[l3_off] >> 4) != 6:
             return None
         proto = eth_frame[l3_off + 6]
+        src_ip = socket.inet_ntop(
+            socket.AF_INET6, eth_frame[l3_off + 8:l3_off + 24]
+        )
+        dst_ip = socket.inet_ntop(
+            socket.AF_INET6, eth_frame[l3_off + 24:l3_off + 40]
+        )
         l4_off = l3_off + 40
         while proto in (0, 43, 60) and len(eth_frame) >= l4_off + 2:
             nxt, hdr_ext_len = eth_frame[l4_off], eth_frame[l4_off + 1]
@@ -264,28 +290,125 @@ def _extract_udp_segment(eth_frame):
         '!HHHH', eth_frame[l4_off:l4_off + 8]
     )
     end_off = min(len(eth_frame), l4_off + max(8, udp_len))
-    return src_port, dst_port, eth_frame[l4_off + 8:end_off]
+    return (
+        src_mac,
+        dst_mac,
+        src_ip,
+        dst_ip,
+        src_port,
+        dst_port,
+        eth_frame[l4_off + 8:end_off],
+    )
 
 
-def _scan_wifi_pcap_oracles(pcap_path):
-    """Counts (_matterd._udp mDNS response frames, UDC/Matter UDP frames) in a libpcap file."""
+def _classify_matter_udp_payload(payload):
+    """Classifies a Matter UDP payload as 'udc', 'operational', 'secure_channel', or None."""
+    if len(payload) < 8:
+        return None
+    msg_flags = payload[0]
+    version = (msg_flags >> 4) & 0x0F
+    dsiz = msg_flags & 0x03
+    if version != 0 or dsiz == 3:
+        return None
+    session_id = struct.unpack_from('<H', payload, 1)[0]
+    sec_flags = payload[3]
+    session_type = sec_flags & 0x03
+    if session_type not in (0, 1):
+        return None
+    pos = 8
+    if msg_flags & 0x04:
+        pos += 8
+    if dsiz == 1:
+        pos += 8
+    elif dsiz == 2:
+        if session_type != 1:
+            return None
+        pos += 2
+    if sec_flags & 0x20:
+        if pos + 2 > len(payload):
+            return None
+        mx_len = struct.unpack_from('<H', payload, pos)[0]
+        pos += 2 + mx_len
+    if pos >= len(payload):
+        return None
+
+    # Encrypted unicast/group session (PacketHeader::IsEncrypted() in MessageHeader.h)
+    if session_id != 0 or session_type != 0:
+        return 'operational' if len(payload) >= pos + 22 else None
+
+    if sec_flags & 0x80:
+        return None
+    if pos + 6 > len(payload):
+        return None
+    ex_flags = payload[pos]
+    opcode = payload[pos + 1]
+    pos += 4
+    if ex_flags & 0x10:
+        if pos + 2 > len(payload):
+            return None
+        vendor_id = struct.unpack_from('<H', payload, pos)[0]
+        pos += 2
+    else:
+        vendor_id = 0x0000
+    if pos + 2 > len(payload):
+        return None
+    protocol_id = struct.unpack_from('<H', payload, pos)[0]
+    pos += 2
+    if ex_flags & 0x02:
+        pos += 4
+    if ex_flags & 0x08:
+        if pos + 2 > len(payload):
+            return None
+        sx_len = struct.unpack_from('<H', payload, pos)[0]
+        pos += 2 + sx_len
+    if pos > len(payload):
+        return None
+
+    # Protocols::UserDirectedCommissioning (0x0003), IdentificationDeclaration (0x00)
+    if vendor_id == 0x0000 and protocol_id == 0x0003 and opcode == 0x00:
+        return 'udc'
+    if vendor_id == 0x0000 and protocol_id == 0x0000:
+        return 'secure_channel'
+    return None
+
+
+def _endpoint_matches(pkt_ip, pkt_mac, expected_ip=None, expected_mac=None):
+    """Matches a packet endpoint by IPv4 address when IPv4, else by Ethernet MAC."""
+    if not expected_ip and not expected_mac:
+        return True
+    if expected_ip and '.' in pkt_ip:
+        return pkt_ip == expected_ip
+    if expected_mac:
+        return pkt_mac.lower() == expected_mac.lower()
+    return False
+
+
+def _scan_wifi_pcap_oracles(
+    pcap_path,
+    tv_ip=None,
+    casting_ip=None,
+    tv_mac=None,
+    casting_mac=None,
+):
+    """Counts (TV _matterd._udp PTR answers, UDC requests, operational Matter frames) in PCAP."""
     with open(pcap_path, 'rb') as fp:
         data = fp.read()
     if len(data) < 24:
-        return 0, 0
+        return 0, 0, 0
     magic = struct.unpack('<I', data[:4])[0]
     if magic in (0xA1B2C3D4, 0xA1B23C4D):
         endian = '<'
     elif magic in (0xD4C3B2A1, 0x4D3CB2A1):
         endian = '>'
     else:
-        return 0, 0
+        return 0, 0, 0
     linktype = struct.unpack(endian + 'I', data[20:24])[0]
     if linktype != 1:
-        return 0, 0
+        return 0, 0, 0
 
     mdns_answers = 0
     udc_datagrams = 0
+    operational_datagrams = 0
     off = 24
     while off + 16 <= len(data):
         _ts_s, _ts_u, incl_len, _orig_len = struct.unpack(
@@ -298,29 +421,100 @@ def _scan_wifi_pcap_oracles(pcap_path):
         off += incl_len
         if udp is None:
             continue
-        src_port, dst_port, payload = udp
-        if dst_port in (33433, 5550, 5540):
-            udc_datagrams += 1
-        if (src_port == 5353 or dst_port == 5353) and _mdns_response_has_service(
-            payload, '_matterd._udp'
+        src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, payload = udp
+        if (src_port == 5353 or dst_port == 5353) and _endpoint_matches(
+            src_ip, src_mac, expected_ip=tv_ip, expected_mac=tv_mac
         ):
-            mdns_answers += 1
-    return mdns_answers, udc_datagrams
+            if _mdns_response_has_service(payload, '_matterd._udp.local'):
+                mdns_answers += 1
+            continue
+
+        if dst_port == 5353 or src_port == 5353:
+            continue
+        kind = _classify_matter_udp_payload(payload)
+        if kind == 'udc':
+            if _endpoint_matches(
+                src_ip, src_mac, expected_ip=casting_ip, expected_mac=casting_mac
+            ) and _endpoint_matches(
+                dst_ip, dst_mac, expected_ip=tv_ip, expected_mac=tv_mac
+            ):
+                udc_datagrams += 1
+        elif kind == 'operational':
+            between_pair = (
+                _endpoint_matches(
+                    src_ip, src_mac, expected_ip=casting_ip, expected_mac=casting_mac
+                )
+                and _endpoint_matches(
+                    dst_ip, dst_mac, expected_ip=tv_ip, expected_mac=tv_mac
+                )
+            ) or (
+                _endpoint_matches(
+                    src_ip, src_mac, expected_ip=tv_ip, expected_mac=tv_mac
+                )
+                and _endpoint_matches(
+                    dst_ip, dst_mac, expected_ip=casting_ip, expected_mac=casting_mac
+                )
+            )
+            if between_pair:
+                operational_datagrams += 1
+    return mdns_answers, udc_datagrams, operational_datagrams
+
+
+def _check_android_preconditions() -> bool:
+    if not os.path.exists('/dev/kvm'):
+        sys.stderr.write(
+            'Precondition failed: /dev/kvm not found; KVM hardware acceleration is'
+            ' required for cirque-android-runner (see'
+            ' third_party/cirque/repo/README.md).\n'
+        )
+        return False
+    try:
+        res = subprocess.run(
+            ['docker', 'image', 'inspect', ANDROID_RUNNER_IMAGE],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            check=False,
+        )
+        if res.returncode != 0:
+            sys.stderr.write(
+                f"Precondition failed: Docker image '{ANDROID_RUNNER_IMAGE}' not"
+                ' found. Build via: docker build -t'
+                f' {ANDROID_RUNNER_IMAGE} -f'
+                ' third_party/cirque/repo/cirque/nodes/Dockerfile.android_runner'
+                ' third_party/cirque/repo/cirque/nodes (see'
+                ' third_party/cirque/repo/README.md).\n'
+            )
+            return False
+    except (subprocess.SubprocessError, FileNotFoundError) as e:
+        sys.stderr.write(
+            f'Precondition failed: docker inspect failed: {e}\n'
+        )
+        return False
+    return True
 
 
 class AndroidTvCastingTest(CHIPVirtualHome):
-    def __init__(self, device_config):
+    def __init__(self, device_config=None):
+        if device_config is None:
+            device_config = DEVICE_CONFIG
         super().__init__(CIRQUE_URL, device_config)
         self.logger = logger
 
     def setup(self):
+        if not _check_android_preconditions():
+            raise AssertionError('Android runner preconditions failed')
         self.initialize_home()
 
     def run_test(self, save_logs=True):
+        if not _check_android_preconditions():
+            return TestResult.TEST_FAILURE
         return super().run_test(save_logs=save_logs)
 
-    def save_device_logs(self):
-        super().save_device_logs()
+    def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
+        super().save_device_logs(timeout=timeout, deadline=deadline)
+        if deadline is not None and time.monotonic() >= deadline:
+            return
         timestamp = int(time.time())
         save_android_emulator_diagnostics(self, timestamp)
 
@@ -414,6 +608,9 @@ class AndroidTvCastingTest(CHIPVirtualHome):
             ip_match = re.search(r'inet\s+(10\.0\.1\.\d+)', addr_output)
             if wifi_connected and cs_connected and ip_match:
                 active_ip = ip_match.group(1)
+                if not hasattr(self, '_active_ips'):
+                    self._active_ips = {}
+                self._active_ips[container_id] = active_ip
                 self._apply_emulator_wifi_routes(container_id, active_ip)
                 self.logger.info(
                     'Emulator %s WIFI CONNECTED ready with IP %s',
@@ -424,7 +621,7 @@ class AndroidTvCastingTest(CHIPVirtualHome):
 
             self.execute_device_cmd(
                 container_id,
-                'adb shell "killall dhcpclient 2>/dev/null || true; '
+                'adb shell "'
                 'settings put global captive_portal_mode 0 2>/dev/null || true; '
                 'settings put global captive_portal_detection_enabled 0 '
                 '2>/dev/null || true; '
@@ -436,8 +633,8 @@ class AndroidTvCastingTest(CHIPVirtualHome):
             if wifi_connected and not ip_match:
                 self.execute_device_cmd(
                     container_id,
-                    'adb shell "nohup /vendor/bin/dhcpclient -i wlan0 '
-                    '>/dev/null 2>&1 &"',
+                    'adb shell "pidof dhcpclient >/dev/null 2>&1 || '
+                    'nohup /vendor/bin/dhcpclient -i wlan0 >/dev/null 2>&1 &"',
                 )
             time.sleep(2)
 
@@ -606,8 +803,8 @@ class AndroidTvCastingTest(CHIPVirtualHome):
             return False
         x, y = center
         self.logger.info("Clicking element resource_id=%s, text=%s at (%d, %d)", resource_id, text, x, y)
-        self.execute_device_cmd(container_id, f'adb shell input tap {x} {y}')
-        return True
+        tap_res = self.execute_device_cmd(container_id, f'adb shell input tap {x} {y}')
+        return str(tap_res.get('return_code')) == '0'
 
     def _run_tv_and_casting_ui_flow(self, tv_server, casting_client):
         # Start tv-app
@@ -766,11 +963,30 @@ class AndroidTvCastingTest(CHIPVirtualHome):
             f"wifi_medium.pcap not found in {pcap_dir}",
         )
 
-        mdns_answers, udc_datagrams = _scan_wifi_pcap_oracles(pcap_path)
+        active_ips = getattr(self, '_active_ips', {})
+        tv_desc = tv_server.get('description', {})
+        casting_desc = casting_client.get('description', {})
+        tv_ip = active_ips.get(tv_server['id']) or tv_desc.get('ipv4_addr', '10.0.1.11')
+        casting_ip = (
+            active_ips.get(casting_client['id'])
+            or casting_desc.get('ipv4_addr', '10.0.1.12')
+        )
+        tv_mac = tv_desc.get('mac_address', '02:15:b2:00:00:01')
+        casting_mac = casting_desc.get('mac_address', '02:15:b2:00:00:02')
+
+        mdns_answers, udc_datagrams, operational_datagrams = _scan_wifi_pcap_oracles(
+            pcap_path,
+            tv_ip=tv_ip,
+            casting_ip=casting_ip,
+            tv_mac=tv_mac,
+            casting_mac=casting_mac,
+        )
         self.logger.info(
-            "wifi_medium.pcap oracles: _matterd._udp mDNS answers=%d, UDC/Matter UDP datagrams=%d",
+            'wifi_medium.pcap oracles: _matterd._udp mDNS PTR answers=%d,'
+            ' UDC datagrams=%d, operational Matter UDP datagrams=%d',
             mdns_answers,
             udc_datagrams,
+            operational_datagrams,
         )
         self.assertTrue(
             mdns_answers > 0,

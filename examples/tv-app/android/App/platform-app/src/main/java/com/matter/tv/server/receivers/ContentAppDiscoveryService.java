@@ -123,6 +123,7 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
       applications.put(pkg, app);
 
       Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_ADD);
+      in.setPackage(context.getPackageName());
       Bundle extras = new Bundle();
       extras.putString(DISCOVERY_APPAGENT_EXTRA_PACKAGENAME, pkg);
       in.putExtras(extras);
@@ -138,6 +139,7 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
     if (contentApp != null) {
       applications.remove(pkg);
       Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_REMOVE);
+      in.setPackage(context.getPackageName());
       Bundle extras = new Bundle();
       extras.putString(DISCOVERY_APPAGENT_EXTRA_PACKAGENAME, pkg);
       extras.putInt(DISCOVERY_APPAGENT_EXTRA_ENDPOINTID, contentApp.getEndpointId());

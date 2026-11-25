@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.matter.tv.app.api.SupportedCluster;
@@ -124,11 +125,15 @@ public class AppPlatformService {
             String packageName =
                 intent.getStringExtra(
                     ContentAppDiscoveryService.DISCOVERY_APPAGENT_EXTRA_PACKAGENAME);
-            if (action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD)) {
+            if (ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD.equals(action)) {
               ContentApp app =
                   ContentAppDiscoveryService.getReceiverInstance()
                       .getDiscoveredContentApps()
                       .get(packageName);
+              if (app == null) {
+                Log.w(TAG, "Ignoring content app add broadcast for unknown package " + packageName);
+                return;
+              }
               // if this app was already added as endpoint remove and add so that the app metadata
               // stored by the content app platform is also updated
               ContentApp persistedContentApp =
@@ -150,18 +155,14 @@ public class AppPlatformService {
             }
           }
         };
-    int flags = 0;
-    if (android.os.Build.VERSION.SDK_INT >= 34) { // Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-      flags = 2; // Context.RECEIVER_EXPORTED
+    IntentFilter filter =
+        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD);
+    filter.addAction(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.registerReceiver(mBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+    } else {
+      context.registerReceiver(mBroadcastReceiver, filter);
     }
-    context.registerReceiver(
-        mBroadcastReceiver,
-        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD),
-        flags);
-    context.registerReceiver(
-        mBroadcastReceiver,
-        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE),
-        flags);
   }
 
   public void setActivity(Activity activity) {
