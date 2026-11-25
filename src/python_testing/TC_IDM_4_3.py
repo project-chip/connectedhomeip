@@ -33,6 +33,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-spec-errata-ci-only-disallowed-for-certification
+#     # Takes about 2.6 minutes.
+#     tags: [slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
@@ -47,6 +49,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-spec-errata-ci-only-disallowed-for-certification
+#     # Takes about 3.4 minutes.
+#     tags: [slow]
 #   run3:
 #     app: ${CAMERA_APP}
 #     factory-reset: true
@@ -61,7 +65,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-spec-errata-ci-only-disallowed-for-certification
-#     tags: [nightly]
+#     # Takes about 86 seconds.
+#     tags: [nightly, slow]
 #   run4:
 #     app: ${CHIP_LOCK_APP}
 #     factory-reset: true
@@ -76,7 +81,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-spec-errata-ci-only-disallowed-for-certification
-#     tags: [nightly]
+#     # Takes about 86 seconds.
+#     tags: [nightly, slow]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

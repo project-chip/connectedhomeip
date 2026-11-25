@@ -39,6 +39,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 41 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 """Define Matter test case TC_DEM_2_10."""
