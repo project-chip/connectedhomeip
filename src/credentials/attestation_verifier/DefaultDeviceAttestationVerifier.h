@@ -82,6 +82,7 @@ public:
                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
+    const AttestationTrustStore * GetAttestationTrustStore() const { return mAttestationTrustStore; }
 
     CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate) override
     {
