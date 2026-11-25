@@ -3,8 +3,8 @@
 `--device on-off-sensor:1` exposes the mandatory Identify and Binding servers,
 plus Identify and On/Off clients. Descriptor is provided by the endpoint base.
 The sensor sends commands through bindings using its C++ `SendOn`, `SendOff`,
-`SendToggle`, and `SendIdentify` methods. Optional clusters are not enabled.
-The Identify server uses the platform delegate, including its TriggerEffect
+`SendToggle`, and `SendIdentify` methods. Optional clusters are not enabled. The
+Identify server uses the platform delegate, including its TriggerEffect
 capability.
 
 ## Running
@@ -18,8 +18,8 @@ Run commands from the SDK root after building all-devices-app:
 
 ## Named-Pipe Commands
 
-On POSIX, write one JSON object per message to the `--app-pipe` named pipe.
-Each action targets the sensor endpoint specified by `EndpointId`:
+On POSIX, write one JSON object per message to the `--app-pipe` named pipe. Each
+action targets the sensor endpoint specified by `EndpointId`:
 
 ```text
 {"Name": "SensorOn", "EndpointId": 1}
