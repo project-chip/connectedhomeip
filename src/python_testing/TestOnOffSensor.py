@@ -69,7 +69,7 @@ class TestOnOffSensor(MatterTestCommissionedDevice):
         with ExitStack() as cleanup:
             storage = cleanup.enter_context(tempfile.TemporaryDirectory(prefix="on-off-sensor-peer-"))
             peer = AppServerSubprocess(peer_app, storage, discriminator, passcode, port=5543,
-                                      extra_args=["--device", "on-off-light:1"])
+                                       extra_args=["--device", "on-off-light:1"])
             cleanup.callback(peer.terminate)
             peer.start(expected_output="Server initialization complete", timeout=30)
             await self.default_controller.CommissionOnNetwork(
