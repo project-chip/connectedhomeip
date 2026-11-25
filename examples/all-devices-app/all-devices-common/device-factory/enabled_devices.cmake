@@ -78,6 +78,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/HeatPump.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/impl/SimulatedHeatPump.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
@@ -228,6 +230,7 @@ foreach(_key
         fan
         flow-sensor
         generic-switch
+        heat-pump
         humidity-conditioner
         humidity-sensor
         irrigation-system
