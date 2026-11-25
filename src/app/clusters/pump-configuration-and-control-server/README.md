@@ -19,7 +19,7 @@ store.
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MaxPressure, MaxSpeed, MaxFlow, Min/Max\* limits | `Config::fixedAttributes`. Fixed, there are no setters. Out-of-range values are replaced with null.                                                                   |
 | OperationMode, ControlMode                       | Writable. Validated against the FeatureMap. Persisted.                                                                                                                |
-| EffectiveOperationMode                           | Follows OperationMode (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode.                                       |
+| EffectiveOperationMode                           | Follows OperationMode, Local while LocalOverride is set (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode.     |
 | EffectiveControlMode                             | Computed by the cluster, or set by the application when owned by the application (see [Effective modes](#effective-modes)). Not persisted.                            |
 | LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                                                                                                                   |
 | PumpStatus, Capacity, Speed, Power               | Set by the application. Capacity, Speed and Power use quieter reporting (`Q` quality): changes are marked reportable at most once per second and on null transitions. |
@@ -76,9 +76,32 @@ control mode feature is not enabled is ignored.
 EffectiveControlMode: in Minimum and Maximum mode, while a remote sensor is
 active, and in Normal mode when ControlMode is enabled and not Automatic.
 
-`OnOperationModeMinMax` is called only when OperationMode changes. A ControlMode
+`OnOperationModeMinMax` is called only when OperationMode changes, or when the
+pump returns to OperationMode after LocalOverride (see below). A ControlMode
 change while OperationMode is Minimum or Maximum does not call it again, because
 ControlMode does not affect how the pump runs in these modes.
+
+### LocalOverride
+
+The LocalOverride bit of PumpStatus means that hardware, such as an external
+STOP button or a local HMI, overrides the device control. As required by the
+spec, while the application has this bit set with `SetPumpStatus`:
+
+-   EffectiveOperationMode is Local.
+-   OperationMode changes return `FAILURE`, for client writes and for
+    `SetOperationMode`. Writing the current value succeeds.
+-   `SetEffectiveOperationMode` returns `InvalidInState` for modes other than
+    Local.
+
+When the bit is cleared, EffectiveOperationMode is set back to OperationMode,
+and `OnOperationModeMinMax` is called if that is Minimum or Maximum.
+
+The Local operation mode requires the LocalOperation feature. Without it, the
+LocalOverride bit is ignored in `SetPumpStatus` and an error is logged.
+
+EffectiveControlMode, the application ownership of EffectiveControlMode and the
+remote sensor handling depend on the OperationMode attribute, not on
+LocalOverride.
 
 Call `OnRemoteSensorChanged()` when the value returned by `GetRemoteSensorType`
 changes. It only has an effect while OperationMode is Normal and the active
@@ -110,8 +133,8 @@ configuration:
     values. Configure the hardware limits of the pump as ZAP defaults.
 -   When ControlMode is not enabled, the EffectiveControlMode default is used as
     the control mode of the pump.
--   The cluster gets a delegate owned by the integration. When OperationMode
-    changes to Minimum or Maximum, it sets the Level Control CurrentLevel to
+-   The cluster gets a delegate owned by the integration. When the pump enters
+    Minimum or Maximum operation, it sets the Level Control CurrentLevel to
     MinLevel (at least 1) or MaxLevel on the same endpoint.
 
 Applications can install an `ApplicationDelegate` to report a remote sensor and
@@ -165,7 +188,7 @@ PumpConfigurationAndControl::Attributes::PumpStatus::Set(endpointId, pumpStatus)
 | `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`          | Not available. The setters report changes                                                                                                                                                    |
 | `MatterReportingAttributeChangeCallback` after a setter                 | Not needed. The setters report changes                                                                                                                                                       |
 | `MatterPostAttributeChangeCallback` for this cluster                    | Not called. Use `ApplicationDelegate::OnAttributeChanged`                                                                                                                                    |
-| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next OperationMode change sets it back to OperationMode, and it is not restored after a reboot                                             |
+| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next OperationMode change sets it back to OperationMode, and it is not restored after a reboot. For a hardware override, prefer the LocalOverride bit of PumpStatus |
 | `Attributes::EffectiveControlMode::Set`                                 | Same call (validated against the FeatureMap). Returns `InvalidInState` when the cluster computes EffectiveControlMode (see [Effective modes](#effective-modes)). Not restored after a reboot |
 | `Attributes::ClusterRevision::Get`                                      | Not available. Use `PumpConfigurationAndControl::kRevision`                                                                                                                                  |
 | `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)`         | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`                                                                                                                         |

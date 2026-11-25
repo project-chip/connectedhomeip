@@ -52,7 +52,9 @@ public:
     /// Call PumpConfigurationAndControlCluster::OnRemoteSensorChanged when the returned value changes.
     virtual RemoteSensorType GetRemoteSensorType(EndpointId endpointId) = 0;
 
-    /// Called after OperationMode changes to Minimum or Maximum, once the effective modes are updated.
+    /// Called after the effective modes are updated, when OperationMode changes to Minimum or
+    /// Maximum, or when the LocalOverride bit of PumpStatus is cleared while OperationMode is
+    /// Minimum or Maximum.
     ///
     /// The application is expected to run the pump at its minimum or maximum speed
     /// (e.g. by updating the Level Control cluster on the same endpoint).

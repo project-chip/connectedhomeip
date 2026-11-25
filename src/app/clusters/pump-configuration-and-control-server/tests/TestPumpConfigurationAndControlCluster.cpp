@@ -868,11 +868,12 @@ TEST_F(TestPumpConfigurationAndControlCluster, PumpStatusRejectsUndefinedBits)
     ClusterTester tester(cluster);
     ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
 
-    // PumpStatusBitmap defines bits 0 to 8; bits 6 to 8 are remote sensor bits owned by the cluster.
+    // PumpStatusBitmap defines bits 0 to 8; bits 6 to 8 are remote sensor bits owned by the cluster,
+    // and bit 4 (LocalOverride) is ignored without the LocalOperation feature.
     EXPECT_EQ(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(static_cast<uint16_t>(0x0200))),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
     EXPECT_SUCCESS(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(static_cast<uint16_t>(0x01FF))));
-    EXPECT_EQ(cluster.GetPumpStatus().Raw(), 0x003Fu);
+    EXPECT_EQ(cluster.GetPumpStatus().Raw(), 0x002Fu);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -912,6 +913,80 @@ TEST_F(TestPumpConfigurationAndControlCluster, PumpStatusPreservesClusterOwnedRe
                                                                     PumpStatusBitmap::kDeviceFault));
     EXPECT_TRUE(tester.GetDirtyList().empty());
     EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, LocalOverrideIgnoredWithoutLocalOperationFeature)
+{
+    // While LocalOverride is set, EffectiveOperationMode is Local, which requires the LocalOperation feature.
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    EXPECT_SUCCESS(cluster.SetPumpStatus(
+        PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kLocalOverride, PumpStatusBitmap::kRunning)));
+    EXPECT_EQ(cluster.GetPumpStatus(), PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRunning));
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, LocalOverrideSetsEffectiveOperationModeToLocal)
+{
+    // Spec, LocalOverride bit: while the bit is set, EffectiveOperationMode is Local and requests
+    // changing OperationMode fail with FAILURE. When the bit is cleared, the device returns to the
+    // operation mode set in OperationMode.
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kLocalOperation));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+    config.operationMode = OperationModeEnum::kMaximum;
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    tester.GetDirtyList().clear();
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kLocalOverride)));
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+    EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kMaximum);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+    EXPECT_TRUE(tester.IsAttributeDirty(PumpStatus::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(EffectiveOperationMode::Id));
+    EXPECT_TRUE(mDelegate.WasChanged(PumpStatus::Id));
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+    EXPECT_TRUE(mDelegate.mMinMaxCalls.empty());
+
+    // OperationMode changes fail; writing the current value is not a change.
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMinimum), Status::Failure);
+    EXPECT_EQ(cluster.SetOperationMode(OperationModeEnum::kNormal), CHIP_IM_GLOBAL_STATUS(Failure));
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kMaximum);
+
+    // EffectiveOperationMode stays Local while the bit is set.
+    EXPECT_EQ(cluster.SetEffectiveOperationMode(OperationModeEnum::kNormal), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    EXPECT_SUCCESS(cluster.SetEffectiveOperationMode(OperationModeEnum::kLocal));
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+
+    // Other PumpStatus bits do not change EffectiveOperationMode.
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetPumpStatus(
+        PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kLocalOverride, PumpStatusBitmap::kRunning)));
+    EXPECT_FALSE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+
+    // Clearing the bit returns to OperationMode, and runs the Maximum action again.
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRunning)));
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+    ASSERT_EQ(mDelegate.mMinMaxCalls.size(), 1u);
+    EXPECT_EQ(mDelegate.mMinMaxCalls[0], OperationModeEnum::kMaximum);
+
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kNormal), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

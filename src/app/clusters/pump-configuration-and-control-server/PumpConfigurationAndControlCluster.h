@@ -127,6 +127,7 @@ public:
     /// the remote sensor bits of PumpStatus.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
+    /// Returns Failure if the mode changes while the LocalOverride bit of PumpStatus is set.
     CHIP_ERROR SetOperationMode(PumpConfigurationAndControl::OperationModeEnum operationMode);
     PumpConfigurationAndControl::OperationModeEnum GetOperationMode() const { return mOperationMode; }
 
@@ -161,16 +162,23 @@ public:
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
 
     /// Overrides EffectiveOperationMode, e.g. to Local while the pump is physically set to run with
-    /// its local settings. The next OperationMode change sets it back to OperationMode. The value is
-    /// not persisted: Startup sets it to OperationMode.
+    /// its local settings. The next OperationMode change, or clearing the LocalOverride bit of
+    /// PumpStatus, sets it back to OperationMode. The value is not persisted: Startup sets it to
+    /// OperationMode.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
+    /// Returns InvalidInState for a mode other than Local while the LocalOverride bit is set.
     CHIP_ERROR SetEffectiveOperationMode(PumpConfigurationAndControl::OperationModeEnum operationMode);
     PumpConfigurationAndControl::OperationModeEnum GetEffectiveOperationMode() const { return mEffectiveOperationMode; }
 
     /// Sets the application-controlled bits of PumpStatus. The remote sensor bits
     /// (RemotePressure, RemoteFlow, RemoteTemperature) are owned by the cluster and ignored in
     /// `pumpStatus`.
+    ///
+    /// While the LocalOverride bit is set, EffectiveOperationMode is Local and OperationMode
+    /// changes return Failure. Clearing the bit sets EffectiveOperationMode back to OperationMode
+    /// (and calls Delegate::OnOperationModeMinMax if that is Minimum or Maximum). LocalOverride
+    /// requires the LocalOperation feature: without it, the bit is ignored and an error is logged.
     ///
     /// Returns ConstraintError if a bit outside of PumpStatusBitmap is set.
     CHIP_ERROR SetPumpStatus(PumpStatusBitMask pumpStatus);
@@ -256,6 +264,7 @@ private:
     bool IsOperationModeSupported(PumpConfigurationAndControl::OperationModeEnum operationMode) const;
     bool IsControlModeSupported(PumpConfigurationAndControl::ControlModeEnum controlMode) const;
     bool CanApplicationOwnEffectiveControlMode(PumpConfigurationAndControl::RemoteSensorType sensorType) const;
+    bool IsLocalOverrideActive() const { return mPumpStatus.Has(PumpConfigurationAndControl::PumpStatusBitmap::kLocalOverride); }
     PumpConfigurationAndControl::RemoteSensorType GetActiveRemoteSensor() const;
     PumpConfigurationAndControl::ControlModeEnum
     SelectInitialControlMode(std::optional<PumpConfigurationAndControl::ControlModeEnum> configured) const;

@@ -103,11 +103,16 @@ SanitizeFixedAttributes(PumpConfigurationAndControlCluster::FixedAttributes fixe
     return fixed;
 }
 
+bool IsMinimumOrMaximum(OperationModeEnum operationMode)
+{
+    return operationMode == OperationModeEnum::kMinimum || operationMode == OperationModeEnum::kMaximum;
+}
+
 /// `sensorType` is the active remote sensor, which is kNoSensor unless `operationMode` is Normal.
 ControlModeEnum ComputeEffectiveControlMode(OperationModeEnum operationMode, ControlModeEnum controlMode,
                                             RemoteSensorType sensorType)
 {
-    if (operationMode == OperationModeEnum::kMinimum || operationMode == OperationModeEnum::kMaximum)
+    if (IsMinimumOrMaximum(operationMode))
     {
         return ControlModeEnum::kConstantSpeed;
     }
@@ -268,7 +273,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
     // not persisted. The delegate is not notified: it may not be ready yet, and Level Control may
     // not be initialized.
     mActiveRemoteSensor     = GetActiveRemoteSensor();
-    mEffectiveOperationMode = mOperationMode;
+    mEffectiveOperationMode = IsLocalOverrideActive() ? OperationModeEnum::kLocal : mOperationMode;
     mEffectiveControlMode   = ComputeEffectiveControlMode(mOperationMode, mControlMode, mActiveRemoteSensor);
     if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
@@ -425,7 +430,10 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Attributes(const ConcreteClusterP
 CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnum operationMode)
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(SetAttributeValue(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
+    VerifyOrReturnError(operationMode != mOperationMode, CHIP_NO_ERROR);
+    // The spec requires a FAILURE status for OperationMode changes while LocalOverride is set.
+    VerifyOrReturnError(!IsLocalOverrideActive(), CHIP_IM_GLOBAL_STATUS(Failure));
+    SetAttributeValue(mOperationMode, operationMode, OperationMode::Id);
     StoreAttribute(OperationMode::Id, mOperationMode);
     UpdateEffectiveModes(OperationMode::Id, GetActiveRemoteSensor());
     return CHIP_NO_ERROR;
@@ -452,6 +460,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
 CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveOperationMode(OperationModeEnum operationMode)
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(!IsLocalOverrideActive() || operationMode == OperationModeEnum::kLocal,
+                        CHIP_IM_GLOBAL_STATUS(InvalidInState));
     UpdateAttribute(mEffectiveOperationMode, operationMode, EffectiveOperationMode::Id);
     return CHIP_NO_ERROR;
 }
@@ -460,7 +470,32 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask p
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(PumpStatus::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError((pumpStatus.Raw() & ~kPumpStatusDefinedBits.Raw()) == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    UpdateAttribute(mPumpStatus, WithRemoteSensorBits(pumpStatus, mActiveRemoteSensor), PumpStatus::Id);
+    // EffectiveOperationMode becomes Local while LocalOverride is set, and the Local operation mode
+    // requires the LocalOperation feature.
+    if (pumpStatus.Has(PumpStatusBitmap::kLocalOverride) && !mFeatures.Has(Feature::kLocalOperation))
+    {
+        ChipLogError(Zcl, "PCC: LocalOverride requires the LocalOperation feature on endpoint %u, ignoring it", mPath.mEndpointId);
+        pumpStatus.Clear(PumpStatusBitmap::kLocalOverride);
+    }
+
+    const bool localOverrideChanged = pumpStatus.Has(PumpStatusBitmap::kLocalOverride) != IsLocalOverrideActive();
+    VerifyOrReturnError(SetAttributeValue(mPumpStatus, WithRemoteSensorBits(pumpStatus, mActiveRemoteSensor), PumpStatus::Id),
+                        CHIP_NO_ERROR);
+    const bool effectiveOperationModeChanged = localOverrideChanged &&
+        SetAttributeValue(mEffectiveOperationMode, IsLocalOverrideActive() ? OperationModeEnum::kLocal : mOperationMode,
+                          EffectiveOperationMode::Id);
+
+    // All values are written: delegate calls below may call back into the cluster.
+    const EndpointId endpointId = mPath.mEndpointId;
+    if (effectiveOperationModeChanged && IsMinimumOrMaximum(mEffectiveOperationMode))
+    {
+        mDelegate.OnOperationModeMinMax(endpointId, mEffectiveOperationMode);
+    }
+    mDelegate.OnAttributeChanged(endpointId, PumpStatus::Id);
+    if (effectiveOperationModeChanged)
+    {
+        mDelegate.OnAttributeChanged(endpointId, EffectiveOperationMode::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -641,7 +676,7 @@ void PumpConfigurationAndControlCluster::UpdateEffectiveModes(AttributeId trigge
         SetAttributeValue(mPumpStatus, WithRemoteSensorBits(mPumpStatus, sensorType), PumpStatus::Id);
 
     // All values are written: delegate calls below may call back into the cluster.
-    if (operationModeChanged && (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum))
+    if (operationModeChanged && IsMinimumOrMaximum(mOperationMode))
     {
         mDelegate.OnOperationModeMinMax(endpointId, mOperationMode);
     }
