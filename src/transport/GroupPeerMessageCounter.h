@@ -23,7 +23,9 @@
 
 #include <array>
 #include <bitset>
+#include <optional>
 
+#include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
@@ -41,6 +43,14 @@ class GroupSender
 public:
     NodeId mNodeId = kUndefinedNodeId;
     PeerMessageCounter msgCounter;
+    KeysetId mKeysetId = kInvalidKeysetId;
+
+    void Reset()
+    {
+        mNodeId   = kUndefinedNodeId;
+        mKeysetId = kInvalidKeysetId;
+        msgCounter.Reset();
+    }
 };
 
 class GroupFabric
@@ -49,28 +59,64 @@ public:
     FabricIndex mFabricIndex  = kUndefinedFabricIndex;
     uint8_t mControlPeerCount = 0;
     uint8_t mDataPeerCount    = 0;
+<<<<<<< HEAD
+=======
+
+    // GroupPeerTable manages these arrays as per-fabric LRU pools indexed by
+    // (mKeysetId, mNodeId), with the most recently used entry at index 0.
+    // When full, insertion evicts the least-recently-used entry of whichever
+    // keyset holds the most slots (preferring the incoming keyset on ties).
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
     GroupSender mDataGroupSenders[CHIP_CONFIG_MAX_GROUP_DATA_PEERS];
     GroupSender mControlGroupSenders[CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS];
+
+    void Reset()
+    {
+        mFabricIndex      = kUndefinedFabricIndex;
+        mControlPeerCount = 0;
+        mDataPeerCount    = 0;
+        for (auto & sender : mDataGroupSenders)
+        {
+            sender.Reset();
+        }
+        for (auto & sender : mControlGroupSenders)
+        {
+            sender.Reset();
+        }
+    }
 };
 
-class GroupPeerTable
+class GroupPeerTable : public Credentials::GroupDataProvider::GroupListener
 {
 public:
-    CHIP_ERROR FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl,
+    // Returned counter pointer is valid until the next mutating call on GroupPeerTable.
+    CHIP_ERROR FindOrAddPeer(FabricIndex fabricIndex, KeysetId keysetId, NodeId nodeId, bool isControl,
                              chip::Transport::PeerMessageCounter *& counter);
 
     // Used in case of MCSP failure
-    CHIP_ERROR RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl);
+    CHIP_ERROR RemovePeer(FabricIndex fabricIndex, KeysetId keysetId, NodeId nodeId, bool isControl);
+
+    CHIP_ERROR KeySetRemoved(FabricIndex fabricIndex, KeysetId keysetId);
 
     CHIP_ERROR FabricRemoved(FabricIndex fabricIndex);
 
+    void OnKeySetRemoved(FabricIndex fabricIndex, KeysetId keysetId) override
+    {
+        // Keysets that never received group messages have no entry in GroupPeerTable.
+        RETURN_SAFELY_IGNORED KeySetRemoved(fabricIndex, keysetId);
+    }
+
     // Protected for Unit Tests inheritance
 protected:
-    bool RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size);
+    bool RemoveSpecificPeer(GroupSender * list, KeysetId keysetId, NodeId nodeId, uint32_t size);
     void CompactPeers(GroupSender * list, uint32_t size);
     void RemoveAndCompactFabric(uint32_t tableIndex);
 
     GroupFabric mGroupFabrics[CHIP_CONFIG_MAX_FABRICS];
+
+private:
+    std::optional<uint32_t> FindFabricIndex(FabricIndex fabricIndex) const;
+    uint8_t RemovePeersForKeySet(GroupSender * list, uint8_t & peerCount, KeysetId keysetId, uint32_t size);
 };
 
 // Might want to rename this so that it is explicitly the sending side of counters
