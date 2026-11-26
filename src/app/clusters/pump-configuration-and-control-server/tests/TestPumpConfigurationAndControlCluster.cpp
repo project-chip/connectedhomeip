@@ -724,6 +724,47 @@ TEST_F(TestPumpConfigurationAndControlCluster, QuieterReportingForCapacitySpeedA
         EXPECT_EQ(getValue(), DataModel::MakeNullable(third));
         EXPECT_TRUE(tester.IsAttributeDirty(id)) << "attribute " << id;
 
+        // A value that settles during the quiet window still becomes reportable when polled after 1 second,
+        // without notifying the delegate a second time for the unchanged value.
+        mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+        tester.GetDirtyList().clear();
+        tester.GetTestContext().ChangeListener().ChangedList().clear();
+        mDelegate.mChangedAttributes.clear();
+        EXPECT_SUCCESS(setValue(DataModel::MakeNullable(second)));
+        EXPECT_FALSE(tester.IsAttributeDirty(id)) << "attribute " << id;
+        EXPECT_TRUE(tester.GetTestContext().ChangeListener().IsChanged({ kTestEndpointId, PumpConfigurationAndControl::Id, id }))
+            << "attribute " << id;
+        EXPECT_TRUE(mDelegate.WasChanged(id)) << "attribute " << id;
+
+        // Polling the same settled value before 1 second has elapsed is a no-op.
+        mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(400));
+        tester.GetDirtyList().clear();
+        tester.GetTestContext().ChangeListener().ChangedList().clear();
+        mDelegate.mChangedAttributes.clear();
+        EXPECT_SUCCESS(setValue(DataModel::MakeNullable(second)));
+        EXPECT_FALSE(tester.IsAttributeDirty(id)) << "attribute " << id;
+        EXPECT_TRUE(tester.GetTestContext().ChangeListener().ChangedList().empty()) << "attribute " << id;
+        EXPECT_FALSE(mDelegate.WasChanged(id)) << "attribute " << id;
+
+        // Polling the same settled value once 1 second has elapsed marks it reportable without re-notifying the delegate.
+        mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(100));
+        tester.GetDirtyList().clear();
+        tester.GetTestContext().ChangeListener().ChangedList().clear();
+        mDelegate.mChangedAttributes.clear();
+        EXPECT_SUCCESS(setValue(DataModel::MakeNullable(second)));
+        EXPECT_TRUE(tester.IsAttributeDirty(id)) << "attribute " << id;
+        EXPECT_FALSE(mDelegate.WasChanged(id)) << "attribute " << id;
+
+        // Subsequent polls of the already-reported value do not report or notify again.
+        mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(1000));
+        tester.GetDirtyList().clear();
+        tester.GetTestContext().ChangeListener().ChangedList().clear();
+        mDelegate.mChangedAttributes.clear();
+        EXPECT_SUCCESS(setValue(DataModel::MakeNullable(second)));
+        EXPECT_FALSE(tester.IsAttributeDirty(id)) << "attribute " << id;
+        EXPECT_TRUE(tester.GetTestContext().ChangeListener().ChangedList().empty()) << "attribute " << id;
+        EXPECT_FALSE(mDelegate.WasChanged(id)) << "attribute " << id;
+
         // Non-null -> null and null -> non-null are reportable even within 1 second.
         mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(100));
         tester.GetDirtyList().clear();

@@ -232,6 +232,23 @@ private:
     const MatterClusterShutdownType mShutdownType;
 };
 
+/// Resolves fixed endpoints from StaticApplicationConfig so SetApplicationDelegate works before emberAfEndpointConfigure().
+uint16_t FindClusterInstanceIndex(EndpointId endpointId)
+{
+    if constexpr (kPumpConfigurationAndControlFixedClusterCount > 0)
+    {
+        for (size_t i = 0; i < kPumpConfigurationAndControlFixedClusterCount; ++i)
+        {
+            if (PumpConfigurationAndControl::StaticApplicationConfig::kFixedClusterConfig[i].endpointNumber == endpointId)
+            {
+                return static_cast<uint16_t>(i);
+            }
+        }
+    }
+    return emberAfGetClusterServerEndpointIndex(endpointId, PumpConfigurationAndControl::Id,
+                                                kPumpConfigurationAndControlFixedClusterCount);
+}
+
 } // namespace
 
 void MatterPumpConfigurationAndControlClusterInitCallback(EndpointId endpointId)
@@ -287,8 +304,7 @@ PumpConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId
 
 CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * delegate)
 {
-    const uint16_t index = emberAfGetClusterServerEndpointIndex(endpointId, PumpConfigurationAndControl::Id,
-                                                                kPumpConfigurationAndControlFixedClusterCount);
+    const uint16_t index = FindClusterInstanceIndex(endpointId);
     VerifyOrReturnError(index < kPumpConfigurationAndControlMaxClusterCount, CHIP_ERROR_NOT_FOUND);
 
     gDelegates[index].SetApplicationDelegate(endpointId, delegate);

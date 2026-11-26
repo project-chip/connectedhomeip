@@ -528,24 +528,31 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask p
     return CHIP_NO_ERROR;
 }
 
-void PumpConfigurationAndControlCluster::NotifyQuietAttributeChanged(AttributeId attributeId, AttributeDirtyState dirtyState)
+void PumpConfigurationAndControlCluster::NotifyQuietAttributeChanged(AttributeId attributeId, bool valueChanged,
+                                                                     AttributeDirtyState dirtyState)
 {
-    NotifyAttributeChanged(attributeId,
-                           dirtyState == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
-                                                                          : DataModel::AttributeChangeType::kQuiet);
-    mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+    if (valueChanged || dirtyState == AttributeDirtyState::kMustReport)
+    {
+        NotifyAttributeChanged(attributeId,
+                               dirtyState == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
+                                                                              : DataModel::AttributeChangeType::kQuiet);
+    }
+    if (valueChanged)
+    {
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+    }
 }
 
 template <typename T>
 void PumpConfigurationAndControlCluster::UpdateQuietAttribute(QuieterReportingAttribute<T> & attr,
                                                               const DataModel::Nullable<T> & value, AttributeId attributeId)
 {
-    VerifyOrReturn(attr.value() != value);
+    const bool valueChanged = (attr.value() != value);
     const AttributeDirtyState dirtyState =
         attr.SetValue(value, System::SystemClock().GetMonotonicMilliseconds64(), [](const auto & candidate) {
             return (candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= kQuietReportingInterval;
         });
-    NotifyQuietAttributeChanged(attributeId, dirtyState);
+    NotifyQuietAttributeChanged(attributeId, valueChanged, dirtyState);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetCapacity(DataModel::Nullable<int16_t> capacity)
