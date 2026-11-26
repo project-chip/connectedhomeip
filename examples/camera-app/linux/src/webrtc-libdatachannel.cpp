@@ -18,8 +18,11 @@
 
 #include "webrtc-abstract.h"
 #include <Options.h>
+#include <algorithm>
 #include <arpa/inet.h>
+#include <chrono>
 #include <lib/support/logging/CHIPLogging.h>
+#include <optional>
 #include <rtc/rtc.hpp>
 
 namespace {
@@ -240,7 +243,14 @@ public:
         // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
         rtc::binary frame(data.size());
         std::memcpy(frame.data(), data.data(), data.size());
-        rtc::FrameInfo info(timestamp);
+
+        if (!mFirstTimestampMs.has_value())
+        {
+            mFirstTimestampMs = timestamp;
+        }
+        const int64_t elapsedMs = std::max<int64_t>(0, timestamp - *mFirstTimestampMs);
+        // Pass a duration so libdatachannel scales timestamps by the track RTP clock rate (90 kHz video, 48 kHz audio).
+        rtc::FrameInfo info(std::chrono::duration<double, std::milli>(static_cast<double>(elapsedMs)));
         mTrack->sendFrame(std::move(frame), info);
     }
 
@@ -260,6 +270,7 @@ private:
     // Lazy-init state
     bool mAudioInitDone = false;
     bool mVideoInitDone = false;
+    std::optional<int64_t> mFirstTimestampMs;
 
     std::shared_ptr<rtc::Track> mTrack;
     int mPayloadType;
