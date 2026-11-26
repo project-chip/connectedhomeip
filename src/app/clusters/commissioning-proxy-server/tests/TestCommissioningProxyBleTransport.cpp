@@ -764,6 +764,30 @@ TEST_F(TestCommissioningProxyBleTransport, ConnectRefusedByTheBleLayerFailsAndRe
     EXPECT_TRUE(adapter.IsScanning());
 }
 
+TEST_F(TestCommissioningProxyBleTransport, BackgroundScanRefreshWaitsForAPendingConnect)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
+    ASSERT_TRUE(transport.IsConnectPending());
+    ASSERT_FALSE(adapter.IsScanning());
+    const unsigned startsDuringConnect = adapter.startScanCalls;
+
+    EXPECT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    EXPECT_EQ(adapter.startScanCalls, startsDuringConnect);
+    EXPECT_FALSE(adapter.IsScanning());
+
+    mockTimer.AdvanceClock(System::Clock::Seconds16(20));
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Timeout));
+    EXPECT_EQ(adapter.startScanCalls, startsDuringConnect + 1);
+    EXPECT_TRUE(adapter.IsScanning());
+}
+
 // ---------------------------------------------------------------------------
 // Session-keyed operations with no session, and teardown
 // ---------------------------------------------------------------------------

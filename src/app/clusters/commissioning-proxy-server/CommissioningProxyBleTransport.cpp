@@ -415,6 +415,9 @@ CHIP_ERROR CommissioningProxyBleTransport::ProxyBleDelegate::SetEndPoint(BLEEndP
 
 CHIP_ERROR CommissioningProxyBleTransport::BgScanHardware::StartHardwareScan()
 {
+    // A pending connect needs the single BLE scanner. On BUSY the registry keeps the
+    // request and starts the scan when the transport resumes background scanning.
+    VerifyOrReturnError(!mOwner.mPendingConnect.has_value(), CHIP_ERROR_BUSY);
     return mOwner.mAdapter.StartScan(HandleBackgroundScanResult, &mOwner);
 }
 
@@ -900,8 +903,8 @@ Status CommissioningProxyBleTransport::BgScanStart(System::Clock::Seconds16 time
                                                    FabricIndex fabricIndex, NodeId nodeId)
 {
     // BLE has no Wi-Fi bands: register with the kBle transport and empty bands. The
-    // registry starts or defers the hardware scan (StartScan reports BUSY while a connect
-    // or foreground scan holds the single scanner).
+    // registry starts the hardware scan, or defers it while a BLE connect is pending or
+    // the scanner is held (StartScan reports BUSY).
     return mBgScan.Start(fabricIndex, nodeId, BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle), BitMask<WiFiBandBitmap>{},
                          timeout);
 }
