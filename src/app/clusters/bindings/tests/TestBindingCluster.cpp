@@ -39,6 +39,7 @@ using namespace chip::app::Clusters::Binding;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+using chip::Protocols::InteractionModel::Status;
 using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -84,13 +85,11 @@ TEST_F(TestBindingCluster, RejectsReservedGroupId)
         TargetStructType target{ .group = MakeOptional(kUndefinedGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
         app::DataModel::List<const TargetStructType> bindings(&target, 1);
 
-        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern),
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern), Status::ConstraintError);
         EXPECT_EQ(manager.GetBindingTable().Size(), 0u);
 
         target.group = MakeOptional(kMinApplicationGroupId);
-        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern),
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern), Status::Success);
         ASSERT_EQ(manager.GetBindingTable().Size(), 1u);
         EXPECT_EQ(manager.GetBindingTable().begin()->groupId, kMinApplicationGroupId);
     }
@@ -121,7 +120,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         app::DataModel::List<const TargetStructType> bindings(&invalid, 1);
 
         EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, chip::Testing::ListWritingPattern::ReplaceAll),
-                  Protocols::InteractionModel::Status::ConstraintError);
+                  Status::ConstraintError);
         EXPECT_TRUE(tester.GetDirtyList().empty());
         EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -136,8 +135,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         TargetStructType valid{ .group = MakeOptional(kMinApplicationGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
         app::DataModel::List<const TargetStructType> bindings(&valid, 1);
 
-        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern),
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern), Status::Success);
         EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
         EXPECT_NE(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -155,7 +153,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
                                 .fabricIndex = chip::Testing::kTestFabricIndex };
         auto decoder = writeOp.DecoderFor(valid);
 
-        EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder), Status::Success);
         EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
         EXPECT_NE(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -172,7 +170,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         TargetStructType invalid{ .group = MakeOptional(kUndefinedGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
         auto decoder = writeOp.DecoderFor(invalid);
 
-        EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder), Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder), Status::ConstraintError);
         EXPECT_TRUE(tester.GetDirtyList().empty());
         EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -184,7 +182,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
 
         app::DataModel::List<const TargetStructType> empty;
         EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll),
-                  Protocols::InteractionModel::Status::Success);
+                  Status::Success);
         EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
         EXPECT_NE(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -197,7 +195,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
 
         app::DataModel::List<const TargetStructType> empty;
         EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll),
-                  Protocols::InteractionModel::Status::Success);
+                  Status::Success);
         EXPECT_TRUE(tester.GetDirtyList().empty());
         EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
     }
@@ -208,7 +206,7 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         app::DataModel::List<const TargetStructType> initialList(&initial, 1);
         ASSERT_EQ(
             tester.WriteAttribute(Binding::Attributes::Binding::Id, initialList, chip::Testing::ListWritingPattern::ReplaceAll),
-            Protocols::InteractionModel::Status::Success);
+            Status::Success);
         ASSERT_EQ(manager.GetBindingTable().Size(), 1u);
 
         tester.GetDirtyList().clear();

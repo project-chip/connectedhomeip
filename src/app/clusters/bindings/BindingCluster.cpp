@@ -31,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -127,7 +128,7 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
     default:
         break;
     }
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    return Status::UnsupportedAttribute;
 }
 
 DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -221,14 +222,14 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             ReturnErrorOnFailure(decoder.Decode(target));
             if (!IsValidBinding(request.path.mEndpointId, target))
             {
-                return Protocols::InteractionModel::Status::ConstraintError;
+                return Status::ConstraintError;
             }
             return notifier.MarkChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
         }
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
+        return Status::UnsupportedWrite;
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
+        return Status::UnsupportedWrite;
     }
 }
 
