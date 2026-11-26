@@ -16,6 +16,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRCommissioningOperation;
+
 NS_ASSUME_NONNULL_BEGIN
 
 #ifdef DEBUG
@@ -29,6 +31,18 @@ NS_ASSUME_NONNULL_BEGIN
 // Blocks the commissioning queue (up to 60 seconds) until the semaphore is signaled, so a test can control which work
 // queued on it runs first.
 - (void)unitTestHoldCommissioningQueueUntil:(dispatch_semaphore_t)semaphore;
+// The current commissioning, and the call that ends it, as MTRCommissioningOperation uses them.
+@property (atomic, readonly, nullable, weak) MTRCommissioningOperation * currentCommissioning;
+- (void)commissioningDone:(MTRCommissioningOperation *)commissioning;
+// Makes the commissioning current, as startWithController: does.
+- (void)unitTestSetCurrentCommissioning:(MTRCommissioningOperation *)commissioning;
+// Installs the commissioning as the delegate bridge's delegate on the Matter queue, as starting its PASE session does.
+- (void)unitTestInstallCommissioningAsBridgeDelegate:(MTRCommissioningOperation *)commissioning;
+// The delegate bridge's current delegate, read on the Matter queue.
+- (nullable id)unitTestBridgeDelegate;
+// Called by commissioningDone: after it clears the current commissioning and before it queues the delegate bridge
+// reset. Nil by default.
+@property (atomic, copy, nullable) dispatch_block_t unitTestCommissioningDoneBeforeDelegateReset;
 @end
 #endif
 

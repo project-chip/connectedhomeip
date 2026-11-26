@@ -170,6 +170,9 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
+#ifdef DEBUG
+@synthesize unitTestCommissioningDoneBeforeDelegateReset = _unitTestCommissioningDoneBeforeDelegateReset;
+#endif
 @synthesize controllerNodeID = _controllerNodeID;
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
@@ -976,11 +979,22 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MTR_LOG("%@ stopping commissioning %@", self, commissioning);
         self.currentCommissioning = nil;
 
+#ifdef DEBUG
+        dispatch_block_t beforeDelegateReset = self.unitTestCommissioningDoneBeforeDelegateReset;
+        if (beforeDelegateReset) {
+            beforeDelegateReset();
+        }
+#endif
+
         // Reset ourselves as the device controller delegate, so we can
         // correctly handle the commissioning codepaths that don't use
         // MTRCommissioningOperation yet.
         auto block = ^{
-            self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
+            // A commissioning that started after we cleared currentCommissioning
+            // has installed itself as the delegate on this queue already; keep it.
+            if (self.currentCommissioning == nil) {
+                self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
+            }
         };
 
         // We don't care whether this fails.  If it fails, we are shut down
@@ -1518,6 +1532,27 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [self syncRunOnWorkQueue:^{
         self->_cppCommissioner->SessionMgr()->ExpireAllPASESessions();
     } error:nil];
+}
+
+- (void)unitTestSetCurrentCommissioning:(MTRCommissioningOperation *)commissioning
+{
+    self.currentCommissioning = commissioning;
+}
+
+- (void)unitTestInstallCommissioningAsBridgeDelegate:(MTRCommissioningOperation *)commissioning
+{
+    [self syncRunOnWorkQueue:^{
+        self->_deviceControllerDelegateBridge->setDelegate(self, commissioning, self->_commissioningQueue);
+    } error:nil];
+}
+
+- (nullable id)unitTestBridgeDelegate
+{
+    __block id delegate = nil;
+    [self syncRunOnWorkQueue:^{
+        delegate = self->_deviceControllerDelegateBridge->unitTestDelegate();
+    } error:nil];
+    return delegate;
 }
 
 - (void)unitTestHoldCommissioningQueueUntil:(dispatch_semaphore_t)semaphore

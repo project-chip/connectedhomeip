@@ -63,6 +63,10 @@ public:
 
     void SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters);
 
+#ifdef DEBUG
+    _Nullable id<MTRDeviceControllerDelegate> unitTestDelegate() const { return mDelegate; }
+#endif
+
 private:
     MTRDeviceController * __weak mController;
     _Nullable id<MTRDeviceControllerDelegate> __weak mDelegate;
