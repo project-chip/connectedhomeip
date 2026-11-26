@@ -997,7 +997,7 @@ async def verify_operational_network(test, ssid):
         pass
 
 
-class TC_CNET_4_11(MatterTestCommissionedDevice):
+class TC_CNET_4_11_provisional(MatterTestCommissionedDevice):
     # The test repeatedly switches the TH's own Wi-Fi connection between two access
     # points (steps 7-8, 11-12, 16-17), so the transport to the DUT is torn down and
     # rebuilt several times. A background wildcard subscription cannot survive that and
@@ -1042,7 +1042,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     def default_timeout(self) -> int:
         return TIMEOUT
 
-    def steps_TC_CNET_4_11(self):
+    def steps_TC_CNET_4_11_provisional(self):
         return [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
@@ -1100,7 +1100,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
                      " 2. Connected is of type bool and is TRUE"),
         ]
 
-    def desc_TC_CNET_4_11(self):
+    def desc_TC_CNET_4_11_provisional(self):
         return "[TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command [DUT-Server]"
 
     @pixit(PIXIT_2ND_AP_SSID, str,
@@ -1109,11 +1109,11 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
            f"Passphrase of the second access point, plain text; {PIXIT_2ND_AP_USAGE}",
            sensitive=True)
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
-    async def test_TC_CNET_4_11(self):
+    async def test_TC_CNET_4_11_provisional(self):
 
         # Set the target device ID for mDNS discovery from DUT node ID
         set_target_device_id(self.dut_node_id)
-        logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
+        logger.info("test_TC_CNET_4_11_provisional: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
         # Presence and type of both PIXITs are validated by the @pixit decorators before the test starts.
         wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
