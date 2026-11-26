@@ -395,7 +395,6 @@ public:
     std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
 private:
-    int videoDeviceFd            = -1;
     std::string mVideoDevicePath = kDefaultVideoDevicePath;
     std::vector<VideoStream> mVideoStreams;       // Vector to hold available video streams
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
@@ -415,7 +414,6 @@ private:
 
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         CameraError & error);
-    CameraError SetV4l2Control(uint32_t controlId, int value);
 
     bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
                                     chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
