@@ -14,7 +14,7 @@
 
 # This YAML test is temporarily available until the automated Python test is
 # reliable:
-# https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_CNET_4_12.py
+# https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_CNET_4_12_provisional.py
 
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
