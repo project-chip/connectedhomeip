@@ -107,7 +107,7 @@ DEVICE_CONFIG = {
 TV_MDNS_LOGCAT_PATTERN = (
     r'InitCommissioner|initCommissioner|MdnsAdvertiser|MdnsInterfaceSocket|'
     r'NsdManagerServiceResolver|publish serviceName=|publish: replacing|'
-    r'by NsdManager|onServiceRegistered|onServiceUnregistered|'
+    r'onServiceRegistered|onServiceUnregistered|'
     r'onRegistrationFailed|_matterd\._udp'
 )
 NSD_PUBLISH_SERVICE_RE = re.compile(
@@ -117,16 +117,12 @@ NSD_PUBLISH_LISTENER_RE = re.compile(r'\bpublish\s+(\S+@\w+)\s+count\s*=')
 NSD_REPLACING_REG_RE = re.compile(
     r'\bpublish:\s+replacing\s+changed\s+registration\s+for\s+([^:\s]+):(\S+)'
 )
-NSD_RENAME_SERVICE_RE = re.compile(
-    r"\bservice\s+'([^']+)'\s+was\s+renamed\s+to\s+'([^']+)'\s+by\s+"
-    r'NsdManager\b'
-)
 NSD_REMOVE_LISTENER_RE = re.compile(r'\bRemove\s+(\S+@\w+)\b')
 NSD_SERVICE_REGISTERED_RE = re.compile(
-    r'\bservice\s+([^\r\n(]+?)\(([^()\s]+)\)\s+onServiceRegistered\b'
+    r'\bservice\s+(.+?)\(([^()\s]+@[0-9a-f]+)\)\s+onServiceRegistered\b'
 )
 NSD_SERVICE_UNREGISTERED_RE = re.compile(
-    r'\bservice\s+([^\r\n(]+?)\(([^()\s]+)\)\s+onServiceUnregistered\b'
+    r'\bservice\s+(.+?)\(([^()\s]+@[0-9a-f]+)\)\s+onServiceUnregistered\b'
 )
 NSD_REGISTRATION_FAILED_RE = re.compile(
     r'\bservice\s+([^\r\n]+?)\s+onRegistrationFailed\s*:'
@@ -176,7 +172,7 @@ class WifiPcapOracles:
     Attributes:
         mdns_answers: Answer-section PTR records for _matterd._udp.local from TV.
         udc_datagrams: Unencrypted UDC IdentificationDeclaration frames to TV.
-        operational_datagrams: Encrypted operational Matter UDP frames between pair.
+        operational_datagrams: Encrypted Matter unicast UDP frames between pair.
     """
 
     mdns_answers: int = 0
@@ -311,6 +307,17 @@ def casting_ui_shows_connected(xml_content):
     return False
 
 
+def casting_ui_next_button_enabled(xml_content: str) -> bool:
+    """Returns True if uiautomator dump shows an enabled connectionFragmentNextButton."""
+    root = _parse_ui_hierarchy_root(xml_content)
+    if root is None:
+        return False
+    return any(
+        node.get('resource-id', '').endswith('connectionFragmentNextButton') and node.get('enabled') == 'true'
+        for node in root.iter('node')
+    )
+
+
 def casting_ui_shows_discovered(xml_content):
     """Returns True if uiautomator dump shows a discovered CastingPlayer item."""
     root = _parse_ui_hierarchy_root(xml_content)
@@ -346,7 +353,6 @@ class _NsdPublishedService:
 
     service_type: str
     requested_name: str
-    effective_name: str
     listener: str | None = None
     active: bool = True
     confirmed: bool = False
@@ -360,7 +366,7 @@ class _NsdPublishedService:
         if not self.active or self.confirmed:
             return False
         map_key = f'{self.service_type}:{self.requested_name}'
-        return fail_key in (self.effective_name, self.requested_name, map_key)
+        return fail_key in (self.requested_name, map_key)
 
 
 def _deactivate_matching_listener(
@@ -386,7 +392,6 @@ def _apply_nsd_publish_line(
             _NsdPublishedService(
                 service_type=svc_type,
                 requested_name=name,
-                effective_name=name,
             )
         )
         return True
@@ -402,14 +407,6 @@ def _apply_nsd_publish_line(
             if entry.matches_replacement(rep_type, rep_name):
                 entry.active = False
                 entry.confirmed = False
-                break
-        return True
-    ren = NSD_RENAME_SERVICE_RE.search(line)
-    if ren:
-        old_name, new_name = ren.group(1), ren.group(2)
-        for entry in reversed(entries):
-            if entry.active and entry.requested_name == old_name:
-                entry.effective_name = new_name
                 break
         return True
     return False
@@ -457,6 +454,7 @@ def tv_mdns_has_registered_matterd(log_output: str) -> bool:
         if not _apply_nsd_publish_line(line, entries):
             _apply_nsd_callback_line(line, entries, confirmed_by_name)
 
+    confirmed_listeners = set().union(*confirmed_by_name.values())
     active_matterd = [
         e for e in entries if e.active and e.service_type == '_matterd._udp'
     ]
@@ -464,16 +462,16 @@ def tv_mdns_has_registered_matterd(log_output: str) -> bool:
         return False
     latest = active_matterd[-1]
     if latest.listener is not None:
-        return latest.confirmed
-    target_name = latest.effective_name
+        return latest.confirmed or latest.listener in confirmed_listeners
+    target_name = latest.requested_name
     same_name_active = [
         e
         for e in entries
-        if e.active
-        and e.listener is None
-        and target_name in (e.requested_name, e.effective_name)
+        if e.active and e.listener is None and e.requested_name == target_name
     ]
-    confirmed_count = len(confirmed_by_name.get(target_name, set()))
+    bound_listeners = {e.listener for e in entries if e.listener is not None}
+    unbound_confirmed = confirmed_by_name.get(target_name, set()) - bound_listeners
+    confirmed_count = len(unbound_confirmed)
     return confirmed_count > 0 and confirmed_count >= len(same_name_active)
 
 
@@ -722,7 +720,7 @@ def _scan_wifi_pcap_oracles(
     tv_mac=None,
     casting_mac=None,
 ) -> WifiPcapOracles:
-    """Counts TV _matterd._udp PTR answers, UDC requests, and operational frames in PCAP."""
+    """Counts TV _matterd._udp PTR answers, UDC requests, and encrypted Matter unicast frames in PCAP."""
     with open(pcap_path, 'rb') as fp:
         data = fp.read()
     endian = _parse_ethernet_pcap_endian(data)
@@ -875,6 +873,16 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.logger.error('Timeout waiting for WIFI CONNECTED state on %s', container_id)
         return False
 
+    def _tv_mdns_still_registered_after_settle(
+        self, container_id: str, logcat_cmd: str, settle_sec: float
+    ) -> bool:
+        if settle_sec <= 0:
+            return True
+        time.sleep(settle_sec)
+        post_res = self.execute_device_cmd(container_id, logcat_cmd)
+        post_output = str(post_res.get('output', '')) if str(post_res.get('return_code')) == '0' else ''
+        return tv_mdns_has_registered_matterd(post_output)
+
     def _wait_for_tv_mdns_ready(self, container_id, timeout_sec=45.0, settle_sec=3.0):
         logcat_cmd = f'adb logcat -d -e {shlex.quote(TV_MDNS_LOGCAT_PATTERN)}'
         start_time = time.time()
@@ -896,8 +904,9 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
                 time.sleep(2)
                 continue
 
-            if settle_sec > 0:
-                time.sleep(settle_sec)
+            if not self._tv_mdns_still_registered_after_settle(container_id, logcat_cmd, settle_sec):
+                prev_adv_events = None
+                continue
             self.logger.info(
                 'TV app mDNS ready on %s (wlan0_probing=%s, adv_events=%d)',
                 container_id,
@@ -1020,8 +1029,24 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.logger.info('TV App dialog found, trying to accept')
         return any(self._click_ui_element(tv_id, text=label) for label in ('Allow', 'ALLOW', 'OK'))
 
+    def _wait_for_next_button_enabled(self, container_id: str, timeout_sec: float) -> bool:
+        dump_cmd = 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
+        start_time = time.time()
+        while time.time() - start_time < timeout_sec:
+            dump_res = self.execute_device_cmd(container_id, dump_cmd)
+            if str(dump_res.get('return_code')) == '0' and casting_ui_next_button_enabled(
+                str(dump_res.get('output', ''))
+            ):
+                return True
+            time.sleep(1)
+        self.logger.error('Timeout waiting for connectionFragmentNextButton to become enabled')
+        return False
+
     def _exercise_launch_url_and_read_vendor_id(self, tv_id: str, casting_id: str) -> None:
-        time.sleep(2)
+        self.assertTrue(
+            self._wait_for_next_button_enabled(casting_id, ANDROID_COMMISSION_TIMEOUT_SEC),
+            'connectionFragmentNextButton did not become enabled',
+        )
         self.assertTrue(
             self._click_ui_element(casting_id, resource_id='connectionFragmentNextButton'),
             'Failed to click next button',
@@ -1148,7 +1173,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         )
         self.logger.info(
             'wifi_medium.pcap oracles: _matterd._udp mDNS PTR answers=%d,'
-            ' UDC datagrams=%d, operational Matter UDP datagrams=%d',
+            ' UDC datagrams=%d, encrypted Matter unicast UDP datagrams=%d',
             oracles.mdns_answers,
             oracles.udc_datagrams,
             oracles.operational_datagrams,
@@ -1157,7 +1182,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.assertTrue(oracles.udc_datagrams > 0, 'No UDC datagram found from Casting App to TV')
         self.assertTrue(
             oracles.operational_datagrams > 0,
-            'No operational Matter UDP datagram found between Casting App and TV in pcap',
+            'No encrypted Matter unicast UDP datagram found between Casting App and TV in pcap',
         )
 
     def test_routine(self):

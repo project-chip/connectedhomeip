@@ -172,7 +172,7 @@ class CHIPToolActivity :
     val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, DEFAULT_SETUP_PIN_CODE)
     if (!hasValidCommissioningParams(discriminator, setupPinCode)) {
       rejectCommissioningIntent(
-        "Out-of-range discriminator=$discriminator or setupPinCode=$setupPinCode",
+        "Out-of-range discriminator=$discriminator or setupPinCode",
         "Invalid commissioning discriminator or setup PIN code",
       )
       return
@@ -248,7 +248,7 @@ class CHIPToolActivity :
     val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, DEFAULT_SETUP_PIN_CODE)
     if (!hasValidCommissioningParams(discriminator, setupPinCode)) {
       rejectCommissioningIntent(
-        "Out-of-range discriminator=$discriminator or setupPinCode=$setupPinCode",
+        "Out-of-range discriminator=$discriminator or setupPinCode",
         "Invalid commissioning discriminator or setup PIN code",
       )
       return

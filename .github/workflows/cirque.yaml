@@ -160,6 +160,16 @@ jobs:
                 platform: android
             - name: Build Android x64 APKs
               run: |
+                  for attempt in 1 2 3; do
+                    if third_party/java_deps/set_up_java_deps.sh; then
+                      break
+                    fi
+                    if [ "$attempt" -eq 3 ]; then
+                      echo "Failed to set up Java dependencies after 3 attempts" >&2
+                      exit 1
+                    fi
+                    sleep $((attempt * 10))
+                  done
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
                        --target android-x64-chip-tool \
@@ -262,7 +272,7 @@ jobs:
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/build/gn_gen_cirque.sh \
+                       && scripts/build/gn_gen_cirque.sh --all-clusters-only \
                        && chown -R $(id -u):$(id -g) out \
                       "
             - name: Set up Android emulator

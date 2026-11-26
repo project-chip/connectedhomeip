@@ -299,6 +299,8 @@ class TestAndroidBleWiFiMobileDevice(AndroidCirqueTestBase):
     def run_android_ble_wifi_commissioning_test(self):
         server_devices = [d for d in self.non_ap_devices if d['type'] == 'CHIPEndDevice']
         req_devices = [d for d in self.non_ap_devices if d['type'] == 'android_emulator']
+        if not server_devices:
+            raise RuntimeError("Required 'CHIPEndDevice' node not found in topology")
         if not req_devices:
             raise RuntimeError("Required controller device 'android_emulator' not found in topology")
         server_ids = [d['id'] for d in server_devices]

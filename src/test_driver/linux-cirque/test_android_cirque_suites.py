@@ -245,6 +245,7 @@ class AndroidBleThreadFixesTest(unittest.TestCase):
         harness = THREAD_MOD.TestAndroidBleThreadMobileDevice({})
         harness.logger = logging.getLogger('test_thread')
         cmds = []
+        log_calls = [0]
 
         def fake_query(endpoint, _args=None, params=None):
             del params
@@ -259,7 +260,10 @@ class AndroidBleThreadFixesTest(unittest.TestCase):
             if 'uiautomator dump' in cmd:
                 return {'output': 'onOffClusterBtn'}
             if 'logcat -d' in cmd:
-                return {'output': 'I ChipTool: Device commissioning completed\nOn/Off attribute value: true\n'}
+                log_calls[0] += 1
+                prefix = 'I ChipTool: Device commissioning completed\n'
+                suffix = '' if log_calls[0] == 1 else 'On/Off attribute value: true\n'
+                return {'output': prefix + suffix}
             return {'output': '', 'return_code': '0'}
 
         harness.query_api = fake_query
@@ -273,6 +277,37 @@ class AndroidBleThreadFixesTest(unittest.TestCase):
         self.assertTrue(comm_ok and toggle_ok and read_ok)
         self.assertFalse(any('input tap 537 730' in c for c in cmds))
         self.assertTrue(any('input tap 166 884' in c for c in cmds))
+
+    def test_resolve_thread_topology_requires_single_tbr(self):
+        two_tbr_cfg = {
+            'tbr1': {'id': 'tbr1', 'type': 'ThreadBorderRouter'},
+            'tbr2': {'id': 'tbr2', 'type': 'ThreadBorderRouter'},
+            'end1': {'id': 'end1', 'type': 'CHIPEndDevice'},
+            'emu1': {'id': 'emu1', 'type': 'android_emulator'},
+        }
+        harness = THREAD_MOD.TestAndroidBleThreadMobileDevice(two_tbr_cfg)
+        harness.device_config = two_tbr_cfg
+        with self.assertRaisesRegex(RuntimeError, 'Expected exactly 1'):
+            harness._resolve_thread_topology()
+
+        zero_tbr_cfg = {
+            'end1': {'id': 'end1', 'type': 'CHIPEndDevice'},
+            'emu1': {'id': 'emu1', 'type': 'android_emulator'},
+        }
+        harness.device_config = zero_tbr_cfg
+        with self.assertRaisesRegex(RuntimeError, 'Expected exactly 1'):
+            harness._resolve_thread_topology()
+
+        one_tbr_cfg = {
+            'tbr1': {'id': 'tbr1', 'type': 'ThreadBorderRouter'},
+            'end1': {'id': 'end1', 'type': 'CHIPEndDevice'},
+            'emu1': {'id': 'emu1', 'type': 'android_emulator'},
+        }
+        harness.device_config = one_tbr_cfg
+        topo = harness._resolve_thread_topology()
+        self.assertEqual(topo.tbr_ids, ('tbr1',))
+        self.assertEqual(topo.server_ids, ['end1'])
+        self.assertEqual(topo.req_device_id, 'emu1')
 
 
 class AndroidBleWiFiFixesTest(unittest.TestCase):
@@ -345,6 +380,15 @@ class AndroidBleWiFiFixesTest(unittest.TestCase):
         self.assertTrue(comm_ok and toggle_ok and read_ok)
         self.assertFalse(any('input tap 537 730' in c for c in cmds))
         self.assertEqual(video_starts.count('3_onoff_cluster_toggle_read.mp4'), 1)
+
+    def test_wifi_commissioning_rejects_missing_end_device_before_emulator_boot(self):
+        harness = WIFI_MOD.TestAndroidBleWiFiMobileDevice({})
+        harness.logger = logging.getLogger('test_wifi_no_end_device')
+        harness.non_ap_devices = [{'id': 'emu1', 'type': 'android_emulator'}]
+        with mock.patch.object(harness, '_setup_android_emulator_node') as boot_mock:
+            with self.assertRaisesRegex(RuntimeError, 'CHIPEndDevice'):
+                harness.run_android_ble_wifi_commissioning_test()
+            boot_mock.assert_not_called()
 
 
 class AndroidTvCastingFixesTest(unittest.TestCase):
@@ -561,6 +605,132 @@ class AndroidTvCastingFixesTest(unittest.TestCase):
             CASTING_MOD.tv_mdns_has_registered_matterd(unregistered_after)
         )
 
+    def test_tv_mdns_reconciles_callback_before_listener_binding(self):
+        listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@dac5229'
+        callback_first_log = (
+            'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110'
+            ' type=_matterd._udp subTypes=[_T35] port=5550\n'
+            f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({listener}) onServiceRegistered\n'
+            f'D NsdManagerServiceResolver: publish {listener} count = 1\n'
+        )
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(callback_first_log))
+
+        removed_after = (
+            callback_first_log
+            + f'I NsdManagerServiceResolver: Remove {listener} (_matterd._udp:7FE4A1F542AC5110)\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(removed_after))
+
+        unreg_before_bind = (
+            'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110'
+            ' type=_matterd._udp subTypes=[_T35] port=5550\n'
+            f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({listener}) onServiceRegistered\n'
+            f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({listener}) onServiceUnregistered\n'
+            f'D NsdManagerServiceResolver: publish {listener} count = 1\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(unreg_before_bind))
+
+    def test_tv_mdns_matches_renamed_service_with_parentheses(self):
+        listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@9ab12cd'
+        renamed_log = (
+            'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110'
+            ' type=_matterd._udp subTypes=[_T35] port=5550\n'
+            f'D NsdManagerServiceResolver: publish {listener} count = 1\n'
+            f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110 (2)({listener}) onServiceRegistered\n'
+        )
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(renamed_log))
+
+        unreg_renamed_log = (
+            renamed_log
+            + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110 (2)({listener}) onServiceUnregistered\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(unreg_renamed_log))
+
+    def test_tv_mdns_unbound_fallback_excludes_other_service_bound_listener(self):
+        matterc_listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@d3b2e9d'
+        matterd_listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@dac5229'
+        collided_unbound_matterd = (
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110'
+            ' type=_matterc._udp subTypes=[_CM] port=5540\n'
+            f'D NsdManagerServiceResolver: publish {matterc_listener} count = 1\n'
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110'
+            ' type=_matterd._udp subTypes=[_T35] port=5550\n'
+            f'I NsdManagerServiceResolver: service 6FE4A1F542AC5110({matterc_listener}) onServiceRegistered\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(collided_unbound_matterd))
+
+        with_unbound_matterd_confirm = (
+            collided_unbound_matterd
+            + f'I NsdManagerServiceResolver: service 6FE4A1F542AC5110({matterd_listener}) onServiceRegistered\n'
+        )
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(with_unbound_matterd_confirm))
+
+    def test_wait_for_tv_mdns_ready_rechecks_registration_after_settle(self):
+        harness = CASTING_MOD.AndroidTvCastingTest({})
+        harness.logger = logging.getLogger('test_tv_mdns_post_settle')
+        listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@dac5229'
+        confirmed_log = (
+            'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110'
+            ' type=_matterd._udp subTypes=[_T35] port=5550\n'
+            f'D NsdManagerServiceResolver: publish {listener} count = 1\n'
+            'I serviceDiscovery: [MdnsAdvertiser] Adding service name:'
+            ' 7FE4A1F542AC5110, type: _matterd._udp, port: 5550\n'
+            'I SPT : InitCommissioner nodeId=0xFFFFFFEFFFFFFFFF\n'
+            f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({listener}) onServiceRegistered\n'
+        )
+        withdrawn_log = (
+            confirmed_log
+            + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({listener}) onServiceUnregistered\n'
+        )
+        outputs = [confirmed_log, confirmed_log, withdrawn_log]
+        harness.execute_device_cmd = lambda _cid, _cmd: {
+            'return_code': '0',
+            'output': outputs.pop(0) if outputs else withdrawn_log,
+        }
+        ticks = itertools.chain([0.0, 0.5, 2.5, 10.0], itertools.repeat(10.0))
+        fake_time = types.SimpleNamespace(time=lambda: next(ticks), sleep=lambda _s: None)
+        with mock.patch.object(CASTING_MOD, 'time', fake_time):
+            self.assertFalse(harness._wait_for_tv_mdns_ready('tv-1', timeout_sec=5.0, settle_sec=3.0))
+
+    def test_wait_for_next_button_enabled_polls_until_enabled_before_tap(self):
+        harness = CASTING_MOD.AndroidTvCastingTest({})
+        harness.logger = logging.getLogger('test_casting_next_enabled')
+        disabled_xml = (
+            '<?xml version="1.0"?><hierarchy>'
+            '<node resource-id="com.chip.casting:id/connectionFragmentNextButton" enabled="false" />'
+            '</hierarchy>'
+        )
+        enabled_xml = (
+            '<?xml version="1.0"?><hierarchy>'
+            '<node resource-id="com.chip.casting:id/connectionFragmentNextButton" enabled="true" />'
+            '</hierarchy>'
+        )
+        dumps = [disabled_xml, enabled_xml]
+        harness.execute_device_cmd = lambda _cid, _cmd: {
+            'return_code': '0',
+            'output': dumps.pop(0) if dumps else enabled_xml,
+        }
+        ticks = itertools.chain([0.0, 0.5, 1.5, 2.5], itertools.repeat(2.5))
+        fake_time = types.SimpleNamespace(time=lambda: next(ticks), sleep=lambda _s: None)
+        with mock.patch.object(CASTING_MOD, 'time', fake_time):
+            self.assertTrue(harness._wait_for_next_button_enabled('cast-1', timeout_sec=10.0))
+        self.assertEqual(dumps, [])
+
+        harness.execute_device_cmd = lambda _cid, _cmd: {'return_code': '0', 'output': disabled_xml}
+        ticks_timeout = itertools.chain([0.0, 0.5, 12.0], itertools.repeat(12.0))
+        fake_time_timeout = types.SimpleNamespace(time=lambda: next(ticks_timeout), sleep=lambda _s: None)
+        with mock.patch.object(CASTING_MOD, 'time', fake_time_timeout):
+            self.assertFalse(harness._wait_for_next_button_enabled('cast-1', timeout_sec=10.0))
+
+        with (
+            mock.patch.object(harness, '_wait_for_next_button_enabled', return_value=False) as wait_mock,
+            mock.patch.object(harness, '_click_ui_element') as click_mock,
+            self.assertRaises(AssertionError),
+        ):
+            harness._exercise_launch_url_and_read_vendor_id('tv-1', 'cast-1')
+        wait_mock.assert_called_once_with('cast-1', CASTING_MOD.ANDROID_COMMISSION_TIMEOUT_SEC)
+        click_mock.assert_not_called()
+
 
 class AndroidCirqueSharedBaseTest(unittest.TestCase):
     """Covers helper/AndroidCirqueTestBase.py dataclasses, pure helpers, and mock contracts."""
@@ -722,6 +892,90 @@ class AndroidCirqueSharedBaseTest(unittest.TestCase):
         harness.query_api.assert_called_once_with(
             'stop_screen_recording', ['home-1', 'emu1'], timeout=5.0, deadline=115.0
         )
+
+    def test_wait_for_guest_boot_retries_when_wait_for_device_fails(self):
+        harness = BASE_MOD.AndroidCirqueTestBase('http://localhost:5000', {})
+        harness.logger = logging.getLogger('test_boot_wait_fail')
+        cmds = []
+
+        def fake_exec_always_timeout(_dev_id, cmd):
+            cmds.append(cmd)
+            if 'getprop sys.boot_completed' in cmd:
+                return {'return_code': '0', 'output': '1\n'}
+            if 'wait-for-device' in cmd:
+                return {'return_code': '124', 'output': ''}
+            return {'return_code': '0', 'output': ''}
+
+        harness.execute_device_cmd = fake_exec_always_timeout
+        ticks = itertools.chain([0.0, 0.5, 2.0], itertools.repeat(2.0))
+        with (
+            mock.patch.object(BASE_MOD.time, 'monotonic', side_effect=lambda: next(ticks)),
+            mock.patch.object(BASE_MOD.time, 'sleep'),
+            self.assertRaises(AssertionError),
+        ):
+            harness._wait_for_guest_boot('emu1', boot_timeout_sec=1.0)
+        self.assertTrue(any('wait-for-device' in c for c in cmds))
+        self.assertFalse(any('setenforce 0' in c for c in cmds))
+
+        cmds.clear()
+        wait_attempts = [0]
+
+        def fake_exec_recovers(_dev_id, cmd):
+            cmds.append(cmd)
+            if 'getprop sys.boot_completed' in cmd:
+                return {'return_code': '0', 'output': '1\n'}
+            if 'wait-for-device' in cmd:
+                wait_attempts[0] += 1
+                return {'return_code': '124' if wait_attempts[0] == 1 else '0', 'output': ''}
+            return {'return_code': '0', 'output': ''}
+
+        harness.execute_device_cmd = fake_exec_recovers
+        ticks_ok = itertools.chain([0.0, 0.5, 1.5, 2.5], itertools.repeat(2.5))
+        with (
+            mock.patch.object(BASE_MOD.time, 'monotonic', side_effect=lambda: next(ticks_ok)),
+            mock.patch.object(BASE_MOD.time, 'sleep'),
+        ):
+            harness._wait_for_guest_boot('emu1', boot_timeout_sec=10.0)
+        self.assertEqual(wait_attempts[0], 2)
+        self.assertTrue(any('setenforce 0' in c for c in cmds))
+
+    def test_ui_read_only_retry_rejects_stale_onoff_value_without_fresh_delta(self):
+        harness = BASE_MOD.AndroidCirqueTestBase('http://localhost:5000', {})
+        harness.logger = logging.getLogger('test_stale_ui_read')
+        stale_log = 'I ChipTool: Device commissioning completed\nOn/Off attribute value: true\n'
+
+        def fake_exec(_dev_id, cmd):
+            if 'uiautomator dump' in cmd:
+                return {'output': 'onOffClusterBtn'}
+            if 'logcat -d' in cmd:
+                return {'output': stale_log}
+            return {'output': '', 'return_code': '0'}
+
+        harness.execute_device_cmd = fake_exec
+        with mock.patch.object(BASE_MOD.time, 'sleep'):
+            res = harness._run_ui_toggle_and_read_steps(
+                'emu1', skip_toggle=True, check_state_before_toggle=False
+            )
+        self.assertTrue(res.toggle_ok)
+        self.assertFalse(res.read_ok)
+        self.assertFalse(res.require_toggle_marker)
+
+    def test_final_logcat_oracle_accepts_rotated_log_when_interaction_passed(self):
+        harness = BASE_MOD.AndroidCirqueTestBase('http://localhost:5000', {})
+        harness.logger = logging.getLogger('test_rotated_final_oracle')
+        passed = BASE_MOD.CommissioningInteractionResult(
+            commissioned=True, toggled=True, read_verified=True
+        )
+        harness.execute_device_cmd = lambda _dev, _cmd: {
+            'output': 'I ActivityManager: unrelated post-rotation line\n'
+        }
+        harness._assert_chiptool_logcat_oracles('emu1', passed)
+
+        harness.execute_device_cmd = lambda _dev, _cmd: {
+            'output': 'E ChipTool: onCommissioningComplete errorCode: 3\n'
+        }
+        with self.assertRaises(AssertionError):
+            harness._assert_chiptool_logcat_oracles('emu1', passed)
 
 
 class RealChipTestBaseIntegrationTest(unittest.TestCase):

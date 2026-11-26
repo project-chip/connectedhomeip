@@ -18,6 +18,20 @@
 
 set -e
 
+ALL_CLUSTERS_ONLY=false
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --all-clusters-only)
+            ALL_CLUSTERS_ONLY=true
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            exit 2
+            ;;
+    esac
+done
+
 CHIP_ROOT="$(dirname "$0")/../.."
 if [[ -z "${CHIP_ROOT_PATH}" ]]; then
     CHIP_ROOT_PATH=""
@@ -35,11 +49,13 @@ echo "Ensure submodules for Linux builds are checked out"
 echo "Setup build environment"
 source "./scripts/activate.sh"
 
-echo "Build: GN configure"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args out/debug --args='target_os="all" chip_logging_backend="stdio" chip_build_tests=false chip_enable_wifi=false chip_im_force_fabric_quota_check=true enable_default_builds=false enable_host_gcc_build=true enable_standalone_chip_tool_build=true enable_linux_lit_icd_app_build=true chip_device_config_enable_joint_fabric=true'
+if [[ "$ALL_CLUSTERS_ONLY" == false ]]; then
+    echo "Build: GN configure"
+    gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args out/debug --args='target_os="all" chip_logging_backend="stdio" chip_build_tests=false chip_enable_wifi=false chip_im_force_fabric_quota_check=true enable_default_builds=false enable_host_gcc_build=true enable_standalone_chip_tool_build=true enable_linux_lit_icd_app_build=true chip_device_config_enable_joint_fabric=true'
 
-echo "Build: Ninja build"
-time ninja -C out/debug all check
+    echo "Build: Ninja build"
+    time ninja -C out/debug all check
+fi
 
 # Disable Thread MeshCoP proxy (third_party/ot-commissioner + libevent) since
 # Cirque Linux E2E apps do not use it.
@@ -55,9 +71,11 @@ echo "Build: Build all-clusters-app which has different configs than some other 
 # Enable Wi-Fi so BleMobileDeviceTest (--network wifi) can provision the app over BLE.
 ./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/debug/standalone "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=true'
 
-echo "Build: Build tv-app and tv-casting-app for TvCastingTest."
-# Disable Wi-Fi for tv-app and tv-casting-app, which communicate over IP/mDNS
-# and do not need Wi-Fi commissioning; both use the default Linux OpenSSL
-# crypto backend matching all-clusters-app in chip-cirque-device-base.
-./scripts/examples/gn_build_example.sh examples/tv-app/linux/ out/debug/tv-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'
-./scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/debug/tv-casting-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'
+if [[ "$ALL_CLUSTERS_ONLY" == false ]]; then
+    echo "Build: Build tv-app and tv-casting-app for TvCastingTest."
+    # Disable Wi-Fi for tv-app and tv-casting-app, which communicate over IP/mDNS
+    # and do not need Wi-Fi commissioning; both use the default Linux OpenSSL
+    # crypto backend matching all-clusters-app in chip-cirque-device-base.
+    ./scripts/examples/gn_build_example.sh examples/tv-app/linux/ out/debug/tv-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'
+    ./scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/debug/tv-casting-app "${STANDALONE_APP_ARGS[@]}" 'chip_enable_wifi=false'
+fi

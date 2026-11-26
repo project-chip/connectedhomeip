@@ -225,7 +225,9 @@ class AndroidBleThreadHelpersTest(unittest.TestCase):
         harness.commands.clear()
         harness._inject_android_thread_ipv6_routes('emu1')
         injected_cmds = [cmd for _, cmd in harness.commands]
-        for suffix in ('dev wlan0 ', 'table wlan0 ', 'table eth0 '):
+        main_route_cmds = [c for c in injected_cmds if 'fd11:33::/64 via fd11:22::2 dev wlan0' in c and 'table' not in c]
+        self.assertTrue(bool(main_route_cmds))
+        for suffix in ('table wlan0 ', 'table eth0 '):
             self.assertTrue(
                 any('fd11:33::/64 via fd11:22::2' in c and suffix in c for c in injected_cmds)
             )

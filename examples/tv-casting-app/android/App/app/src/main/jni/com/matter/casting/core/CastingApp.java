@@ -38,8 +38,7 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
-  private static final long BROWSE_SERVICE_TIMEOUT =
-      Long.getLong("matter.casting.browseTimeoutMs", 5000L);
+  private static final long BROWSE_SERVICE_TIMEOUT = 5000;
   private static final long RESOLVE_SERVICE_TIMEOUT = 15000;
 
   private static CastingApp sInstance;

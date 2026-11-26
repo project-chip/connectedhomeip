@@ -826,8 +826,10 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         tbr_devices = [d for d in all_devs if d.get('type') == 'ThreadBorderRouter']
         server_devices = [d for d in all_devs if d.get('type') == 'CHIPEndDevice']
         req_devices = [d for d in all_devs if d.get('type') in ('android_emulator', 'Android_Emulator')]
-        if not tbr_devices:
-            raise RuntimeError("Required 'ThreadBorderRouter' node not found in topology")
+        if len(tbr_devices) != 1:
+            raise RuntimeError(
+                f"Expected exactly 1 'ThreadBorderRouter' node in topology, found {len(tbr_devices)}"
+            )
         if not server_devices:
             raise RuntimeError("Required 'CHIPEndDevice' node not found in topology")
         if not req_devices:

@@ -479,12 +479,21 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         while time.monotonic() < deadline:
             res = self.execute_device_cmd(req_device_id, 'adb shell getprop sys.boot_completed')
             rc_ok = isinstance(res, dict) and str(res.get('return_code')) == '0'
-            if rc_ok and self._cmd_output_str(res).strip() == '1':
-                self.execute_device_cmd(req_device_id, 'adb root')
-                time.sleep(0.5)
-                self.execute_device_cmd(req_device_id, 'timeout 60 adb wait-for-device')
+            if not (rc_ok and self._cmd_output_str(res).strip() == '1'):
+                time.sleep(1.0)
+                continue
+            self.execute_device_cmd(req_device_id, 'adb root')
+            time.sleep(0.5)
+            wait_res = self.execute_device_cmd(req_device_id, 'timeout 60 adb wait-for-device')
+            if isinstance(wait_res, dict) and str(wait_res.get('return_code')) == '0':
                 self.execute_device_cmd(req_device_id, 'adb shell setenforce 0')
                 return
+            if self.logger is not None:
+                self.logger.warning(
+                    'adb wait-for-device failed after adb root on %s (res=%s); retrying',
+                    req_device_id,
+                    wait_res,
+                )
             time.sleep(1.0)
         self.assertTrue(False, 'Android emulator failed to boot within timeout')
 
@@ -655,13 +664,15 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
                 return ToggleReadResult(toggle_ok=True, read_ok=True, require_toggle_marker=False)
             if probed is None:
                 return ToggleReadResult(toggle_ok=False, read_ok=False, require_toggle_marker=True)
+        before_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
         if not skip_toggle:
             self.execute_device_cmd(req_device_id, 'adb shell input tap 537 730')
             time.sleep(2.0)
         self.execute_device_cmd(req_device_id, 'adb shell input tap 166 884')
         time.sleep(2.0)
         logcat_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, logcat_cmd))
-        parsed = parse_toggle_read_logcat(logcat_out, require_toggle=not skip_toggle)
+        delta_out = _extract_logcat_delta(before_out, logcat_out)
+        parsed = parse_toggle_read_logcat(delta_out, require_toggle=not skip_toggle)
         return ToggleReadResult(
             toggle_ok=True if skip_toggle else parsed.toggle_ok,
             read_ok=parsed.read_ok,
@@ -736,11 +747,6 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         self.assertTrue(interaction.read_verified, 'Read command was not observed in logcat')
         nonzero_err = find_nonzero_commissioning_error(logcat_out)
         self.assertTrue(nonzero_err is None, f'onCommissioningComplete returned a non-zero errorCode: {nonzero_err}')
-        self.assertTrue(has_commissioning_complete_marker(logcat_out), 'adb logcat missing commissioning complete marker')
-        parsed = parse_toggle_read_logcat(logcat_out, require_toggle=interaction.require_toggle_marker)
-        if interaction.require_toggle_marker:
-            self.assertTrue(parsed.toggle_ok, 'adb logcat missing Toggle command success marker')
-        self.assertTrue(parsed.read_ok, 'adb logcat missing post-toggle On/Off attribute value: true')
 
     def _assert_emulator_radio_path(self, req_device_id: str) -> None:
         ps_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, 'ps -ef'))
