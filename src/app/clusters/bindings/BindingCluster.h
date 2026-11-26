@@ -56,6 +56,9 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
+    DataModel::ActionReturnStatus WriteBindingAttribute(const DataModel::WriteAttributeRequest & request,
+                                                        AttributeValueDecoder & decoder);
+
     bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry);
 
     CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
