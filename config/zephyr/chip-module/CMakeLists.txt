@@ -138,6 +138,16 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
+    if(CMAKE_CXX_COMPILER_LAUNCHER)
+        list(JOIN CMAKE_CXX_COMPILER_LAUNCHER " " _matter_compiler_launcher)
+        matter_add_gn_arg_string("pw_command_launcher" ${_matter_compiler_launcher})
+        # Keep the absolute paths in the debug info so that the debugger finds the
+        # sources from any directory. With CCACHE_NOHASHDIR, these paths can be
+        # wrong: ccache can return an object compiled in another directory.
+        if(NOT DEFINED ENV{CCACHE_NOHASHDIR})
+            matter_add_gn_arg_bool("strip_absolute_paths_from_debug_symbols" FALSE)
+        endif()
+    endif()
 
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")

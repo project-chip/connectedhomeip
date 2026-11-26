@@ -1,0 +1,17 @@
+/*
+ * Unified 160 KB SRAM.
+ *
+ * The whole 0x68000..0x90000 range is retention-capable, so use a single
+ * contiguous region instead of the default 96 KB / 64 KB split.
+ *
+ * The ram_ilm_nonretention node is kept untouched: the SoC linker still
+ * defines the RAM_ILM_N memory region from it, but after remapping
+ * telink_tlx_regions.ld nothing is placed there anymore.
+ *
+ * Note: picked up through LOCAL_DTC_OVERLAY_FILE, which is
+ *       boards/${BASE_BOARD}.overlay (BASE_BOARD = tl3238x).
+ */
+
+&ram_ilm_retention {
+	reg = <0x00068000 0x00028000>; /* 160 KB */
+};
