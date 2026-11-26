@@ -199,7 +199,7 @@ struct CompletionRecord
 {
     int count        = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
-    Clusters::Binding::TableEntry target;
+    std::optional<Clusters::Binding::TableEntry> target;
 
     BindingCommandCallback Callback()
     {
@@ -251,8 +251,9 @@ TEST_F(TestBindingHandlerWithManager, ExpiredCommandReportsTimeoutOnceAndFreesBi
     DrainAndServiceIO();
     EXPECT_EQ(first.count, 1);
     EXPECT_EQ(first.error, CHIP_ERROR_TIMEOUT);
-    EXPECT_EQ(first.target.nodeId, 0x1234u);
-    EXPECT_EQ(first.target.remote, 2);
+    ASSERT_TRUE(first.target.has_value());
+    EXPECT_EQ(first.target->nodeId, 0x1234u);
+    EXPECT_EQ(first.target->remote, 2);
     ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, options));
     EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(index));
     EXPECT_EQ(first.count, 1);
@@ -278,10 +279,12 @@ TEST_F(TestBindingHandlerWithManager, CompletionReportsEachRemovedTarget)
     ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { record.Callback() }));
     EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(first));
     EXPECT_EQ(record.count, 1);
-    EXPECT_EQ(record.target.nodeId, 0x1234u);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->nodeId, 0x1234u);
     EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(second));
     EXPECT_EQ(record.count, 2);
-    EXPECT_EQ(record.target.nodeId, 0x5678u);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->nodeId, 0x5678u);
     EXPECT_EQ(record.error, CHIP_ERROR_CANCELLED);
 }
 
@@ -359,8 +362,9 @@ TEST_F(TestBindingHandlerWithManager, GroupCompletionReportsLocalSendFailure)
     EXPECT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { record.Callback() }));
     EXPECT_EQ(record.count, 1);
     EXPECT_NE(record.error, CHIP_NO_ERROR);
-    EXPECT_EQ(record.target.groupId, 7);
-    EXPECT_EQ(record.target.fabricIndex, GetAliceFabricIndex());
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->groupId, 7);
+    EXPECT_EQ(record.target->fabricIndex, GetAliceFabricIndex());
 }
 
 TEST_F(TestBindingHandlerWithManager, InvalidTimeoutRejectsWithoutCompletion)
@@ -835,7 +839,8 @@ TEST_F(TestBindingHandlerWithManager, ResponseCompletionSurvivesCommandDestructi
     DrainAndServiceIO();
     EXPECT_EQ(record.count, 1);
     EXPECT_NE(record.error, CHIP_NO_ERROR);
-    EXPECT_EQ(record.target.remote, 2);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->remote, 2);
 }
 
 TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSkipsGroupTarget)

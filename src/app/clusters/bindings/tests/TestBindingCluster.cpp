@@ -26,7 +26,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
@@ -62,6 +64,90 @@ TEST_F(TestBindingCluster, TestAttributes)
                                         {
                                             Binding::Attributes::Binding::kMetadataEntry,
                                         }));
+}
+
+TEST_F(TestBindingCluster, NonListWriteReportsBindingAttributeChange)
+{
+    TestPersistentStorageDelegate storage;
+    Binding::Manager manager;
+    manager.GetBindingTable().SetPersistentStorage(&storage);
+    BindingCluster cluster({ manager.GetBindingTable(), manager, DeviceLayer::PlatformMgr() }, 1);
+    chip::Testing::ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+    const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+    const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+    const auto version = cluster.GetDataVersion(clusterPath);
+    TargetStructType target{ .group = MakeOptional(kMinApplicationGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
+    app::DataModel::List<const TargetStructType> bindings(&target, 1);
+    chip::Testing::WriteOperation write(attributePath);
+    write.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+    auto decoder = write.DecoderFor(bindings);
+
+    ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), decoder).IsSuccess());
+    EXPECT_EQ(manager.GetBindingTable().Size(), 1u);
+    ASSERT_EQ(tester.GetDirtyList().size(), 1u);
+    EXPECT_EQ(tester.GetDirtyList()[0], attributePath);
+    EXPECT_EQ(cluster.GetDataVersion(clusterPath), version + 1);
+}
+
+TEST_F(TestBindingCluster, CompletedListWritesReportBindingChangesIncludingClear)
+{
+    for (const auto pattern :
+         { chip::Testing::ListWritingPattern::ReplaceAll, chip::Testing::ListWritingPattern::ClearAllThenAppendItems })
+    {
+        TestPersistentStorageDelegate storage;
+        Binding::Manager manager;
+        manager.GetBindingTable().SetPersistentStorage(&storage);
+        BindingCluster cluster({ manager.GetBindingTable(), manager, DeviceLayer::PlatformMgr() }, 1);
+        chip::Testing::ClusterTester tester(cluster);
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+        const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+        const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+        TargetStructType target{ .group = MakeOptional(kMinApplicationGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
+        app::DataModel::List<const TargetStructType> bindings(&target, 1);
+
+        for (bool clear : { false, true })
+        {
+            tester.GetDirtyList().clear();
+            const auto version = cluster.GetDataVersion(clusterPath);
+            if (clear)
+            {
+                bindings = app::DataModel::List<const TargetStructType>();
+            }
+            ASSERT_TRUE(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern).IsSuccess());
+            EXPECT_EQ(manager.GetBindingTable().Size(), clear ? 0u : 1u);
+            EXPECT_TRUE(tester.GetDirtyList().empty());
+            EXPECT_EQ(cluster.GetDataVersion(clusterPath), version);
+
+            cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteSuccess,
+                                                   chip::Testing::kTestFabricIndex);
+            ASSERT_EQ(tester.GetDirtyList().size(), 1u);
+            EXPECT_EQ(tester.GetDirtyList()[0], attributePath);
+            EXPECT_EQ(cluster.GetDataVersion(clusterPath), version + 1);
+        }
+    }
+}
+
+TEST_F(TestBindingCluster, RejectedReplacementDoesNotReportAttributeChange)
+{
+    TestPersistentStorageDelegate storage;
+    Binding::Manager manager;
+    manager.GetBindingTable().SetPersistentStorage(&storage);
+    BindingCluster cluster({ manager.GetBindingTable(), manager, DeviceLayer::PlatformMgr() }, 1);
+    chip::Testing::ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+    const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+    const auto version = cluster.GetDataVersion(clusterPath);
+    TargetStructType target{ .group = MakeOptional(kUndefinedGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
+    app::DataModel::List<const TargetStructType> bindings(&target, 1);
+
+    EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, chip::Testing::ListWritingPattern::ReplaceAll),
+              Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_TRUE(tester.GetDirtyList().empty());
+    EXPECT_EQ(cluster.GetDataVersion(clusterPath), version);
 }
 
 TEST_F(TestBindingCluster, RejectsReservedGroupId)

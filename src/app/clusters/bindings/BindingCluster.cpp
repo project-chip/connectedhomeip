@@ -216,6 +216,7 @@ CHIP_ERROR BindingCluster::Attributes(const ConcreteClusterPath & path, ReadOnly
 
 CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricIndex)
 {
+    NotifyAttributeChanged(Binding::Attributes::Binding::Id);
     DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
                                         .BindingsChanged = { .fabricIndex = accessingFabricIndex } };
     return mClusterContext.platformManager.PostEvent(&event);
