@@ -248,4 +248,125 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
     cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestBindingCluster, NotifiesAttributeChangedOnExternalMutations)
+{
+    constexpr EndpointId kEndpoint1 = 1;
+    constexpr EndpointId kEndpoint2 = 2;
+    const app::ConcreteClusterPath clusterPath1(kEndpoint1, Binding::Id);
+    const app::ConcreteClusterPath clusterPath2(kEndpoint2, Binding::Id);
+
+    TestPersistentStorageDelegate storage;
+    Binding::Manager manager;
+    Binding::Table & table = manager.GetBindingTable();
+    table.SetPersistentStorage(&storage);
+
+    BindingCluster cluster1(
+        BindingCluster::Context{ .bindingTable = table, .bindingManager = manager, .platformManager = DeviceLayer::PlatformMgr() },
+        kEndpoint1);
+    BindingCluster cluster2(
+        BindingCluster::Context{ .bindingTable = table, .bindingManager = manager, .platformManager = DeviceLayer::PlatformMgr() },
+        kEndpoint2);
+
+    chip::Testing::ClusterTester tester1(cluster1);
+    chip::Testing::ClusterTester tester2(cluster2);
+    ASSERT_SUCCESS(cluster1.Startup(tester1.GetServerClusterContext()));
+    ASSERT_SUCCESS(cluster2.Startup(tester2.GetServerClusterContext()));
+
+    // Binding::Manager::AddBindingEntry notifies only the matching endpoint.
+    {
+        tester1.GetDirtyList().clear();
+        tester2.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+        const DataVersion version2Before = cluster2.GetDataVersion(clusterPath2);
+
+        ASSERT_SUCCESS(manager.AddBindingEntry(
+            Binding::TableEntry::ForGroup(chip::Testing::kTestFabricIndex, kMinApplicationGroupId, kEndpoint1, std::nullopt)));
+
+        EXPECT_TRUE(tester1.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster1.GetDataVersion(clusterPath1), version1Before);
+        EXPECT_TRUE(tester2.GetDirtyList().empty());
+        EXPECT_EQ(cluster2.GetDataVersion(clusterPath2), version2Before);
+    }
+
+    // Direct Binding::Table::Add notifies only the matching endpoint.
+    {
+        tester1.GetDirtyList().clear();
+        tester2.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+        const DataVersion version2Before = cluster2.GetDataVersion(clusterPath2);
+
+        ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(
+            chip::Testing::kTestFabricIndex, static_cast<GroupId>(kMinApplicationGroupId + 1), kEndpoint2, std::nullopt)));
+
+        EXPECT_TRUE(tester1.GetDirtyList().empty());
+        EXPECT_EQ(cluster1.GetDataVersion(clusterPath1), version1Before);
+        EXPECT_TRUE(tester2.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster2.GetDataVersion(clusterPath2), version2Before);
+    }
+
+    // Direct Binding::Table::RemoveAt notifies only the endpoint of the removed entry.
+    {
+        tester1.GetDirtyList().clear();
+        tester2.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+        const DataVersion version2Before = cluster2.GetDataVersion(clusterPath2);
+
+        auto iter = table.begin();
+        ASSERT_NE(iter, table.end());
+        ASSERT_EQ(iter->local, kEndpoint1);
+        ASSERT_SUCCESS(table.RemoveAt(iter));
+
+        EXPECT_TRUE(tester1.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster1.GetDataVersion(clusterPath1), version1Before);
+        EXPECT_TRUE(tester2.GetDirtyList().empty());
+        EXPECT_EQ(cluster2.GetDataVersion(clusterPath2), version2Before);
+    }
+
+    // Cluster WriteAttribute on endpoint 1 does not notify endpoint 2.
+    {
+        tester1.GetDirtyList().clear();
+        tester2.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+        const DataVersion version2Before = cluster2.GetDataVersion(clusterPath2);
+
+        TargetStructType valid{ .group = MakeOptional(kMinApplicationGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
+        app::DataModel::List<const TargetStructType> bindings(&valid, 1);
+        EXPECT_EQ(tester1.WriteAttribute(Binding::Attributes::Binding::Id, bindings, chip::Testing::ListWritingPattern::ReplaceAll),
+                  Status::Success);
+
+        EXPECT_TRUE(tester1.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster1.GetDataVersion(clusterPath1), version1Before);
+        EXPECT_TRUE(tester2.GetDirtyList().empty());
+        EXPECT_EQ(cluster2.GetDataVersion(clusterPath2), version2Before);
+    }
+
+    // Shutdown unregisters the listener; a subsequent Startup re-registers it.
+    cluster1.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+    {
+        tester1.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+
+        ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(
+            chip::Testing::kTestFabricIndex, static_cast<GroupId>(kMinApplicationGroupId + 2), kEndpoint1, std::nullopt)));
+
+        EXPECT_TRUE(tester1.GetDirtyList().empty());
+        EXPECT_EQ(cluster1.GetDataVersion(clusterPath1), version1Before);
+    }
+
+    ASSERT_SUCCESS(cluster1.Startup(tester1.GetServerClusterContext()));
+    {
+        tester1.GetDirtyList().clear();
+        const DataVersion version1Before = cluster1.GetDataVersion(clusterPath1);
+
+        ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(
+            chip::Testing::kTestFabricIndex, static_cast<GroupId>(kMinApplicationGroupId + 3), kEndpoint1, std::nullopt)));
+
+        EXPECT_TRUE(tester1.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster1.GetDataVersion(clusterPath1), version1Before);
+    }
+
+    cluster1.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+    cluster2.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

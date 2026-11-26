@@ -29,7 +29,7 @@ namespace Clusters {
 using TargetStructType         = Binding::Structs::TargetStruct::Type;
 using DecodableBindingListType = Binding::Attributes::Binding::TypeInfo::DecodableType;
 
-class BindingCluster : public DefaultServerCluster
+class BindingCluster : public DefaultServerCluster, public Binding::Table::Listener
 {
 public:
     /// Injected dependencies for this cluster
@@ -40,9 +40,12 @@ public:
         DeviceLayer::PlatformManager & platformManager;
     };
 
-    constexpr BindingCluster(Context && context, EndpointId endpointId) :
+    BindingCluster(Context && context, EndpointId endpointId) :
         DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id)), mClusterContext(std::move(context))
     {}
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -56,6 +59,8 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
+    void OnBindingsChanged(EndpointId endpointId) override;
+
     bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry);
 
     CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
