@@ -142,7 +142,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             discriminator=self.provider_discriminator,
             port=self.provider_port,
             extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '120', '--applyUpdateAction', 'awaitNextAction'],
+                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '60', '--applyUpdateAction', 'awaitNextAction'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             timeout=20
@@ -157,11 +157,6 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
-    async def _cleanup_test(self):
-        if self.cleanup:
-            await self.clear_ota_providers(self.controller, self.requestor_node_id)
-            self.terminate_provider()
-
     async def _wait_for_idle_after_software_update(self, update_state_handler):
         # Wait for the DUT to return to Idle after the Provider is canceled.
         update_state_match = AttributeMatcher.from_callable(
@@ -172,7 +167,8 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     @async_test_body
     async def teardown_test(self):
         # Once checks are completed clear the ota provider list to then terminate the provider.
-        await self._cleanup_test()
+        await self.clear_ota_providers(self.controller, self.requestor_node_id)
+        self.terminate_provider()
         self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
 
@@ -278,12 +274,12 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Read the last QueryImageResponse the OTA-P sent, in order to capture the UpdateToken.
         # Reads the QuerySnapshot when the Download is in progress to then retrieve the values for
         # ApplyUpdateRequest when transfer is complete.
-        logger.info("About to read  the named pipe OtaSoftwareUpdateProvider from provider")
+        logger.info("%s - About to read  the named pipe OtaSoftwareUpdateProvider from provider", step_number_s1)
         query_command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider",
                          "Endpoint": self.get_endpoint()}
         self.write_to_app_pipe(query_command, self.provider_app_pipe)
         query_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info("Provider QueryImageResponse snapshot: %s", query_response_data)
+        logger.info("%s - Provider QueryImageResponse snapshot: %s", step_number_s1, query_response_data)
         expected_update_token = query_response_data['Payload']["UpdateToken"]
 
         last_progress_s1 = [None]
@@ -297,17 +293,18 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             last_progress_s1[0] = val
             return True
 
-        # Applying: reaching this state means the download completed and the DUT has already
+        # kDelayedOnApply: reaching this state means the download completed and the DUT has already
         # sent ApplyUpdateRequest to the OTA-P (and received an ApplyUpdateResponse).
+        # kDelayedOnApply is only used to provide some time time to poll for data.
         subscription_attr_s1.await_first_value_asserting_no_forbidden(
-            target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
             forbidden_values=set(),
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=60),
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
             stall_timeout_sec=1800,
             liveness_matcher=progress_liveness_s1,
         )
-
+        logger.info("%s - DUT reached kDelayedOnApply to allow read the named pipe for GetApplyUpdateRequestStatus", step_number_s1)
         # Pool for a max of 30 seconds the read the last ApplyUpdateRequest that the OTA-P received from the DUT to avoid a race condition.
         # A delayedApplyActionTimeSec of 60 secs to cover the poll time.
         # The provider exposes this snapshot via the "GetApplyUpdateRequestStatus" pipe command,
@@ -322,21 +319,21 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Commands for named pipes
         apply_command = {"Name": "GetApplyUpdateRequestStatus", "Cluster": "OtaSoftwareUpdateProvider",
                                  "Endpoint": self.get_endpoint()}
-
+        logger.info("%s - Read named pipe for ApplyUpdateRequest", step_number_s1)
         while True:
             wait_poll = True
             attempt += 1
-            self.write_to_app_pipe(apply_command, self.provider_app_pipe)
             try:
+                self.write_to_app_pipe(apply_command, self.provider_app_pipe)
                 apply_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
                 received_update_token = apply_response_data["Payload"]["UpdateToken"]
                 received_new_version = int(apply_response_data["Payload"]["NewVersion"])
-                logger.info("Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d",
-                            apply_response_data, attempt)
+                logger.info("%s - Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d",
+                            step_number_s1, apply_response_data, attempt)
             except TimeoutError:
                 # Not able to read named pipe in the read_from_app_pipe timeout, do not wait more.
                 wait_poll = False
-                logger.info("%s Not able to read from named pipe, retrying.")
+                logger.info("%s - Not able to read from named pipe, retrying.", step_number_s1)
 
             # If the named pipe retrieved correct data, then terminate to poll the named pipe
             if received_update_token is not None and len(received_update_token) > 0 and received_new_version is not None and received_new_version > 0:
@@ -348,7 +345,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             if remaining <= 0:
                 # Time exhausted, warn and exit the loop. Asserts will fail as received_update_token and expected_update_token initialized as None
                 logger.warning(
-                    'Step #1 ApplyUpdateRequest has not been reached after %.0fs. Retrying', poll_command_interval_sec)
+                    "%s ApplyUpdateRequest has not been reached after %.0fs. Retrying", step_number_s1, poll_command_interval_sec)
                 break
             if wait_poll:
                 await asyncio.sleep(min(poll_command_interval_sec, remaining))
@@ -364,8 +361,19 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             received_new_version, self.expected_software_version,
             f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
         # Clean up and terminate if this is completed dont perform this action on teardown
-        await self._cleanup_test()
-        self.cleanup = False
+
+        # Wait DUT for kApplying and start updating the DUT after the delay
+        subscription_attr_s1.await_first_value_asserting_no_forbidden(
+            target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            forbidden_values=set(),
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=60),
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+        )
+        logger.info("%s - DUT Applying the software udpate", step_number_s1)
+        # DUT is applying the software update
+
+        # BLOCK TO CHECK CONNECTED DEVICE
+
         # Wait DUT go back to kIdle
         await self._wait_for_idle_after_software_update(update_state_handler=subscription_attr_s1)
         subscription_attr_s1.cancel()
