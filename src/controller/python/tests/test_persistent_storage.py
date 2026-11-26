@@ -47,6 +47,26 @@ class TestCaKeysBackwardCompatibilityRewrite(unittest.TestCase):
             'unrelated': 'value',
         })
 
+    def test_ca_index_suffix_is_hexadecimal(self):
+        # Suffix 'b' is CA index 11 and suffix '10' is CA index 16; caList keys are decimal.
+        sdkData = {
+            'ExampleOpCredsCAKey1': 'root-key-1',
+            'ExampleOpCredsCAKeyb': 'root-key-11',
+            'ExampleOpCredsIPKb': 'ipk-11',
+            'ExampleOpCredsIPK10': 'ipk-16',
+        }
+        data = {'caList': {'1': [], '11': [], '16': []}}
+
+        data, sdkData = PersistentStorageJSON._caKeysBackwardCompatibilityRewrite(None, data, sdkData)
+
+        self.assertEqual(data['caList'], {'0': [], '10': [], '15': []})
+        self.assertEqual(sdkData, {
+            'ExampleOpCredsCAKey0': 'root-key-1',
+            'ExampleOpCredsCAKeya': 'root-key-11',
+            'ExampleOpCredsIPKa': 'ipk-11',
+            'ExampleOpCredsIPKf': 'ipk-16',
+        })
+
 
 class TestChipToolFabricStorageCommit(unittest.TestCase):
     def test_ipk_epoch_key_is_written_to_chip_tool_fabric_storage(self):
@@ -62,6 +82,7 @@ class TestChipToolFabricStorageCommit(unittest.TestCase):
             storage._sdkData = {
                 'ExampleOpCredsCAKey0': 'root-key',
                 'ExampleOpCredsIPK0': 'ipk',
+                'ExampleOpCredsIPKa': 'ipk-10',
                 'unrelated': 'value',
             }
 
@@ -72,6 +93,7 @@ class TestChipToolFabricStorageCommit(unittest.TestCase):
             self.assertEqual(dict(fabric.items('Default')), {
                 'ExampleOpCredsCAKey0': 'root-key',
                 'ExampleOpCredsIPK0': 'ipk',
+                'ExampleOpCredsIPKa': 'ipk-10',
             })
 
             repl = PersistentStorageINI.ConfigParser()
