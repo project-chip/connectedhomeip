@@ -17,7 +17,7 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
-#import "MTRTestDeclarations.h"
+#import "MTRDeviceControllerFactory_Test.h"
 
 @interface MTRServerEndpointTests : XCTestCase
 

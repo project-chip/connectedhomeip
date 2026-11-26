@@ -22,15 +22,16 @@
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_Test.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -369,7 +370,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 @end
 
-// Declared here because MTRTestDeclarations.h does not declare it.
+// Declared here because MTRDeviceControllerDataStore.h, which declares it, is not importable from Objective-C.
 @protocol MTRPerControllerStorageTestsDeviceDataStoreMethods <NSObject>
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(NSDictionary<NSString *, id> * _Nullable)deviceData forNodeID:(NSNumber *)nodeID;
 @end
