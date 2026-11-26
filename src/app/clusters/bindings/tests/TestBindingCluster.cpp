@@ -27,8 +27,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
-#include <lib/support/Defer.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
