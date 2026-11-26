@@ -2564,6 +2564,14 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             if ([interestedClusterPath.endpoint isEqualToNumber:attributePath.endpoint] && [interestedClusterPath.cluster isEqualToNumber:attributePath.cluster]) {
                 return YES;
             }
+        } else if ([interestedPath isKindOfClass:[MTRAttributeRequestPath class]]) {
+            // A nil field is a wildcard.
+            MTRAttributeRequestPath * interestedRequestPath = interestedPath;
+            if ((interestedRequestPath.endpoint == nil || [interestedRequestPath.endpoint isEqualToNumber:attributePath.endpoint])
+                && (interestedRequestPath.cluster == nil || [interestedRequestPath.cluster isEqualToNumber:attributePath.cluster])
+                && (interestedRequestPath.attribute == nil || [interestedRequestPath.attribute isEqualToNumber:attributePath.attribute])) {
+                return YES;
+            }
         }
     }
 

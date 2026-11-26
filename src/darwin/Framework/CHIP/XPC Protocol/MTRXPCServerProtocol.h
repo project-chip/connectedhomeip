@@ -55,6 +55,9 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedF
  *   MTRDeviceControllerRegistrationInterestedPathClusterIDKey: every path in that cluster.
  * - The same dictionary plus MTRDeviceControllerRegistrationInterestedPathAttributeIDKey (attribute array)
  *   or MTRDeviceControllerRegistrationInterestedPathEventIDKey (event array): that single path.
+ * - In the attribute array only, a dictionary missing MTRDeviceControllerRegistrationInterestedPathEndpointIDKey
+ *   or MTRDeviceControllerRegistrationInterestedPathClusterIDKey: a path with a wildcard in each missing position,
+ *   as an MTRAttributeRequestPath with nil fields (for example, one attribute of one cluster on every endpoint).
  */
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));

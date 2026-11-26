@@ -9517,6 +9517,81 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [controller shutdown];
 }
 
+// Tests that an MTRAttributeRequestPath joins the union as the narrowest equivalent path, stays a request path
+// when its wildcard can't be expressed otherwise, and makes the union every path when every field is a wildcard.
+- (void)test012_UnionCanonicalizesAttributeRequestPaths
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * wildcardEndpointPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(6) attributeID:@(0)];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[
+            wildcardEndpointPath,
+            [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(8) attributeID:@(0)],
+            [MTRAttributeRequestPath requestPathWithEndpointID:@(2) clusterID:@(8) attributeID:nil],
+            [MTRAttributeRequestPath requestPathWithEndpointID:@(3) clusterID:nil attributeID:nil],
+        ]
+            interestedPathsForEvents:@[]];
+
+    NSArray * expectedUnion = @[
+        @(3),
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(8)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(8) attributeID:@(0)],
+        wildcardEndpointPath,
+    ];
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedUnion);
+
+    __auto_type * everyPathDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    everyPathDelegate.skipSetupSubscription = YES;
+    [device addDelegate:everyPathDelegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil] ]
+            interestedPathsForEvents:@[]];
+    XCTAssertNil([device unionOfInterestedPathsForAttributes]);
+
+    [device removeDelegate:everyPathDelegate];
+    [device removeDelegate:delegate];
+}
+
+// Tests that an MTRAttributeRequestPath with a wildcard endpoint reaches the server as a dictionary without an endpoint ID.
+- (void)test013_RegistrationEncodesAttributeRequestPathWildcards
+{
+    __auto_type * server = [[MTRInterestedPathsTestXPCServer alloc] init];
+    NSDictionary * expectedNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId1),
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @{
+            MTRDeviceControllerRegistrationInterestedPathClusterIDKey : @(6),
+            MTRDeviceControllerRegistrationInterestedPathAttributeIDKey : @(0),
+        } ],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[],
+    };
+    XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with wildcard endpoint received"];
+    registrationReceived.assertForOverFulfill = NO;
+    server.onControllerConfiguration = ^(NSDictionary * controllerState) {
+        if ([controllerState[MTRDeviceControllerRegistrationNodeIDsKey] containsObject:expectedNode]) {
+            [registrationReceived fulfill];
+        }
+    };
+
+    __auto_type * controller = [self createControllerWithPlainServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(6) attributeID:@(0)] ]
+            interestedPathsForEvents:@[]];
+
+    [self waitForExpectations:@[ registrationReceived ] timeout:kTimeoutInSeconds];
+
+    server.onControllerConfiguration = nil;
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
 // Tests that a subclass of a path class joins the union as that path class, and a path of the other leaf kind as its cluster path.
 - (void)test010_UnionCanonicalizesPathSubclasses
 {

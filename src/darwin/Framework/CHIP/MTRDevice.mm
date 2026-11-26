@@ -62,6 +62,7 @@ typedef NS_ENUM(NSUInteger, MTRInterestedPathKind) {
     MTRInterestedPathKindCluster,
     MTRInterestedPathKindAttribute,
     MTRInterestedPathKindEvent,
+    MTRInterestedPathKindAttributeRequest,
 };
 
 static MTRInterestedPathKind MTRInterestedPathKindOf(id path)
@@ -75,14 +76,36 @@ static MTRInterestedPathKind MTRInterestedPathKindOf(id path)
     if ([path isKindOfClass:[MTREventPath class]]) {
         return MTRInterestedPathKindEvent;
     }
+    if ([path isKindOfClass:[MTRAttributeRequestPath class]]) {
+        return MTRInterestedPathKindAttributeRequest;
+    }
     return MTRInterestedPathKindCluster;
 }
 
 // Returns an NSNumber or an exact MTRClusterPath / leafPathClass; the other leaf kind widens to its cluster.
+// For attributes, an MTRAttributeRequestPath becomes the matching endpoint, cluster or attribute path when it
+// has no wildcard in a leading position, NSNull when every field is a wildcard (every path), and otherwise
+// stays an MTRAttributeRequestPath.
 static id _Nullable MTRCanonicalInterestedPath(id path, Class leafPathClass)
 {
     if ([path isKindOfClass:[NSNumber class]]) {
         return path;
+    }
+    if (leafPathClass == [MTRAttributePath class] && [path isKindOfClass:[MTRAttributeRequestPath class]]) {
+        MTRAttributeRequestPath * requestPath = path;
+        if (requestPath.endpoint == nil && requestPath.cluster == nil && requestPath.attribute == nil) {
+            return [NSNull null];
+        }
+        if (requestPath.endpoint != nil && requestPath.cluster == nil && requestPath.attribute == nil) {
+            return requestPath.endpoint;
+        }
+        if (requestPath.endpoint != nil && requestPath.cluster != nil) {
+            if (requestPath.attribute == nil) {
+                return [MTRClusterPath clusterPathWithEndpointID:requestPath.endpoint clusterID:requestPath.cluster];
+            }
+            return [MTRAttributePath attributePathWithEndpointID:requestPath.endpoint clusterID:requestPath.cluster attributeID:requestPath.attribute];
+        }
+        return [MTRAttributeRequestPath requestPathWithEndpointID:requestPath.endpoint clusterID:requestPath.cluster attributeID:requestPath.attribute];
     }
     if (![path isKindOfClass:[MTRClusterPath class]]) {
         return nil;
@@ -118,6 +141,25 @@ static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
         }
         if (kindA == MTRInterestedPathKindEndpoint) {
             return [(NSNumber *) a compare:(NSNumber *) b];
+        }
+        if (kindA == MTRInterestedPathKindAttributeRequest) {
+            // A nil (wildcard) field sorts before any ID.
+            NSComparisonResult (^compareField)(NSNumber *, NSNumber *) = ^NSComparisonResult(NSNumber * fieldA, NSNumber * fieldB) {
+                if (fieldA == nil || fieldB == nil) {
+                    return fieldA == fieldB ? NSOrderedSame : (fieldA == nil ? NSOrderedAscending : NSOrderedDescending);
+                }
+                return [fieldA compare:fieldB];
+            };
+            MTRAttributeRequestPath * requestPathA = a;
+            MTRAttributeRequestPath * requestPathB = b;
+            NSComparisonResult requestResult = compareField(requestPathA.endpoint, requestPathB.endpoint);
+            if (requestResult == NSOrderedSame) {
+                requestResult = compareField(requestPathA.cluster, requestPathB.cluster);
+            }
+            if (requestResult == NSOrderedSame) {
+                requestResult = compareField(requestPathA.attribute, requestPathB.attribute);
+            }
+            return requestResult;
         }
 
         MTRClusterPath * clusterPathA = a;
@@ -316,7 +358,8 @@ MTR_DIRECT_MEMBERS
         }
     }];
 
-    return wantsEverything ? nil : unionOfPaths;
+    // An all-wildcard MTRAttributeRequestPath canonicalizes to NSNull: every path.
+    return (wantsEverything || [unionOfPaths containsObject:[NSNull null]]) ? nil : unionOfPaths;
 }
 
 - (nullable NSArray<id> *)unionOfInterestedPathsForAttributes

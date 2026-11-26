@@ -223,4 +223,38 @@ static const uint64_t kDeviceId1 = 0x12344321;
     XCTAssertEqualObjects(eventPaths, @[ [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)] ]);
     [device removeDelegate:delegate];
 }
+
+// Tests that an MTRAttributeRequestPath matches every report whose fields match its non-nil fields.
+- (void)test006_AttributeRequestPathWildcardsMatchAnyValue
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    NSMutableArray<MTRAttributePath *> * attributePaths = [NSMutableArray array];
+    __auto_type * delegate = [self addDelegateToDevice:device
+                          interestedPathsForAttributes:@[
+                              [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(6) attributeID:@(0)],
+                              [MTRAttributeRequestPath requestPathWithEndpointID:@(3) clusterID:nil attributeID:@(5)],
+                          ]
+                              interestedPathsForEvents:@[]
+                                        attributePaths:attributePaths
+                                            eventPaths:[NSMutableArray array]];
+
+    [device unitTestInjectAttributeReport:@[
+        TestAttributeResponseValue(@(1), @(6), @(0), 1),
+        TestAttributeResponseValue(@(2), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(6), @(1), 1),
+        TestAttributeResponseValue(@(1), @(8), @(0), 1),
+        TestAttributeResponseValue(@(3), @(8), @(5), 1),
+        TestAttributeResponseValue(@(4), @(8), @(5), 1),
+    ]
+                         fromSubscription:YES];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    NSArray * expectedAttributePaths = @[
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(6) attributeID:@(0)],
+        [MTRAttributePath attributePathWithEndpointID:@(3) clusterID:@(8) attributeID:@(5)],
+    ];
+    XCTAssertEqualObjects(attributePaths, expectedAttributePaths);
+    [device removeDelegate:delegate];
+}
 @end

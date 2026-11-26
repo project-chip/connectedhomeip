@@ -76,6 +76,12 @@ static NSArray * _Nullable DecodeInterestedPaths(id encodedPaths, NSString * lea
         NSNumber * clusterID = encodedPath[MTRDeviceControllerRegistrationInterestedPathClusterIDKey];
         NSNumber * leafID = encodedPath[leafKey];
         if (![endpointID isKindOfClass:[NSNumber class]] || ![clusterID isKindOfClass:[NSNumber class]]) {
+            // A missing endpoint or cluster is a wildcard, for attribute paths only.
+            if ([leafKey isEqualToString:MTRDeviceControllerRegistrationInterestedPathAttributeIDKey]) {
+                [paths addObject:[MTRAttributeRequestPath requestPathWithEndpointID:([endpointID isKindOfClass:[NSNumber class]] ? endpointID : nil)
+                                                                          clusterID:([clusterID isKindOfClass:[NSNumber class]] ? clusterID : nil)
+                                                                        attributeID:([leafID isKindOfClass:[NSNumber class]] ? leafID : nil)]];
+            }
             continue;
         }
         if (![leafID isKindOfClass:[NSNumber class]]) {
