@@ -386,6 +386,37 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
+    /**
+     * Initial default values for mutable attributes used when no persisted value exists in storage.
+     */
+    struct DefaultAttributeValues
+    {
+        uint16_t currentFrameRate                         = 0;
+        bool hdrModeEnabled                               = false;
+        bool softRecordingPrivacyModeEnabled              = false;
+        bool softLivestreamPrivacyModeEnabled             = false;
+        bool hardPrivacyModeOn                            = false;
+        TriStateAutoEnum nightVision                      = TriStateAutoEnum::kOn;
+        TriStateAutoEnum nightVisionIllum                 = TriStateAutoEnum::kOn;
+        Globals::Structs::ViewportStruct::Type viewport   = { 0, 0, 0, 0 };
+        bool speakerMuted                                 = false;
+        uint8_t speakerVolumeLevel                        = 0;
+        uint8_t speakerMaxLevel                           = kMaxSpeakerLevel;
+        uint8_t speakerMinLevel                           = 0;
+        bool microphoneMuted                              = false;
+        uint8_t microphoneVolumeLevel                     = 0;
+        uint8_t microphoneMaxLevel                        = kMaxMicrophoneLevel;
+        uint8_t microphoneMinLevel                        = 0;
+        bool microphoneAGCEnabled                         = false;
+        uint16_t imageRotation                            = 0;
+        bool imageFlipHorizontal                          = false;
+        bool imageFlipVertical                            = false;
+        bool localVideoRecordingEnabled                   = false;
+        bool localSnapshotRecordingEnabled                = false;
+        bool statusLightEnabled                           = false;
+        Globals::ThreeLevelAutoEnum statusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
+    };
+
     struct InitArguments
     {
         /**
@@ -448,11 +479,16 @@ public:
 
         /** Indicates the priority ranking of the available streams. */
         std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
+
+        /** Initial default values for mutable attributes when not present in persistent storage. */
+        DefaultAttributeValues defaultAttributeValues = {};
     };
 
     /**
-     * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
-     * to be registered and called by the interaction model at the appropriate times.
+     * @brief Creates a Camera AV Stream Management cluster instance.
+     *
+     * Configuration validation and loading of persisted attributes happen in Startup() when the
+     * cluster is registered with the data model provider.
      *
      * @param aArgs                             Initialization arguments.
      *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate)
@@ -463,16 +499,9 @@ public:
 
     ~CameraAVStreamManagementCluster() override;
 
-    /**
-     * @brief Initialise the Camera AV Stream Management server instance.
-     * This function must be called after defining an CameraAVStreamManagementCluster class object.
-     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
-     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
-     */
-    CHIP_ERROR Init();
-
     // Server cluster implementation
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
@@ -859,6 +888,8 @@ private:
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
+
+    CHIP_ERROR ValidateConfiguration() const;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.

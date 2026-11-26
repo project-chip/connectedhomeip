@@ -65,9 +65,8 @@ private:
     chip::app::DefaultTimerDelegate mAmbientContextSensingTimerDelegate;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::AmbientContextSensingCluster> mAmbientContextSensingServer;
 
-    // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
+    // Method to instantiate and register CameraAVStreamMgmt with initial HAL attribute defaults.
     void CreateAndInitializeCameraAVStreamMgmt();
-    CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

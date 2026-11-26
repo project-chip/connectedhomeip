@@ -61,6 +61,25 @@ CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(InitArguments &
     mMaxContentBufferSize(aArgs.maxContentBufferSize), mMicrophoneCapabilities(std::move(aArgs.microphoneCapabilities)),
     mSpeakerCapabilities(std::move(aArgs.spkrCapabilities)), mTwoWayTalkSupport(aArgs.twoWayTalkSupport),
     mSnapshotCapabilitiesList(std::move(aArgs.snapshotCapabilities)), mMaxNetworkBandwidth(aArgs.maxNetworkBandwidth),
+    mCurrentFrameRate(aArgs.defaultAttributeValues.currentFrameRate), mHDRModeEnabled(aArgs.defaultAttributeValues.hdrModeEnabled),
+    mSoftRecordingPrivacyModeEnabled(aArgs.defaultAttributeValues.softRecordingPrivacyModeEnabled),
+    mSoftLivestreamPrivacyModeEnabled(aArgs.defaultAttributeValues.softLivestreamPrivacyModeEnabled),
+    mHardPrivacyModeOn(aArgs.defaultAttributeValues.hardPrivacyModeOn), mNightVision(aArgs.defaultAttributeValues.nightVision),
+    mNightVisionIllum(aArgs.defaultAttributeValues.nightVisionIllum), mViewport(aArgs.defaultAttributeValues.viewport),
+    mSpeakerMuted(aArgs.defaultAttributeValues.speakerMuted), mSpeakerVolumeLevel(aArgs.defaultAttributeValues.speakerVolumeLevel),
+    mSpeakerMaxLevel(aArgs.defaultAttributeValues.speakerMaxLevel), mSpeakerMinLevel(aArgs.defaultAttributeValues.speakerMinLevel),
+    mMicrophoneMuted(aArgs.defaultAttributeValues.microphoneMuted),
+    mMicrophoneVolumeLevel(aArgs.defaultAttributeValues.microphoneVolumeLevel),
+    mMicrophoneMaxLevel(aArgs.defaultAttributeValues.microphoneMaxLevel),
+    mMicrophoneMinLevel(aArgs.defaultAttributeValues.microphoneMinLevel),
+    mMicrophoneAGCEnabled(aArgs.defaultAttributeValues.microphoneAGCEnabled),
+    mImageRotation(aArgs.defaultAttributeValues.imageRotation),
+    mImageFlipHorizontal(aArgs.defaultAttributeValues.imageFlipHorizontal),
+    mImageFlipVertical(aArgs.defaultAttributeValues.imageFlipVertical),
+    mLocalVideoRecordingEnabled(aArgs.defaultAttributeValues.localVideoRecordingEnabled),
+    mLocalSnapshotRecordingEnabled(aArgs.defaultAttributeValues.localSnapshotRecordingEnabled),
+    mStatusLightEnabled(aArgs.defaultAttributeValues.statusLightEnabled),
+    mStatusLightBrightness(aArgs.defaultAttributeValues.statusLightBrightness),
     mSupportedStreamUsages(std::move(aArgs.supportedStreamUsages)), mStreamUsagePriorities(std::move(aArgs.streamUsagePriorities))
 {
     mDelegate.SetCameraAVStreamManagementCluster(this);
@@ -73,7 +92,15 @@ CameraAVStreamManagementCluster::~CameraAVStreamManagementCluster()
     mDelegate.SetCameraAVStreamManagementCluster(nullptr);
 }
 
-CHIP_ERROR CameraAVStreamManagementCluster::Init()
+CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(ValidateConfiguration());
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    LoadPersistentAttributes();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManagementCluster::ValidateConfiguration() const
 {
     // Constraint checks for RateDistortionTardeOffPoints vector
     for (const auto & rateDistortionTradeOffPoints : mRateDistortionTradeOffPointsList)
@@ -154,14 +181,6 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
                          "at least one of the ImageFlip or Rotation attributes shall be supported",
                          mPath.mEndpointId));
-    }
-
-    // Load persisted attributes now that the cluster context is available (set during Startup()).
-    // Init() is expected to be called after Startup(); the IsStarted() guard prevents callers that
-    // invoke Init() without an established context from dereferencing a null context.
-    if (IsStarted())
-    {
-        LoadPersistentAttributes();
     }
 
     return CHIP_NO_ERROR;

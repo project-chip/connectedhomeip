@@ -54,11 +54,7 @@ Within your application setup (e.g., in a function like
 The example uses a `ServerCluster<CameraAVStreamManagementCluster>` member and a
 `Create` method.
 
-    d.  **Register Cluster:** Register the created cluster instance with the Matter data model registry for the desired endpoint.
-
-    e.  **Set Initial Attribute Values:** After creation, set the initial values for writable attributes based on the device's current state. This is typically done by calling the cluster's setter methods (e.g., `SetHDRModeEnabled`, `SetViewport`, etc.).
-
-    f.  **Call `Init()`:** Finally, call the `Init()` method on the cluster instance. This performs essential validation of the configuration.
+    d.  **Register Cluster:** Register the created cluster instance with the Matter data model registry for the desired endpoint. Initial default values for mutable attributes belong in `InitArguments::defaultAttributeValues`; `Startup()` validates configuration and loads persisted attributes over those defaults.
 
 Refer to the Matter specification, the header files
 (`CameraAVStreamManagementCluster.h`, `CameraAVStreamManagementDelegate.h`), and
