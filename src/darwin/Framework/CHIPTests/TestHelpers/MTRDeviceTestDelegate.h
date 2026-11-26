@@ -29,6 +29,8 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
 @property (atomic, copy, nullable) dispatch_block_t onReportBegin;
+// Called synchronously on the Matter queue, without the device lock held, when the device starts handling a report.
+@property (atomic, copy, nullable) dispatch_block_t onReportBeginOnMatterQueue;
 @property (atomic, copy, nullable) dispatch_block_t onReportEnd;
 @property (atomic, copy, nullable) dispatch_block_t onDeviceCachePrimed;
 @property (atomic) BOOL skipExpectedValuesForWrite;
@@ -50,6 +52,8 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
+// Called after a subscription reattempt timer has handed its work to the Matter queue.
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionReattemptDispatched;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

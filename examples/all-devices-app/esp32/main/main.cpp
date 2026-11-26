@@ -323,6 +323,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
+        .deviceInfoProvider       = gExampleDeviceInfoProvider,
     });
 
     auto & deviceFactory = AppDeviceFactory::GetInstance();

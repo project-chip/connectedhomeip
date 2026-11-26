@@ -54,6 +54,13 @@
     }
 }
 
+- (void)unitTestReportBeginOnMatterQueueForDevice:(MTRDevice *)device
+{
+    if (self.onReportBeginOnMatterQueue != nil) {
+        self.onReportBeginOnMatterQueue();
+    }
+}
+
 - (void)unitTestReportEndForDevice:(MTRDevice *)device
 {
     if (self.onReportEnd != nil) {
@@ -162,6 +169,13 @@
 {
     if (self.onInternalStateTransition != nil) {
         self.onInternalStateTransition(state);
+    }
+}
+
+- (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionReattemptDispatched != nil) {
+        self.onSubscriptionReattemptDispatched();
     }
 }
 

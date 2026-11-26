@@ -76,5 +76,6 @@ chip_test_suite("tests-delegate") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

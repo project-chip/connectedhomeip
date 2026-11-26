@@ -38,9 +38,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    int16_t mPressureMeasuredValue = 0;
 };
 
 } // namespace app

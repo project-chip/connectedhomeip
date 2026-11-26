@@ -64,9 +64,12 @@ object PostCommissioningDialogHelper {
     context: Context? = null,
   ): CommissionedNode {
     val defaultLabel =
-      deviceInfo?.let { "Matter Device (VID:${it.vendorId} PID:${it.productId})" }
-        ?: "Device 0x${nodeId.toString(16)}"
-    val productName = deviceInfo?.let { "Matter Product ${it.productId}" } ?: "Matter Device"
+      CommissionedNodeRegistry.placeholderNodeLabel(
+        nodeId,
+        deviceInfo?.vendorId,
+        deviceInfo?.productId,
+      )
+    val productName = CommissionedNodeRegistry.placeholderProductName(deviceInfo?.productId)
 
     return registry
       .autoRegisterCommissionedNode(
@@ -75,7 +78,10 @@ object PostCommissioningDialogHelper {
         productName = productName,
         roomName = "Unassigned",
       )
-      .also { context?.let { ctx -> registry.saveFabricToPreferences(ctx) } }
+      .also {
+        context?.let { ctx -> registry.saveFabricToPreferences(ctx) }
+        CenterConnectionManager.onNodeCommissioned(nodeId)
+      }
   }
 
   /**
@@ -89,7 +95,8 @@ object PostCommissioningDialogHelper {
     deviceInfo: CHIPDeviceInfo? = null,
     onComplete: ((CommissionedNode) -> Unit)? = null,
   ) {
-    val node = autoRegisterNode(registry, nodeId, deviceInfo, activity)
+    // Callers usually auto-register first; re-registering would notify the manager again.
+    val node = registry.getNode(nodeId) ?: autoRegisterNode(registry, nodeId, deviceInfo, activity)
     registry.saveFabricToPreferences(activity)
     val binding = DialogPostCommissioningSetupBinding.inflate(LayoutInflater.from(activity))
 
@@ -114,20 +121,21 @@ object PostCommissioningDialogHelper {
             "Unassigned",
             node.aliases,
           )
+        Toast.makeText(activity, "Saved ${updated.nodeLabel} to Unassigned", Toast.LENGTH_SHORT)
+          .show()
         CenterConnectionManager.onNodeCommissioned(nodeId)
-        Toast.makeText(activity, "Saved $finalName to Unassigned", Toast.LENGTH_SHORT).show()
         onComplete?.invoke(updated)
       }
       .setPositiveButton("Save & Finish") { _, _ ->
         val updated =
           saveFromDialogInputs(activity, binding, registry, node, defaultName, "Unassigned")
-        CenterConnectionManager.onNodeCommissioned(nodeId)
         Toast.makeText(
             activity,
             "Configured ${updated.nodeLabel} in ${updated.roomName}",
             Toast.LENGTH_SHORT,
           )
           .show()
+        CenterConnectionManager.onNodeCommissioned(nodeId)
         onComplete?.invoke(updated)
       }
       .show()
@@ -202,7 +210,10 @@ object PostCommissioningDialogHelper {
       }
     val updated =
       saveMetadataAndPreferences(context, registry, node, finalName, finalRoom, node.aliases)
-    if (binding.syncNodeLabelCheckbox.isChecked) {
+    if (
+      binding.syncNodeLabelCheckbox.isChecked &&
+        !CommissionedNodeRegistry.isGenericNodeLabel(node.nodeId, finalName)
+    ) {
       syncNodeLabelToDevice(context, node.nodeId, finalName, registry)
     }
     return updated

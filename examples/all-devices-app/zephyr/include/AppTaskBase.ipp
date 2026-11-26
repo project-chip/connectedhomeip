@@ -32,6 +32,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -55,7 +56,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <device/types/root-node/features/OtaFeature.h>
+#ifdef CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#include CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#else
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
 #endif
 
 namespace chip::app::AllDevices {
@@ -147,6 +152,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     mGroupDataProvider.SetSessionKeystore(mInitParams.sessionKeystore);
     ReturnErrorOnFailure(mGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&mGroupDataProvider);
+    DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
 
     return CHIP_NO_ERROR;
 }
@@ -258,6 +264,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .bindingHandler           = mBindingHandler,
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
         .identifyDelegate         = Self().GetIdentifyDelegate(),
+        .deviceInfoProvider       = mDeviceInfoProvider,
     });
 
     return CHIP_NO_ERROR;

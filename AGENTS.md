@@ -151,6 +151,14 @@ for full details.
 -   Tests in `src/python_testing` and `src/app/tests/suites` which verify
     expected failures should clearly indicate why the failure is expected.
     Include a summary of the relevant specification requirements if possible.
+-   C++ unit tests should generally include
+    `<lib/support/tests/ExtraPwTestMacros.h>`. It provides `ASSERT_SUCCESS` /
+    `EXPECT_SUCCESS` for `CHIP_ERROR` results, and versions of `ASSERT_TRUE` /
+    `ASSERT_FALSE` that clang-tidy understands as guards. Check that an optional
+    has a value in a way clang-tidy can see before accessing it, or compare the
+    optional directly instead. `NOLINT(bugprone-unchecked-optional-access)`
+    should not be needed in tests. See
+    [docs/testing/unit_testing.md](docs/testing/unit_testing.md#best-practices).
 
 ## Architectural Constraints
 
@@ -194,6 +202,12 @@ You can run commands within the environment using `scripts/run_in_build_env.sh`:
 
 Alternatively, you can activate the environment in your shell:
 `source scripts/activate.sh`
+
+An additional checkout (e.g. a `git worktree`) can reuse the environment of an
+existing checkout instead of bootstrapping its own:
+`source scripts/activate.sh --environment-root /path/to/other/checkout/.environment`.
+See
+[Sharing an environment between checkouts](docs/guides/BUILDING.md#sharing-an-environment-between-checkouts).
 
 ### Build and Test
 

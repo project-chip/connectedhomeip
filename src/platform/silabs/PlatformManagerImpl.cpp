@@ -25,11 +25,15 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
+#if SLI_SI91X_MCU_INTERFACE
+#include <platform/FreeRTOS/SystemTimeSupport.h>
+#else
+#include <platform/silabs/SystemTimeSupport.h>
+#endif
 
 #include <lib/core/ErrorStr.h>
 #include <platform/PlatformError.h>

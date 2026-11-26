@@ -37,6 +37,10 @@ bool IsExcludedFromWildcard(const std::string & type)
 {
     // These device types are excluded from the wildcard (*) expansion to prevent redundant,
     // invalid, or non-leaf endpoint structures.
+    // Do not expect anything except aggregator and bridged-node here:
+    // Only add utility or node types that make no sense stand-alone.
+    // Specifically do not add things here to avoid same-device-type
+    // creation and use semantic tags instead.
     static const std::vector<std::string> kExcludedDevices = {
         "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
         "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.
@@ -68,6 +72,7 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 constexpr uint16_t kOptionPasscode      = 0xffe1;
 constexpr uint16_t kOptionWiFiEmulated  = 0xffe2;
+constexpr uint16_t kOptionThread        = 0xffe3;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -144,6 +149,13 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     return mConfig;
 }
 
+void AppOptions::Reset()
+{
+    sParser.Clear();
+    mConfig            = AppConfig();
+    sIsConfigValidated = false;
+}
+
 CHIP_ERROR AppOptions::ValidateConfig()
 {
     // Default device fallback if no devices are configured
@@ -172,6 +184,13 @@ CHIP_ERROR AppOptions::ValidateConfig()
     }
 
     ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
+
+    if (mConfig.IsWiFiEnabled() && mConfig.IsThreadEnabled())
+    {
+        ChipLogError(AppServer, "Cannot enable both Wi-Fi and Thread on endpoint 0.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     sIsConfigValidated = true;
     return CHIP_NO_ERROR;
 }
@@ -205,6 +224,14 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableWiFi  = true;
         mConfig.emulateWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled with an emulated driver");
+        return true;
+    case kOptionThread:
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        mConfig.threadArgs.push_back(value);
+#else
+        mConfig.threadArgs.push_back("yes");
+        ChipLogProgress(AppServer, "Thread usage enabled");
+#endif
         return true;
     case kOptionKVS:
         mConfig.kvsPath = value;
@@ -327,6 +354,11 @@ OptionSet * AppOptions::GetOptions()
         { "wifi-emulated", kNoArgument, kOptionWiFiEmulated },
 #endif
 #endif
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        { "thread-arg", kArgumentRequired, kOptionThread },
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        { "thread", kNoArgument, kOptionThread },
+#endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "passcode", kArgumentRequired, kOptionPasscode },
@@ -378,6 +410,14 @@ OptionSet * AppOptions::GetOptions()
         result += "       Enable wifi support for commissioning, using an emulated driver that does not\n";
         result += "       touch any real network interface. ConnectNetwork succeeds for any configured network.\n\n";
 #endif
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        result += "  --thread-arg <arg>\n";
+        result += "       Enable Thread and pass <arg> to the OpenThread platform. May be repeated.\n\n";
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        result += "  --thread\n";
+        result += "       Enable Thread management via ot-agent.\n\n";
 #endif
 
         result += "  --KVS <path>\n";

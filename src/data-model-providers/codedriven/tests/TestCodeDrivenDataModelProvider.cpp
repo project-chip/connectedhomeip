@@ -49,15 +49,19 @@ public:
     struct EndpointChange
     {
         EndpointId endpointId;
+        EndpointId parentEndpointId;
         EndpointChangeType type;
 
-        bool operator==(const EndpointChange & other) const { return endpointId == other.endpointId && type == other.type; }
+        bool operator==(const EndpointChange & other) const
+        {
+            return endpointId == other.endpointId && parentEndpointId == other.parentEndpointId && type == other.type;
+        }
     };
 
     void OnAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type) override { mDirtyList.push_back(path); }
-    void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) override
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type) override
     {
-        mEndpointChanges.push_back({ endpointId, type });
+        mEndpointChanges.push_back({ endpointId, parentEndpointId, type });
     }
 
     std::vector<ConcreteAttributePath> mDirtyList;
@@ -274,15 +278,15 @@ constexpr DataModel::EndpointEntry endpointEntry1 = { .id                 = 1,
                                                       .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily };
 
 constexpr DataModel::EndpointEntry endpointEntry2 = { .id                 = 2,
-                                                      .parentId           = kInvalidEndpointId,
+                                                      .parentId           = endpointEntry1.id,
                                                       .compositionPattern = DataModel::EndpointCompositionPattern::kTree };
 
 constexpr DataModel::EndpointEntry endpointEntry3 = { .id                 = 3,
-                                                      .parentId           = kInvalidEndpointId,
+                                                      .parentId           = endpointEntry1.id,
                                                       .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily };
 
 constexpr DataModel::EndpointEntry endpointEntry4 = { .id                 = 4,
-                                                      .parentId           = kInvalidEndpointId,
+                                                      .parentId           = endpointEntry3.id,
                                                       .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily };
 
 constexpr chip::EndpointId clientClusterId1 = 1;
@@ -457,8 +461,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry3));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
     EXPECT_EQ(mProvider.RemoveEndpoint(endpointEntry3.id), CHIP_NO_ERROR);
+    EXPECT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> out;
     EXPECT_EQ(mProvider.Endpoints(out), CHIP_NO_ERROR);
@@ -1122,22 +1126,25 @@ TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedOnAddAndRemove)
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(mChangeListener.mEndpointChanges[0],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
+    EXPECT_EQ(
+        mChangeListener.mEndpointChanges[0],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kAdded }));
 
     mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 2u);
-    EXPECT_EQ(mChangeListener.mEndpointChanges[1],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kAdded }));
+    EXPECT_EQ(
+        mChangeListener.mEndpointChanges[1],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, endpointEntry2.parentId, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
 
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 3u);
-    EXPECT_EQ(mChangeListener.mEndpointChanges[2],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
+    EXPECT_EQ(
+        mChangeListener.mEndpointChanges[2],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kRemoved }));
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedBeforeStartupAndOnShutdown)
@@ -1154,28 +1161,32 @@ TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedBeforeStartupAndOnS
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
     ASSERT_EQ(localListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(localListener.mEndpointChanges[0],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
+    EXPECT_EQ(
+        localListener.mEndpointChanges[0],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
     ASSERT_EQ(localListener.mEndpointChanges.size(), 2u);
-    EXPECT_EQ(localListener.mEndpointChanges[1],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
+    EXPECT_EQ(
+        localListener.mEndpointChanges[1],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kRemoved }));
 
     mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
     ASSERT_EQ(localListener.mEndpointChanges.size(), 3u);
-    EXPECT_EQ(localListener.mEndpointChanges[2],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kAdded }));
+    EXPECT_EQ(
+        localListener.mEndpointChanges[2],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, endpointEntry2.parentId, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
     EXPECT_EQ(localListener.mEndpointChanges.size(), 3u);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
     ASSERT_EQ(localListener.mEndpointChanges.size(), 4u);
-    EXPECT_EQ(localListener.mEndpointChanges[3],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kRemoved }));
+    EXPECT_EQ(
+        localListener.mEndpointChanges[3],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, endpointEntry2.parentId, EndpointChangeType::kRemoved }));
 
     localProvider.UnregisterAttributeChangeListener(localListener);
 }
@@ -1237,15 +1248,17 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointSucceedsAndNotifiesWhenCluste
     EXPECT_EQ(failingCluster.startupCallCount, 1);
     EXPECT_EQ(succeedingCluster.startupCallCount, 1);
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(mChangeListener.mEndpointChanges[0],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
+    EXPECT_EQ(
+        mChangeListener.mEndpointChanges[0],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
     EXPECT_EQ(failingCluster.shutdownCallCount, 1);
     EXPECT_EQ(succeedingCluster.shutdownCallCount, 1);
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 2u);
-    EXPECT_EQ(mChangeListener.mEndpointChanges[1],
-              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
+    EXPECT_EQ(
+        mChangeListener.mEndpointChanges[1],
+        (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, endpointEntry1.parentId, EndpointChangeType::kRemoved }));
 
     EXPECT_EQ(mProvider.RemoveCluster(&failingCluster), CHIP_NO_ERROR);
     EXPECT_EQ(mProvider.RemoveCluster(&succeedingCluster), CHIP_NO_ERROR);

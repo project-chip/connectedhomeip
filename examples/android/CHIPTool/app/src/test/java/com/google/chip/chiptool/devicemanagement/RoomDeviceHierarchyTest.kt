@@ -359,4 +359,33 @@ class RoomDeviceHierarchyTest {
     assertTrue(basicCluster.attributes.any { it.attributeName == "NodeLabel" && it.isWritable })
     assertEquals("General & System", basicCluster.category)
   }
+
+  @Test
+  fun testLastCheckInTextUsesFormatAge() {
+    val now = 1_700_000_000_000L
+    CenterConnectionManager.clock = { now }
+    try {
+      val lightNode = registry.getNode(0x1001L)!!
+
+      HomeStateCache.putCheckIn(0x1001L, 1L, now - 15_000L)
+      val recentCard = RoomDeviceHierarchyMapper.toDeviceCardState(lightNode)
+      assertNotNull(recentCard.lastCheckInText)
+      assertTrue(
+        "Expected '(just now)' in '${recentCard.lastCheckInText}'",
+        recentCard.lastCheckInText!!.endsWith("(just now)"),
+      )
+
+      HomeStateCache.clear()
+      HomeStateCache.putCheckIn(0x1001L, 2L, now - 300_000L)
+      val olderCard = RoomDeviceHierarchyMapper.toDeviceCardState(lightNode)
+      assertNotNull(olderCard.lastCheckInText)
+      assertTrue(
+        "Expected '(5m ago)' in '${olderCard.lastCheckInText}'",
+        olderCard.lastCheckInText!!.endsWith("(5m ago)"),
+      )
+    } finally {
+      CenterConnectionManager.clock = { System.currentTimeMillis() }
+      HomeStateCache.clear()
+    }
+  }
 }

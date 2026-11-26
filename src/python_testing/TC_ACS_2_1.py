@@ -55,9 +55,9 @@ max_value_uint16 = 65535
 min_value_uint32 = 0
 max_value_uint32 = 4294967295
 
-HUMAN_ACTIVITY_NAMESPACE_ID = 0x4B
-OBJECT_IDENTIFICATION_NAMESPACE_ID = 0x49
-SOUND_IDENTIFICATION_NAMESPACE_ID = 0x4A
+HUMAN_ACTIVITY_NAMESPACE_ID = 75  # 0x4B
+OBJECT_IDENTIFICATION_NAMESPACE_ID = 73  # 0x49
+SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 HUMAN_ACTIVITY_MAXTAGNUMBER = 0X09
 OBJECT_IDENTIFICATION_MAXTAGNUMBER = 0X0C
@@ -103,12 +103,12 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
         # Add attribute values for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
-        if self.is_ci:
+        if self.is_ci:  # for ci testing purpose, all values are hard coded.
             ci_wait_time = 1
             self.write_to_app_pipe({
                 "Name": "SetAmbientContextSupport",
                 "EndpointId": endpoint,
-                "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
+                "AmbientContextType": [{"TypeId": 73, "TagId": 0}, {"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
             })
             await asyncio.sleep(ci_wait_time)
 
@@ -129,6 +129,9 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 "AmbientContextType": [{"TypeId": 74, "TagId": 4}]
             })
             await asyncio.sleep(ci_wait_time)
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Input AmbientContextTypeSupported attribute values (ex. SetAmbientContextSupport function), SensorFusionSupported attribute values (ex. SetSensorFusionSupported function), and AmbientContextType attribute value (ex. AddAmbientContextDetect function). Press ENTER after done.")
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
@@ -241,42 +244,57 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                                 "Expected True or False Boolean value.")
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
-            # read test attribute from the current DUT attribute (just one object identification)
-            for acts in ambientContextTypeSupported:
-                nsID = acts.namespaceID
-                tagID = acts.tag
-                if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
-                    OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
+            # obtain ObjectCountConfig test attribute from the current DUT attribute
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
-            OBJECT_COUNT_THRESHOLD = objectCountConfig.objectCountThreshold
+            log.info("Rx'd objectCountConfig: %s", objectCountConfig)
 
-            # write back
+            asserts.assert_equal(objectCountConfig.countingObject.namespaceID,
+                                 OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
+            tag_read = objectCountConfig.countingObject.tag
+            asserts.assert_less_equal(tag_read, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
+            threshold_read = objectCountConfig.objectCountThreshold
+            asserts.assert_greater_equal(threshold_read, 1,
+                                         "Threshold value should be greater than equalt to 1.")
+            # check if the counting object tag is supported (including 0 = unknown), if not then fail.
+            if ambientContextTypeSupported:
+                find_ind = 0
+                for acts in ambientContextTypeSupported:
+                    nsID = acts.namespaceID
+
+                    if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        tagID = acts.tag
+                        if tagID == tag_read:
+                            find_ind = find_ind+1
+                asserts.assert_greater_equal(
+                    find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
+
+            # write the object count configuration back to the device (write a Person tag for clarity instead)
             semantic_tag = Globals.Structs.SemanticTagStruct(
-                mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
+                mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=tag_read, label=None)
+            log.info("Rx'd semantic_tag: %s", semantic_tag)
             objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
-                countingObject=semantic_tag, objectCountThreshold=OBJECT_COUNT_THRESHOLD)
-
+                countingObject=semantic_tag, objectCountThreshold=threshold_read)
+            log.info("Rx'd objectCountConfig_input: %s", objectCountConfig_input)
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
-            await asyncio.sleep(1)
 
             # Read test attributes
-            objectCountConfig = await self.read_single_attribute_check_success(
+            objectCountConfig_again = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig
             )
 
-            nsID = objectCountConfig.countingObject.namespaceID
-            tagID = objectCountConfig.countingObject.tag
+            nsID = objectCountConfig_again.countingObject.namespaceID
+            tagID = objectCountConfig_again.countingObject.tag
 
             # object should come from Identified Object namespace
             asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
-            asserts.assert_equal(tagID, OBJECT_IDENTIFICATION_NAMESPACE_TAG, "Not Identified Object Namespace Tag")
+            asserts.assert_equal(tagID, tag_read, "Not Identified Object Namespace Tag")
             asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
 
             # ObjectCountThreshold should be greater than equal to 1
-            asserts.assert_equal(objectCountConfig.objectCountThreshold,
-                                 OBJECT_COUNT_THRESHOLD, "Not the same object count threshold")
-            asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
+            asserts.assert_equal(objectCountConfig_again.objectCountThreshold,
+                                 threshold_read, "Not the same object count threshold")
+            asserts.assert_greater_equal(objectCountConfig_again.objectCountThreshold, 1,
                                          "Threshold value should be greater than equalt to 1.")
 
             # ObjectCount test (optional)

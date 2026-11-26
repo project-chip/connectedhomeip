@@ -60,6 +60,16 @@ config CHIP_APP_LOG_LEVEL
 config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	imply REBOOT
 
+config CHIP_OTA_BACKEND_CUSTOM
+	bool
+	help
+	  Selected by a platform that provides its own OTA image processor and
+	  OTA image packaging instead of MCUboot.
+
+# Default: MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	def_bool CHIP_OTA_REQUESTOR && !CHIP_OTA_BACKEND_CUSTOM
+
 # See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
 	imply SHELL

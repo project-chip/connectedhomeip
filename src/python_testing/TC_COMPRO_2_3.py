@@ -51,7 +51,9 @@ suite, see ``support_modules/compro_support.py``.
 
 Tests ProxyBackGroundScanStartRequest / ProxyBackGroundScanStopRequest with subscription
 monitoring of CachedResults and NumCachedResults attributes.  Also covers the Timeout
-parameter and negative transport/band validation.
+parameter and negative transport/band validation.  Other commissionable devices in radio
+range may also be cached; while the scan runs, only entries with the ED's discriminator
+(``ed_discriminator``) are judged.
 
 Test plan reference: TC-COMPRO-2.3
 PICS requirement: COMPRO.S.F01 (BackgroundScan feature)
@@ -143,20 +145,24 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
                      "Timeout=0, WiFiBands=valid_bands if WI supported)",
                      "DUT responds with SUCCESS"),
             TestStep(7, "TH monitors for 40 s while ED is NOT commissionable",
-                     "NumCachedResults == 0; CachedResults is null"),
+                     "No CachedResults entry has the ED's Discriminator; in every subscription report and "
+                     "in a final read NumCachedResults equals the number of CachedResults entries; in the "
+                     "final read CachedResults is null when NumCachedResults is 0"),
             TestStep(8, "Ensure ED IS commissionable"),
-            TestStep(9, "TH monitors until NumCachedResults >= 1 (up to 40 s)",
-                     "NumCachedResults >= 1; NumCachedResults equals the number of CachedResults "
-                     "entries; CachedResults has at least one entry with non-zero Transport, "
-                     "valid Discriminator, VendorID, ProductID"),
+            TestStep(9, "TH monitors until CachedResults has the ED's entry (up to 40 s)",
+                     "A subscription report carries the ED's entry and the reported NumCachedResults "
+                     "matches it; CachedResults has an entry with the ED's Discriminator and a single "
+                     "non-zero Transport; NumCachedResults equals the number of CachedResults entries"),
             TestStep(10, "TH reads CacheTimeout attribute",
                      "Store as cache_timeout"),
             TestStep(11, "Ensure ED is NOT commissionable"),
-            TestStep(12, "TH monitors until cache clears (up to cache_timeout + 10 s)",
-                     "NumCachedResults drops to 0; CachedResults becomes null"),
+            TestStep(12, "TH monitors until the ED's entry expires (up to cache_timeout + 10 s)",
+                     "A subscription report shows the ED's entry removed from CachedResults and the "
+                     "reported NumCachedResults matches it; CachedResults is null when NumCachedResults is 0"),
             TestStep(13, "Ensure ED IS commissionable again"),
-            TestStep(14, "TH monitors until NumCachedResults >= 1 again (up to 40 s)",
-                     "NumCachedResults >= 1 (ED re-appears in background scan cache)"),
+            TestStep(14, "TH monitors until CachedResults has the ED's entry again (up to 40 s)",
+                     "A subscription report carries the ED's entry again and the reported "
+                     "NumCachedResults matches it"),
             TestStep(15, "TH sends ProxyBackGroundScanStopRequest(Transport=valid_transports, "
                      "WiFiBands=valid_bands if WI supported)",
                      "DUT responds with SUCCESS"),
@@ -224,7 +230,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         # internally; reports are pushed by the DUT and queued in handler.attribute_queue.
         self.step(5)
         handler = AttributeSubscriptionHandler(expected_cluster=cp)
-        await handler.start(
+        subscription = await handler.start(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=self.cp_endpoint,
@@ -232,6 +238,8 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
             max_interval_sec=30,
             keepSubscriptions=False,
         )
+        # handler.attribute_reports holds only the reports after this priming value.
+        primed_num_cached = subscription.GetAttributes()[self.cp_endpoint][cp][cp.Attributes.NumCachedResults]
         # Cancel unconditionally: steps 6-17 can raise, and the explicit cancel at
         # step 18 would then never run, leaving the subscription open for the rest of
         # the process.  Shutdown() warns and returns if already done, so the step-18
@@ -250,8 +258,21 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         # standard SDK pattern (see event_attribute_reporting.py, TC_RR_1_1.py).
         # ------------------------------------------------------------------
 
-        def _monitor_sub_empty(duration_sec: int):
-            """Drain reports for duration_sec s; fail if NumCachedResults ever != 0."""
+        ed_discriminator = self.ed_discriminator
+
+        def _assert_no_ed_entry(cached_results, label: str):
+            """Fail if the ED has an entry or the list breaks the duplicate or Discriminator range rules."""
+            self.assert_entries_unique_and_in_range(cached_results, f"{label} CachedResults")
+            ed_results, other_results = self.split_ed_entries(cached_results)
+            logger.info("%s: other devices cached: %s", label, self.describe_entries(other_results))
+            asserts.assert_false(
+                ed_results,
+                f"{label}: CachedResults has an entry with the ED's discriminator {ed_discriminator} while "
+                f"the ED is not commissionable (another device may share it): "
+                f"{self.describe_entries(ed_results)}")
+
+        def _monitor_no_ed_entry(duration_sec: int):
+            """Drain reports for duration_sec s; fail if a CachedResults report holds the ED's entry."""
             deadline = time.time() + duration_sec
             while True:
                 remaining = deadline - time.time()
@@ -259,31 +280,49 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
                     break
                 try:
                     item = handler.attribute_queue.get(block=True, timeout=remaining)
-                    if item.attribute == cp.Attributes.NumCachedResults:
-                        logger.info("Sub report (step 7): NumCachedResults=%d", item.value)
-                        asserts.assert_equal(
-                            item.value, 0,
-                            f"NumCachedResults={item.value} while ED is not commissionable")
+                    if item.attribute == cp.Attributes.CachedResults:
+                        _assert_no_ed_entry(item.value, "Sub report (step 7)")
                 except queue.Empty:
                     break  # No report within the window — correct
 
-        def _wait_for_num_cached(condition_fn, timeout_sec: int, label: str):
-            """Block until a NumCachedResults report satisfies condition_fn."""
+        def _wait_for_ed_entry(present: bool, timeout_sec: int, label: str) -> bool:
+            """Block until a CachedResults report has (or lacks) the ED's entry; False on timeout.
+
+            Returns instead of failing so the caller's direct read can name the cause first.
+            """
             deadline = time.time() + timeout_sec
             while True:
                 remaining = deadline - time.time()
                 if remaining <= 0:
-                    asserts.fail(f"{label}: NumCachedResults condition not met "
-                                 f"within {timeout_sec} s")
+                    return False
                 try:
                     item = handler.attribute_queue.get(block=True, timeout=remaining)
-                    if item.attribute == cp.Attributes.NumCachedResults:
-                        logger.info("Sub report (%s): NumCachedResults=%d", label, item.value)
-                        if condition_fn(item.value):
-                            return item.value
                 except queue.Empty:
-                    asserts.fail(f"{label}: NumCachedResults condition not met "
-                                 f"within {timeout_sec} s")
+                    return False
+                if item.attribute == cp.Attributes.CachedResults:
+                    ed_results, other_results = self.split_ed_entries(item.value)
+                    logger.info("Sub report (%s): %d entries for the ED, %d for other devices",
+                                label, len(ed_results), len(other_results))
+                    if bool(ed_results) == present:
+                        return True
+
+        async def _assert_reported_count_matches(label: str, attempts: int = 3):
+            """Fail unless the last reported (or primed) NumCachedResults equals the size of the last CachedResults report.
+
+            The two reports can arrive a moment apart, so a mismatch is re-checked before failing.
+            """
+            for attempt in range(1, attempts + 1):
+                reports = handler.attribute_reports
+                count_reports = reports[cp.Attributes.NumCachedResults]
+                reported_count = count_reports[-1].value if count_reports else primed_num_cached
+                reported_list = reports[cp.Attributes.CachedResults][-1].value
+                reported_entries = 0 if reported_list is NullValue else len(reported_list)
+                if reported_count == reported_entries or attempt == attempts:
+                    break
+                await asyncio.sleep(1)
+            asserts.assert_equal(reported_count, reported_entries,
+                                 f"{label}: the last reported NumCachedResults must equal the number of entries "
+                                 "in the last CachedResults report")
 
         # Step 6 — send ProxyBackGroundScanStartRequest (Timeout=0: infinite)
         self.step(6)
@@ -297,66 +336,65 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         # Timeout=0 runs until stopped, and step 15 is eight steps away.
         self.register_bgscan_stop(valid_transports, valid_bands if has_wi else None)
 
-        # Step 7 — verify cache stays empty for 40 s via subscription monitoring.
-        # Any subscription report with NumCachedResults != 0 fails the step immediately.
+        # Step 7 — verify the ED never appears in the cache for 40 s via subscription
+        # monitoring.  A report holding the ED's entry fails the step immediately.
         # A direct read at the end confirms the final state.
         self.step(7)
         logger.info("Monitoring subscription for 40 s (ED not commissionable)...")
-        _monitor_sub_empty(40)
-        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-        cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
+        step7_reports = []
+
+        def _record_report(transaction):
+            # Runs on the Matter thread once the whole report is applied, so it records
+            # both values for the test to check rather than asserting.
+            values = transaction.GetAttributes()[self.cp_endpoint][cp]
+            step7_reports.append((values[cp.Attributes.NumCachedResults], values[cp.Attributes.CachedResults]))
+
+        subscription.SetReportEndCallback(_record_report)
+        _monitor_no_ed_entry(40)
+        subscription.SetReportEndCallback(None)
+        logger.info("Step 7: %d subscription reports checked", len(step7_reports))
+        for reported_count, reported_list in list(step7_reports):
+            reported_entries = 0 if reported_list is NullValue else len(reported_list)
+            asserts.assert_equal(reported_count, reported_entries,
+                                 f"Step 7: a subscription report has NumCachedResults={reported_count} but "
+                                 f"{reported_entries} CachedResults entries")
+        num_cached, cached_results = await self.read_cached_results()
         logger.info("After 40 s (no ED): NumCachedResults=%d", num_cached)
-        asserts.assert_equal(num_cached, 0,
-                             "NumCachedResults must be 0 when no ED is commissionable")
-        asserts.assert_equal(cached_results, NullValue,
-                             "CachedResults must be null when no ED is commissionable")
+        _assert_no_ed_entry(cached_results, "Step 7")
 
         # Step 8 — make ED commissionable
         self.step(8)
         await self.ensure_ed_commissionable(ed)
 
-        # Step 9 — wait for background scan cache to populate via subscription.
-        # The subscription report signals the exact moment the DUT updates the cache.
+        # Step 9 — wait for the ED's entry via subscription, then validate it on a
+        # direct read (which also checks NumCachedResults against the entries).
         self.step(9)
-        logger.info("Waiting up to 40 s for NumCachedResults >= 1 via subscription...")
-        _wait_for_num_cached(lambda v: v >= 1, 40, "step 9")
-        # Direct read for detailed entry validation (NumCachedResults + CachedResults).
-        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-        cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
-        asserts.assert_greater_equal(num_cached, 1,
-                                     "NumCachedResults must be >= 1 after ED becomes commissionable")
-        asserts.assert_not_equal(cached_results, NullValue,
-                                 "CachedResults must not be null after ED becomes commissionable")
-        asserts.assert_greater_equal(len(cached_results), 1,
-                                     "CachedResults must have at least one entry")
-        asserts.assert_equal(num_cached, len(cached_results),
-                             "NumCachedResults must equal the number of CachedResults entries")
-        result = cached_results[0]
-        asserts.assert_not_equal(result.transport, 0,
-                                 "CachedResult entry Transport must be non-zero")
-        asserts.assert_equal(result.transport & (result.transport - 1), 0,
-                             f"CachedResult entry Transport 0x{result.transport:02x} must have exactly "
-                             "one bit set (single transport)")
-        asserts.assert_less_equal(result.discriminator, 4095,
-                                  "CachedResult entry Discriminator must be <= 4095")
-        # Cache holds one entry per unique device (CommissioningProxy.adoc CachedResults:
-        # "each unique device based on discriminator, VendorID, ProductID and Transport").
-        seen_keys = set()
-        for r in cached_results:
-            key = (r.discriminator, r.vendorID, r.productID, r.transport)
-            asserts.assert_true(
-                key not in seen_keys,
-                f"Duplicate cached result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
-                f"productID={r.productID}, transport=0x{r.transport:02x}); CachedResults must hold one "
-                "entry per unique discriminator/VendorID/ProductID/Transport")
-            seen_keys.add(key)
+        logger.info("Waiting up to 40 s for the ED's entry in CachedResults via subscription...")
+        reported = _wait_for_ed_entry(True, 40, "step 9")
+        num_cached, cached_results = await self.read_cached_results()
+        ed_results, other_results = self.split_ed_entries(cached_results)
+        logger.info("Step 9: NumCachedResults=%d; other devices cached: %s",
+                    num_cached, self.describe_entries(other_results))
+        if not ed_results:
+            await self.fail_ed_missing("Step 9", other_results)
+        asserts.assert_true(reported, "Step 9: CachedResults has the ED's entry, but no subscription report "
+                            "carried it within 40 s")
+        await _assert_reported_count_matches("Step 9")
         # WiFiBand is populated only for PAFTP results (CommissioningProxy.adoc
         # WiFiBand Field of ScanResultStruct).  A BLE-discovered entry leaves it
         # null even when the WI feature is supported.
         wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
-        if has_wi and (result.transport & wifipaf_bit):
-            asserts.assert_not_equal(result.wiFiBand, NullValue,
-                                     "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
+        for result in ed_results:
+            asserts.assert_not_equal(result.transport, 0,
+                                     "CachedResult entry Transport must be non-zero")
+            asserts.assert_equal(result.transport & (result.transport - 1), 0,
+                                 f"CachedResult entry Transport 0x{result.transport:02x} must have exactly "
+                                 "one bit set (single transport)")
+            if has_wi and (result.transport & wifipaf_bit):
+                asserts.assert_true(
+                    result.wiFiBand not in (None, NullValue, 0),
+                    "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
+        self.assert_entries_unique_and_in_range(cached_results, "Step 9 CachedResults")
 
         # Step 10 — read CacheTimeout
         self.step(10)
@@ -376,29 +414,42 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         self.step(11)
         await self.ensure_ed_not_commissionable(ed)
 
-        # Step 12 — wait for cache to expire via subscription.
-        # We receive the moment the DUT drops NumCachedResults to 0.
+        # Step 12 — wait for the ED's entry to expire via subscription; a direct read
+        # confirms it.  Other devices that keep advertising stay cached.
         self.step(12)
         expiry_deadline = cache_timeout + 10
-        logger.info("Waiting up to %d s for cache to expire via subscription...", expiry_deadline)
-        _wait_for_num_cached(lambda v: v == 0, expiry_deadline, "step 12")
-        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-        cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
-        asserts.assert_equal(num_cached, 0, "NumCachedResults must be 0 after cache timeout")
-        asserts.assert_equal(cached_results, NullValue,
-                             "CachedResults must be null after cache timeout")
+        logger.info("Waiting up to %d s for the ED's entry to expire via subscription...", expiry_deadline)
+        reported = _wait_for_ed_entry(False, expiry_deadline, "step 12")
+        num_cached, cached_results = await self.read_cached_results()
+        self.assert_entries_unique_and_in_range(cached_results, "Step 12 CachedResults")
+        ed_results, other_results = self.split_ed_entries(cached_results)
+        logger.info("Step 12: NumCachedResults=%d; other devices cached: %s",
+                    num_cached, self.describe_entries(other_results))
+        asserts.assert_false(ed_results,
+                             f"The ED's entry must expire from CachedResults within {expiry_deadline} s: "
+                             f"{self.describe_entries(ed_results)}")
+        asserts.assert_true(reported, "Step 12: the ED's entry expired from CachedResults, but no subscription "
+                            f"report showed it removed within {expiry_deadline} s")
+        await _assert_reported_count_matches("Step 12")
 
         # Step 13 — make ED commissionable again to verify continuous background scan
         self.step(13)
         await self.ensure_ed_commissionable(ed)
 
-        # Step 14 — wait for cache to re-populate via subscription
+        # Step 14 — wait for the ED's entry to re-appear via subscription
         self.step(14)
-        logger.info("Waiting up to 40 s for NumCachedResults >= 1 (ED re-appears)...")
-        _wait_for_num_cached(lambda v: v >= 1, 40, "step 14")
-        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-        asserts.assert_greater_equal(num_cached, 1,
-                                     "NumCachedResults must be >= 1 after ED re-appears")
+        logger.info("Waiting up to 40 s for the ED's entry to re-appear...")
+        reported = _wait_for_ed_entry(True, 40, "step 14")
+        num_cached, cached_results = await self.read_cached_results()
+        self.assert_entries_unique_and_in_range(cached_results, "Step 14 CachedResults")
+        ed_results, other_results = self.split_ed_entries(cached_results)
+        logger.info("Step 14: NumCachedResults=%d; other devices cached: %s",
+                    num_cached, self.describe_entries(other_results))
+        if not ed_results:
+            await self.fail_ed_missing("Step 14", other_results)
+        asserts.assert_true(reported, "Step 14: CachedResults has the ED's entry again, but no subscription "
+                            "report carried it within 40 s")
+        await _assert_reported_count_matches("Step 14")
 
         # Step 15 — stop the background scan
         self.step(15)

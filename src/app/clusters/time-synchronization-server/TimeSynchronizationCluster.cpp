@@ -495,7 +495,7 @@ void TimeSynchronizationCluster::OnDone(ReadClient * apReadClient)
 
 void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
 {
-    if (timeSource != TimeSourceEnum::kNone && granularity == GranularityEnum::kNoTimeGranularity)
+    if (granularity == GranularityEnum::kNoTimeGranularity)
     {
         // Unable to get time from the delegate. Try remaining sources.
         CHIP_ERROR err = AttemptToGetTimeFromTrustedNode();
@@ -864,6 +864,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityE
             ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
+        mOnTimeSyncCompletion.Cancel(); // A pending platform time request is now moot
         GetDelegate()->UTCTimeAvailabilityChanged(utct);
         SetAttributeValue(mGranularity, gran, Granularity::Id);
         SetAttributeValue(mTimeSource, tsrc, TimeSource::Id);

@@ -131,6 +131,35 @@
       android:paddingBottom="8dp"
       tools:listitem="@layout/item_cluster_attribute_editor" />
 
+  <!-- Check-ins Section -->
+  <LinearLayout
+      android:id="@+id/checkInsSection"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="@color/colorSurfaceVariant"
+      android:padding="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Check-ins"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:paddingBottom="4dp"/>
+
+    <ScrollView
+        android:id="@+id/checkInsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+      <LinearLayout
+          android:id="@+id/checkInsContainer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical" />
+    </ScrollView>
+  </LinearLayout>
+
   <!-- Recent Events Section -->
   <LinearLayout
       android:layout_width="match_parent"

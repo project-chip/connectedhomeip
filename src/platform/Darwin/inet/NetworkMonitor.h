@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include <Network/Network.h>
