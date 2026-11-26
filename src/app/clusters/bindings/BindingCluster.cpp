@@ -338,6 +338,10 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
 void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
                                                     FabricIndex accessingFabric)
 {
+    if (path.mAttributeId != Binding::Attributes::Binding::Id)
+    {
+        return;
+    }
     if (opType == DataModel::ListWriteOperation::kListWriteBegin)
     {
         SnapshotBindingList(path.mEndpointId, accessingFabric);

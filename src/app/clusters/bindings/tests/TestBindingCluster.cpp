@@ -107,8 +107,7 @@ class ReadBindingOnChange : public app::DataModel::AttributeChangeListener
 public:
     ReadBindingOnChange(BindingCluster & cluster, FabricIndex fabric, DataVersion version,
                         const std::vector<TableEntry> & expected) :
-        mCluster(cluster),
-        mFabric(fabric), mVersion(version), mExpected(expected)
+        mCluster(cluster), mFabric(fabric), mVersion(version), mExpected(expected)
     {}
     void OnAttributeChanged(const app::ConcreteAttributePath &, app::DataModel::AttributeChangeType) override
     {
@@ -230,6 +229,78 @@ TEST_F(TestBindingCluster, ReadsBetweenChunksKeepOriginalValueAndVersionUntilCom
             ExpectBindingRead(cluster, otherFabric, true, finalVersion, { other });
             finalBindings.push_back(other);
             ExpectBindingRead(cluster, fabric, false, finalVersion, finalBindings);
+        }
+    }
+}
+
+TEST_F(TestBindingCluster, UnrelatedListNotificationsPreserveActiveBindingWrite)
+{
+    using ListWriteOperation = app::DataModel::ListWriteOperation;
+    for (auto unrelatedEnd : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        for (bool otherFabric : { false, true })
+        {
+            for (bool failBinding : { false, true })
+            {
+                TestPersistentStorageDelegate storage;
+                Binding::Manager manager;
+                auto & table = manager.GetBindingTable();
+                table.SetPersistentStorage(&storage);
+                constexpr auto fabric = chip::Testing::kTestFabricIndex;
+                const auto original   = TableEntry::ForGroup(fabric, 1, 1, std::nullopt);
+                ASSERT_SUCCESS(table.Add(original));
+                BindingCluster cluster({ table, manager, DeviceLayer::PlatformMgr() }, 1);
+                chip::Testing::ClusterTester tester(cluster);
+                ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+                auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+                const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+                const app::ConcreteAttributePath bindingPath(1, Binding::Id, Binding::Attributes::Binding::Id);
+                const app::ConcreteAttributePath unrelatedPath(1, Binding::Id, Binding::Attributes::AttributeList::Id);
+                const auto version = cluster.GetDataVersion(clusterPath);
+                cluster.ListAttributeWriteNotification(bindingPath, ListWriteOperation::kListWriteBegin, fabric);
+                chip::Testing::WriteOperation write(bindingPath);
+                write.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+                write.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+                auto clear = write.DecoderFor(app::DataModel::List<const TargetStructType>());
+                ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), clear).IsSuccess());
+                ASSERT_EQ(table.Size(), 0u);
+
+                // Read-only list writes can produce notifications before the provider rejects them.
+                const auto accessingFabric = otherFabric ? static_cast<FabricIndex>(fabric + 1) : fabric;
+                cluster.ListAttributeWriteNotification(unrelatedPath, ListWriteOperation::kListWriteBegin, accessingFabric);
+                ExpectBindingRead(cluster, fabric, true, version, { original });
+                cluster.ListAttributeWriteNotification(unrelatedPath, unrelatedEnd, accessingFabric);
+                ExpectBindingRead(cluster, fabric, true, version, { original });
+                EXPECT_TRUE(tester.GetDirtyList().empty());
+
+                write.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
+                TargetStructType target{ .group       = MakeOptional(failBinding ? kUndefinedGroupId : GroupId{ 1 }),
+                                         .fabricIndex = fabric };
+                auto append = write.DecoderFor(target);
+                if (failBinding)
+                {
+                    // The invalid group is rejected after the earlier chunk has cleared the table.
+                    EXPECT_EQ(cluster.WriteAttribute(write.GetRequest(), append), Status::ConstraintError);
+                }
+                else
+                {
+                    ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), append).IsSuccess());
+                }
+                ExpectBindingRead(cluster, fabric, true, version, { original });
+                EXPECT_TRUE(tester.GetDirtyList().empty());
+                cluster.ListAttributeWriteNotification(
+                    bindingPath, failBinding ? ListWriteOperation::kListWriteFailure : ListWriteOperation::kListWriteSuccess,
+                    fabric);
+                EXPECT_EQ(tester.IsAttributeDirty(Binding::Attributes::Binding::Id), failBinding);
+                if (failBinding)
+                {
+                    ExpectBindingRead(cluster, fabric, true, version + 1, {});
+                }
+                else
+                {
+                    ExpectBindingRead(cluster, fabric, true, version, { original });
+                }
+            }
         }
     }
 }
