@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -382,10 +382,46 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
         // no longer create groups here, but on a by-service basis in PublishService()
         mInitCallback(mAsyncReturnContext, CHIP_NO_ERROR);
         break;
-    case AVAHI_CLIENT_FAILURE:
-        ChipLogError(DeviceLayer, "Avahi client failure");
-        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
+    case AVAHI_CLIENT_FAILURE: {
+        // An avahi client never leaves AVAHI_CLIENT_FAILURE by itself. This is
+        // what happens when avahi-daemon is restarted/stopped after we connected
+        // (AVAHI_ERR_DISCONNECTED), e.g. during TV boot or by another service.
+        // Previously this was only reported as a generic error, so DNS-SD stayed
+        // dead: every operational resolve of an already-paired node failed and
+        // the controller could not reconnect until the process was restarted.
+        //
+        // Recover the same way as a name collision: fail outstanding resolves so
+        // callers retry, and request a full DNS-SD restart (FORCED_RESET ->
+        // DiscoveryImplPlatform::Shutdown() + kDnssdRestartNeeded -> re-init),
+        // which creates a fresh client with AVAHI_CLIENT_NO_FAIL that reconnects
+        // as soon as the daemon is back. Deferred so the client is not freed from
+        // inside its own state callback.
+        const int avahiErr = avahi_client_errno(client);
+        ChipLogError(DeviceLayer, "Avahi client failure: %s -> restarting DNS-SD", avahi_strerror(avahiErr));
+
+        std::list<ResolveContext *> pending;
+        pending.swap(mAllocatedResolves);
+        for (ResolveContext * ctx : pending)
+        {
+            ctx->mCallback(ctx->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+            chip::Platform::Delete(ctx);
+        }
+
+        DnssdAsyncReturnCallback errorCallback = mErrorCallback;
+        void * errorContext                    = mAsyncReturnContext;
+        CHIP_ERROR err                         = chip::DeviceLayer::SystemLayer().ScheduleLambda([errorCallback, errorContext]() {
+            if (errorCallback != nullptr)
+            {
+                errorCallback(errorContext, CHIP_ERROR_FORCED_RESET);
+            }
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule DNS-SD restart: %" CHIP_ERROR_FORMAT, err.Format());
+            mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
+        }
         break;
+    }
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
