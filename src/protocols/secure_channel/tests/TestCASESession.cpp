@@ -138,6 +138,14 @@ public:
                                           TestCASESecurePairingDelegate & delegateCommissioner);
 
     void SimulateUpdateNOCInvalidatePendingEstablishment();
+
+    // Drops the retransmission of the message the session is waiting on a response to, as MRP does when it runs
+    // out of retransmissions, so the exchange still expects a response that can no longer arrive.
+    void GiveUpRetransmittingSessionMessage(CASESession & session)
+    {
+        ASSERT_NE(session.mExchangeCtxt.Get(), nullptr);
+        GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(session.mExchangeCtxt->GetReliableMessageContext());
+    }
     void BusyReportsRemainingSigma2Time();
 };
 
@@ -996,9 +1004,6 @@ TEST_F_FROM_FIXTURE(TestCASESession, BusyReportsRemainingSigma2Time)
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-// Waits in real time for MRP to stop retransmitting, which only host builds do
-// within the test's time budget.
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
 {
     TemporarySessionManager sessionManager(*this);
@@ -1019,25 +1024,20 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
               CHIP_NO_ERROR);
 
     // Deliver the first initiator's Sigma1, then lose everything after it, so
-    // the responder's Sigma2 and all of its retransmissions go unacknowledged.
-    // Short retransmission intervals make the responder give up quickly.
+    // the responder's Sigma2 never reaches it.
     loopback.mNumMessagesToAllowBeforeDropping = 1;
     loopback.mNumMessagesToDrop                = 1000;
 
-    constexpr ReliableMessageProtocolConfig kFastMRP(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10));
     ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(&pairingCommissioner1);
     EXPECT_EQ(pairingCommissioner1.EstablishSession(sessionManager, &gCommissionerFabrics,
                                                     ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
-                                                    nullptr, nullptr, &delegateCommissioner1, MakeOptional(kFastMRP)),
+                                                    nullptr, nullptr, &delegateCommissioner1, NullOptional),
               CHIP_NO_ERROR);
-
-    // Wait until every reliable send, including the responder's Sigma2, has
-    // run out of retransmissions.
-    auto * rm = GetExchangeManager().GetReliableMessageMgr();
-    GetIOContext().DriveIOUntil(System::Clock::Seconds16(10),
-                                [&] { return loopback.mDroppedMessageCount >= 2 && rm->TestGetCountRetransTable() == 0; });
-    ASSERT_EQ(rm->TestGetCountRetransTable(), 0);
+    ServiceEvents();
     ASSERT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+    // The responder's MRP runs out of retransmissions for its Sigma2.
+    GiveUpRetransmittingSessionMessage(gPairingServer.GetSession());
 
     // The first initiator goes away; the network works again.
     pairingCommissioner1.Clear();
@@ -1061,7 +1061,6 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
     loopback.SetLoopbackTransportDelegate(nullptr);
     gPairingServer.Shutdown();
 }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_WITH_NLFAULTINJECTION
 
