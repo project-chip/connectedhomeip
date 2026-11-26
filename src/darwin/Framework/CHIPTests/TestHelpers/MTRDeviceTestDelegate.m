@@ -90,6 +90,14 @@
     return self.skipExpectedValuesForWrite;
 }
 
+- (void)unitTestWriteDidInstallExpectedValue:(MTRDevice *)device attributePath:(MTRAttributePath *)attributePath
+{
+    void (^block)(MTRAttributePath *) = self.onWriteDidInstallExpectedValue;
+    if (block) {
+        block(attributePath);
+    }
+}
+
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
 {
     return self.forceAttributeReportsIfMatchingCache;

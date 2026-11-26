@@ -283,6 +283,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
     MTRDeviceWriteRequestFieldTimeoutIndex = 2,
     MTRDeviceWriteRequestFieldExpectedValueIDIndex = 3,
     MTRDeviceWriteRequestFieldExpectedValueIntervalIndex = 4,
+    MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex = 5,
 };
 
 // The expiration time of an expected value whose request is still waiting in the work queue.  Its interval has
@@ -455,6 +456,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
+- (void)unitTestWriteDidInstallExpectedValue:(MTRDevice *)device attributePath:(MTRAttributePath *)attributePath;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
@@ -3880,6 +3882,20 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         [self _setPendingExpectedValues:@[ newExpectedValueDictionary ] expectedValueID:&expectedValueID];
     }
 
+#ifdef DEBUG
+    if (useValueAsExpectedValue) {
+        // Called without the lock held, so a test can hold this write here while other writes run.
+        id testDelegate;
+        {
+            std::lock_guard lock(_lock);
+            testDelegate = [_delegateManager firstDelegate];
+        }
+        if ([testDelegate respondsToSelector:@selector(unitTestWriteDidInstallExpectedValue:attributePath:)]) {
+            [testDelegate unitTestWriteDidInstallExpectedValue:self attributePath:attributePath];
+        }
+    }
+#endif
+
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
     MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
@@ -3892,8 +3908,9 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     //
     // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts.  A fifth item, the expected
     // value interval, travels with the expected value ID so that a write merged into an earlier work item starts its
-    // own interval when that work item sends it.
-    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID), useValueAsExpectedValue ? expectedValueInterval : [NSNull null] ];
+    // own interval when that work item sends it.  A sixth item lists the [ path, expectedValueID ] of each write
+    // that a later write replaced while merging, whose value is never sent.
+    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID), useValueAsExpectedValue ? expectedValueInterval : [NSNull null], [NSMutableArray array] ];
 
     NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
 
@@ -3918,8 +3935,19 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 return outcome;
             }
 
-            // Replace our one request with the first one from the next item.
-            auto writeItem = writeRequestsNext.firstObject;
+            // Replace our one request with the first one from the next item.  The replaced request's value is
+            // never sent, so its expected value is removed when this work item sends, fails or is cancelled.  This
+            // work item's own request is not listed: those paths already handle its expected value.
+            NSArray * replacedRequest = writeRequestsCurrent[0];
+            NSMutableArray<NSArray *> * mergedOutExpectedValues = replacedRequest[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex];
+            NSNumber * replacedExpectedValueID = replacedRequest[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
+            if (replacedRequest[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex] != [NSNull null]
+                && replacedExpectedValueID.unsignedLongLongValue != expectedValueID) {
+                [mergedOutExpectedValues addObject:@[ replacedRequest[MTRDeviceWriteRequestFieldPathIndex], replacedExpectedValueID ]];
+            }
+            NSMutableArray * writeItem = [writeRequestsNext.firstObject mutableCopy];
+            [mergedOutExpectedValues addObjectsFromArray:writeItem[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex]];
+            writeItem[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex] = mergedOutExpectedValues;
             [writeRequestsNext removeObjectAtIndex:0];
             [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
             MTR_LOG("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
@@ -3956,8 +3984,9 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // write did not set one; it is a no-op when the merged write replaced it.
         NSNumber * requestExpectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
         id requestExpectedValueInterval = request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex];
+        NSArray<NSArray *> * mergedOutExpectedValues = [request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex] copy];
         MTRRequestWillBeSentHandler requestWillBeSent = nil;
-        if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null]) {
+        if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null] || mergedOutExpectedValues.count) {
             mtr_weakify(self);
             MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             requestWillBeSent = ^BOOL {
@@ -3979,6 +4008,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                        expectedValueID:requestExpectedValueID.unsignedLongLongValue
                                                  expectedValueInterval:requestExpectedValueInterval];
                 }
+                [self _removeMergedOutWriteExpectedValues:mergedOutExpectedValues];
                 return YES;
             };
         }
@@ -4006,6 +4036,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                        if (requestExpectedValueInterval != [NSNull null]) {
                                            [self removeExpectedValueForAttributePath:path expectedValueID:requestExpectedValueID.unsignedLongLongValue];
                                        }
+                                       [self _removeMergedOutWriteExpectedValues:mergedOutExpectedValues];
                                    }
                                    completion(MTRAsyncWorkComplete);
                                }];
@@ -4027,6 +4058,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             [self removeExpectedValueForAttributePath:request[MTRDeviceWriteRequestFieldPathIndex]
                                       expectedValueID:[request[MTRDeviceWriteRequestFieldExpectedValueIDIndex] unsignedLongLongValue]];
         }
+        [self _removeMergedOutWriteExpectedValues:request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex]];
     }];
     if (useValueAsExpectedValue) {
         // As for an invoke with expected values, the write's wait in the queue is bounded: if it has sent nothing by
@@ -5629,6 +5661,14 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+    }
+}
+
+// Removes the expected values of writes a later write replaced while merging; each entry is [ path, expectedValueID ].
+- (void)_removeMergedOutWriteExpectedValues:(NSArray<NSArray *> *)mergedOutExpectedValues
+{
+    for (NSArray * mergedOut in mergedOutExpectedValues) {
+        [self removeExpectedValueForAttributePath:mergedOut[0] expectedValueID:[mergedOut[1] unsignedLongLongValue]];
     }
 }
 

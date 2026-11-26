@@ -10018,6 +10018,128 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects(readValue, @(accessoryValue), @"the dropped write reached the accessory");
 }
 
+// Writes three values to the test path so that their work items merge into one, with the middle one's expected
+// value the one left in the cache: the first write is held after it sets its expected value and before it is
+// queued, while the second and third set theirs and are queued.  The queue order is then second, third, first, and
+// the third write's expected value, set last, is the one in the cache.  The device's work queue is held until the
+// returned block is called, so the three are merged only then.  Returns the value the cache shows.
+- (unsigned)_writeThreeMergedValuesToDevice:(MTRDevice *)device
+                                   delegate:(MTRDeviceTestDelegate *)delegate
+                         releaseDeviceQueue:(dispatch_block_t __autoreleasing *)releaseDeviceQueueOut
+{
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const unsigned firstValue = 5;
+    const unsigned secondValue = 6;
+    const unsigned thirdValue = 7;
+
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    __block BOOL deviceQueueReleased = NO;
+    [self addTeardownBlock:^{
+        if (!deviceQueueReleased) {
+            dispatch_semaphore_signal(deviceQueueBlocker);
+        }
+    }];
+    MTRAsyncWorkItem * holdItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [holdItem setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+        workCompletion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:holdItem description:@"Blocking work item"];
+
+    dispatch_semaphore_t firstInstalled = dispatch_semaphore_create(0);
+    dispatch_semaphore_t releaseFirst = dispatch_semaphore_create(0);
+    __block NSUInteger installs = 0;
+    delegate.onWriteDidInstallExpectedValue = ^(MTRAttributePath * attributePath) {
+        NSUInteger install;
+        @synchronized(self) {
+            install = ++installs;
+        }
+        if (install == 1) {
+            dispatch_semaphore_signal(firstInstalled);
+            dispatch_semaphore_wait(releaseFirst, DISPATCH_TIME_FOREVER);
+        }
+    };
+    __auto_type writeValue = ^(unsigned value) {
+        [device writeAttributeWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                       value:[self _expectedValueTestDataValue:value]
+                       expectedValueInterval:@(60000)
+                           timedWriteTimeout:nil];
+    };
+
+    dispatch_semaphore_t firstQueued = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        writeValue(firstValue);
+        dispatch_semaphore_signal(firstQueued);
+    });
+    XCTAssertEqual(dispatch_semaphore_wait(firstInstalled, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+    writeValue(secondValue);
+    writeValue(thirdValue);
+    dispatch_semaphore_signal(releaseFirst);
+    XCTAssertEqual(dispatch_semaphore_wait(firstQueued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+    delegate.onWriteDidInstallExpectedValue = nil;
+
+    // The hold and the three writes.
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, 4u);
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(thirdValue));
+
+    *releaseDeviceQueueOut = [^{
+        deviceQueueReleased = YES;
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    } copy];
+    return thirdValue;
+}
+
+- (void)_waitForEmptyWorkQueueOfDevice:(MTRDevice *)device timeout:(NSTimeInterval)timeout
+{
+    XCTNSPredicateExpectation * drained = [[XCTNSPredicateExpectation alloc]
+        initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary<NSString *, id> * _Nullable bindings) {
+            return device.asyncWorkQueue.itemCount == 0;
+        }]
+                   object:nil];
+    [self waitForExpectations:@[ drained ] timeout:timeout];
+    [self _waitForDeviceQueue:device];
+}
+
+- (void)test081_MergedWritesLeaveNoExpectedValueAfterTheyAreSent
+{
+    // When writes to one path merge into one work item, the expected value of a write merged out in the middle does
+    // not outlive the merged write: once it has been sent and has completed, the cache no longer shows any of their
+    // expected values.  Nothing reports the accessory's value here, so the cached value is what remains.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+
+    dispatch_block_t releaseDeviceQueue;
+    [self _writeThreeMergedValuesToDevice:device delegate:delegate releaseDeviceQueue:&releaseDeviceQueue];
+    releaseDeviceQueue();
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:kTimeoutInSeconds * 3];
+
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
+        @"a merged-out write's expected value is still shown after the merged write was sent");
+}
+
+- (void)test082_MergedWritesLeaveNoExpectedValueWhenCancelled
+{
+    // As test081, but the merged write waits for its session past the queue bound (10 s) and is cancelled unsent:
+    // none of the three writes' expected values remains.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const NSTimeInterval bound = 10;
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    dispatch_block_t releaseDeviceQueue;
+    [self _writeThreeMergedValuesToDevice:device delegate:delegate releaseDeviceQueue:&releaseDeviceQueue];
+    releaseDeviceQueue();
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:(bound + 2)];
+
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
+        @"a merged-out write's expected value is still shown after the merged write was cancelled");
+    releaseSession();
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase
