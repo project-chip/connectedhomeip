@@ -292,8 +292,7 @@ TEST(TestServiceNaming, TestZeroLengthDestination)
     char buffer[64];
     DiscoveryFilter filter;
 
-    // bufferLen == 0 leaves no room even for a terminator, so every builder must reject it
-    // rather than underflow the (bufferLen - 1) comparison and report success.
+    // bufferLen == 0 leaves no room even for the null terminator.
     filter.type = DiscoveryFilterType::kNone;
     EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
