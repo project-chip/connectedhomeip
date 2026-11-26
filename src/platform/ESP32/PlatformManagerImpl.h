@@ -57,6 +57,9 @@ private:
 
     CHIP_ERROR _InitChipStack(void);
     void _Shutdown();
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    void _DispatchEvent(const ChipDeviceEvent * event);
+#endif
 
     // ===== Members for internal use by the following friends.
 

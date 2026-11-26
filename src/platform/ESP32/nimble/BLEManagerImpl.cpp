@@ -261,6 +261,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        ReturnErrorOnFailure(EnsureBleLayerInitialized());
+#endif
         StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     }
 
@@ -366,7 +369,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleMatterBleWrite(*event);
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
+                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -668,12 +672,12 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 }
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-CHIP_ERROR BLEManagerImpl::DisconnectBleLink(BleLink & link)
+CHIP_ERROR BLEManagerImpl::DisconnectBleLink(std::optional<BleLink> & link)
 {
-    const int result = ble_gap_terminate(link.Connection, BLE_ERR_REM_USER_CONN_TERM);
+    const int result = ble_gap_terminate(link->Connection, BLE_ERR_REM_USER_CONN_TERM);
     if (result == BLE_HS_ENOTCONN)
     {
-        link = {};
+        link.reset();
         return CHIP_NO_ERROR;
     }
     return result == BLE_HS_EALREADY ? CHIP_NO_ERROR : MapBLEError(result);

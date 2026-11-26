@@ -21,7 +21,6 @@
 #include <cstring>
 
 #include <lib/support/CodeUtils.h>
-#include <platform/DeviceControlServer.h>
 #include <platform/internal/BLEManager.h>
 
 namespace chip {
@@ -31,31 +30,14 @@ namespace Internal {
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 namespace {
 constexpr System::Clock::Seconds16 kHandoffRetryInterval(1);
-constexpr uint8_t kHandoffRetryCount = 2;
 } // namespace
 #endif
-
-void BLEManagerImpl::HandleMatterBleWrite(const ChipDeviceEvent & event)
-{
-    const auto connection                = event.CHIPoBLEWriteReceived.ConId;
-    [[maybe_unused]] const bool received = HandleWriteReceived(connection, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
-                                                               System::PacketBufferHandle::Adopt(event.CHIPoBLEWriteReceived.Data));
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (auto * link = FindBleLink(connection); received && link != nullptr)
-    {
-        link->UsedByMatter = true;
-    }
-#endif
-}
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (const auto * link = FindBleLink(conId); mNetworkHandoffPending && link != nullptr && link->UsedByMatter)
-    {
-        // The handoff owns physical disconnects for these links, even after their Matter endpoints are gone.
-        return;
-    }
+    // The handoff closes the physical links after the Matter BLE layer has shut down.
+    VerifyOrReturn(!mNetworkHandoffPending);
 #endif
     LogErrorOnFailure(CloseConnection(conId));
 }
@@ -65,56 +47,49 @@ void BLEManagerImpl::CheckNonConcurrentBleClosing()
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     VerifyOrReturn(IsBleClosing() && !mNetworkHandoffPending);
 
-    mNetworkHandoffPending          = true;
-    mNetworkHandoffRetriesRemaining = kHandoffRetryCount;
-    PostCloseAllBleConnections();
+    mNetworkHandoffPending = true;
+    ScheduleNetworkHandoff();
     LogErrorOnFailure(SystemLayer().StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, this));
 #endif
 }
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
-BLEManagerImpl::BleLink * BLEManagerImpl::FindBleLink(uint16_t connection)
-{
-    auto link = std::find_if(mBleLinks.begin(), mBleLinks.end(),
-                             [connection](const auto & candidate) { return candidate.Connection == connection; });
-    return link == mBleLinks.end() ? nullptr : &*link;
-}
-
 bool BLEManagerImpl::HandleBleHandoffEvent(const ChipDeviceEvent & event)
 {
     switch (event.Type)
     {
-    case DeviceEventType::kPlatformESP32BLELinkConnected: {
-        auto * link = FindBleLink(event.Platform.BLELink.Connection);
-        if (link == nullptr)
-        {
-            link = FindBleLink(BLE_CONNECTION_UNINITIALIZED);
-        }
-        VerifyOrReturnValue(link != nullptr, true, ChipLogError(DeviceLayer, "No slot for BLE link"));
-        *link            = {};
-        link->Connection = event.Platform.BLELink.Connection;
+    case DeviceEventType::kPlatformESP32BLELinkConnected:
+    case DeviceEventType::kPlatformESP32BLELinkDisconnected: {
+        const auto & link = event.Platform.BLELink;
+        auto existing     = std::find_if(mBleLinks.begin(), mBleLinks.end(), [&link](const auto & candidate) {
+            if (!candidate.has_value())
+            {
+                return false;
+            }
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
-        std::memcpy(link->PeerAddress, event.Platform.BLELink.PeerAddress, sizeof(link->PeerAddress));
+            // Both Bluedroid GATT roles can report the same physical link.
+            return std::memcmp(candidate->PeerAddress, link.PeerAddress, sizeof(link.PeerAddress)) == 0;
+#else
+            return candidate->Connection == link.Connection;
 #endif
+        });
+        if (event.Type == DeviceEventType::kPlatformESP32BLELinkConnected)
+        {
+            if (existing == mBleLinks.end())
+            {
+                const auto free = std::find(mBleLinks.begin(), mBleLinks.end(), std::nullopt);
+                VerifyOrDieWithMsg(free != mBleLinks.end(), DeviceLayer, "No slot for physical BLE link");
+                *free = link;
+            }
+        }
+        else if (existing != mBleLinks.end())
+        {
+            existing->reset();
+        }
+        ScheduleNetworkHandoff();
         return true;
     }
-    case DeviceEventType::kPlatformESP32BLELinkDisconnected:
-        if (auto * link = FindBleLink(event.Platform.BLELink.Connection); link != nullptr)
-        {
-            *link = {};
-        }
-        FinishNetworkHandoffIfReady();
-        return true;
-
-    case DeviceEventType::kCloseAllBleConnections:
-        if (mNetworkHandoffPending)
-        {
-            // The commissioning window manager closes the Matter endpoints during this event dispatch.
-            LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) { sInstance.DisconnectCommissioningLinks(); }));
-        }
-        return true;
-
     case DeviceEventType::kFailSafeTimerExpired:
         if (mNetworkHandoffPending || IsBleClosing() || !IsInitialized())
         {
@@ -128,66 +103,55 @@ bool BLEManagerImpl::HandleBleHandoffEvent(const ChipDeviceEvent & event)
     }
 }
 
-void BLEManagerImpl::PostCloseAllBleConnections()
+void BLEManagerImpl::ScheduleNetworkHandoff()
 {
-    VerifyOrReturn(!mCloseAllBleConnectionsPosted);
-    const CHIP_ERROR err          = DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-    mCloseAllBleConnectionsPosted = (err == CHIP_NO_ERROR);
+    VerifyOrReturn(mNetworkHandoffPending && !mNetworkHandoffPosted);
+    const ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformESP32BLEHandoff };
+    const CHIP_ERROR err  = PlatformMgr().PostEvent(&event);
+    mNetworkHandoffPosted = (err == CHIP_NO_ERROR);
     LogErrorOnFailure(err);
 }
 
-void BLEManagerImpl::DisconnectCommissioningLinks()
+bool BLEManagerImpl::DisconnectBleLinks()
 {
-    VerifyOrReturn(mNetworkHandoffPending && !IsInitialized());
-
+    VerifyOrReturnValue(mNetworkHandoffPending && !IsInitialized(), false);
     for (auto & link : mBleLinks)
     {
-        if (link.UsedByMatter)
+        if (link.has_value())
         {
             LogErrorOnFailure(DisconnectBleLink(link));
         }
     }
-    FinishNetworkHandoffIfReady();
-}
-
-void BLEManagerImpl::FinishNetworkHandoffIfReady()
-{
-    VerifyOrReturn(mNetworkHandoffPending && !IsInitialized());
-    VerifyOrReturn(std::none_of(mBleLinks.begin(), mBleLinks.end(), [](const auto & link) { return link.UsedByMatter; }));
-    const CHIP_ERROR err = DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent();
-    LogErrorOnFailure(err);
-    if (err == CHIP_NO_ERROR)
-    {
-        ResetNetworkHandoff();
-    }
+    return std::none_of(mBleLinks.begin(), mBleLinks.end(), [](const auto & link) { return link.has_value(); });
 }
 
 void BLEManagerImpl::ResetNetworkHandoff()
 {
     SystemLayer().CancelTimer(RetryNetworkHandoff, this);
-    mNetworkHandoffPending          = false;
-    mCloseAllBleConnectionsPosted   = false;
-    mNetworkHandoffRetriesRemaining = 0;
+    mNetworkHandoffPending = false;
+    mNetworkHandoffPosted  = false;
 }
 
 void BLEManagerImpl::RetryNetworkHandoff(System::Layer * layer, void * state)
 {
     auto & manager = *static_cast<BLEManagerImpl *>(state);
-    VerifyOrReturn(manager.mNetworkHandoffPending && manager.mNetworkHandoffRetriesRemaining != 0);
+    VerifyOrReturn(manager.mNetworkHandoffPending);
 
-    --manager.mNetworkHandoffRetriesRemaining;
-    if (manager.IsInitialized())
-    {
-        manager.PostCloseAllBleConnections();
-    }
-    else
-    {
-        manager.DisconnectCommissioningLinks();
-    }
-    if (manager.mNetworkHandoffRetriesRemaining != 0)
-    {
-        LogErrorOnFailure(layer->StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, &manager));
-    }
+    // Keep retrying at a fixed rate until the commissioning fail-safe expires.
+    manager.ScheduleNetworkHandoff();
+    LogErrorOnFailure(layer->StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, &manager));
+}
+
+CHIP_ERROR BLEManagerImpl::EnsureBleLayerInitialized()
+{
+    VerifyOrReturnError(!mNetworkHandoffPending, CHIP_ERROR_BUSY);
+    VerifyOrReturnError(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !IsInitialized(), CHIP_NO_ERROR);
+
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+    return BleLayer::Init(this, this, this, &SystemLayer());
+#else
+    return BleLayer::Init(this, this, &SystemLayer());
+#endif
 }
 
 void BLEManagerImpl::RestoreBleLayerAfterFailedHandoff(intptr_t)
@@ -198,14 +162,7 @@ void BLEManagerImpl::RestoreBleLayerAfterFailedHandoff(intptr_t)
     {
         sInstance.BleLayer::Shutdown();
     }
-    if (!sInstance.IsInitialized())
-    {
-#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-        LogErrorOnFailure(sInstance.BleLayer::Init(&sInstance, &sInstance, &sInstance, &SystemLayer()));
-#else
-        LogErrorOnFailure(sInstance.BleLayer::Init(&sInstance, &sInstance, &SystemLayer()));
-#endif
-    }
+    LogErrorOnFailure(sInstance.EnsureBleLayerInitialized());
 }
 
 #endif // !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION

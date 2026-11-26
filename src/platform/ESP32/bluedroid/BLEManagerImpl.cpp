@@ -36,6 +36,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#include <lib/support/SafeInt.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/ESP32/BLEManagerImpl.h>
 #include <platform/ESP32/ChipDeviceScanner.h>
@@ -67,6 +68,15 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void PostBleLinkEvent(uint16_t type, const esp_bd_addr_t & peerAddress)
+{
+    ChipDeviceEvent event{ .Type = type };
+    memcpy(event.Platform.BLELink.PeerAddress, peerAddress, sizeof(peerAddress));
+    PlatformMgr().PostEventOrDie(&event);
+}
+#endif
 
 struct ESP32ChipServiceData
 {
@@ -236,10 +246,6 @@ void BLEManagerImpl::_Shutdown()
     // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE gatt service
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
 
-#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    OnChipBleConnectReceived = nullptr;
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-
     LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 }
 
@@ -251,6 +257,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        SuccessOrExit(err = EnsureBleLayerInitialized());
+#endif
         StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     }
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -358,7 +367,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleMatterBleWrite(*event);
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
+                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -461,6 +471,9 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
         }
         break;
     case ESP_GATTC_CONNECT_EVT:
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, p_data->connect.remote_bda);
+#endif
         err = sInstance.HandleGAPConnect(*p_data);
         SuccessOrExit(err);
         break;
@@ -679,6 +692,9 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
         ChipLogProgress(Ble, "write char success ");
         break;
     case ESP_GATTC_DISCONNECT_EVT:
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, p_data->disconnect.remote_bda);
+#endif
         connect    = false;
         get_server = false;
         ChipLogProgress(Ble, "ESP_GATTC_DISCONNECT_EVT, reason = %d", p_data->disconnect.reason);
@@ -888,11 +904,12 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     ChipLogProgress(Ble, "In send write request\n");
-    int rc;
+    const size_t dataLength = pBuf->DataLength();
+    VerifyOrReturnError(CanCastTo<uint16_t>(dataLength), CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    rc = esp_ble_gattc_write_char(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                                  gl_profile_tab[PROFILE_A_APP_ID].write_char_handle, pBuf->DataLength(), pBuf->Start(),
-                                  ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
+    const int rc = esp_ble_gattc_write_char(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
+                                          gl_profile_tab[PROFILE_A_APP_ID].write_char_handle, static_cast<uint16_t>(dataLength),
+                                          pBuf->Start(), ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
@@ -909,9 +926,9 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 }
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-CHIP_ERROR BLEManagerImpl::DisconnectBleLink(BleLink & link)
+CHIP_ERROR BLEManagerImpl::DisconnectBleLink(std::optional<BleLink> & link)
 {
-    return MapBLEError(esp_ble_gap_disconnect(link.PeerAddress));
+    return MapBLEError(esp_ble_gap_disconnect(link->PeerAddress));
 }
 #endif
 
@@ -1455,17 +1472,14 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
 
     switch (event)
     {
-    case ESP_GATTS_CONNECT_EVT: {
+    case ESP_GATTS_CONNECT_EVT:
         ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", param->connect.conn_id);
 
         // Allocate a connection state record for the new connection.
         GetConnectionState(param->mtu.conn_id, true);
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkConnected };
-        linkEvent.Platform.BLELink.Connection = param->connect.conn_id;
-        memcpy(linkEvent.Platform.BLELink.PeerAddress, param->connect.remote_bda, sizeof(linkEvent.Platform.BLELink.PeerAddress));
-        PlatformMgr().PostEventOrDie(&linkEvent);
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, param->connect.remote_bda);
 #endif
 
         // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
@@ -1475,8 +1489,6 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
         LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
         break;
-    }
-
     case ESP_GATTS_DISCONNECT_EVT:
         HandleDisconnect(param);
         break;
@@ -1709,9 +1721,7 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
                     param->disconnect.reason);
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkDisconnected };
-    linkEvent.Platform.BLELink.Connection = param->disconnect.conn_id;
-    PlatformMgr().PostEventOrDie(&linkEvent);
+    PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, param->disconnect.remote_bda);
 #endif
 
     // If this was a CHIPoBLE connection, release the associated connection state record
@@ -1830,7 +1840,7 @@ void BLEManagerImpl::OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_add
     connect                      = true;
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kConnectTimeout), HandleConnectTimeout, nullptr);
-    mDeviceScanner.StopScan();
+    LogErrorOnFailure(mDeviceScanner.StopScan());
     ChipLogProgress(Ble, "Scanned all devices\n");
 
     ConnectDevice(addr, addr_type, kConnectTimeout);

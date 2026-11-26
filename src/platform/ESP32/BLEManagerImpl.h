@@ -25,6 +25,7 @@
 
 #pragma once
 #include <array>
+#include <optional>
 #include <sdkconfig.h>
 #include <string>
 
@@ -78,6 +79,9 @@ struct ble_gatt_char_context
 
 namespace chip {
 namespace DeviceLayer {
+
+class PlatformManagerImpl;
+
 namespace Internal {
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -212,6 +216,7 @@ private:
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
+    friend class ::chip::DeviceLayer::PlatformManagerImpl;
 
     static BLEManagerImpl sInstance;
 
@@ -298,36 +303,24 @@ private:
     uint16_t mC3CharAttrHandle;
 #endif
     uint16_t mTXCharCCCDAttrHandle;
-    void HandleMatterBleWrite(const ChipDeviceEvent & event);
-
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    struct BleLink
-    {
-        uint16_t Connection = BLE_CONNECTION_UNINITIALIZED;
-        bool UsedByMatter   = false;
-#ifdef CONFIG_BT_BLUEDROID_ENABLED
-        esp_bd_addr_t PeerAddress = {};
-#endif
-    };
-
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
     static constexpr size_t kMaxBleLinks = CONFIG_BT_ACL_CONNECTIONS;
 #else
     static constexpr size_t kMaxBleLinks = CONFIG_BT_NIMBLE_MAX_CONNECTIONS;
 #endif
 
-    std::array<BleLink, kMaxBleLinks> mBleLinks{};
-    bool mNetworkHandoffPending             = false;
-    bool mCloseAllBleConnectionsPosted      = false;
-    uint8_t mNetworkHandoffRetriesRemaining = 0;
+    using BleLink = ChipDevicePlatformEvent::BleLink;
+    std::array<std::optional<BleLink>, kMaxBleLinks> mBleLinks{};
+    bool mNetworkHandoffPending = false;
+    bool mNetworkHandoffPosted  = false;
 
     bool HandleBleHandoffEvent(const ChipDeviceEvent & event);
-    BleLink * FindBleLink(uint16_t connection);
-    CHIP_ERROR DisconnectBleLink(BleLink & link);
-    void PostCloseAllBleConnections();
-    void DisconnectCommissioningLinks();
-    void FinishNetworkHandoffIfReady();
+    CHIP_ERROR DisconnectBleLink(std::optional<BleLink> & link);
+    void ScheduleNetworkHandoff();
+    bool DisconnectBleLinks();
     void ResetNetworkHandoff();
+    CHIP_ERROR EnsureBleLayerInitialized();
     static void RetryNetworkHandoff(System::Layer *, void *);
     static void RestoreBleLayerAfterFailedHandoff(intptr_t);
 #endif

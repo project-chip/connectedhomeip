@@ -58,6 +58,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformESP32BLEIndicationReceived,
     kPlatformESP32BLELinkConnected,
     kPlatformESP32BLELinkDisconnected,
+    kPlatformESP32BLEHandoff,
 };
 
 } // namespace DeviceEventType
@@ -67,6 +68,15 @@ enum InternalPlatformSpecificEventTypes
  */
 struct ChipDevicePlatformEvent final
 {
+    struct BleLink
+    {
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+        uint8_t PeerAddress[6];
+#else
+        uint16_t Connection;
+#endif
+    };
+
     union
     {
         struct
@@ -94,13 +104,7 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
-        struct
-        {
-            uint16_t Connection;
-#ifdef CONFIG_BT_BLUEDROID_ENABLED
-            uint8_t PeerAddress[6];
-#endif
-        } BLELink;
+        BleLink BLELink;
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         struct
         {
