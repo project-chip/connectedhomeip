@@ -262,6 +262,11 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (mNetworkHandoff == NetworkHandoffState::kRestoringBle)
+        {
+            mFlags.Set(Flags::kAdvertisingEnabled);
+            return CHIP_NO_ERROR;
+        }
         ReturnErrorOnFailure(EnsureBleLayerInitialized());
 #endif
         StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
@@ -761,8 +766,11 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled &&
-        mFlags.Has(Flags::kAdvertisingEnabled)
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled)
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        && mNetworkHandoff == NetworkHandoffState::kIdle &&
+        IsInitialized()
+#endif
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
         // and no connections are active...
         && (_NumConnections() == 0)

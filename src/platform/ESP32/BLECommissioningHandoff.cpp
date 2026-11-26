@@ -37,7 +37,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     // The handoff closes the physical links after the Matter BLE layer has shut down.
-    VerifyOrReturn(!mNetworkHandoffPending);
+    VerifyOrReturn(mNetworkHandoff == NetworkHandoffState::kIdle);
 #endif
     LogErrorOnFailure(CloseConnection(conId));
 }
@@ -45,11 +45,9 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 void BLEManagerImpl::CheckNonConcurrentBleClosing()
 {
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    VerifyOrReturn(IsBleClosing() && !mNetworkHandoffPending);
+    VerifyOrReturn(IsBleClosing() && mNetworkHandoff == NetworkHandoffState::kIdle);
 
-    mNetworkHandoffPending = true;
-    ScheduleNetworkHandoff();
-    LogErrorOnFailure(SystemLayer().StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, this));
+    StartNetworkHandoff(NetworkHandoffState::kStartingNetwork);
 #endif
 }
 
@@ -91,10 +89,10 @@ bool BLEManagerImpl::HandleBleHandoffEvent(const ChipDeviceEvent & event)
         return true;
     }
     case DeviceEventType::kFailSafeTimerExpired:
-        if (mNetworkHandoffPending || IsBleClosing() || !IsInitialized())
+        if (mNetworkHandoff != NetworkHandoffState::kIdle ||
+            (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && (IsBleClosing() || !IsInitialized())))
         {
-            ResetNetworkHandoff();
-            LogErrorOnFailure(PlatformMgr().ScheduleWork(RestoreBleLayerAfterFailedHandoff));
+            StartNetworkHandoff(NetworkHandoffState::kRestoringBle);
         }
         return true;
 
@@ -103,9 +101,16 @@ bool BLEManagerImpl::HandleBleHandoffEvent(const ChipDeviceEvent & event)
     }
 }
 
+void BLEManagerImpl::StartNetworkHandoff(NetworkHandoffState state)
+{
+    mNetworkHandoff = state;
+    ScheduleNetworkHandoff();
+    LogErrorOnFailure(SystemLayer().StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, this));
+}
+
 void BLEManagerImpl::ScheduleNetworkHandoff()
 {
-    VerifyOrReturn(mNetworkHandoffPending && !mNetworkHandoffPosted);
+    VerifyOrReturn(mNetworkHandoff != NetworkHandoffState::kIdle && !mNetworkHandoffPosted);
     const ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformESP32BLEHandoff };
     const CHIP_ERROR err  = PlatformMgr().PostEvent(&event);
     mNetworkHandoffPosted = (err == CHIP_NO_ERROR);
@@ -114,7 +119,7 @@ void BLEManagerImpl::ScheduleNetworkHandoff()
 
 bool BLEManagerImpl::DisconnectBleLinks()
 {
-    VerifyOrReturnValue(mNetworkHandoffPending && !IsInitialized(), false);
+    VerifyOrReturnValue(mNetworkHandoff != NetworkHandoffState::kIdle && !IsInitialized(), false);
     for (auto & link : mBleLinks)
     {
         if (link.has_value())
@@ -128,23 +133,22 @@ bool BLEManagerImpl::DisconnectBleLinks()
 void BLEManagerImpl::ResetNetworkHandoff()
 {
     SystemLayer().CancelTimer(RetryNetworkHandoff, this);
-    mNetworkHandoffPending = false;
-    mNetworkHandoffPosted  = false;
+    mNetworkHandoff       = NetworkHandoffState::kIdle;
+    mNetworkHandoffPosted = false;
 }
 
 void BLEManagerImpl::RetryNetworkHandoff(System::Layer * layer, void * state)
 {
     auto & manager = *static_cast<BLEManagerImpl *>(state);
-    VerifyOrReturn(manager.mNetworkHandoffPending);
+    VerifyOrReturn(manager.mNetworkHandoff != NetworkHandoffState::kIdle);
 
-    // Keep retrying at a fixed rate until the commissioning fail-safe expires.
     manager.ScheduleNetworkHandoff();
     LogErrorOnFailure(layer->StartTimer(kHandoffRetryInterval, RetryNetworkHandoff, &manager));
 }
 
 CHIP_ERROR BLEManagerImpl::EnsureBleLayerInitialized()
 {
-    VerifyOrReturnError(!mNetworkHandoffPending, CHIP_ERROR_BUSY);
+    VerifyOrReturnError(mNetworkHandoff == NetworkHandoffState::kIdle, CHIP_ERROR_BUSY);
     VerifyOrReturnError(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !IsInitialized(), CHIP_NO_ERROR);
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -152,17 +156,6 @@ CHIP_ERROR BLEManagerImpl::EnsureBleLayerInitialized()
 #else
     return BleLayer::Init(this, this, &SystemLayer());
 #endif
-}
-
-void BLEManagerImpl::RestoreBleLayerAfterFailedHandoff(intptr_t)
-{
-    VerifyOrReturn(sInstance.mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
-
-    if (sInstance.IsBleClosing())
-    {
-        sInstance.BleLayer::Shutdown();
-    }
-    LogErrorOnFailure(sInstance.EnsureBleLayerInitialized());
 }
 
 #endif // !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION

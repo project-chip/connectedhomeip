@@ -69,9 +69,10 @@ void PlatformManagerImpl::_DispatchEvent(const ChipDeviceEvent * event)
         return;
     }
 
+    using HandoffState        = Internal::BLEManagerImpl::NetworkHandoffState;
     auto & ble                = Internal::BLEMgrImpl();
     ble.mNetworkHandoffPosted = false;
-    VerifyOrReturn(ble.mNetworkHandoffPending);
+    VerifyOrReturn(ble.mNetworkHandoff != HandoffState::kIdle);
 
     if (ble.IsBleClosing())
     {
@@ -80,7 +81,15 @@ void PlatformManagerImpl::_DispatchEvent(const ChipDeviceEvent * event)
     }
 
     VerifyOrReturn(ble.DisconnectBleLinks());
+    const bool restoreBle = ble.mNetworkHandoff == HandoffState::kRestoringBle;
     ble.ResetNetworkHandoff();
+    if (restoreBle)
+    {
+        VerifyOrReturn(ble.mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        LogErrorOnFailure(ble._IsAdvertisingEnabled() ? ble._SetAdvertisingEnabled(true) : ble.EnsureBleLayerInitialized());
+        return;
+    }
+
     // Deliver readiness in this dispatch so a queued notification cannot outlive a cancelled handoff.
     const ChipDeviceEvent ready{ .Type = DeviceEventType::kOperationalNetworkStarted };
     Base::_DispatchEvent(&ready);

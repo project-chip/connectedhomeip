@@ -311,18 +311,23 @@ private:
 #endif
 
     using BleLink = ChipDevicePlatformEvent::BleLink;
+    enum class NetworkHandoffState : uint8_t{
+        kIdle,
+        kStartingNetwork,
+        kRestoringBle,
+    };
     std::array<std::optional<BleLink>, kMaxBleLinks> mBleLinks{};
-    bool mNetworkHandoffPending = false;
-    bool mNetworkHandoffPosted  = false;
+    NetworkHandoffState mNetworkHandoff = NetworkHandoffState::kIdle;
+    bool mNetworkHandoffPosted          = false;
 
     bool HandleBleHandoffEvent(const ChipDeviceEvent & event);
     CHIP_ERROR DisconnectBleLink(std::optional<BleLink> & link);
+    void StartNetworkHandoff(NetworkHandoffState state);
     void ScheduleNetworkHandoff();
     bool DisconnectBleLinks();
     void ResetNetworkHandoff();
     CHIP_ERROR EnsureBleLayerInitialized();
     static void RetryNetworkHandoff(System::Layer *, void *);
-    static void RestoreBleLayerAfterFailedHandoff(intptr_t);
 #endif
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
