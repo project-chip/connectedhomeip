@@ -996,6 +996,9 @@ TEST_F_FROM_FIXTURE(TestCASESession, BusyReportsRemainingSigma2Time)
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
+// Waits in real time for MRP to stop retransmitting, which only host builds do
+// within the test's time budget.
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
 {
     TemporarySessionManager sessionManager(*this);
@@ -1058,6 +1061,7 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
     loopback.SetLoopbackTransportDelegate(nullptr);
     gPairingServer.Shutdown();
 }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_WITH_NLFAULTINJECTION
 
