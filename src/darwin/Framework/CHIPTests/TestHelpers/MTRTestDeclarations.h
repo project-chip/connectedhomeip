@@ -89,6 +89,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
+@property (nonatomic, readonly) dispatch_queue_t queue;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration

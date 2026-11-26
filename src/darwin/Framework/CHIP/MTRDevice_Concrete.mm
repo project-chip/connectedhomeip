@@ -4295,6 +4295,15 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }];
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            // If the work item was cancelled first by a user command's token or by a queue timeout, its cancel
+            // handler reports that cancel to the caller and removes the expected values: that outcome won, so report
+            // nothing here.  Any other cancel (the device going away) reports nothing to the caller, so this result
+            // still does.
+            BOOL accepted = workCompletion(MTRAsyncWorkComplete);
+            if (!accepted && (userInvokeToken || cancelledByTimeout->load())) {
+                MTR_LOG("Invoke work item [%llu] was cancelled before its result arrived: %@", workItemID, error);
+                return;
+            }
             // Remove a failed invoke's expected values first, so its completion sees the cached value.
             if (error && expectedValues) {
                 [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
@@ -4302,7 +4311,6 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             dispatch_async(queue, ^{
                 completion(values, error);
             });
-            workCompletion(MTRAsyncWorkComplete);
         };
 
         NSNumber * timedInvokeTimeout = nil;

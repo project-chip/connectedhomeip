@@ -9581,6 +9581,46 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
 }
 
+- (void)test068b_CancelWinningOverSessionFailureCompletesCancelled
+{
+    // A user command whose session fails can still be cancelled until the queue has taken that failure as its
+    // outcome.  Here the cancel lands between the session failure and its result on the device queue: the cancel
+    // wins, so the caller hears, exactly once, that the command was cancelled.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSError *> * errors = [NSMutableArray array];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+
+    // A suspended controller fails every session request at once, without sending anything.
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    XCTestExpectation * completed = [[XCTestExpectation alloc] initWithDescription:@"Caller completed"];
+    __block BOOL cancelled = NO;
+    [device unitTestSyncRunOnDeviceQueue:^{
+        // The ready handler runs after this block, on the device queue; the session fails inside it and its result
+        // is queued behind it.  The cancel below is queued between the ready handler and that result.
+        [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            [errors addObject:error ?: (NSError *) NSNull.null];
+            [completed fulfill];
+        }];
+        dispatch_async(device.queue, ^{
+            cancelled = [token cancel];
+        });
+    }];
+    [self waitForExpectations:@[ completed ] timeout:kTimeoutInSeconds];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+
+    XCTAssertTrue(cancelled, @"the command had sent nothing, so the cancel must succeed");
+    XCTAssertEqual(errors.count, 1);
+    XCTAssertEqualObjects(errors.firstObject.domain, MTRErrorDomain);
+    XCTAssertEqual(errors.firstObject.code, MTRErrorCodeCancelled, @"the caller got %@ although its cancel succeeded", errors.firstObject);
+}
+
 - (void)test069_QueuedInvokeFailsAtCallerTimeout
 {
     // A user command still queued when its caller's timeout elapses fails then with a timeout error, and is never
