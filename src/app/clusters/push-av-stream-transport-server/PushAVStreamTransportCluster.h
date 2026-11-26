@@ -37,8 +37,7 @@ public:
     /**
      * @brief Creates a Push AV Stream Transport server instance
      *
-     * After this instance is registered and started, Init() must be called
-     * to load the persisted state.
+     * Persisted CurrentConnections are loaded in Startup().
      *
      * @param aEndpointId The endpoint on which this cluster exists (must match zap configuration)
      * @param aFeatures   BitFlags indicating which features are supported by this instance
@@ -57,12 +56,22 @@ public:
 
     PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
+    /**
+     * Attaches the delegate to this cluster.
+     *
+     * If the cluster is already started, PersistentAttributesLoadedCallback() is invoked immediately
+     * because Startup() already loaded persisted state; otherwise Startup() invokes it after loading.
+     */
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
         mLogic.SetDelegate(delegate);
         if (delegate != nullptr)
         {
             delegate->SetPushAvStreamTransportServer(this);
+            if (IsStarted())
+            {
+                LogErrorOnFailure(delegate->PersistentAttributesLoadedCallback());
+            }
         }
     }
 
@@ -110,20 +119,25 @@ public:
         return mLogic.NotifyTransportStopped(connectionID, triggerType);
     }
 
-    /**
-     * Loads the persisted CurrentConnections and drops entries whose fabric no longer
-     * exists. Must be called after Startup().
-     */
-    CHIP_ERROR Init()
-    {
-        VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mLogic.Init(mContext->attributeStorage, mFabricTable);
-    }
-
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
         ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-        return mFabricTable.AddFabricDelegate(this);
+        CHIP_ERROR err = mFabricTable.AddFabricDelegate(this);
+        if (err != CHIP_NO_ERROR)
+        {
+            DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
+            return err;
+        }
+
+        err = mLogic.Init(context.attributeStorage, mFabricTable);
+        if (err != CHIP_NO_ERROR)
+        {
+            mLogic.Shutdown();
+            mFabricTable.RemoveFabricDelegate(this);
+            DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
+            return err;
+        }
+        return CHIP_NO_ERROR;
     }
 
     void Shutdown(ClusterShutdownType shutdownType) override

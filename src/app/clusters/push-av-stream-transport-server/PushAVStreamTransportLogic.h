@@ -101,7 +101,8 @@ public:
     std::vector<PushAvStreamTransport::TransportConfigurationStorage> mCurrentConnections;
 
     /**
-     * Loads the persisted CurrentConnections from `attributeStorage` and notifies the delegate.
+     * Loads the persisted CurrentConnections from `attributeStorage` and notifies the delegate
+     * if one is set.
      *
      * Connections whose fabric no longer exists in `fabricTable` are dropped before the
      * delegate is notified, so the delegate does not re-allocate transports for removed

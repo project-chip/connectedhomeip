@@ -195,7 +195,6 @@ public:
 
         mServer.GetLogic().SetDelegate(&mockDelegate);
         mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
         auto result = mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
 
