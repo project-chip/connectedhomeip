@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This YAML test is temporarily available until the automated Python test is
+# reliable:
+# https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_CNET_4_11.py
+
 name:
     12.4.9. [TC-CNET-4.11] [WiFi] Verification for ConnectNetwork Command
     [DUT-Server]
