@@ -1200,6 +1200,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     NSString * stopPairingMessage = [NSString stringWithFormat:@"StopPairing called for node ID 0x%016llX", nodeID1];
     NSString * stopPairingFailure = @"Failure while trying to stop the pairing process";
     __block NSUInteger stopPairingLogCount = 0;
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(0, nil);
+    }];
     MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
         if ([message containsString:stopPairingMessage] || [message containsString:stopPairingFailure]) {
             @synchronized(stopPairingMessage) {
@@ -1309,6 +1312,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
     NSString * stopPairingMessage = [NSString stringWithFormat:@"StopPairing called for node ID 0x%016llX", nodeID];
     __block NSUInteger stopPairingCount = 0;
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(0, nil);
+    }];
     MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
         if ([message containsString:stopPairingMessage]) {
             @synchronized(stopPairingMessage) {
@@ -1346,6 +1352,8 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [sController cancelCommissioningForNodeID:@(nodeID) error:nil];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    // The session loss released the commissionee first, so the first attempt ends with that loss, not a cancellation.
+    [self _assertConnectionClosedFailure:controllerDelegate1];
 
     XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
     __auto_type * controllerDelegate2 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation2
@@ -1355,6 +1363,51 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     self.controllerDelegate = controllerDelegate2;
 
     NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
+    XCTAssertNil(error);
+    [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNil(controllerDelegate2.commissioningCompleteError);
+    XCTAssertEqual(controllerDelegate1.commissioningCompleteCount, 1);
+    XCTAssertEqual(controllerDelegate2.commissioningCompleteCount, 1);
+}
+
+- (void)test023b_CancelBeforePASESessionReleaseWhileWaitingAfterPASECompletesOnce
+{
+    [self startServerAppWithPayload:kOnboardingPayload1];
+    [self startServerAppWithPayload:kOnboardingPayload2];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    dispatch_semaphore_t holdQueue = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(holdQueue);
+    }];
+
+    XCTestExpectation * expectation1 = [self expectationWithDescription:@"Commissioning 1 ended"];
+    __auto_type nodeID = ++sDeviceId;
+    __auto_type * controllerDelegate1 = [self _pausedCommissioningForPayload:kOnboardingPayload1 nodeID:nodeID expectation:expectation1 queue:callbackQueue];
+
+    // Cancel first, then lose the session before the cancellation's completion is delivered: the release StopPairing
+    // reports waits on the commissioning queue behind the hold, so the expiry lands in between.
+    [sController unitTestHoldCommissioningQueueUntil:holdQueue];
+    NSError * error;
+    XCTAssertTrue([sController cancelCommissioningForNodeID:@(nodeID) error:&error]);
+    XCTAssertNil(error);
+    [sController unitTestExpirePASESessions];
+    dispatch_semaphore_signal(holdQueue);
+
+    [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertEqualObjects(controllerDelegate1.commissioningCompleteError.domain, MTRErrorDomain);
+    XCTAssertEqual(controllerDelegate1.commissioningCompleteError.code, MTRErrorCodeCancelled);
+
+    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
+    __auto_type * controllerDelegate2 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation2
+                                                                                  attestationDelegate:nil
+                                                                                    failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate2 queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate2;
+
     __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:&error];
     XCTAssertNotNil(payload);
     XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
@@ -1450,8 +1503,10 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [self startServerAppWithPayload:kOnboardingPayload2];
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    dispatch_semaphore_t releaseGate = dispatch_semaphore_create(0);
     dispatch_semaphore_t holdQueue = dispatch_semaphore_create(0);
     [self addTeardownBlock:^{
+        dispatch_semaphore_signal(releaseGate);
         dispatch_semaphore_signal(holdQueue);
     }];
 
@@ -1459,11 +1514,29 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     __auto_type nodeID1 = ++sDeviceId;
     __auto_type * controllerDelegate = [self _pausedNodeIDCommissioningForPayload:kOnboardingPayload1 nodeID:nodeID1 expectation:expectation1 queue:callbackQueue];
 
-    // The release StopPairing reports is delivered on the commissioning queue, so it waits behind the hold.
-    [sController unitTestHoldCommissioningQueueUntil:holdQueue];
+    // The release StopPairing reports, and then the failure that release handler dispatches, both run on the
+    // commissioning queue. Gate the queue, cancel so the release queues behind the gate, then queue the hold behind the
+    // release: opening the gate lets the release handler run while its failure waits behind the hold.
+    NSString * releasedMessage = @"was released (cancelled) while waiting for commissionNodeWithID:";
+    XCTestExpectation * releaseHandled = [self expectationWithDescription:@"Release handled before the failure is delivered"];
+    releaseHandled.assertForOverFulfill = NO;
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(0, nil);
+    }];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:releasedMessage]) {
+            [releaseHandled fulfill];
+        }
+    });
+
+    [sController unitTestHoldCommissioningQueueUntil:releaseGate];
     NSError * error;
     XCTAssertTrue([sController cancelCommissioningForNodeID:@(nodeID1) error:&error]);
     XCTAssertNil(error);
+    [sController unitTestHoldCommissioningQueueUntil:holdQueue];
+    dispatch_semaphore_signal(releaseGate);
+    [self waitForExpectations:@[ releaseHandled ] timeout:kPairingTimeoutInSeconds];
+    MTRSetLogCallback(0, nil);
 
     // Commissioning 1 is still current, so commissioning 2 is refused as busy.
     XCTestExpectation * refused = [self expectationWithDescription:@"Commissioning 2 refused"];
