@@ -149,7 +149,7 @@ void DispatchProxyScanResult(intptr_t arg);
 
 /**
  * Scanner delegate installed for the duration of a proxy scan.
- * Start(), Stop() and Deliver() run on the Matter event loop. 
+ * Start(), Stop() and Deliver() run on the Matter event loop.
  * OnDeviceScanned() runs on the NimBLE host task
  */
 
