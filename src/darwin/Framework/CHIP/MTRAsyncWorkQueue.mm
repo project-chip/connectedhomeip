@@ -419,7 +419,7 @@ struct ContextSnapshot {
     NSUInteger runningCount = [self _runningCount];
     for (NSUInteger i = 0; i < runningCount; i++) {
         MTRAsyncWorkItem * item = _items[i];
-        if (!item.tracksSend || item.sent) {
+        if (!item.tracksSend || item.sent || item.jumpsUnsentWork) {
             return NO;
         }
     }

@@ -887,6 +887,41 @@
     readCompletion(MTRAsyncWorkComplete);
 }
 
+- (void)testSecondJumperWaitsForSendTrackingJumperInNormalSlot
+{
+    // A send-tracking user command that started in the normal slot holds a second user command back too: both are
+    // user commands, so the second must not run above the width and finish before the first.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSObject * lock = [[NSObject alloc] init];
+    __block int started = 0;
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        jumper.jumpsUnsentWork = YES;
+        jumper.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
+        jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
+            dispatch_semaphore_signal(jumperStarted);
+            if (first) {
+                dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+            }
+            completion(MTRAsyncWorkComplete);
+        };
+        [workQueue enqueueWorkItem:jumper descriptionWithFormat:@"send-tracking jumper J%d", i + 1];
+    }
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the first jumper runs in the normal slot");
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"the second jumper does not start above width beside the first");
+    dispatch_semaphore_signal(j1Release);
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
+}
+
 - (void)testReadSendAfterJumperSendReturns
 {
     MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
