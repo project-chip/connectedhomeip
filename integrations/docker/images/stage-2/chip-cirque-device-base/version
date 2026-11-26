@@ -1,1 +1,1 @@
-1 : add tcpdump and tshark for in-container packet capture and PID 1 signal handling
+2 : enable OT_POSIX_INSTALL_EXTERNAL_ROUTES in ot-br-posix build

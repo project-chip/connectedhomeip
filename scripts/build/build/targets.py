@@ -81,6 +81,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'on-off-light',
     'on-off-light-switch',
     'on-off-plug-in-unit',
+    'on-off-sensor',
     'oven',
     'power-source',
     'pressure-sensor',
