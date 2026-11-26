@@ -52,6 +52,8 @@ public:
     Transport * GetTransportForAudioStream(uint16_t audioStreamID) override;
     // Reset the transport's sink state for proper preroll buffering before starting transmission
     void ResetTransportSinkState(Transport * transport) override;
+    // Purge buffered video frames so pre-update frames are not replayed after a privacy zone update
+    void ClearVideoPreRollBuffer() override { mPreRollBuffer.ClearVideoBuffers(); }
 
 private:
     void UnregisterTransportLocked(Transport * transport) CHIP_REQUIRES(mConnectionsMutex);

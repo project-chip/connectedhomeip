@@ -45,6 +45,8 @@ BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(Sim
     {
     case SimulatedElectricalSensorDelegate::Role::kGrid:
         return BitMask<Feature>(Feature::kAlternatingCurrent);
+    case SimulatedElectricalSensorDelegate::Role::kAcPolyphaseOutput:
+        return BitMask<Feature>(Feature::kAlternatingCurrent, Feature::kPolyphasePower);
     case SimulatedElectricalSensorDelegate::Role::kBattery:
         return BitMask<Feature>(Feature::kDirectCurrent);
     case SimulatedElectricalSensorDelegate::Role::kGeneric:
@@ -61,7 +63,8 @@ PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensorDelegate::Rol
 
     switch (role)
     {
-    case SimulatedElectricalSensorDelegate::Role::kGrid: {
+    case SimulatedElectricalSensorDelegate::Role::kGrid:
+    case SimulatedElectricalSensorDelegate::Role::kAcPolyphaseOutput: {
         OptionalAttributesSet attributes(OptionalAttributesSet::All());
         attributes.Set<ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id>(false);
         return attributes;
@@ -164,12 +167,10 @@ CHIP_ERROR
 SimulatedElectricalSensorDelegate::GetAccuracyByIndex(uint8_t index,
                                                       ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
 {
-    static ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type accuracyRange = { .rangeMin = 0,
-                                                                                                       .rangeMax = 10 };
     val = { .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
             .measured         = false,
             .minMeasuredValue = 0,
             .maxMeasuredValue = 10,
-            .accuracyRanges   = Span(&accuracyRange, 1) };
+            .accuracyRanges   = Span(&mAccuracyRange, 1) };
     return index == 0 ? CHIP_NO_ERROR : CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }

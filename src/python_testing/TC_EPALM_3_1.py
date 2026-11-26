@@ -59,7 +59,7 @@ ALARM_BIT = 0
 class TC_EPALM_3_1(ElectricalProtectionAlarmTestBaseHelper):
 
     def pics_TC_EPALM_3_1(self) -> list[str]:
-        return ["EPALM.S", "EPALM.S.F20", "EPALM.S.E00"]
+        return ["EPALM.S", "EPALM.S.F14", "EPALM.S.E00"]
 
     def steps_TC_EPALM_3_1(self) -> list[TestStep]:
         return self.alarm_notify_steps(ALARM_BIT, ALARM_NAME)

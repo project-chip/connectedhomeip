@@ -50,6 +50,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'battery-storage',
     'bridged-node',
     'chime',
+    'closure-controller',
     'color-temperature-light',
     'contact-sensor',
     'cooktop',
@@ -58,12 +59,14 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-plug-in-unit',
     'dishwasher',
     'doorbell',
+    'electrical-energy-tariff',
     'electrical-sensor',
     'extended-color-light',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
+    'heat-pump',
     'humidity-conditioner',
     'humidity-sensor',
     'irrigation-system',
@@ -78,6 +81,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'on-off-light',
     'on-off-light-switch',
     'on-off-plug-in-unit',
+    'on-off-sensor',
     'oven',
     'power-source',
     'pressure-sensor',
@@ -87,6 +91,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'robotic-vacuum-cleaner',
     'room-air-conditioner',
     'soil-sensor',
+    'solar-power',
     'speaker',
     'temperature-sensor',
     'thermostat',
@@ -672,6 +677,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="build-only-no-blobs", build_only_no_blobs=True).OnlyIfRe('zephyr')
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
 
@@ -902,6 +908,7 @@ def BuildTelinkTarget():
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('all-devices', app=TelinkApp.ALL_DEVICES),
         TargetPart('bridge', app=TelinkApp.BRIDGE),
+        TargetPart('closure', app=TelinkApp.CLOSURE),
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),

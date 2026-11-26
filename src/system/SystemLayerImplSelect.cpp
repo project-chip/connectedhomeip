@@ -308,6 +308,8 @@ CriticalFailure LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
+    assertChipStackLockedByCurrentThread();
+
     // Find a free slot.
     SocketWatch * watch = nullptr;
     for (auto & w : mSocketWatchPool)
@@ -338,6 +340,8 @@ CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * token
 
 CHIP_ERROR LayerImplSelect::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
 {
+    assertChipStackLockedByCurrentThread();
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -346,12 +350,19 @@ CHIP_ERROR LayerImplSelect::SetCallback(SocketWatchToken token, SocketWatchCallb
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
+CHIP_ERROR LayerImplSelect::RequestCallback(SocketWatchToken token, SocketEventFlags flag)
 {
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    watch->mPendingIO.Set(SocketEventFlags::kRead);
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    const bool wasPending = watch->mPendingIO.Has(flag);
+#endif
+    watch->mPendingIO.Set(flag);
 
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
     VerifyOrDie(mLibEvLoopP != nullptr);
@@ -371,43 +382,34 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
         ev_io_modify(&watch->mIoWatcher, evs);
         ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
     }
+#else
+    // A caller holding the Matter stack lock on another thread (for example, an
+    // Android JNI callback) can enable read or write interest while the event loop thread
+    // has released the stack lock around WaitForEvents() / select(). Wake
+    // select() on the 0 -> 1 transition so PrepareEvents() adds the FD.
+    if (!wasPending)
+    {
+        Signal();
+    }
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
+{
+    return RequestCallback(token, SocketEventFlags::kRead);
 }
 
 CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token)
 {
-    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
-    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    watch->mPendingIO.Set(SocketEventFlags::kWrite);
-
-#if CHIP_SYSTEM_CONFIG_USE_LIBEV
-    VerifyOrDie(mLibEvLoopP != nullptr);
-    int evs = (watch->mPendingIO.Has(SocketEventFlags::kRead) ? EV_READ : 0) |
-        (watch->mPendingIO.Has(SocketEventFlags::kWrite) ? EV_WRITE : 0);
-    if (!ev_is_active(&watch->mIoWatcher))
-    {
-        // First time actually using that watch
-        ev_io_set(&watch->mIoWatcher, watch->mFD, evs);
-        ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
-    }
-    else
-    {
-        // already active, just change flags
-        // Note: changing flags only reliably works when the watcher is stopped
-        ev_io_stop(mLibEvLoopP, &watch->mIoWatcher);
-        ev_io_modify(&watch->mIoWatcher, evs);
-        ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
-
-    return CHIP_NO_ERROR;
+    return RequestCallback(token, SocketEventFlags::kWrite);
 }
 
 CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingRead(SocketWatchToken token)
 {
+    assertChipStackLockedByCurrentThread();
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -426,6 +428,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingRead(SocketWatchToken token)
 
 CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 {
+    assertChipStackLockedByCurrentThread();
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -444,6 +448,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 
 CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(tokenInOut != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);

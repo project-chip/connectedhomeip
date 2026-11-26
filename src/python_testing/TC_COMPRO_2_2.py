@@ -49,8 +49,10 @@
 For the test rig topology, the Python wheel requirement and how to run this
 suite, see ``support_modules/compro_support.py``.
 
-Verifies that ProxyScanRequest returns an empty list when no ED is commissionable,
-and returns a populated result list (with correct fields) when an ED is commissionable.
+Verifies that ProxyScanRequest lists no entry for the ED when it is not commissionable,
+and lists the ED (with correct fields) when it is commissionable.  Other commissionable
+devices in radio range may also be listed; only entries with the ED's discriminator
+(``ed_discriminator``) are judged.
 
 Test plan reference: TC-COMPRO-2.2
 
@@ -92,10 +94,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
-# When an ED discriminator and passcode are known for verification they can be
-# passed as --int-arg ed_discriminator:<int>
-# If not provided, only NumberOfResults >= 1 is checked (discriminator not validated).
-
 # Tolerance added on top of ScanMaxTime before the response must arrive (10 %)
 SCAN_TIMEOUT_MARGIN = 1.10
 
@@ -120,7 +118,8 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
                      "Store as scan_max_time"),
             TestStep(6, "TH sends ProxyScanRequest with valid_transports (and valid_bands if WI)",
                      "DUT sends ProxyScanResponse within scan_max_time * 1.1 s; "
-                     "Status SUCCESS; NumberOfResults == 0; ProxyScanResult is empty"),
+                     "Status SUCCESS; no ProxyScanResult entry has the ED's Discriminator; "
+                     "NumberOfResults equals the number of ProxyScanResult entries"),
             TestStep(7, "Ensure ED IS commissionable"),
             TestStep(8, "TH sends ProxyScanRequest with valid_transports (and valid_bands if WI)",
                      "DUT sends ProxyScanResponse within scan_max_time * 1.1 s; "
@@ -148,13 +147,7 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
         cp = self.cp
         ed = self._ed_fixture_from_params()
         params = getattr(self, 'user_params', {}) or {}
-
-        # Verify the scan result matches the ED discriminator.  Defaults to 3841
-        # to match EDFixture's default so an ED started via ed_app_path (without an
-        # explicit ed_discriminator) is still validated.
-        expected_discriminator = int(params.get('ed_discriminator', 3841))
-        asserts.assert_true(0 <= expected_discriminator <= 4095,
-                            f"ed_discriminator {expected_discriminator} out of range (0-4095)")
+        ed_discriminator = self.ed_discriminator
         ed_transport = params.get('ed_transport', 'wifipaf')
 
         # Step 1 — commissioning done by framework
@@ -192,10 +185,15 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
         self.step(6)
         response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
                                                  timeout_sec=response_deadline)
-        asserts.assert_equal(response.numberOfResults, 0,
-                             "Expected NumberOfResults == 0 when no ED is commissionable")
-        asserts.assert_equal(response.proxyScanResult, [],
-                             "Expected empty ProxyScanResult when no ED is commissionable")
+        asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
+                             "NumberOfResults must equal the number of ProxyScanResult entries")
+        self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 6 ProxyScanResult")
+        ed_results, other_results = self.split_ed_entries(response.proxyScanResult)
+        logger.info("Step 6: other devices listed: %s", self.describe_entries(other_results))
+        asserts.assert_false(
+            ed_results,
+            f"ProxyScanResult has an entry with the ED's discriminator {ed_discriminator} while the ED is "
+            f"not commissionable (another device may share it): {self.describe_entries(ed_results)}")
 
         # Step 7 — make ED commissionable
         self.step(7)
@@ -219,46 +217,32 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
         asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
                              "NumberOfResults must equal the number of ProxyScanResult entries")
 
-        # Validate the entry matching the known ED discriminator.  A discriminator is
-        # always in scope (ed_discriminator defaults to EDFixture's 3841), including
-        # the legal value 0, so the match is unconditional.
-        matches = [r for r in response.proxyScanResult if r.discriminator == expected_discriminator]
-        asserts.assert_greater_equal(len(matches), 1,
-                                     f"No scan result matched ED discriminator {expected_discriminator}")
-        result = matches[0]
+        # Validate the ED's entry; other devices in range may be listed too.
+        matches, other_results = self.split_ed_entries(response.proxyScanResult)
+        logger.info("Step 8: other devices listed: %s", self.describe_entries(other_results))
+        if not matches:
+            await self.fail_ed_missing("Step 8", other_results, has_bgs)
 
-        logger.info("Scan result: discriminator=%d transport=0x%02x vendorID=%d productID=%d",
-                    result.discriminator, result.transport, result.vendorID, result.productID)
-
-        # Transport must be non-zero and indicate a SINGLE transport
-        # (CommissioningProxy.adoc ScanResultStruct Transport field: "SHALL indicate
-        # the single transport of the scan result").
-        asserts.assert_not_equal(result.transport, 0,
-                                 "ScanResultStruct.Transport must be non-zero")
-        asserts.assert_equal(result.transport & (result.transport - 1), 0,
-                             f"ScanResultStruct.Transport 0x{result.transport:02x} must have exactly "
-                             "one bit set (single transport)")
-        # Discriminator range: 0-4095
-        asserts.assert_less_equal(result.discriminator, 4095,
-                                  "ScanResultStruct.Discriminator must be <= 4095")
-        # Each device is reported once per (Discriminator, VendorID, ProductID, Transport)
-        # — the ProxyScanResponse must not contain duplicate tuples.
-        seen_keys = set()
-        for r in response.proxyScanResult:
-            key = (r.discriminator, r.vendorID, r.productID, r.transport)
-            asserts.assert_true(
-                key not in seen_keys,
-                f"Duplicate scan result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
-                f"productID={r.productID}, transport=0x{r.transport:02x}); each device must be "
-                "reported once per discriminator/VendorID/ProductID/transport")
-            seen_keys.add(key)
         # WiFiBand is populated only when the result's transport is PAFTP
         # (CommissioningProxy.adoc WiFiBand Field of ScanResultStruct).  For
         # BLE-discovered entries it is null even when the WI feature is on.
         wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
-        if has_wi and (result.transport & wifipaf_bit):
-            asserts.assert_not_equal(result.wiFiBand, NullValue,
-                                     "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
+        for result in matches:
+            logger.info("Scan result: discriminator=%d transport=0x%02x vendorID=%d productID=%d",
+                        result.discriminator, result.transport, result.vendorID, result.productID)
+            # Transport must be non-zero and indicate a SINGLE transport
+            # (CommissioningProxy.adoc ScanResultStruct Transport field: "SHALL indicate
+            # the single transport of the scan result").
+            asserts.assert_not_equal(result.transport, 0,
+                                     "ScanResultStruct.Transport must be non-zero")
+            asserts.assert_equal(result.transport & (result.transport - 1), 0,
+                                 f"ScanResultStruct.Transport 0x{result.transport:02x} must have exactly "
+                                 "one bit set (single transport)")
+            if has_wi and (result.transport & wifipaf_bit):
+                asserts.assert_true(
+                    result.wiFiBand not in (None, NullValue, 0),
+                    "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
+        self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 8 ProxyScanResult")
 
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
         # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported
@@ -385,14 +369,17 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
                     "simultaneously (e.g. BLE and WiFiPAF), then press Enter to continue."))
             response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
                                                      timeout_sec=response_deadline)
-            ed_entries = [r for r in response.proxyScanResult
-                          if r.discriminator == expected_discriminator]
-            logger.info("Step 13: %d ProxyScanResult entries for the ED: %s",
-                        len(ed_entries),
-                        [f"disc={e.discriminator} transport=0x{e.transport:02x}" for e in ed_entries])
+            asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
+                                 "NumberOfResults must equal the number of ProxyScanResult entries")
+            self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 13 ProxyScanResult")
+            ed_entries, other_results = self.split_ed_entries(response.proxyScanResult)
+            logger.info("Step 13: %d ProxyScanResult entries for the ED: %s; other devices listed: %s",
+                        len(ed_entries), self.describe_entries(ed_entries),
+                        self.describe_entries(other_results))
             asserts.assert_greater_equal(
                 len(ed_entries), 2,
-                "Expected the dual-transport ED to appear as at least two ProxyScanResult entries")
+                "Expected the dual-transport ED to appear as at least two ProxyScanResult entries "
+                f"(other devices listed: {self.describe_entries(other_results)})")
             transports_seen = set()
             for entry in ed_entries:
                 # Each entry must report exactly one transport bit.

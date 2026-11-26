@@ -79,6 +79,7 @@ The application supports the following device types (specified via the
 -   `chime`
 -   `closure-barrier`
 -   `closure-cabinet`
+-   `closure-controller`
 -   `closure-door`
 -   `closure-garage-door`
 -   `closure-gate`
@@ -93,6 +94,7 @@ The application supports the following device types (specified via the
 -   `dimmable-plug-in-unit`
 -   `dishwasher-simulated`
 -   `doorbell`
+-   `electrical-energy-tariff`
 -   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
@@ -100,6 +102,8 @@ The application supports the following device types (specified via the
 -   `flow-sensor`
 -   `flow-sensor-simulated`
 -   `generic-switch`
+-   `heat-pump`
+-   `heat-pump-thermostat-client`
 -   `humidity-conditioner`
 -   `humidity-sensor`
 -   `humidity-sensor-simulated`
@@ -118,6 +122,7 @@ The application supports the following device types (specified via the
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
 -   `on-off-plug-with-sensors`
+-   `on-off-sensor`
 -   `oven`
 -   `oven-2`
 -   `power-source`
@@ -134,6 +139,11 @@ The application supports the following device types (specified via the
 -   `smoke-co-alarm`
 -   `soil-sensor`
 -   `soil-sensor-simulated`
+-   `solar-power`
+-   `solar-power-four-panels`
+-   `solar-power-three-phase`
+-   `solar-power-two-strings`
+-   `solar-power-two-strings-four-panels`
 -   `speaker`
 -   `temperature-sensor`
 -   `temperature-sensor-simulated`

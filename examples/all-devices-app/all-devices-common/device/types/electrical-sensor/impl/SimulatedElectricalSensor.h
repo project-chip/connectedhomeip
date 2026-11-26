@@ -37,6 +37,7 @@ public:
         kGeneric,
         kGrid,
         kBattery,
+        kAcPolyphaseOutput,
     };
 
     SimulatedElectricalSensorDelegate(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
@@ -132,6 +133,9 @@ private:
     Role mRole;
     FakeReadings mFakeReadings;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
+
+    Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type mAccuracyRange = { .rangeMin = 0,
+                                                                                                           .rangeMax = 10 };
 };
 
 class SimulatedElectricalSensor : public SimulatedElectricalSensorDelegate, public ElectricalSensor

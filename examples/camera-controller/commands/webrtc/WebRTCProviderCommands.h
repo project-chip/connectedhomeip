@@ -20,6 +20,7 @@
 
 #include <commands/common/CHIPCommand.h>
 #include <device-manager/DeviceManager.h>
+#include <webrtc-manager/WebRTCProviderClient.h>
 
 namespace webrtc {
 
@@ -42,6 +43,48 @@ private:
     chip::EndpointId mPeerEndpointId = chip::kInvalidEndpointId;
 };
 
+// The optional SolicitOffer / ProvideOffer arguments shared by both commands.
+class OfferOptionArguments
+{
+public:
+    OfferOptionArguments() :
+        mComplex_VideoStreams(&mVideoStreams), mComplex_AudioStreams(&mAudioStreams), mComplex_SFrameConfig(&mSFrameConfig),
+        mComplex_ICEServers(&mICEServers)
+    {}
+
+    void AddTo(Command & command)
+    {
+        command.AddArgument("video-streams", &mComplex_VideoStreams, "JSON list of video stream IDs, e.g. [1,2]",
+                            Argument::kOptional);
+        command.AddArgument("audio-streams", &mComplex_AudioStreams, "JSON list of audio stream IDs, e.g. [3]",
+                            Argument::kOptional);
+        command.AddArgument("metadata-enabled", 0, 1, &mMetadataEnabled);
+        command.AddArgument("sframe-config", &mComplex_SFrameConfig,
+                            "JSON SFrameStruct, e.g. {\"cipherSuite\":2,\"baseKey\":\"hex:<32 bytes>\",\"kid\":\"hex:0102\"}",
+                            Argument::kOptional);
+        command.AddArgument("ice-servers", &mComplex_ICEServers,
+                            "JSON list of ICEServerStruct, e.g. [{\"URLs\":[\"stun:stun.example.com\"]}]", Argument::kOptional);
+        command.AddArgument("ice-transport-policy", &mICETransportPolicy);
+    }
+
+    // Returns a copy of the arguments that owns its data.
+    WebRTCProviderClient::OfferOptions ToOfferOptions() const;
+
+private:
+    chip::Optional<chip::app::DataModel::List<const uint16_t>> mVideoStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
+    chip::Optional<chip::app::DataModel::List<const uint16_t>> mAudioStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
+    chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type> mSFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
+    chip::Optional<chip::app::DataModel::List<const WebRTCProviderClient::ICEServerStruct>> mICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const WebRTCProviderClient::ICEServerStruct>>>
+        mComplex_ICEServers;
+    chip::Optional<bool> mMetadataEnabled;
+    chip::Optional<char *> mICETransportPolicy;
+};
+
 class ProvideOfferCommand : public CHIPCommand
 {
 public:
@@ -51,6 +94,7 @@ public:
         AddArgument("webrtc-session-id", 0, UINT16_MAX, &mWebRTCSessionId);
         AddArgument("video-stream-id", 0, UINT16_MAX, &mVideoStreamId);
         AddArgument("audio-stream-id", 0, UINT16_MAX, &mAudioStreamId);
+        mOfferOptionArguments.AddTo(*this);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -63,6 +107,7 @@ private:
     chip::Optional<uint16_t> mWebRTCSessionId;
     chip::Optional<uint16_t> mVideoStreamId;
     chip::Optional<uint16_t> mAudioStreamId;
+    OfferOptionArguments mOfferOptionArguments;
 };
 
 class SolicitOfferCommand : public CHIPCommand
@@ -73,6 +118,7 @@ public:
         AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
         AddArgument("video-stream-id", 0, UINT16_MAX, &mVideoStreamId);
         AddArgument("audio-stream-id", 0, UINT16_MAX, &mAudioStreamId);
+        mOfferOptionArguments.AddTo(*this);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -84,6 +130,7 @@ private:
     uint8_t mStreamUsage = 0;
     chip::Optional<uint16_t> mVideoStreamId;
     chip::Optional<uint16_t> mAudioStreamId;
+    OfferOptionArguments mOfferOptionArguments;
 };
 
 class EstablishSessionCommand : public CHIPCommand

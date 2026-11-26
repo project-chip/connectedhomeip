@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <credentials/FabricTable.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <functional>
 #include <platform/CHIPDeviceLayer.h>
@@ -40,7 +41,7 @@ public:
         return instance;
     }
 
-    void Init();
+    void Init(chip::FabricTable & fabricTable);
 
     /**
      * @brief Set callback to be invoked when WebRTC session is established
@@ -59,10 +60,12 @@ public:
 
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                            WebRTCProviderClient::OfferOptions options = WebRTCProviderClient::OfferOptions());
 
     CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                            const WebRTCProviderClient::OfferOptions & options = WebRTCProviderClient::OfferOptions());
 
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
@@ -114,6 +117,7 @@ private:
         StreamUsageEnum streamUsage = {};
         chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId;
         chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId;
+        WebRTCProviderClient::OfferOptions offerOptions;
 
         void Reset() { *this = PendingSdpContext{}; }
     };

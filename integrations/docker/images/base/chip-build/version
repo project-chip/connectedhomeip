@@ -1,1 +1,1 @@
-220 : [NXP] Revert to pre-installed zephyr and pin nxp zephyr to commit SHA
+222 : [CI] Publish chip-build and chip-build-minimal as multi-arch (amd64 + arm64) images

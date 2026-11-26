@@ -49,6 +49,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-controller/ClosureController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -63,6 +64,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/doorbell/Doorbell.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/ElectricalEnergyTariff.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
@@ -75,6 +78,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/HeatPump.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/impl/SimulatedHeatPump.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
@@ -106,6 +111,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-sensor/OnOffSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"
@@ -117,7 +123,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
@@ -129,6 +134,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/PanelElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SolarPowerVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
@@ -161,6 +171,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -203,6 +214,7 @@ foreach(_key
         bridged-node
         chime
         closure
+        closure-controller
         color-temperature-light
         commissioning-proxy
         contact-sensor
@@ -212,12 +224,14 @@ foreach(_key
         dimmable-plug-in-unit
         dishwasher
         doorbell
+        electrical-energy-tariff
         electrical-sensor
         extended-color-light
         extractor-hood
         fan
         flow-sensor
         generic-switch
+        heat-pump
         humidity-conditioner
         humidity-sensor
         irrigation-system
@@ -233,6 +247,7 @@ foreach(_key
         on-off-light
         on-off-light-switch
         on-off-plug-in-unit
+        on-off-sensor
         oven
         power-source
         pressure-sensor
@@ -243,6 +258,7 @@ foreach(_key
         room-air-conditioner
         smoke-co-alarm
         soil-sensor
+        solar-power
         speaker
         temperature-sensor
         thermostat
