@@ -26,6 +26,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Binding/Metadata.h>
+#include <lib/support/Defer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -260,43 +261,21 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
 DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                              AttributeValueDecoder & decoder)
 {
-    class ScopedAttributeChangeNotifier
-    {
-    public:
-        ScopedAttributeChangeNotifier(BindingCluster & cluster, AttributeId attributeId) :
-            mCluster(cluster), mAttributeId(attributeId)
-        {}
-
-        ScopedAttributeChangeNotifier(const ScopedAttributeChangeNotifier &)             = delete;
-        ScopedAttributeChangeNotifier & operator=(const ScopedAttributeChangeNotifier &) = delete;
-
-        ~ScopedAttributeChangeNotifier()
-        {
-            if (mChanged)
-            {
-                mCluster.NotifyAttributeChanged(mAttributeId);
-            }
-        }
-
-        CHIP_ERROR MarkChangedOnSuccess(CHIP_ERROR err)
-        {
-            if (err == CHIP_NO_ERROR)
-            {
-                mChanged = true;
-            }
-            return err;
-        }
-
-    private:
-        BindingCluster & mCluster;
-        const AttributeId mAttributeId;
-        bool mChanged = false;
-    };
-
     switch (request.path.mAttributeId)
     {
     case Binding::Attributes::Binding::Id: {
         VerifyOrReturnError(!mListWrite.has_value() || mListWrite->valid, CHIP_ERROR_NO_MEMORY);
+        bool changed              = false;
+        auto notify               = MakeDefer([&] {
+            if (changed && !mListWrite.has_value())
+            {
+                LogErrorOnFailure(NotifyBindingsChanged(request.GetAccessingFabricIndex()));
+            }
+        });
+        auto markChangedOnSuccess = [&](CHIP_ERROR error) {
+            changed = changed || error == CHIP_NO_ERROR;
+            return error;
+        };
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             DecodableBindingListType newBindingList;
@@ -321,7 +300,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
                     {
                         TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
-                    ReturnErrorOnFailure(notifier.MarkChangedOnSuccess(mClusterContext.bindingTable.RemoveAt(bindingTableIter)));
+                    ReturnErrorOnFailure(markChangedOnSuccess(mClusterContext.bindingTable.RemoveAt(bindingTableIter)));
                 }
                 else
                 {
@@ -334,16 +313,9 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             CHIP_ERROR err = CHIP_NO_ERROR;
             while (iter.Next() && err == CHIP_NO_ERROR)
             {
-                err = notifier.MarkChangedOnSuccess(CreateBindingEntry(iter.GetValue(), request.path.mEndpointId));
+                err = markChangedOnSuccess(CreateBindingEntry(iter.GetValue(), request.path.mEndpointId));
             }
 
-            // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
-            // so a notification is sent here.
-            if (!request.path.IsListOperation())
-            {
-                // Notify binding table has changed
-                LogErrorOnFailure(NotifyBindingsChanged(request.GetAccessingFabricIndex()));
-            }
             return err;
         }
         if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -354,7 +326,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             {
                 return Status::ConstraintError;
             }
-            return notifier.MarkChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
+            return markChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
         }
         return Status::UnsupportedWrite;
     }

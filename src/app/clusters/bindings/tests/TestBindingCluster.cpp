@@ -16,13 +16,13 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/bindings/BindingCluster.h>
-#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
+#include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/data-model/Decode.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <clusters/Binding/Enums.h>
 #include <clusters/Binding/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -31,6 +31,10 @@
 #include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
+#include <vector>
 
 namespace {
 
@@ -38,8 +42,6 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Binding;
 
-using chip::app::DataModel::AcceptedCommandEntry;
-using chip::app::DataModel::AttributeEntry;
 using chip::Protocols::InteractionModel::Status;
 using chip::Testing::IsAttributesListEqualTo;
 
@@ -574,8 +576,8 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
 
         app::DataModel::List<const TargetStructType> empty;
-        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll),
-                  Status::Success);
+        EXPECT_TRUE(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll)
+                        .IsNoOpSuccess());
         EXPECT_TRUE(tester.GetDirtyList().empty());
         EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
     }
