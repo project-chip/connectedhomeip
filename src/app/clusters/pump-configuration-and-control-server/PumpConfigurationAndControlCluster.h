@@ -257,6 +257,7 @@ private:
 
     template <typename T>
     void UpdateQuietAttribute(QuieterReportingAttribute<T> & attr, const DataModel::Nullable<T> & value, AttributeId attributeId);
+    void NotifyQuietAttributeChanged(AttributeId attributeId, AttributeDirtyState dirtyState);
 
     /// Stores `value` for `attributeId`. Does nothing before Startup. Failures are logged.
     template <typename T>

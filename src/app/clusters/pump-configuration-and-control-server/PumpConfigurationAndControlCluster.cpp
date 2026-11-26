@@ -399,7 +399,7 @@ DataModel::ActionReturnStatus PumpConfigurationAndControlCluster::WriteAttribute
 CHIP_ERROR PumpConfigurationAndControlCluster::Attributes(const ConcreteClusterPath & path,
                                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    constexpr DataModel::AttributeEntry optionalAttributes[] = {
+    static constexpr DataModel::AttributeEntry kOptionalAttributes[] = {
         MinConstPressure::kMetadataEntry,       //
         MaxConstPressure::kMetadataEntry,       //
         MinCompPressure::kMetadataEntry,        //
@@ -418,7 +418,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Attributes(const ConcreteClusterP
     };
 
     AttributeListBuilder listBuilder(builder);
-    ReturnErrorOnFailure(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes));
+    ReturnErrorOnFailure(listBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), mEnabledOptionalAttributes));
 
     if (mControlModeEnabled)
     {
@@ -499,18 +499,23 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask p
     return CHIP_NO_ERROR;
 }
 
+void PumpConfigurationAndControlCluster::NotifyQuietAttributeChanged(AttributeId attributeId, AttributeDirtyState dirtyState)
+{
+    NotifyAttributeChanged(attributeId,
+                           dirtyState == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
+                                                                          : DataModel::AttributeChangeType::kQuiet);
+    mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+}
+
 template <typename T>
 void PumpConfigurationAndControlCluster::UpdateQuietAttribute(QuieterReportingAttribute<T> & attr,
                                                               const DataModel::Nullable<T> & value, AttributeId attributeId)
 {
     VerifyOrReturn(attr.value() != value);
-    const AttributeDirtyState dirtyState =
-        attr.SetValue(value, System::SystemClock().GetMonotonicMilliseconds64(),
-                      QuieterReportingAttribute<T>::GetPredicateForSufficientTimeSinceLastDirty(kQuietReportingInterval));
-    NotifyAttributeChanged(attributeId,
-                           dirtyState == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
-                                                                          : DataModel::AttributeChangeType::kQuiet);
-    mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+    const AttributeDirtyState dirtyState = attr.SetValue(
+        value, System::SystemClock().GetMonotonicMilliseconds64(),
+        [](const auto & candidate) { return (candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= kQuietReportingInterval; });
+    NotifyQuietAttributeChanged(attributeId, dirtyState);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetCapacity(DataModel::Nullable<int16_t> capacity)
