@@ -192,6 +192,22 @@ TEST_F(EnergyManagementTestFixture, RequestDuringAdjustmentRestartsDurationWitho
     ExpectIdle();
 }
 
+TEST_F(EnergyManagementTestFixture, EnergyUseIsNotRoundedDownPerRequest)
+{
+    ASSERT_SUCCESS(mTestEventTriggerDelegate.HandleEventTriggers(kTriggerPowerAdjustment));
+
+    EXPECT_EQ(PowerAdjust(5'000'000, 20, AdjustmentCauseEnum::kLocalOptimization), Status::Success);
+    ExpectPowerAdjustStartEvent();
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(10));
+    EXPECT_EQ(PowerAdjust(5'000'000, 10, AdjustmentCauseEnum::kLocalOptimization), Status::Success);
+    ExpectNoEvent();
+
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(10));
+    // 5 kW for 20 s = 27777.7 mWh. Rounding the two 10 s intervals down separately would give 27776 mWh.
+    ExpectPowerAdjustEndEvent(CauseEnum::kNormalCompletion, 20, 27'777);
+    ExpectIdle();
+}
+
 TEST_F(EnergyManagementTestFixture, PowerAdjustmentTriggerChangesCapability)
 {
     EXPECT_EQ(mDevice.GetAbsMinPower(), 0);

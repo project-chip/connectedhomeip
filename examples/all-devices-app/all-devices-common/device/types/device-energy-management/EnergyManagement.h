@@ -123,8 +123,8 @@ private:
         System::Clock::Timestamp startTime;
         // Start of the interval that uses `power`. A PowerAdjustRequest during an active adjustment starts a new interval.
         System::Clock::Timestamp intervalStartTime;
-        int64_t power;     // mW
-        int64_t energyUse; // mWh, of the intervals before `intervalStartTime`
+        int64_t power;                       // mW
+        int64_t energyMilliwattMilliseconds; // mW*ms, of the intervals before `intervalStartTime`
     };
 
     CHIP_ERROR SetPowerAdjustmentCause(Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum cause);

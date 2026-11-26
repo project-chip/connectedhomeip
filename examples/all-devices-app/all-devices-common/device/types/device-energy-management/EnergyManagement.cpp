@@ -64,11 +64,14 @@ OptOutStateEnum AddOptOut(OptOutStateEnum current, OptOutStateEnum added)
     return static_cast<OptOutStateEnum>(chip::to_underlying(current) | chip::to_underlying(added));
 }
 
-int64_t EnergyUse(int64_t powerMilliwatts, chip::System::Clock::Milliseconds64 duration)
+constexpr int64_t kMillisecondsPerHour = 3'600'000;
+
+// Energy in mW*ms. The value is converted to mWh once, for the whole adjustment, so that the division does not
+// drop a remainder for every interval.
+int64_t EnergyMilliwattMilliseconds(int64_t powerMilliwatts, chip::System::Clock::Milliseconds64 duration)
 {
-    constexpr int64_t kMillisecondsPerHour = 3'600'000;
-    const int64_t absolutePower            = powerMilliwatts < 0 ? -powerMilliwatts : powerMilliwatts;
-    return absolutePower * static_cast<int64_t>(duration.count()) / kMillisecondsPerHour;
+    const int64_t absolutePower = powerMilliwatts < 0 ? -powerMilliwatts : powerMilliwatts;
+    return absolutePower * static_cast<int64_t>(duration.count());
 }
 
 } // namespace
@@ -158,12 +161,12 @@ Protocols::InteractionModel::Status EnergyManagement::PowerAdjustRequest(const i
     if (isNewAdjustment)
     {
         mActivePowerAdjustment =
-            ActivePowerAdjustment{ .startTime = now, .intervalStartTime = now, .power = power, .energyUse = 0 };
+            ActivePowerAdjustment{ .startTime = now, .intervalStartTime = now, .power = power, .energyMilliwattMilliseconds = 0 };
     }
     else
     {
         ActivePowerAdjustment & adjustment = *mActivePowerAdjustment;
-        adjustment.energyUse += EnergyUse(adjustment.power, now - adjustment.intervalStartTime);
+        adjustment.energyMilliwattMilliseconds += EnergyMilliwattMilliseconds(adjustment.power, now - adjustment.intervalStartTime);
         adjustment.intervalStartTime = now;
         adjustment.power             = power;
     }
@@ -206,7 +209,9 @@ void EnergyManagement::EndPowerAdjustment(CauseEnum cause)
     Events::PowerAdjustEnd::Type event;
     event.cause     = cause;
     event.duration  = static_cast<uint32_t>(((now - adjustment.startTime).count() + 500) / 1000);
-    event.energyUse = adjustment.energyUse + EnergyUse(adjustment.power, now - adjustment.intervalStartTime);
+    event.energyUse = (adjustment.energyMilliwattMilliseconds +
+                       EnergyMilliwattMilliseconds(adjustment.power, now - adjustment.intervalStartTime)) /
+        kMillisecondsPerHour;
 
     VerifyOrReturn(mDemCluster.IsConstructed());
     mDemCluster.Cluster().GenerateEvent(event);
