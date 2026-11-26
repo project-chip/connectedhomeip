@@ -179,9 +179,7 @@ public final class CastingApp {
     return MatterError.NO_ERROR;
   }
 
-  /**
-   * @brief Tears down all active subscriptions.
-   */
+  /** @brief Tears down all active subscriptions. */
   public native MatterError shutdownAllSubscriptions();
 
   /**

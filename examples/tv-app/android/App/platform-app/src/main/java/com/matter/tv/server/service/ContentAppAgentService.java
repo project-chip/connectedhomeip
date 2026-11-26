@@ -84,10 +84,11 @@ public class ContentAppAgentService extends Service {
             // Make this call async so that even if the content apps make this call during command
             // processing and synchronously, the command processing thread will not block for the
             // chip stack lock.
-            executorService.execute(() -> {
-              AppPlatformService.get()
-                  .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
-            });
+            executorService.execute(
+                () -> {
+                  AppPlatformService.get()
+                      .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+                });
             return true;
           }
           Log.e(TAG, "No matter content app found for package " + pkg);
