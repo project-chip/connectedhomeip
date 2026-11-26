@@ -457,6 +457,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     WebrtcTransport * transport = GetTransport(args.sessionId);
     if (transport == nullptr)
     {
+        // Check resource availability before inserting a new session slot.
+        if (mWebrtcTransportMap.size() >= kMaxConcurrentWebRTCSessions)
+        {
+            ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%u)",
+                            kMaxConcurrentWebRTCSessions);
+            return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+        }
+
         mWebrtcTransportMap[args.sessionId]                            = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
         mSessionIdMap[ScopedNodeId(args.peerNodeId, args.fabricIndex)] = args.sessionId;
         transport                                                      = mWebrtcTransportMap[args.sessionId].get();
@@ -467,16 +475,19 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
     }
 
-    // Check resource availability before proceeding
-    // If we cannot allocate resources, respond with a response status of RESOURCE_EXHAUSTED
-    if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
-    {
-        ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%u)",
-                        kMaxConcurrentWebRTCSessions);
-        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
-    }
-
     transport->SetRequestArgs(requestArgs);
+
+    const auto & storedArgs = transport->GetRequestArgs();
+    if (!storedArgs.videoStreams.empty())
+    {
+        outSession.videoStreams.SetValue(
+            DataModel::List<const uint16_t>(storedArgs.videoStreams.data(), storedArgs.videoStreams.size()));
+    }
+    if (!storedArgs.audioStreams.empty())
+    {
+        outSession.audioStreams.SetValue(
+            DataModel::List<const uint16_t>(storedArgs.audioStreams.data(), storedArgs.audioStreams.size()));
+    }
 
     // Store SFrameConfig in Transport base class if provided for later use in frame encryption
     if (args.sFrameConfig.HasValue())
@@ -1068,6 +1079,12 @@ void WebRTCProviderManager::CleanupSession(uint16_t sessionId)
     // Remove from session maps
     mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
+    // Remove the CurrentSessions entry before destroying the transport that backs its stream lists.
+    if (mWebRTCTransportProvider != nullptr)
+    {
+        mWebRTCTransportProvider->RemoveSession(sessionId);
+    }
+
     // Finally, remove and destroy the transport
     mWebrtcTransportMap.erase(sessionId);
 
@@ -1200,13 +1217,6 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
             ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
             CleanupSession(sessionId);
-
-            // Remove from current sessions list in the WebRTC Transport Provider
-            // This MUST be called on the Matter thread with the stack lock held
-            if (mWebRTCTransportProvider != nullptr)
-            {
-                mWebRTCTransportProvider->RemoveSession(sessionId);
-            }
         });
     }
 }
