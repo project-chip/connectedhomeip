@@ -116,6 +116,8 @@ TEST_F(TestBindingCluster, CompletedListWritesReportBindingChangesIncludingClear
             {
                 bindings = app::DataModel::List<const TargetStructType>();
             }
+            cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin,
+                                                   chip::Testing::kTestFabricIndex);
             ASSERT_TRUE(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, pattern).IsSuccess());
             EXPECT_EQ(manager.GetBindingTable().Size(), clear ? 0u : 1u);
             EXPECT_TRUE(tester.GetDirtyList().empty());
@@ -128,6 +130,126 @@ TEST_F(TestBindingCluster, CompletedListWritesReportBindingChangesIncludingClear
             EXPECT_EQ(cluster.GetDataVersion(clusterPath), version + 1);
         }
     }
+}
+
+TEST_F(TestBindingCluster, UnchangedWritesDoNotReportOrIncrementDataVersion)
+{
+    using Pattern                           = chip::Testing::ListWritingPattern;
+    const std::optional<Pattern> patterns[] = { std::nullopt, Pattern::ReplaceAll, Pattern::ClearAllThenAppendItems };
+    for (const auto pattern : patterns)
+    {
+        for (bool empty : { true, false })
+        {
+            TestPersistentStorageDelegate storage;
+            Binding::Manager manager;
+            auto & table = manager.GetBindingTable();
+            table.SetPersistentStorage(&storage);
+            BindingCluster cluster({ table, manager, DeviceLayer::PlatformMgr() }, 1);
+            chip::Testing::ClusterTester tester(cluster);
+            ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+            auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+            const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+            const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+            constexpr auto fabric    = chip::Testing::kTestFabricIndex;
+            const auto otherEndpoint = TableEntry::ForGroup(fabric, 123, 2, std::nullopt);
+            const auto otherFabric   = TableEntry::ForGroup(static_cast<FabricIndex>(fabric + 1), 456, 1, std::nullopt);
+            ASSERT_SUCCESS(table.Add(otherEndpoint));
+            ASSERT_SUCCESS(table.Add(otherFabric));
+            TargetStructType targets[] = {
+                { .group = MakeOptional(GroupId{ 1 }), .cluster = MakeOptional(ClusterId{ 6 }), .fabricIndex = fabric },
+                { .group = MakeOptional(GroupId{ 2 }), .fabricIndex = fabric },
+            };
+            if (!empty)
+            {
+                ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 1, 1, 6)));
+                ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 2, 1, std::nullopt)));
+            }
+            const app::DataModel::List<const TargetStructType> bindings(targets, empty ? 0u : 2u);
+            const auto version = cluster.GetDataVersion(clusterPath);
+            if (pattern.has_value())
+            {
+                cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin, fabric);
+                ASSERT_TRUE(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, *pattern).IsSuccess());
+                cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteSuccess,
+                                                       fabric);
+            }
+            else
+            {
+                chip::Testing::WriteOperation write(attributePath);
+                write.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+                auto decoder = write.DecoderFor(bindings);
+                ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), decoder).IsSuccess());
+            }
+            EXPECT_TRUE(tester.GetDirtyList().empty());
+            EXPECT_EQ(cluster.GetDataVersion(clusterPath), version);
+            EXPECT_EQ(table.Size(), empty ? 2u : 4u);
+            EXPECT_EQ(*table.begin(), otherEndpoint);
+            EXPECT_EQ(*(++table.begin()), otherFabric);
+        }
+    }
+}
+
+TEST_F(TestBindingCluster, ReorderedBindingsReportChange)
+{
+    TestPersistentStorageDelegate storage;
+    Binding::Manager manager;
+    auto & table = manager.GetBindingTable();
+    table.SetPersistentStorage(&storage);
+    constexpr auto fabric = chip::Testing::kTestFabricIndex;
+    ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 1, 1, std::nullopt)));
+    ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 2, 1, std::nullopt)));
+    BindingCluster cluster({ table, manager, DeviceLayer::PlatformMgr() }, 1);
+    chip::Testing::ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+    const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+    const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+    const auto version         = cluster.GetDataVersion(clusterPath);
+    TargetStructType targets[] = {
+        { .group = MakeOptional(GroupId{ 2 }), .fabricIndex = fabric },
+        { .group = MakeOptional(GroupId{ 1 }), .fabricIndex = fabric },
+    };
+    const app::DataModel::List<const TargetStructType> bindings(targets);
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin, fabric);
+    ASSERT_TRUE(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings, chip::Testing::ListWritingPattern::ReplaceAll)
+                    .IsSuccess());
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteSuccess, fabric);
+    EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
+    EXPECT_EQ(cluster.GetDataVersion(clusterPath), version + 1);
+    EXPECT_EQ(table.begin()->groupId, 2);
+}
+
+TEST_F(TestBindingCluster, FailedListWriteReportsPartialChangesAndReleasesSnapshot)
+{
+    TestPersistentStorageDelegate storage;
+    Binding::Manager manager;
+    auto & table = manager.GetBindingTable();
+    table.SetPersistentStorage(&storage);
+    constexpr auto fabric = chip::Testing::kTestFabricIndex;
+    ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 1, 1, std::nullopt)));
+    BindingCluster cluster({ table, manager, DeviceLayer::PlatformMgr() }, 1);
+    chip::Testing::ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+    const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+    TargetStructType invalid{ .group = MakeOptional(kUndefinedGroupId), .fabricIndex = fabric };
+    const app::DataModel::List<const TargetStructType> bindings(&invalid, 1);
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin, fabric);
+    // Clearing succeeds before the reserved group ID is rejected, leaving an observable empty list.
+    EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, bindings,
+                                    chip::Testing::ListWritingPattern::ClearAllThenAppendItems),
+              Protocols::InteractionModel::Status::ConstraintError);
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteFailure, fabric);
+    EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
+    EXPECT_EQ(table.Size(), 0u);
+    tester.GetDirtyList().clear();
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin, fabric);
+    ASSERT_TRUE(tester
+                    .WriteAttribute(Binding::Attributes::Binding::Id, app::DataModel::List<const TargetStructType>(),
+                                    chip::Testing::ListWritingPattern::ReplaceAll)
+                    .IsSuccess());
+    cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteSuccess, fabric);
+    EXPECT_TRUE(tester.GetDirtyList().empty());
 }
 
 TEST_F(TestBindingCluster, RejectedReplacementDoesNotReportAttributeChange)

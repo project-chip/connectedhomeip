@@ -20,6 +20,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <system/SystemLayer.h>
 
+#include <cstdint>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -40,8 +42,7 @@ class PendingNotificationContext
 public:
     PendingNotificationContext(void * context, PendingNotificationContextReleaseHandler contextReleaseHandler,
                                PendingCommandFailureHandler failureHandler = nullptr) :
-        mFailureHandler(failureHandler),
-        mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
+        mFailureHandler(failureHandler), mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
     {}
     ~PendingNotificationContext()
     {
@@ -152,6 +153,7 @@ public:
 
     bool HasPendingNotification(uint8_t bindingEntryId, bool commandsOnly = false) const;
     void RemoveEntry(uint8_t bindingEntryId, CHIP_ERROR error = CHIP_ERROR_CANCELLED);
+    /// Bulk removals exclude entries accepted during their callbacks.
     void RemoveContext(PendingNotificationContext * context, CHIP_ERROR error);
 
     void RemoveAllEntriesForNode(const ScopedNodeId & nodeId);
@@ -172,12 +174,14 @@ public:
 private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
     PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
+    uint64_t mPendingSequences[kMaxPendingNotifications];
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler = nullptr;
 
     Table & mBindingTable;
 
-    uint8_t mNumEntries  = 0;
-    bool mIsShuttingDown = false;
+    uint64_t mLastSequence = 0;
+    uint8_t mNumEntries    = 0;
+    bool mIsShuttingDown   = false;
 };
 
 } // namespace Binding

@@ -36,6 +36,95 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace {
+Binding::TableEntry ToBindingEntry(const TargetStructType & target, EndpointId localEndpoint)
+{
+    if (target.group.HasValue())
+    {
+        return Binding::TableEntry::ForGroup(target.fabricIndex, target.group.Value(), localEndpoint,
+                                             target.cluster.std_optional());
+    }
+    return Binding::TableEntry::ForNode(target.fabricIndex, target.node.Value(), localEndpoint, target.endpoint.Value(),
+                                        target.cluster.std_optional());
+}
+} // namespace
+
+void BindingCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mListWrite.reset();
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+bool BindingCluster::BindingListEquals(EndpointId endpoint, FabricIndex fabric, const DecodableBindingListType & bindings)
+{
+    auto existing = mClusterContext.bindingTable.begin();
+    auto incoming = bindings.begin();
+    while (incoming.Next())
+    {
+        while (existing != mClusterContext.bindingTable.end() && (existing->local != endpoint || existing->fabricIndex != fabric))
+        {
+            ++existing;
+        }
+        if (existing == mClusterContext.bindingTable.end() || !(*existing == ToBindingEntry(incoming.GetValue(), endpoint)))
+        {
+            return false;
+        }
+        ++existing;
+    }
+    for (; existing != mClusterContext.bindingTable.end(); ++existing)
+    {
+        if (existing->local == endpoint && existing->fabricIndex == fabric)
+        {
+            return false;
+        }
+    }
+    return incoming.GetStatus() == CHIP_NO_ERROR;
+}
+
+void BindingCluster::SnapshotBindingList(EndpointId endpoint, FabricIndex fabric)
+{
+    auto & snapshot = mListWrite.emplace();
+    snapshot.fabric = fabric;
+    for (const auto & entry : mClusterContext.bindingTable)
+    {
+        if (entry.local == endpoint && entry.fabricIndex == fabric)
+        {
+            ++snapshot.count;
+        }
+    }
+    if (snapshot.count == 0)
+    {
+        return;
+    }
+    snapshot.valid = static_cast<bool>(snapshot.entries.Alloc(snapshot.count));
+    VerifyOrReturn(snapshot.valid);
+    size_t index = 0;
+    for (const auto & entry : mClusterContext.bindingTable)
+    {
+        if (entry.local == endpoint && entry.fabricIndex == fabric)
+        {
+            snapshot.entries[index++] = entry;
+        }
+    }
+}
+
+bool BindingCluster::BindingListEqualsSnapshot(EndpointId endpoint)
+{
+    VerifyOrReturnValue(mListWrite.has_value() && mListWrite->valid, false);
+    size_t index = 0;
+    for (const auto & entry : mClusterContext.bindingTable)
+    {
+        if (entry.local == endpoint && entry.fabricIndex == mListWrite->fabric)
+        {
+            if (index == mListWrite->count || !(entry == mListWrite->entries[index++]))
+            {
+                return false;
+            }
+        }
+    }
+    return index == mListWrite->count;
+}
+
 bool BindingCluster::IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry)
 {
     // Entry has endpoint, node id and no group id
@@ -136,6 +225,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
     switch (request.path.mAttributeId)
     {
     case Binding::Attributes::Binding::Id: {
+        VerifyOrReturnError(!mListWrite.has_value() || mListWrite->valid, CHIP_ERROR_NO_MEMORY);
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             DecodableBindingListType newBindingList;
@@ -143,6 +233,11 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             ReturnErrorOnFailure(decoder.Decode(newBindingList));
             ReturnErrorOnFailure(
                 CheckValidBindingList(request.path.mEndpointId, newBindingList, request.GetAccessingFabricIndex()));
+
+            if (BindingListEquals(request.path.mEndpointId, request.GetAccessingFabricIndex(), newBindingList))
+            {
+                return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+            }
 
             // Clear all entries for the current accessing fabric and endpoint
             auto bindingTableIter = mClusterContext.bindingTable.begin();
@@ -202,10 +297,16 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
 void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
                                                     FabricIndex accessingFabric)
 {
-    if (opType == DataModel::ListWriteOperation::kListWriteSuccess)
+    if (opType == DataModel::ListWriteOperation::kListWriteBegin)
+    {
+        SnapshotBindingList(path.mEndpointId, accessingFabric);
+        return;
+    }
+    if (mListWrite.has_value() && mListWrite->valid && !BindingListEqualsSnapshot(path.mEndpointId))
     {
         LogErrorOnFailure(NotifyBindingsChanged(accessingFabric));
     }
+    mListWrite.reset();
 }
 
 CHIP_ERROR BindingCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
@@ -224,19 +325,7 @@ CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricInde
 
 CHIP_ERROR BindingCluster::CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
-    Binding::TableEntry bindingEntry;
-
-    if (entry.group.HasValue())
-    {
-        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
-    }
-    else
-    {
-        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
-                                           entry.cluster.std_optional());
-    }
-
-    return mClusterContext.bindingManager.AddBindingEntry(bindingEntry);
+    return mClusterContext.bindingManager.AddBindingEntry(ToBindingEntry(entry, localEndpoint));
 }
 
 } // namespace Clusters

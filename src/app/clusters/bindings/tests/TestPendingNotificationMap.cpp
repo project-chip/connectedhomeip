@@ -124,6 +124,250 @@ TEST_F(TestPendingNotificationMap, NotificationsStillCoalesceAndCommandsCannotRe
     EXPECT_EQ(record.failures, 0);
 }
 
+struct ReentrantRelease
+{
+    PendingNotificationMap * map = nullptr;
+    Platform::UniquePtr<PendingNotificationContext> command;
+    int releases         = 0;
+    CHIP_ERROR admission = CHIP_ERROR_INCORRECT_STATE;
+
+    static void QueueCommand(void * context)
+    {
+        auto & record = *static_cast<ReentrantRelease *>(context);
+        ++record.releases;
+        record.admission = record.map->AddPendingNotification(0, record.command.get());
+        if (record.admission == CHIP_NO_ERROR)
+        {
+            record.command.release();
+        }
+    }
+
+    static void Shutdown(void * context)
+    {
+        auto & record = *static_cast<ReentrantRelease *>(context);
+        ++record.releases;
+        record.map->Shutdown();
+    }
+};
+
+TEST_F(TestPendingNotificationMap, ReentrantCommandRejectsOuterNotificationAndRemainsQueued)
+{
+    TestPersistentStorageDelegate storage;
+    Table table;
+    table.SetPersistentStorage(&storage);
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 2, 6)));
+    PendingRecord accepted;
+    PendingRecord rejected;
+    ReentrantRelease removed;
+    PendingNotificationMap map(table);
+    removed.map = &map;
+    map.RegisterPendingNotificationContextReleaseHandler(PendingRecord::Release);
+    removed.command.reset(map.NewPendingNotificationContext(&accepted, PendingRecord::Failed));
+    ASSERT_NE(removed.command, nullptr);
+    const auto * command = removed.command.get();
+    Platform::UniquePtr<PendingNotificationContext> replacement(map.NewPendingNotificationContext(&rejected));
+    ASSERT_NE(replacement, nullptr);
+    map.RegisterPendingNotificationContextReleaseHandler(ReentrantRelease::QueueCommand);
+    auto * original = map.NewPendingNotificationContext(&removed);
+    ASSERT_NE(original, nullptr);
+    ASSERT_SUCCESS(map.AddPendingNotification(0, original));
+
+    const auto error = map.AddPendingNotification(0, replacement.get());
+    if (error == CHIP_NO_ERROR)
+    {
+        replacement.release();
+    }
+    EXPECT_EQ(error, CHIP_ERROR_BUSY);
+    EXPECT_EQ(removed.admission, CHIP_NO_ERROR);
+    EXPECT_EQ(removed.releases, 1);
+    EXPECT_EQ(accepted.releases, 0);
+    EXPECT_EQ(rejected.releases, 0);
+    auto it = map.begin();
+    ASSERT_NE(it, map.end());
+    EXPECT_EQ((*it).mBindingEntryId, 0);
+    EXPECT_EQ((*it).mContext, command);
+    EXPECT_EQ(++it, map.end());
+    map.Shutdown();
+    EXPECT_EQ(accepted.releases, 1);
+    EXPECT_EQ(accepted.failures, 1);
+    EXPECT_EQ(accepted.error, CHIP_ERROR_CANCELLED);
+    EXPECT_EQ(rejected.releases, 0);
+    ASSERT_NE(replacement, nullptr);
+    replacement.reset();
+    PendingRecord::Release(&rejected);
+    EXPECT_EQ(rejected.releases, 1);
+    EXPECT_EQ(removed.releases, 1);
+}
+
+TEST_F(TestPendingNotificationMap, ReentrantShutdownRejectsOuterNotificationWithoutTakingContext)
+{
+    TestPersistentStorageDelegate storage;
+    Table table;
+    table.SetPersistentStorage(&storage);
+    ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 123, 1, 2, 6)));
+    PendingRecord rejected;
+    ReentrantRelease removed;
+    PendingNotificationMap map(table);
+    removed.map = &map;
+    map.RegisterPendingNotificationContextReleaseHandler(ReentrantRelease::Shutdown);
+    auto * original = map.NewPendingNotificationContext(&removed);
+    ASSERT_NE(original, nullptr);
+    ASSERT_SUCCESS(map.AddPendingNotification(0, original));
+    map.RegisterPendingNotificationContextReleaseHandler(PendingRecord::Release);
+    Platform::UniquePtr<PendingNotificationContext> replacement(map.NewPendingNotificationContext(&rejected));
+    ASSERT_NE(replacement, nullptr);
+
+    const auto error = map.AddPendingNotification(0, replacement.get());
+    if (error == CHIP_NO_ERROR)
+    {
+        replacement.release();
+    }
+    EXPECT_EQ(error, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(map.IsShuttingDown());
+    EXPECT_EQ(map.begin(), map.end());
+    EXPECT_EQ(removed.releases, 1);
+    EXPECT_EQ(rejected.releases, 0);
+    map.Shutdown();
+    EXPECT_EQ(rejected.releases, 0);
+    ASSERT_NE(replacement, nullptr);
+    replacement.reset();
+    PendingRecord::Release(&rejected);
+    EXPECT_EQ(rejected.releases, 1);
+}
+
+enum class RemovalScope
+{
+    kContext,
+    kNode,
+    kFabric,
+};
+
+struct RemovalRecord
+{
+    PendingNotificationContext * reusedContext = nullptr;
+    PendingNotificationMap * map               = nullptr;
+    int failures                               = 0;
+    int releases                               = 0;
+    uint32_t endpoints                         = 0;
+    CHIP_ERROR error                           = CHIP_NO_ERROR;
+    bool requeue                               = false;
+    bool evictEarlier                          = false;
+
+    static void Release(void * context) { ++static_cast<RemovalRecord *>(context)->releases; }
+    static void Failed(const TableEntry & binding, void * context, CHIP_ERROR error)
+    {
+        auto & record = *static_cast<RemovalRecord *>(context);
+        ++record.failures;
+        record.endpoints |= uint32_t{ 1 } << binding.remote;
+        record.error = error;
+        if (record.evictEarlier && record.failures == 1)
+        {
+            record.map->RemoveAllEntriesForNode(ScopedNodeId(111, 2));
+        }
+        // Limit retries so the regression fails instead of hanging with the old removal loop.
+        if (record.requeue && record.failures <= 2)
+        {
+            auto * next =
+                record.reusedContext != nullptr ? record.reusedContext : record.map->NewPendingNotificationContext(&record, Failed);
+            ASSERT_NE(next, nullptr);
+            const auto admission = record.map->AddPendingNotification(0, next);
+            EXPECT_SUCCESS(admission);
+            if (admission != CHIP_NO_ERROR && record.reusedContext == nullptr)
+            {
+                Platform::Delete(next);
+            }
+        }
+    }
+};
+
+TEST_F(TestPendingNotificationMap, BulkRemovalDoesNotSkipEntriesWhenCallbackEvictsEarlierPeer)
+{
+    for (const auto scope : { RemovalScope::kContext, RemovalScope::kNode, RemovalScope::kFabric })
+    {
+        TestPersistentStorageDelegate storage;
+        Table table;
+        table.SetPersistentStorage(&storage);
+        ASSERT_SUCCESS(table.Add(TableEntry::ForNode(2, 111, 1, 1, 6)));
+        ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 222, 1, 2, 6)));
+        ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 222, 1, 3, 6)));
+        RemovalRecord record;
+        PendingNotificationMap map(table);
+        record.map          = &map;
+        record.evictEarlier = true;
+        map.RegisterPendingNotificationContextReleaseHandler(RemovalRecord::Release);
+        ASSERT_SUCCESS(map.AddPendingNotification(0, nullptr));
+        auto * context = map.NewPendingNotificationContext(&record, RemovalRecord::Failed);
+        ASSERT_NE(context, nullptr);
+        ASSERT_SUCCESS(map.AddPendingNotification(1, context));
+        ASSERT_SUCCESS(map.AddPendingNotification(2, context));
+
+        switch (scope)
+        {
+        case RemovalScope::kContext:
+            map.RemoveContext(context, CHIP_ERROR_TIMEOUT);
+            break;
+        case RemovalScope::kNode:
+            map.RemoveAllEntriesForNode(ScopedNodeId(222, 1));
+            break;
+        case RemovalScope::kFabric:
+            map.RemoveAllEntriesForFabric(1);
+            break;
+        }
+        EXPECT_EQ(map.begin(), map.end());
+        EXPECT_EQ(record.failures, 2);
+        EXPECT_EQ(record.endpoints, 0xCu);
+        EXPECT_EQ(record.error, scope == RemovalScope::kContext ? CHIP_ERROR_TIMEOUT : CHIP_ERROR_CANCELLED);
+        EXPECT_EQ(record.releases, 1);
+    }
+}
+
+TEST_F(TestPendingNotificationMap, BulkRemovalPreservesCommandsAcceptedDuringCallbacks)
+{
+    for (const auto scope : { RemovalScope::kContext, RemovalScope::kNode, RemovalScope::kFabric })
+    {
+        TestPersistentStorageDelegate storage;
+        Table table;
+        table.SetPersistentStorage(&storage);
+        ASSERT_SUCCESS(table.Add(TableEntry::ForNode(1, 222, 1, 2, 6)));
+        RemovalRecord record;
+        PendingNotificationMap map(table);
+        record.map     = &map;
+        record.requeue = true;
+        map.RegisterPendingNotificationContextReleaseHandler(RemovalRecord::Release);
+        auto * context = map.NewPendingNotificationContext(&record, RemovalRecord::Failed);
+        ASSERT_NE(context, nullptr);
+        ASSERT_SUCCESS(map.AddPendingNotification(0, context));
+        if (scope == RemovalScope::kContext)
+        {
+            record.reusedContext = context;
+        }
+
+        switch (scope)
+        {
+        case RemovalScope::kContext:
+            map.RemoveContext(context, CHIP_ERROR_TIMEOUT);
+            break;
+        case RemovalScope::kNode:
+            map.RemoveAllEntriesForNode(ScopedNodeId(222, 1));
+            break;
+        case RemovalScope::kFabric:
+            map.RemoveAllEntriesForFabric(1);
+            break;
+        }
+        record.requeue = false;
+        EXPECT_EQ(record.failures, 1);
+        const int releasesBeforeShutdown = record.reusedContext == nullptr ? 1 : 0;
+        EXPECT_EQ(record.releases, releasesBeforeShutdown);
+        EXPECT_TRUE(map.HasPendingNotification(0, true));
+        auto it = map.begin();
+        ASSERT_NE(it, map.end());
+        EXPECT_EQ(++it, map.end());
+        map.Shutdown();
+        EXPECT_EQ(record.failures, 2);
+        EXPECT_EQ(record.releases, releasesBeforeShutdown + 1);
+    }
+}
+
 TEST_F(TestPendingNotificationMap, LruExcludesAllBindingsForPeerWithPendingCommand)
 {
     TestPersistentStorageDelegate storage;
