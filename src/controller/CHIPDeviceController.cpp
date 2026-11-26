@@ -607,7 +607,8 @@ void DeviceCommissioner::Shutdown()
     // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
     // pointers to the device objects.
     mCommissioneeDevicePool.ForEachActiveObject([this](auto * commissioneeDevice) {
-        ReleaseCommissioneeDevice(commissioneeDevice);
+        // Releases during commissioner shutdown are not reported (see DevicePairingDelegate::OnCommissioneeReleased).
+        ReleaseCommissioneeDevice(commissioneeDevice, std::nullopt);
         return Loop::Continue;
     });
 
@@ -645,8 +646,12 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
     return foundDevice;
 }
 
-void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
+void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device, std::optional<CHIP_ERROR> idleReleaseReason)
 {
+    // Decide before releasing: the release clears the state IsIdleCommissionee() reads.
+    bool notify     = idleReleaseReason.has_value() && IsIdleCommissionee(*device);
+    NodeId deviceId = device->GetDeviceId();
+
 #if CONFIG_NETWORK_LAYER_BLE
     if (mDeviceInPASEEstablishment == device && mSystemState->BleLayer() != nullptr)
     {
@@ -682,10 +687,15 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     // Release the commissionee device after we have nulled out our pointers,
     // because that can call back in to us with error notifications as the
     // session is released. Make sure the proxy does not call our
-    // OnCommissioneeSessionReleased: we are releasing it already, and callers
-    // that need to tell the pairing delegate do so themselves.
+    // OnCommissioneeSessionReleased: we are releasing it already, and the
+    // pairing delegate is told below when the caller asked for it.
     device->SetSessionReleaseDelegate(nullptr);
     mCommissioneeDevicePool.ReleaseObject(device);
+
+    if (notify && mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnCommissioneeReleased(deviceId, *idleReleaseReason);
+    }
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
@@ -725,11 +735,7 @@ void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy &
     NodeId deviceId = device.GetDeviceId();
     ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing the commissionee",
                     ChipLogValueX64(deviceId));
-    ReleaseCommissioneeDevice(&device);
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnCommissioneeReleased(deviceId, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
-    }
+    ReleaseCommissioneeDevice(&device, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -939,15 +945,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         // already) or something has gone strange. Delete the old device, try
         // again.
         ChipLogError(Controller, "Found unconnected device, removing");
-        NodeId currentId = current->GetDeviceId();
-        bool wasIdle     = IsIdleCommissionee(*current);
-        ReleaseCommissioneeDevice(current);
-        if (wasIdle && mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnCommissioneeReleased(currentId, CHIP_ERROR_CONNECTION_ABORTED);
-            // The delegate may have started another PASE attempt; do not overwrite it.
-            VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        }
+        ReleaseCommissioneeDevice(current, CHIP_ERROR_CONNECTION_ABORTED);
+        // A notified delegate may have started another PASE attempt; do not overwrite it.
+        VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     }
 
     device = CreateCommissioneeDevice();
@@ -1037,7 +1037,8 @@ exit:
     {
         if (device != nullptr)
         {
-            ReleaseCommissioneeDevice(device);
+            // Still in PASE establishment, never Idle; the caller gets err.
+            ReleaseCommissioneeDevice(device, std::nullopt);
         }
         MATTER_LOG_METRIC_END(kMetricDeviceCommissionerPASESession, err);
     }
@@ -1059,7 +1060,8 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_C
         params.SetConnectionObject(connObj);
         self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
 
-        self->ReleaseCommissioneeDevice(device);
+        // Still in PASE establishment, never Idle; PASE is started again on the new connection.
+        self->ReleaseCommissioneeDevice(device, std::nullopt);
         LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
     }
 }
@@ -1071,7 +1073,8 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
-        self->ReleaseCommissioneeDevice(device);
+        // Still in PASE establishment, never Idle; reported through OnPairingComplete below.
+        self->ReleaseCommissioneeDevice(device, std::nullopt);
         self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
 
         // Callback is required when BLE discovery fails, otherwise the caller will always be in a suspended state
@@ -1097,7 +1100,8 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
         auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
 
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
-        self->ReleaseCommissioneeDevice(device);
+        // Still in PASE establishment, never Idle; PASE is started again on the new connection.
+        self->ReleaseCommissioneeDevice(device, std::nullopt);
         LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
     }
 }
@@ -1111,7 +1115,8 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
     {
         ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %" PRIu64 ", err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
                      err.Format());
-        self->ReleaseCommissioneeDevice(device);
+        // Still in PASE establishment, never Idle; reported through OnPairingComplete below.
+        self->ReleaseCommissioneeDevice(device, std::nullopt);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)
         {
@@ -1286,13 +1291,8 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     }
     else
     {
-        bool wasIdle    = device != mDeviceInPASEEstablishment;
-        NodeId deviceId = device->GetDeviceId();
-        ReleaseCommissioneeDevice(device);
-        if (wasIdle && mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnCommissioneeReleased(deviceId, CHIP_ERROR_CANCELLED);
-        }
+        // During PASE establishment this ends PASE with no callback, as documented in DevicePairingDelegate.h.
+        ReleaseCommissioneeDevice(device, CHIP_ERROR_CANCELLED);
     }
     return CHIP_NO_ERROR;
 }
@@ -1371,7 +1371,8 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
-        ReleaseCommissioneeDevice(mDeviceInPASEEstablishment);
+        // Still in PASE establishment, never Idle; reported through OnPairingComplete below.
+        ReleaseCommissioneeDevice(mDeviceInPASEEstablishment, std::nullopt);
 
         if (mPairingDelegate != nullptr)
         {
@@ -2347,7 +2348,8 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         if (commissionee != nullptr)
         {
-            ReleaseCommissioneeDevice(commissionee);
+            // The end of this commissioning is reported through OnCommissioningComplete below.
+            ReleaseCommissioneeDevice(commissionee, std::nullopt);
         }
         // Send the callbacks, we're done.
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
@@ -2481,7 +2483,8 @@ void DeviceCommissioner::CleanupDoneAfterError()
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
     {
-        ReleaseCommissioneeDevice(commissionee);
+        // The end of this commissioning is reported through OnCommissioningComplete below.
+        ReleaseCommissioneeDevice(commissionee, std::nullopt);
     }
 
     // Invoke callbacks last, after we have cleared up all state.

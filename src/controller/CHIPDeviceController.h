@@ -1178,7 +1178,10 @@ private:
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
-    void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
+    // Releases a commissionee. With idleReleaseReason set, a commissionee that is Idle (see IsIdleCommissionee) is reported
+    // through DevicePairingDelegate::OnCommissioneeReleased() with that reason once it has been released. Callers that pass
+    // std::nullopt say why at the call site: the release is reported some other way, or the commissioner is shutting down.
+    void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device, std::optional<CHIP_ERROR> idleReleaseReason);
 
     // Creates a commissionee in the pool that reports the loss of its session to this commissioner.
     CommissioneeDeviceProxy * CreateCommissioneeDevice();
