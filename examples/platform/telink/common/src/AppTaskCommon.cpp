@@ -110,18 +110,6 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
-#if defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE) &&                                           \
-    !defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
-void EnablePostCommissioningBle(intptr_t)
-{
-    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-#endif
-
 DefaultAttributePersistenceProvider gSimpleAttributePersistence;
 
 /**
@@ -160,6 +148,13 @@ DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttribut
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+/**
+ * Re-enables BLE advertising after commissioning (or on boot of an
+ * already-commissioned device).
+ *
+ * Scheduled via PlatformMgr().ScheduleWork() when
+ * CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING is enabled.
+ */
 void EnablePostCommissioningBle(intptr_t)
 {
     CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -363,6 +358,15 @@ void AppTaskCommon::PrintFirmwareInfo(void)
 #endif
 }
 
+/**
+ * Initializes the common application parts.
+ *
+ * Initializes the Matter server and data model, then applies the BLE advertising
+ * policy for an already-commissioned device in concurrent mode: auto re-advertise,
+ * leave BLE idle, or defer to the post-commissioning BLE teardown.
+ *
+ * @return CHIP_NO_ERROR on success.
+ */
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {
     PrintFirmwareInfo();
@@ -434,34 +438,30 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
-#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
-    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
-    }
-#endif
-
-#if defined(CONFIG_CHIP_CONCURRENT_MODE)
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     // Telink concurrent mode: apply the BLE advertising policy for an
     // already-commissioned device. The common Server::Init() disables BLE
-    // advertising after boot; re-enable it only for pure concurrent mode.
+    // advertising after boot.
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-#ifdef CONFIG_CHIP_CONCURRENT_BLE_IDLE
-        // Concurrent mode with idle BLE: leave BLE stack initialized but do not
-        // auto-start advertising. The user can start it later (e.g. via button).
-        LOG_INF("Fabric already commissioned. BLE idle in concurrent mode");
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+        // Auto re-advertise after commissioning / on reboot (line-powered or
+        // Channel Sounding). The BLE layer also re-enables advertising via the
+        // kCommissioningComplete event; schedule here for the already-commissioned
+        // boot path.
+        LOG_INF("Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
 #elif defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
         // Concurrent mode, BLE off after commissioning: do not re-advertise on
         // boot. The BLE manager tears the stack down once Thread attaches.
         LOG_INF("Fabric already commissioned. BLE will be torn down after Thread attach");
 #else
-        // Concurrent mode: keep BLE advertising enabled for Channel Sounding.
-        LOG_INF("Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+        // Concurrent mode with idle BLE: keep BLE initialized but do not
+        // auto-advertise. The user restarts advertising via the button.
+        LOG_INF("Fabric already commissioned. BLE idle in concurrent mode");
 #endif
     }
-#endif // CONFIG_CHIP_CONCURRENT_MODE
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

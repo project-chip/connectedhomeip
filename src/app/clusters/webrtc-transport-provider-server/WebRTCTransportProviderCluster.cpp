@@ -215,9 +215,46 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate) :
-    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
+WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, WebRTCTransportProvider::Delegate & delegate,
+                                                               FabricTable & fabricTable) :
+    DefaultServerCluster({ endpointId, Id }),
+    mDelegate(delegate), mFabricTable(fabricTable)
 {}
+
+CHIP_ERROR WebRTCTransportProviderCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    return mFabricTable.AddFabricDelegate(this);
+}
+
+void WebRTCTransportProviderCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mFabricTable.RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void WebRTCTransportProviderCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    std::vector<uint16_t> sessionIds;
+    for (const WebRTCSessionStruct & session : mCurrentSessions)
+    {
+        if (session.GetFabricIndex() == fabricIndex)
+        {
+            sessionIds.push_back(session.id);
+        }
+    }
+
+    for (uint16_t sessionId : sessionIds)
+    {
+        CHIP_ERROR err = mDelegate.HandleEndSession(sessionId, WebRTCEndReasonEnum::kUnknownReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved: Failed to end WebRTC session %u: %" CHIP_ERROR_FORMAT, sessionId, err.Format());
+        }
+        // The fabric is gone, so the session entry is removed regardless of the delegate result.
+        RemoveSession(sessionId);
+    }
+}
 
 DataModel::ActionReturnStatus WebRTCTransportProviderCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                             AttributeValueEncoder & encoder)
@@ -740,7 +777,7 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     }
 
     // Prepare the arguments for the delegate.
-    Delegate::OfferRequestArgs args;
+    WebRTCTransportProvider::Delegate::OfferRequestArgs args;
     uint16_t sessionId;
     err = GenerateSessionId(sessionId);
     if (err != CHIP_NO_ERROR)
@@ -852,7 +889,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     WebRTCSessionStruct outSession;
 
     // Prepare delegate arguments for the session
-    Delegate::ProvideOfferRequestArgs args;
+    WebRTCTransportProvider::Delegate::ProvideOfferRequestArgs args;
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
 

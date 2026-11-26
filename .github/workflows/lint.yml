@@ -161,6 +161,7 @@ jobs:
                      --known-failure tests/scripts/example_python_commissioning_flow.py \
                      --known-failure tests/scripts/failsafe_tests.py \
                      --known-failure tests/scripts/icd_device_test.py \
+                     --known-failure tests/scripts/mobile-device-ble-test.py \
                      --known-failure tests/scripts/mobile-device-test.py \
                      --known-failure tests/scripts/network_commissioning.py \
                      --known-failure tests/scripts/python_commissioning_flow_test.py \

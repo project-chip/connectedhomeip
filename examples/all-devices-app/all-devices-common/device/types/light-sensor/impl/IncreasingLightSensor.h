@@ -39,9 +39,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    uint16_t mLightMeasuredValue = 0;
 };
 
 } // namespace app

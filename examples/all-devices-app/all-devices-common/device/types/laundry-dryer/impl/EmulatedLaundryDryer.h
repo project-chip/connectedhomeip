@@ -16,12 +16,14 @@
 
 #pragma once
 
+#include <optional>
+
 #include <device/types/laundry-dryer/LaundryDryer.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class EmulatedLaundryDryer : public LaundryDryer, public Clusters::OperationalState::Delegate, public TimerContext
+class EmulatedLaundryDryer : public Clusters::OperationalState::Delegate, public TimerContext, public LaundryDryer
 {
 public:
     explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate);
@@ -49,9 +51,8 @@ private:
     void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
-    System::Clock::Timestamp mOperationEndTime{};
+    std::optional<System::Clock::Timestamp> mOperationEndTime;
 };
 
 } // namespace chip::app

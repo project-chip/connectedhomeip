@@ -18,6 +18,8 @@
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
+#include <cstdint>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -39,12 +41,13 @@ enum BdxSenderErrorTypes
  * @param[out] blockBuf Preallocated PacketBuffer, implementor should fill the block buf with the data
  * @param[out] size     Size of data
  * @param[out] isEof    Flag which tells whether it is final block or not
- * @param[in]  offset   Offset to read data from
+ * @param[in]  offset   Offset in the image file to read data from. It may be at or past the end of the file, after a
+ *                      BlockQueryWithSkip; the implementor should then return no data and set isEof.
  *
  * @return CHIP_NO_ERROR on success; return appropriate error code otherwise
  */
 typedef CHIP_ERROR (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof,
-                                      uint32_t offset);
+                                      uint64_t offset);
 
 /**
  * @brief
@@ -105,8 +108,11 @@ public:
      */
     const char * GetFileDesignator() const { return mFileDesignator; }
 
-    // No-op, ESP32's BdxOtaSender doesn't need to SetFileDesignatorMap since it uses a callback
-    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> &) {}
+    // The map is used to check a start offset against the image size. Block data still comes from the onBlockQuery callback.
+    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & fileDesignatorMap)
+    {
+        mFileDesignatorMap = fileDesignatorMap;
+    }
 
 protected:
     // Inherited from bdx::TransferFacilitator
@@ -118,10 +124,18 @@ private:
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
 
     void Reset();
+    void RejectInit(chip::bdx::StatusCode reason);
+    // Returns the status to reject the transfer with, if startOffset cannot be served from the requested file.
+    std::optional<chip::bdx::StatusCode> CheckStartOffset(uint64_t startOffset) const;
 
-    uint32_t mNumBytesSent = 0;
+    // Position in the image file of the next block to send.
+    uint64_t mReadOffset = 0;
+
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
 
     bool mInitialized = false;
+
+    bool mRejected = false;
 
     chip::Optional<chip::FabricIndex> mFabricIndex;
 

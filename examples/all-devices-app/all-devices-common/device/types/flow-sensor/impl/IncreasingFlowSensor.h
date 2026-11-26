@@ -38,9 +38,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    uint16_t mFlowMeasuredValue = 0;
 };
 
 } // namespace app

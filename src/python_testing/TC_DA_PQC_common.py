@@ -41,17 +41,18 @@ keep the PQCDA feature bit set while making PQCDeviceAttestationProfile reads fa
 """
 
 import asyncio
+import io
 import json
 import logging
 import os
 import threading
 
+import qrcode
 from mobly import asserts
 
 from matter import ChipDeviceCtrl
-from matter.setup_payload.setup_payload import SetupPayload
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterTestCommissioner
+from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ class PQCCommissioneeApp(AppServerSubprocess):
 
 class PQCDACommissionerTestBase(MatterTestCommissioner):
     """Common setup and row runner for TC-DA-1.11 and TC-DA-1.13."""
+    disable_wildcard_subscription = True
 
     # Distinct per subclass so parallel-ish reruns never collide on discovery.
     kDiscriminatorBase = 0x700
@@ -143,6 +145,14 @@ class PQCDACommissionerTestBase(MatterTestCommissioner):
                              "ML-DSA-44 or ML-DSA-65 PAA; point it at the fixture generator's paa-root-certs "
                              "directory")
 
+    @staticmethod
+    def _render_qr_code(qr_code_data: str) -> str:
+        qr_buf = io.StringIO()
+        qr = qrcode.QRCode()
+        qr.add_data(qr_code_data)
+        qr.print_ascii(out=qr_buf, invert=True)
+        return qr_buf.getvalue()
+
     async def run_pqc_da_row(self, index: int, name: str, provider_path: str | None, pipe_mode: str | None,
                              expected_outcome: str) -> tuple[int, int]:
         """Run one matrix row; returns (pai_requests, dac_requests) observed by the TH.
@@ -156,8 +166,11 @@ class PQCDACommissionerTestBase(MatterTestCommissioner):
         os.makedirs(log_path, exist_ok=True)
         fifo_path = os.path.abspath(os.path.join(log_path, f"{name}_fifo"))
         discriminator = self.kDiscriminatorBase + index
-        manual_code = SetupPayload().GenerateManualPairingCode(passcode=self.app_passcode,
-                                                               discriminator=discriminator)
+
+        setup_params = SetupParameters(discriminator=discriminator, passcode=self.app_passcode)
+
+        manual_code = setup_params.manual_code
+        qr_code = setup_params.qr_code
 
         app = PQCCommissioneeApp(self.app_path, storage_dir=log_path, discriminator=discriminator,
                                  passcode=self.app_passcode, fifo_path=fifo_path,
@@ -196,6 +209,8 @@ class PQCDACommissionerTestBase(MatterTestCommissioner):
                 resp = self.wait_for_user_input(
                     f"\nPlease commission the TH commissionee with the DUT commissioner:\n"
                     f"  Manual Pairing Code: '{manual_code}'\n"
+                    f"   QR Code: {qr_code}\n"
+                    f"{self._render_qr_code(qr_code)}\n"
                     f"  (discriminator 0x{discriminator:03X}, passcode {self.app_passcode})\n\n"
                     f"Expected: {expected_outcome}\n\n"
                     f"Input 'Y' if the DUT commissions the device successfully as described\n"

@@ -55,8 +55,8 @@ private:
 };
 
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
-                                public IrrigationSystem,
-                                public Clusters::IdentifyDelegate
+                                public Clusters::IdentifyDelegate,
+                                public IrrigationSystem
 {
 public:
     struct ValveList
