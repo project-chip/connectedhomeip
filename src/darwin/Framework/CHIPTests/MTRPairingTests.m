@@ -1576,14 +1576,14 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 {
     __auto_type * delegateA = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:[[XCTestExpectation alloc] initWithDescription:@"unused A"]];
     __auto_type * commissioningA = [[MTRCommissioningOperation alloc] initWithParameters:[[MTRCommissioningParameters alloc] init]
-                                                                           setupPayload:kOnboardingPayload1
-                                                                               delegate:delegateA
-                                                                                  queue:dispatch_get_main_queue()];
+                                                                            setupPayload:kOnboardingPayload1
+                                                                                delegate:delegateA
+                                                                                   queue:dispatch_get_main_queue()];
     __auto_type * delegateB = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:[[XCTestExpectation alloc] initWithDescription:@"unused B"]];
     __auto_type * commissioningB = [[MTRCommissioningOperation alloc] initWithParameters:[[MTRCommissioningParameters alloc] init]
-                                                                           setupPayload:kOnboardingPayload2
-                                                                               delegate:delegateB
-                                                                                  queue:dispatch_get_main_queue()];
+                                                                            setupPayload:kOnboardingPayload2
+                                                                                delegate:delegateB
+                                                                                   queue:dispatch_get_main_queue()];
     XCTAssertNotNil(commissioningA);
     XCTAssertNotNil(commissioningB);
 
