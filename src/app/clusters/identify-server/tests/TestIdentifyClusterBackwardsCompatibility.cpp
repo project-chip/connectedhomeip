@@ -200,4 +200,63 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, StopIdentifyingTest)
     EXPECT_TRUE(onIdentifyStopCalled);
 }
 
+TEST_F(TestIdentifyClusterBackwardsCompatibility, FindByEndpointCodeDriven)
+{
+    // Verify no cluster exists on endpoint 10 initially
+    EXPECT_EQ(IdentifyCluster::FindByEndpoint(10), nullptr);
+
+    {
+        // Create a code-driven IdentifyCluster (no legacy struct Identify wrapper)
+        IdentifyCluster cluster(IdentifyCluster::Config(10, mMockTimerDelegate).WithIdentifyType(IdentifyTypeEnum::kLightOutput));
+
+        // FindByEndpoint should find it
+        IdentifyCluster * found = IdentifyCluster::FindByEndpoint(10);
+        ASSERT_NE(found, nullptr);
+        EXPECT_EQ(found, &cluster);
+        EXPECT_EQ(found->GetIdentifyType(), IdentifyTypeEnum::kLightOutput);
+
+        // FindIdentifyClusterOnEndpoint (the CodegenIntegration function) should also find it
+        IdentifyCluster * foundViaCodegen = FindIdentifyClusterOnEndpoint(10);
+        ASSERT_NE(foundViaCodegen, nullptr);
+        EXPECT_EQ(foundViaCodegen, &cluster);
+    }
+
+    // After destruction, FindByEndpoint should return nullptr (AutoUnlink)
+    EXPECT_EQ(IdentifyCluster::FindByEndpoint(10), nullptr);
+}
+
+TEST_F(TestIdentifyClusterBackwardsCompatibility, FindByEndpointMultipleInstances)
+{
+    IdentifyCluster cluster1(IdentifyCluster::Config(20, mMockTimerDelegate).WithIdentifyType(IdentifyTypeEnum::kLightOutput));
+    IdentifyCluster cluster2(IdentifyCluster::Config(21, mMockTimerDelegate).WithIdentifyType(IdentifyTypeEnum::kAudibleBeep));
+
+    // Both should be findable
+    EXPECT_EQ(IdentifyCluster::FindByEndpoint(20), &cluster1);
+    EXPECT_EQ(IdentifyCluster::FindByEndpoint(21), &cluster2);
+
+    // Non-existent endpoint returns nullptr
+    EXPECT_EQ(IdentifyCluster::FindByEndpoint(22), nullptr);
+}
+
+TEST_F(TestIdentifyClusterBackwardsCompatibility, LegacyAndCodeDrivenCoexist)
+{
+    // Legacy instance on endpoint 30
+    struct Identify legacyIdentify(30, nullptr, nullptr, IdentifyTypeEnum::kNone, nullptr, EffectIdentifierEnum::kBlink,
+                                   EffectVariantEnum::kDefault, &mMockTimerDelegate);
+
+    // Code-driven instance on endpoint 31
+    IdentifyCluster codeDrivenCluster(
+        IdentifyCluster::Config(31, mMockTimerDelegate).WithIdentifyType(IdentifyTypeEnum::kAudibleBeep));
+
+    // Legacy path should find endpoint 30 via FindIdentifyClusterOnEndpoint
+    IdentifyCluster * legacyFound = FindIdentifyClusterOnEndpoint(30);
+    ASSERT_NE(legacyFound, nullptr);
+    EXPECT_EQ(legacyFound, &legacyIdentify.mCluster.Cluster());
+
+    // Code-driven path should find endpoint 31 via FindIdentifyClusterOnEndpoint
+    IdentifyCluster * codeDrivenFound = FindIdentifyClusterOnEndpoint(31);
+    ASSERT_NE(codeDrivenFound, nullptr);
+    EXPECT_EQ(codeDrivenFound, &codeDrivenCluster);
+}
+
 } // namespace
