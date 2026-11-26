@@ -23,6 +23,7 @@
 #include "AppKeys.h"
 #include "SilabsIdentifyDelegate.h"
 
+#include "delegates/SilabsColorLight.h"
 #include "delegates/SilabsDimmableLight.h"
 #include "delegates/SilabsHumiditySensor.h"
 #include "delegates/SilabsTemperatureSensor.h"
@@ -52,6 +53,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app_config/enabled_devices.h>
@@ -185,7 +187,7 @@ CHIP_ERROR AppTask::AppInit()
     sl_status_t si70xxStatus = Si70xxSensor::Init();
     if (si70xxStatus != SL_STATUS_OK)
     {
-        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %lx", si70xxStatus);
     }
 #endif
     return CHIP_NO_ERROR;
@@ -233,7 +235,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sDataModelProvider = std::make_unique<chip::app::CodeDrivenDataModelProvider>(storage, sAttributePersistenceProvider);
     VerifyOrReturnError(sDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    chip::DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
+    chip::DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
+    VerifyOrReturnError(deviceInstanceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::DeviceLayer::DeviceInfoProvider * deviceInfoProvider = chip::DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
@@ -248,7 +253,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .accessControl              = chip::Server::GetInstance().GetAccessControl(),
         .persistentStorage          = storage,
         .failSafeContext            = chip::Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider = *deviceInfoProvider,
+        .deviceInstanceInfoProvider = *deviceInstanceInfoProvider,
         .platformManager            = chip::DeviceLayer::PlatformMgr(),
         .groupDataProvider          = *groupDataProvider,
         .sessionManager             = chip::Server::GetInstance().GetSecureSessionManager(),
@@ -374,6 +379,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .bindingHandler           = sBindingHandler,
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
         .identifyDelegate         = sIdentifyDelegate,
+        .deviceInfoProvider       = *deviceInfoProvider,
     });
 
     auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
@@ -404,6 +410,24 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                 chip::app::DimmableLoad::Config{
                     .levelControl = chip::app::DimmableLoad::LevelControlConfig::CiPicsDefaults(),
                 });
+        });
+    }
+
+    if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+    {
+        deviceFactory.RegisterCreator("extended-color-light", [groupDataProvider]() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsColorLight>(
+                chip::app::SilabsColorLight::Context{
+                    .groupDataProvider = *groupDataProvider,
+                    .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
+                    .timerDelegate     = sTimerDelegate,
+                },
+                sIdentifyDelegate
+#if SL_MATTER_DISPLAY_ENABLED
+                ,
+                BaseApplication::GetLCD()
+#endif
+            );
         });
     }
 

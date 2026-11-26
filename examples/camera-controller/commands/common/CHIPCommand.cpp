@@ -28,6 +28,7 @@
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 #include <string>
 
@@ -136,6 +137,10 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
     VerifyOrReturnError(nullptr != systemState, CHIP_ERROR_INCORRECT_STATE);
+
+    // The WebRTC requestor registers a fabric-scoped cluster, so it needs the controller
+    // stack's fabric table, which only exists after the factory is initialized.
+    WebRTCManager::Instance().Init(*systemState->Fabrics());
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 

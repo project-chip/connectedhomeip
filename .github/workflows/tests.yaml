@@ -41,7 +41,6 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
-    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -301,8 +300,8 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -382,14 +381,14 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --target TestOperationalState \
+                     --target 'Test_TC_OO_2_1:Test against all-devices/on-off-light' \
                      --test-order random \
                      run \
                      --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-no-wifi-openthread-endpoint-${BUILD_VARIANT}/all-devices-app \
                      --commissioning-method ble-thread \
                      --summary-file test-summaries/ble-thread.json \
                   "
@@ -404,13 +403,13 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --target TestOperationalState \
+                     --target 'Test_TC_OO_2_1:Test against all-devices/on-off-light' \
                      run \
                      --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/all-devices-app \
                      --commissioning-method thread-meshcop \
                      --summary-file test-summaries/thread-meshcop.json \
                   "
@@ -525,14 +524,14 @@ jobs:
                         "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: always()
               with:
                   name: test-summaries-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: test-summaries/
                   retention-days: 30
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -540,7 +539,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -731,14 +730,14 @@ jobs:
                         "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: always()
               with:
                   name: test-summaries-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: test-summaries/
                   retention-days: 30
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -746,13 +745,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -784,7 +783,7 @@ jobs:
                 job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
                 extra-details-file: "test-summaries/compact-failures.txt"
     # Keep this separate build until Ubuntu's system OpenSSL is upgraded to 3.5.
-    # Other tests requiring that library, such as TC_NETIM, can use this job.
+    # Other tests requiring that library can use this job: tag their runs openssl-3.5.
     openssl_3_5_tests:
         name: OpenSSL 3.5 Tests - Linux
         if: github.actor != 'restyled-io[bot]'
@@ -862,13 +861,13 @@ jobs:
                   "src/python_testing/execute_python_tests.py run
                   --env-file out/openssl-3.5/test_env.yaml
                   --search-directory src/python_testing
-                  --regex '${{env.OPENSSL_3_5_TEST_REGEX}}'
+                  --tag openssl-3.5
                   --summary-file out/openssl-3.5/results.json
                   --junit-file out/openssl-3.5/results.xml
                   --junit-suite-name 'OpenSSL 3.5 Tests'"
             - name: Upload test results
               if: always()
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: openssl-3.5-test-results
                   path: |
@@ -1338,6 +1337,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_matter_base_test_teardown.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_proxr_reflector.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
@@ -1350,6 +1350,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCreateNewController.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestLibdatachannelPeerConnection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPixitSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPics.py'
@@ -1384,7 +1385,7 @@ jobs:
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --tag skip-nightly --tag skip-openssl-3.5 --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1392,7 +1393,7 @@ jobs:
                     scripts/run_in_python_env.sh out/venv \
                       'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ matrix.filter != '' && always() }}
               with:
                   name: test-summaries-python-${{ matrix.filter }}
@@ -1401,7 +1402,7 @@ jobs:
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: junit-results-repl-${{ matrix.filter }}
                   path: ${{matrix.junitxml}}
@@ -1421,7 +1422,7 @@ jobs:
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-repl-${{ matrix.filter }}
@@ -1429,7 +1430,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading packet captures for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: pcaps-linux-repl-${{ matrix.filter }}
@@ -1521,7 +1522,7 @@ jobs:
 
           - name: Upload Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
-            uses: actions/upload-artifact@v7
+            uses: actions/upload-artifact@v7.0.2
             with:
                 name: allure-report-ci-repl
                 path: allure-report
@@ -1600,7 +1601,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -1608,20 +1609,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl

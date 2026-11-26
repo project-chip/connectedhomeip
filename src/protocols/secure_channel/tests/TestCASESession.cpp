@@ -261,6 +261,61 @@ public:
     PayloadHeader mBusyPayloadHeader;
 };
 
+class CheckResponderMRPConfigOnSigma2Messages : public Testing::LoopbackTransportDelegate
+{
+public:
+    CheckResponderMRPConfigOnSigma2Messages(ExchangeManager & exchangeManager,
+                                            const ReliableMessageProtocolConfig & expectedConfig) :
+        mExchangeManager(exchangeManager),
+        mExpectedConfig(expectedConfig)
+    {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        const bool isSigma2       = payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_Sigma2);
+        const bool isSigma2Resume = payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_Sigma2Resume);
+        VerifyOrReturn(isSigma2 || isSigma2Resume);
+
+        size_t numMatchingEntries = 0;
+        mExchangeManager.GetReliableMessageMgr()->EnumerateRetransTable([&](ReliableMessageMgr::RetransTableEntry * entry) {
+            if (!entry->ec->IsInitiator() && entry->ec->GetExchangeId() == payloadHeader.GetExchangeID())
+            {
+                numMatchingEntries++;
+                SessionHandle session = entry->ec->GetSessionHandle();
+                EXPECT_TRUE(session->IsUnauthenticatedSession());
+                EXPECT_EQ(session->GetRemoteMRPConfig(), mExpectedConfig);
+            }
+            return Loop::Continue;
+        });
+        EXPECT_EQ(numMatchingEntries, 1u);
+
+        if (isSigma2)
+        {
+            mNumSigma2Messages++;
+        }
+        else
+        {
+            mNumSigma2ResumeMessages++;
+        }
+    }
+
+    uint32_t mNumSigma2Messages       = 0;
+    uint32_t mNumSigma2ResumeMessages = 0;
+
+private:
+    ExchangeManager & mExchangeManager;
+    ReliableMessageProtocolConfig mExpectedConfig;
+};
+
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
 public:
@@ -591,6 +646,9 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
+    CheckResponderMRPConfigOnSigma2Messages checkResponderMRPConfig(GetExchangeManager(), nonSleepyCommissionerRmpConfig);
+    loopback.SetLoopbackTransportDelegate(&checkResponderMRPConfig);
+
     EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
                                                                             &pairingAccessory),
               CHIP_NO_ERROR);
@@ -606,7 +664,10 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
                   nullptr, nullptr, &delegateCommissioner, MakeOptional(nonSleepyCommissionerRmpConfig)),
               CHIP_NO_ERROR);
     ServiceEvents();
+    loopback.SetLoopbackTransportDelegate(nullptr);
 
+    EXPECT_EQ(checkResponderMRPConfig.mNumSigma2Messages, 1u);
+    EXPECT_EQ(checkResponderMRPConfig.mNumSigma2ResumeMessages, 0u);
     EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount);
     EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
@@ -950,6 +1011,132 @@ struct Sigma1Params
 
     static constexpr bool kExpectSuccess = true;
 };
+
+namespace {
+
+class MockInitiatorDelegate : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        mNumResponses++;
+        mLastMessageType = payloadHeader.GetMessageType();
+        return CHIP_NO_ERROR;
+    }
+
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
+
+    uint32_t mNumResponses   = 0;
+    uint8_t mLastMessageType = 0;
+};
+
+// Encodes a Sigma1 for the device fabric's node that omits the optional initiatorSessionParams.
+CHIP_ERROR EncodeSigma1WithoutSessionParameters(System::PacketBufferHandle & msg)
+{
+    using namespace TLV;
+
+    uint8_t initiatorRandom[Sigma1Params::kInitiatorRandomLen];
+    memset(initiatorRandom, 0xA5, sizeof(initiatorRandom));
+
+    const FabricInfo * fabricInfo = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
+
+    Crypto::P256PublicKey rootPubKey;
+    ReturnErrorOnFailure(gDeviceFabrics.FetchRootPubkey(gDeviceFabricIndex, rootPubKey));
+
+    Credentials::GroupDataProvider::KeySet ipkKeySet;
+    ReturnErrorOnFailure(gDeviceGroupDataProvider.GetIpkKeySet(gDeviceFabricIndex, ipkKeySet));
+    VerifyOrReturnError(ipkKeySet.num_keys_used > 0, CHIP_ERROR_INTERNAL);
+
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan destinationIdSpan(destinationId);
+    ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(ipkKeySet.epoch_keys[0].key), ByteSpan(initiatorRandom),
+                                                   Credentials::P256PublicKeySpan(rootPubKey.ConstBytes()),
+                                                   fabricInfo->GetFabricId(), fabricInfo->GetNodeId(), destinationIdSpan));
+
+    Crypto::P256Keypair ephemeralKey;
+    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDH));
+
+    msg = System::PacketBufferHandle::New(
+        EstimateStructOverhead(sizeof(initiatorRandom), sizeof(uint16_t), sizeof(destinationId), Crypto::kP256_PublicKey_Length));
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    System::PacketBufferTLVWriter tlvWriter;
+    tlvWriter.Init(std::move(msg));
+
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kInitiatorRandomTag), ByteSpan(initiatorRandom)));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kInitiatorSessionIdTag), static_cast<uint16_t>(1)));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kDestinationIdTag), ByteSpan(destinationIdSpan)));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(Sigma1Params::NumToTag(Sigma1Params::kInitiatorEphPubKeyTag),
+                                            ephemeralKey.Pubkey().ConstBytes(),
+                                            static_cast<uint32_t>(ephemeralKey.Pubkey().Length())));
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    return tlvWriter.Finalize(&msg);
+}
+
+} // namespace
+
+// A Sigma1 without initiatorSessionParams must leave the CASEServer session with the default
+// parameters, not the ones from the previous handshake on the same session.
+TEST_F(TestCASESession, Sigma1WithoutSessionParametersUsesDefaults)
+{
+    System::PacketBufferHandle sigma1;
+    ASSERT_SUCCESS(EncodeSigma1WithoutSessionParameters(sigma1));
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    {
+        TemporarySessionManager sessionManager(*this);
+        TestCASESecurePairingDelegate delegateCommissioner;
+        CASESession pairingCommissioner;
+        pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+        SessionParameters commissionerSessionParams;
+        commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+        commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+        pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+        ReliableMessageProtocolConfig commissionerMrpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                            System::Clock::Milliseconds16(4000));
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+        EXPECT_EQ(pairingCommissioner.EstablishSession(
+                      sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                      contextCommissioner, nullptr, nullptr, &delegateCommissioner, MakeOptional(commissionerMrpConfig)),
+                  CHIP_NO_ERROR);
+        ServiceEvents();
+
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    }
+
+    MockInitiatorDelegate initiatorDelegate;
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&initiatorDelegate);
+    EXPECT_SUCCESS(
+        contextInitiator->SendMessage(SecureChannel::MsgType::CASE_Sigma1, std::move(sigma1), SendMessageFlags::kExpectResponse));
+    ServiceEvents();
+    if (initiatorDelegate.mNumResponses == 0)
+    {
+        contextInitiator->Close();
+    }
+
+    // A Sigma2 response shows that the responder accepted this Sigma1.
+    EXPECT_EQ(initiatorDelegate.mNumResponses, 1u);
+    EXPECT_EQ(initiatorDelegate.mLastMessageType, to_underlying(SecureChannel::MsgType::CASE_Sigma2));
+
+    const SessionParameters & remoteSessionParams = gPairingServer.GetSession().GetRemoteSessionParameters();
+    EXPECT_EQ(remoteSessionParams.GetSupportedTransports(), 0u);
+    EXPECT_EQ(remoteSessionParams.GetMaxTCPPayloadSize(), 0u);
+    EXPECT_EQ(remoteSessionParams.GetMRPConfig(), GetDefaultMRPConfig());
+
+    gPairingServer.Shutdown();
+}
 
 TEST_F(TestCASESession, DestinationIdTest)
 {
@@ -1916,12 +2103,17 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         },
     };
 
+    ReliableMessageProtocolConfig commissionerMrpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                        System::Clock::Milliseconds16(4000));
+
     auto & loopback = GetLoopback();
     for (size_t i = 0; i < sizeof(testVectors) / sizeof(testVectors[0]); ++i)
     {
         auto * pairingCommissioner = chip::Platform::New<CASESession>();
         pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
         loopback.mSentMessageCount = 0;
+        CheckResponderMRPConfigOnSigma2Messages checkResponderMRPConfig(GetExchangeManager(), commissionerMrpConfig);
+        loopback.SetLoopbackTransportDelegate(&checkResponderMRPConfig);
         EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                                &testVectors[i].responderStorage, nullptr,
                                                                &gDeviceGroupDataProvider),
@@ -1930,9 +2122,12 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
             GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
             contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
-            Optional<ReliableMessageProtocolConfig>::Missing());
+            MakeOptional(commissionerMrpConfig));
         ServiceEvents();
+        loopback.SetLoopbackTransportDelegate(nullptr);
         EXPECT_EQ(establishmentReturnVal, CHIP_NO_ERROR);
+        EXPECT_EQ(checkResponderMRPConfig.mNumSigma2Messages, i == 0 ? 0u : 1u);
+        EXPECT_EQ(checkResponderMRPConfig.mNumSigma2ResumeMessages, i == 0 ? 1u : 0u);
         EXPECT_EQ(loopback.mSentMessageCount, testVectors[i].expectedSentMessageCount);
         EXPECT_EQ(delegateCommissioner.mNumPairingComplete, i + 1);
         SessionHolder & holder = delegateCommissioner.GetSessionHolder();
@@ -2160,6 +2355,19 @@ private:
         EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
         EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
         EXPECT_EQ(statusReport.GetProtocolCode(), mExpectedProtocolCode);
+
+        // The failure StatusReport remains reliable, but the rejected Sigma1's MRP parameters must not govern its retransmission.
+        EXPECT_TRUE(payloadHeader.NeedsAck());
+        size_t numResponderRetransmissions = 0;
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->EnumerateRetransTable([&](ReliableMessageMgr::RetransTableEntry * entry) {
+            if (!entry->ec->IsInitiator())
+            {
+                numResponderRetransmissions++;
+                EXPECT_EQ(entry->ec->GetSessionHandle()->GetRemoteMRPConfig(), GetDefaultMRPConfig());
+            }
+            return Loop::Continue;
+        });
+        EXPECT_EQ(numResponderRetransmissions, 1u);
         return CHIP_NO_ERROR;
     }
 
@@ -2184,6 +2392,58 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
     // This uses a bogus destination id that is not going to match anything in practice.
     EXPECT_EQ(EncodeSigma1Helper<Sigma1Params>(buf), CHIP_NO_ERROR);
     data->SetDataLength(static_cast<uint16_t>(buf.size()));
+
+    Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
+    EXPECT_TRUE(session.HasValue());
+
+    TestCASESecurePairingDelegate caseDelegate;
+    CASESession caseSession;
+    caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
+                                                         ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession), CHIP_NO_ERROR);
+
+    ExpectErrorExchangeDelegate delegate(SecureChannel::kProtocolCodeNoSharedRoot);
+    ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
+    ASSERT_NE(exchange, nullptr);
+
+    EXPECT_SUCCESS(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse));
+
+    ServiceEvents();
+
+    EXPECT_EQ(caseDelegate.mNumPairingErrors, 1u);
+    EXPECT_EQ(caseDelegate.mNumPairingComplete, 0u);
+
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1));
+    caseSession.Clear();
+}
+
+TEST_F(TestCASESession, RejectedSigma1WithLargeMRPIntervalsUsesDefaultConfig)
+{
+    using SecureChannel::MsgType;
+
+    SessionManager & sessionManager = GetSecureSessionManager();
+
+    uint8_t initiatorRandom[Crypto::kSHA256_Hash_Length] = { 1 };
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length]   = { 2 };
+    Crypto::P256Keypair ephemeralKey;
+    ASSERT_SUCCESS(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDH));
+
+    CASESessionAccess::EncodeSigma1Inputs encodeParams;
+    encodeParams.initiatorRandom    = ByteSpan(initiatorRandom);
+    encodeParams.initiatorSessionId = 0;
+    encodeParams.destinationId      = ByteSpan(destinationId);
+    encodeParams.initiatorEphPubKey = &ephemeralKey.Pubkey();
+    const auto defaultMRPConfig     = GetDefaultMRPConfig();
+    const auto largeIntervalMRPConfig =
+        ReliableMessageProtocolConfig(System::Clock::Milliseconds32(UINT32_MAX), System::Clock::Milliseconds32(UINT32_MAX),
+                                      defaultMRPConfig.mActiveThresholdTime);
+    encodeParams.initiatorSessionParams.SetMRPConfig(largeIntervalMRPConfig);
+
+    System::PacketBufferHandle data;
+    ASSERT_SUCCESS(CASESessionAccess::EncodeSigma1(data, encodeParams));
 
     Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
     EXPECT_TRUE(session.HasValue());

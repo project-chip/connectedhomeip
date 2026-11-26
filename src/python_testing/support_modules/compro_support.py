@@ -316,10 +316,12 @@ import sys
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 import matter.discovery as discovery
+from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest
@@ -332,6 +334,9 @@ COMPRO_ENDPOINT = 5
 
 # Default node ID assigned by the Matter test framework (TestingDefaults.DUT_NODE_ID).
 _DEFAULT_DUT_NODE_ID = 0x12344321
+
+# --in-test-commissioning-method values the PASE-first helpers (TC-COMPRO-2.6) can drive.
+_IN_TEST_COMMISSIONING_METHODS = ("on-network", "ble-wifi")
 
 
 def commission_if_needed() -> None:
@@ -811,6 +816,95 @@ class COMPROBaseTest(MatterBaseTest):
         return bool(feature_map & self.cp.Bitmaps.Feature.kBackgroundScan)
 
     # ------------------------------------------------------------------
+    # ED entry helpers: other commissionable devices in radio range may also
+    # be listed, so tests judge only the entries with the ED's discriminator.
+    # ------------------------------------------------------------------
+
+    @property
+    def ed_discriminator(self) -> int:
+        """Discriminator of the test's ED (``ed_discriminator``, default 3841)."""
+        params = getattr(self, 'user_params', {}) or {}
+        discriminator = int(params.get('ed_discriminator', 3841))
+        asserts.assert_true(0 <= discriminator <= 4095,
+                            f"ed_discriminator {discriminator} out of range (0-4095)")
+        return discriminator
+
+    def split_ed_entries(self, results) -> tuple[list, list]:
+        """Split ScanResultStruct entries (a list, or NullValue) into (the ED's, other devices')."""
+        entries = [] if results is NullValue else list(results)
+        discriminator = self.ed_discriminator
+        return ([r for r in entries if r.discriminator == discriminator],
+                [r for r in entries if r.discriminator != discriminator])
+
+    @staticmethod
+    def describe_entries(entries: list) -> str:
+        """One-line summary of ScanResultStruct entries for logs and failure messages."""
+        return ", ".join(f"disc={r.discriminator} vid=0x{r.vendorID:04x} pid=0x{r.productID:04x} "
+                         f"transport=0x{r.transport:02x}" for r in entries) or "none"
+
+    @classmethod
+    def assert_entries_unique_and_in_range(cls, results, label: str) -> None:
+        """Fail if ScanResultStruct entries (a list, or NullValue) hold a Discriminator above 4095 or a repeated key.
+
+        ProxyScanResult and CachedResults list each device once per
+        (Discriminator, VendorID, ProductID, Transport), whichever device it is.
+        """
+        seen_keys = set()
+        for r in ([] if results is NullValue else results):
+            asserts.assert_less_equal(r.discriminator, 4095,
+                                      f"{label}: Discriminator must be <= 4095: {cls.describe_entries([r])}")
+            key = (r.discriminator, r.vendorID, r.productID, r.transport)
+            asserts.assert_true(
+                key not in seen_keys,
+                f"{label}: duplicate entry {cls.describe_entries([r])}; each device must be listed "
+                "once per Discriminator/VendorID/ProductID/Transport")
+            seen_keys.add(key)
+
+    async def fail_ed_missing(self, label: str, other_entries: list, has_bgs: bool = True) -> None:
+        """Fail because no entry has the ED's discriminator, naming a list full of other devices."""
+        message = f"{label}: no entry with the ED's discriminator {self.ed_discriminator}"
+        if other_entries:
+            message += f"; other devices listed: {self.describe_entries(other_entries)}"
+            if has_bgs:
+                # This read only adds detail; its failure must not replace the ED failure.
+                try:
+                    max_cached = await self.read_cp_attribute(self.cp.Attributes.MaxCachedResults)
+                except (signals.TestFailure, ChipStackError, InteractionModelError, TimeoutError) as exc:
+                    message += f"; MaxCachedResults could not be read: {exc}"
+                else:
+                    if len(other_entries) >= max_cached:
+                        message += f"; the list is full (MaxCachedResults={max_cached})"
+        asserts.fail(message)
+
+    async def read_cached_results(self, attempts: int = 3) -> tuple[int, list]:
+        """Read NumCachedResults and CachedResults in one interaction, retrying while they disagree.
+
+        Other devices' entries can be added or expire between the two values.  Fails unless the
+        two values agree and CachedResults is null (not an empty list) when NumCachedResults is 0.
+        """
+        cp = self.cp
+        paths = [(self.cp_endpoint, cp.Attributes.NumCachedResults),
+                 (self.cp_endpoint, cp.Attributes.CachedResults)]
+        for attempt in range(1, attempts + 1):
+            values = (await self.default_controller.ReadAttribute(self.dut_node_id, paths))[self.cp_endpoint][cp]
+            num_cached = values[cp.Attributes.NumCachedResults]
+            cached = values[cp.Attributes.CachedResults]
+            for value in (num_cached, cached):
+                asserts.assert_false(isinstance(value, Clusters.Attribute.ValueDecodeFailure),
+                                     f"Error reading the cached results: {value}")
+            entries = [] if cached is NullValue else list(cached)
+            if num_cached == len(entries) or attempt == attempts:
+                break
+            logger.info("NumCachedResults=%d but %d CachedResults entries (attempt %d of %d)",
+                        num_cached, len(entries), attempt, attempts)
+            await asyncio.sleep(1)
+        asserts.assert_equal(num_cached, len(entries),
+                             "NumCachedResults must equal the number of CachedResults entries")
+        if num_cached == 0:
+            asserts.assert_equal(cached, NullValue, "CachedResults must be null when NumCachedResults is 0")
+        return num_cached, entries
+
+    # ------------------------------------------------------------------
     # ED fixture helpers
     # ------------------------------------------------------------------
 
@@ -839,7 +933,7 @@ class COMPROBaseTest(MatterBaseTest):
             return None
         return self.track_ed(EDFixture(
             app_path=app_path,
-            discriminator=int(params.get('ed_discriminator', 3841)),
+            discriminator=self.ed_discriminator,
             passcode=int(params.get('ed_passcode', 20202021)),
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
@@ -1004,33 +1098,60 @@ class COMPROBaseTest(MatterBaseTest):
     #
     # Run it with --in-test-commissioning-method (NOT --commissioning-method);
     # the latter makes the harness auto-commission the DUT before the test body
-    # runs, which defeats the PASE-first premise.  The DUT MUST start
-    # factory-reset / uncommissioned on every run, so 2.6 does not call
-    # commission_if_needed().
+    # runs, which defeats the PASE-first premise.  The method picks the PASE
+    # transport: on-network uses UDP; ble-wifi uses BLE, and commissioning then
+    # provisions the DUT onto Wi-Fi from --wifi-ssid / --wifi-passphrase.  The DUT
+    # MUST start factory-reset / uncommissioned on every run, so 2.6 does not
+    # call commission_if_needed().
     # ------------------------------------------------------------------
 
+    def _in_test_commissioning_method(self) -> str:
+        method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(
+            method,
+            "TC-COMPRO PASE-first tests require --in-test-commissioning-method "
+            "(e.g. 'on-network'); do not pass --commissioning-method, which would "
+            "auto-commission the DUT before the test body runs.")
+        asserts.assert_in(
+            method, _IN_TEST_COMMISSIONING_METHODS,
+            "TC-COMPRO PASE-first tests support --in-test-commissioning-method "
+            f"{' or '.join(_IN_TEST_COMMISSIONING_METHODS)}, got '{method}'")
+        return method
+
     async def establish_pase_to_dut(self, node_id: int | None = None) -> int:
-        """Establish an on-network (UDP) PASE session to the uncommissioned DUT.
+        """Establish a PASE session to the uncommissioned DUT without commissioning it.
 
         Returns the node id the PASE was established to (defaults to the DUT's own
-        node id).  The session is deliberately established over IP/UDP and to the
-        DUT node id so it can be REUSED for commissioning (see
-        commission_dut_in_test): AutoCommissioner derives mNeedsNetworkSetup from
-        the PASE transport type (BLE/WiFiPAF ⇒ needs network setup, UDP ⇒ not —
-        src/controller/AutoCommissioner.cpp).  The proxy advertises commissionable
-        over BLE, WiFiPAF and DNS-SD simultaneously, so the multi-transport
-        SetUpCodePairer (FindOrEstablishPASESession) races onto BLE/WiFiPAF and
-        would force WiFi provisioning during commissioning; establishing the PASE
-        directly over IP avoids that race entirely.
+        node id).  The session is established to the DUT node id so
+        commission_dut_in_test() can REUSE it.
 
-        The DUT IP may be supplied via the ``dut_ip`` param (deterministic; the
-        rig runner passes it).  Otherwise the DUT is discovered on-network and its
-        first routable address is used.
+        The transport follows --in-test-commissioning-method and is chosen here
+        rather than by the multi-transport SetUpCodePairer
+        (FindOrEstablishPASESession): the proxy advertises commissionable over BLE,
+        WiFiPAF and DNS-SD simultaneously, so that pairer can land on any of them.
+        AutoCommissioner derives mNeedsNetworkSetup from the PASE transport type
+        (BLE/WiFiPAF ⇒ provision the network, UDP ⇒ not —
+        src/controller/AutoCommissioner.cpp), so the transport decides whether
+        commissioning puts the DUT onto Wi-Fi.
+
+        on-network: PASE over IP/UDP.  The DUT IP may be supplied via the
+        ``dut_ip`` param (deterministic; the rig runner passes it).  Otherwise the
+        DUT is discovered on-network and its first routable address is used.
+
+        ble-wifi: PASE over BLE, which needs the long discriminator.
         """
         if node_id is None:
             node_id = self.dut_node_id
-        params = getattr(self, 'user_params', {}) or {}
         setup_info = self.get_setup_payload_info()[0]
+        if self._in_test_commissioning_method() == "ble-wifi":
+            asserts.assert_equal(
+                setup_info.filter_type, discovery.FilterType.LONG_DISCRIMINATOR,
+                "A ble-wifi PASE needs the long discriminator: pass --discriminator and "
+                "--passcode, or --qr-code, not --manual-code")
+            await self.default_controller.EstablishPASESessionBLE(
+                setupPinCode=setup_info.passcode, discriminator=setup_info.filter_value, nodeId=node_id)
+            return node_id
+        params = getattr(self, 'user_params', {}) or {}
         dut_ip = params.get('dut_ip')
         # Default CHIP commissioning port when an explicit dut_ip is supplied.
         port = int(params.get('dut_port', 5540))
@@ -1059,30 +1180,19 @@ class COMPROBaseTest(MatterBaseTest):
         return node_id
 
     async def commission_dut_in_test(self) -> None:
-        """Commission the DUT mid-test by REUSING the on-network PASE.
+        """Commission the DUT mid-test over the PASE from establish_pase_to_dut().
 
-        Runs the commissioning state machine over the PASE session opened by
-        establish_pase_to_dut() (do NOT expire it — the DUT supports a single PASE
-        at a time, and re-discovering it after a PASE has been torn down races with
-        the DUT dropping its commissionable advertisement, which times out mDNS).
-        Because that PASE is over UDP, AutoCommissioner keeps mNeedsNetworkSetup
-        false and skips WiFi/Thread provisioning — the proxy is reached over its
-        existing IP network, not provisioned onto WiFi (which would also clash with
-        its WiFiPAF radio use).  A BLE/WiFiPAF PASE would instead force
-        RequestWiFiCredentials and fail with "Not Implemented".
+        commission_devices() finds that PASE by the DUT node id and commissions
+        over it.  Do NOT expire it first: the DUT supports a single PASE at a time,
+        and re-discovering it after a PASE has been torn down races with the DUT
+        dropping its commissionable advertisement, which times out mDNS.  Over a
+        UDP PASE the proxy keeps its existing IP network; over a BLE PASE it is
+        provisioned onto Wi-Fi from --wifi-ssid / --wifi-passphrase.
         """
-        method = self.matter_test_config.in_test_commissioning_method
-        asserts.assert_is_not_none(
-            method,
-            "TC-COMPRO PASE-first tests require --in-test-commissioning-method "
-            "(e.g. 'on-network'); do not pass --commissioning-method, which would "
-            "auto-commission the DUT before the test body runs.")
-        asserts.assert_equal(
-            method, "on-network",
-            f"commission_dut_in_test supports only on-network commissioning, got '{method}'")
-        # Commission() runs commissioning over the existing (reused) PASE session
-        # for this node id.  Raises ChipStackError (→ test failure) on failure.
-        await self.default_controller.Commission(self.dut_node_id)
+        self._in_test_commissioning_method()
+        asserts.assert_true(
+            await self.commission_devices(),
+            "Commissioning the DUT over the PASE session failed (the error is logged above)")
 
     # ------------------------------------------------------------------
     # Bitmap validation helpers

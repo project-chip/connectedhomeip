@@ -50,6 +50,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'battery-storage',
     'bridged-node',
     'chime',
+    'closure-controller',
     'color-temperature-light',
     'contact-sensor',
     'cooktop',
@@ -58,12 +59,14 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-plug-in-unit',
     'dishwasher',
     'doorbell',
+    'electrical-energy-tariff',
     'electrical-sensor',
     'extended-color-light',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
+    'heat-pump',
     'humidity-conditioner',
     'humidity-sensor',
     'irrigation-system',
@@ -78,6 +81,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'on-off-light',
     'on-off-light-switch',
     'on-off-plug-in-unit',
+    'on-off-sensor',
     'oven',
     'power-source',
     'pressure-sensor',
@@ -87,6 +91,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'robotic-vacuum-cleaner',
     'room-air-conditioner',
     'soil-sensor',
+    'solar-power',
     'speaker',
     'temperature-sensor',
     'thermostat',
@@ -283,6 +288,8 @@ def BuildHostTarget():
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('no-tcp', enable_tcp=False).OnlyIfRe('-tests')
+    target.AppendModifier('packetbuffer-pool', packetbuffer_pool=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
     target.AppendModifier('endpoint-unique-id', chip_enable_endpoint_unique_id=True)
@@ -364,6 +371,7 @@ def BuildEsp32ZephyrTarget() -> BuildTarget:
     # boards
     target.AppendFixedTargets([
         TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+        TargetPart('c3devkitm', board=Esp32ZephyrBoard.C3_DEVKITM),
     ])
 
     # applications
@@ -411,7 +419,6 @@ def BuildEfr32Target():
         TargetPart('switch', app=Efr32App.SWITCH),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
-        TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
     ]
 
     # Single-device subset builds for all-devices-app.
@@ -479,7 +486,6 @@ def BuildNrfTarget():
         TargetPart('shell', app=NrfApp.SHELL),
         TargetPart('pump', app=NrfApp.PUMP),
         TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
-        TargetPart('window-covering', app=NrfApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -671,6 +677,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="build-only-no-blobs", build_only_no_blobs=True).OnlyIfRe('zephyr')
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
 
@@ -762,7 +769,6 @@ def BuildStm32Target():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
         TargetPart('STM32WBA65I-DK1', board=stm32Board.STM32WBA6XX),
     ])
 
@@ -902,6 +908,7 @@ def BuildTelinkTarget():
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('all-devices', app=TelinkApp.ALL_DEVICES),
         TargetPart('bridge', app=TelinkApp.BRIDGE),
+        TargetPart('closure', app=TelinkApp.CLOSURE),
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
@@ -914,7 +921,6 @@ def BuildTelinkTarget():
         TargetPart('temperature-measurement',
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
-        TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ]
 
     # Single-device subset builds for all-devices-app.
@@ -963,7 +969,6 @@ def BuildRealtekTarget():
         TargetPart('lighting', app=RealtekApp.LIGHT),
         TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
         TargetPart('lock', app=RealtekApp.LOCK),
-        TargetPart('window', app=RealtekApp.WINDOW),
         TargetPart('all-clusters', app=RealtekApp.ALL_CLUSTERS),
         TargetPart('ota-requestor', app=RealtekApp.OTA_REQUESTOR),
         TargetPart('thermostat', app=RealtekApp.THERMOSTAT),

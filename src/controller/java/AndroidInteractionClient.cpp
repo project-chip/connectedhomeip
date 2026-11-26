@@ -62,7 +62,20 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
+    Optional<SessionHandle> session = device->GetSecureSession();
+    if (!session.HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        if (callback != nullptr)
+        {
+            callback->OnError(CHIP_ERROR_MISSING_SECURE_SESSION);
+            callback->mWrapperCallbackRef.Reset();
+        }
+        return CHIP_ERROR_MISSING_SECURE_SESSION;
+    }
+    app::ReadPrepareParams params(session.Value());
 
     uint16_t aImTimeoutMs             = static_cast<uint16_t>(imTimeoutMs);
     params.mMinIntervalFloorSeconds   = static_cast<uint16_t>(minInterval);
@@ -208,7 +221,20 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
+    Optional<SessionHandle> session = device->GetSecureSession();
+    if (!session.HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        if (callback != nullptr)
+        {
+            callback->OnError(CHIP_ERROR_MISSING_SECURE_SESSION);
+            callback->mWrapperCallbackRef.Reset();
+        }
+        return CHIP_ERROR_MISSING_SECURE_SESSION;
+    }
+    app::ReadPrepareParams params(session.Value());
 
     SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
     SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
@@ -312,8 +338,9 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
     SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributeList, listSize));
 
     writeClient = Platform::New<app::WriteClient>(
-        device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
+        device->GetExchangeManager(), callback->GetChunkedWriteCallback(), device->GetSecureSession().Value(),
         convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
+    VerifyOrExit(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -492,7 +519,9 @@ CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jl
         goto exit;
     }
 
-    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                                      timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
     config.SetRemoteMaxPathsPerInvoke(device->GetSecureSession().Value()->GetRemoteSessionParameters().GetMaxPathsPerInvoke());
     SuccessOrExit(err = commandSender->SetCommandSenderConfig(config));
 
@@ -702,7 +731,9 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                                      timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));

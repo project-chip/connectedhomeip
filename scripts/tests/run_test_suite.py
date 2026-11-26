@@ -22,7 +22,7 @@ import subprocess
 import sys
 import time
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from multiprocessing.managers import SyncManager
 from pathlib import Path
 from typing import Any
@@ -124,7 +124,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--target',
     default=['all'],
     multiple=True,
-    help='Test to run (use "all" to run all tests)'
+    help='Test to run (use "all" to run all tests, or "<test>:<subtarget>" to run a single CI target)'
 )
 @click.option(
     '--target-glob',
@@ -228,13 +228,47 @@ def main(context: click.Context, log_level: str, log_level_tests: str | None, lo
         }
 
     if 'all' not in target:
-        tests = []
+        tests_by_name: dict[str, TestDefinition] = {}
         for name in target:
+            subtarget_name = None
+            if '::' in name:
+                test_name, subtarget_name = name.split('::', maxsplit=1)
+            elif ':' in name:
+                test_name, subtarget_name = name.split(':', maxsplit=1)
+            else:
+                test_name = name
+
             targeted = [test for test in all_tests if test.name.lower()
-                        == name.lower()]
+                        == test_name.lower()]
             if len(targeted) == 0:
                 log.error("Unknown target: '%s'", name)
-            tests.extend(targeted)
+                continue
+
+            if subtarget_name is not None:
+                subtargeted = []
+                for test in targeted:
+                    matching_targets = [
+                        t for t in test.targets if t.name.lower() == subtarget_name.lower()
+                    ]
+                    if matching_targets:
+                        subtargeted.append(replace(test, targets=matching_targets))
+                if len(subtargeted) == 0:
+                    log.error("Unknown sub-target '%s' for target '%s'", subtarget_name, test_name)
+                    exit(1)
+                targeted = subtargeted
+
+            for test in targeted:
+                if test.name in tests_by_name:
+                    existing = tests_by_name[test.name]
+                    merged_targets = list(existing.targets)
+                    for t in test.targets:
+                        if t not in merged_targets:
+                            merged_targets.append(t)
+                    tests_by_name[test.name] = replace(existing, targets=merged_targets)
+                else:
+                    tests_by_name[test.name] = test
+
+        tests = list(tests_by_name.values())
 
     if target_glob:
         matcher = GlobMatcher(target_glob.lower())

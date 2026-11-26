@@ -980,10 +980,8 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
 
     p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
     len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
-    VerifyOrExit(len <= serialNumber.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(serialNumber.data(), p, len);
-    serialNumber.reduce_size(len);
+    SuccessOrExit(error = StripDerIntegerSignByte(ByteSpan(p, len), serialNumber));
 
 exit:
     _log_mbedTLS_error(result);

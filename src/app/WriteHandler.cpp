@@ -76,7 +76,8 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mAccessingFabricIndex = kUndefinedFabricIndex;
+    mStateFlags.ClearAll();
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
@@ -138,6 +139,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // This is only relevant during chunked requests.
     //
     mExchangeCtx.Grab(apExchangeContext);
+    mAccessingFabricIndex = apExchangeContext->GetSessionHandle()->GetFabricIndex();
 
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
@@ -604,8 +606,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     //
     // TODO: That's not technically InvalidAction, and we should probably make
     // our callees hand out Status as well.
-    Status status = Status::InvalidAction;
-
+    Status status                = Status::InvalidAction;
     mLastSuccessfullyWrittenPath = std::nullopt;
 
     reader.Init(std::move(aPayload));
@@ -618,21 +619,19 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
-    err       = writeRequestParser.GetSuppressResponse(&boolValue);
-    if (err == CHIP_END_OF_TLV)
-    {
-        err = CHIP_NO_ERROR;
-    }
+    // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    boolValue = false;
+    err       = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
-    err       = writeRequestParser.GetTimedRequest(&boolValue);
+    boolValue = false;
+    err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
+    boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
@@ -734,7 +733,7 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mAccessingFabricIndex;
 }
 
 const char * WriteHandler::GetStateStr() const

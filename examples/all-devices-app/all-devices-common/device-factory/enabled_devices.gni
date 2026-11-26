@@ -83,6 +83,10 @@ _available_devices = [
     "CLOSURE",
   ],
   [
+    "closure-controller",
+    "CLOSURE_CONTROLLER",
+  ],
+  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],
@@ -119,6 +123,10 @@ _available_devices = [
     "DOORBELL",
   ],
   [
+    "electrical-energy-tariff",
+    "ELECTRICAL_ENERGY_TARIFF",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],
@@ -141,6 +149,10 @@ _available_devices = [
   [
     "generic-switch",
     "GENERIC_SWITCH",
+  ],
+  [
+    "heat-pump",
+    "HEAT_PUMP",
   ],
   [
     "humidity-conditioner",
@@ -203,6 +215,10 @@ _available_devices = [
     "ON_OFF_PLUG_IN_UNIT",
   ],
   [
+    "on-off-sensor",
+    "ON_OFF_SENSOR",
+  ],
+  [
     "oven",
     "OVEN",
   ],
@@ -241,6 +257,10 @@ _available_devices = [
   [
     "soil-sensor",
     "SOIL_SENSOR",
+  ],
+  [
+    "solar-power",
+    "SOLAR_POWER",
   ],
   [
     "speaker",

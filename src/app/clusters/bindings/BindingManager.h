@@ -119,6 +119,21 @@ public:
      * For unicast bindings without an active session, the notification will be queued and a new session will
      * be initiated. The BoundDeviceChangedHandler will be called once the session is established.
      *
+     * Ownership of @p context:
+     *  - If an error is returned, the BindingManager did not take @p context. The BoundDeviceContextReleaseHandler
+     *    will not be called for it, and the caller remains responsible for releasing it.
+     *  - If CHIP_NO_ERROR is returned, the BindingManager owns @p context and calls the BoundDeviceContextReleaseHandler
+     *    exactly once when the context is no longer needed. The release can happen before this function returns
+     *    (e.g. when no binding matches or only multicast bindings match), so the caller must not access @p context
+     *    after a successful call.
+     *
+     * Failures for a single unicast binding (e.g. a session cannot be started) are logged, do not change the
+     * return value, and do not stop the notification of the remaining bindings. A queued unicast notification
+     * is still delivered if a session to the peer is established later.
+     *
+     * @retval CHIP_ERROR_INCORRECT_STATE if the BindingManager is not initialized.
+     * @retval CHIP_ERROR_HANDLER_NOT_SET if no BoundDeviceChangedHandler is registered.
+     * @retval CHIP_ERROR_NO_MEMORY if the internal notification context cannot be allocated.
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 

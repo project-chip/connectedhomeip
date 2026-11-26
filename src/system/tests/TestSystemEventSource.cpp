@@ -33,14 +33,26 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::System;
-using namespace chip::System::Clock::Literals;
-
 // EventSources are only supported by a select-based LayerSelectLoop
 #if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 // The fake PlatformManagerImpl does not drive the system layer event loop
 #if !CHIP_DEVICE_LAYER_TARGET_FAKE
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && CHIP_SYSTEM_CONFIG_POSIX_LOCKING &&                  \
+    !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <sys/socket.h>
+#include <thread>
+#include <unistd.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && CHIP_SYSTEM_CONFIG_POSIX_LOCKING &&
+       // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+
+using namespace chip;
+using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 
 struct TestSource : public LayerImplSelect::EventSource
 {
@@ -219,5 +231,184 @@ TEST_F(TestSystemEventSource, MultipleEventSourcesOfDifferentTimeout)
 
     impl.EventSourceClear();
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && CHIP_SYSTEM_CONFIG_POSIX_LOCKING &&                  \
+    !CHIP_SYSTEM_CONFIG_USE_LIBEV
+
+namespace {
+
+void DrainPendingWakeEvents(LayerImplSelect & impl)
+{
+    TestSource drainSource;
+    drainSource.delaySeconds = 0;
+    impl.EventSourceAdd(&drainSource);
+    impl.PrepareEvents();
+    {
+        DeviceLayer::StackUnlock unlock;
+        impl.WaitForEvents();
+    }
+    impl.HandleEvents();
+    impl.EventSourceRemove(&drainSource);
+}
+
+struct CallbackState
+{
+    explicit CallbackState(SocketEventFlags flag) : expectedFlag(flag) {}
+
+    SocketEventFlags expectedFlag;
+    std::atomic<int> count{ 0 };
+};
+
+void OnSocketWatchEvent(SocketEvents events, intptr_t data)
+{
+    auto * state = reinterpret_cast<CallbackState *>(data);
+    if (events.Has(state->expectedFlag))
+    {
+        state->count.fetch_add(1, std::memory_order_relaxed);
+    }
+}
+
+void VerifyCrossThreadRequestWake(LayerImplSelect & impl, SocketEventFlags flag)
+{
+    int fds[2]             = { -1, -1 };
+    SocketWatchToken token = impl.InvalidSocketWatchToken();
+    auto cleanup           = ScopeExit([&]() {
+        if (token != impl.InvalidSocketWatchToken())
+        {
+            DeviceLayer::StackLock lock;
+            EXPECT_EQ(impl.StopWatchingSocket(&token), CHIP_NO_ERROR);
+            DrainPendingWakeEvents(impl);
+        }
+        if (fds[0] >= 0)
+        {
+            EXPECT_EQ(::close(fds[0]), 0);
+        }
+        if (fds[1] >= 0)
+        {
+            EXPECT_EQ(::close(fds[1]), 0);
+        }
+    });
+
+    DeviceLayer::StackLock stackLock;
+
+    ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
+
+    ASSERT_EQ(impl.StartWatchingSocket(fds[0], &token), CHIP_NO_ERROR);
+
+    CallbackState callbackState(flag);
+    ASSERT_EQ(impl.SetCallback(token, OnSocketWatchEvent, reinterpret_cast<intptr_t>(&callbackState)), CHIP_NO_ERROR);
+
+    DrainPendingWakeEvents(impl);
+
+    TestSource timeoutSource;
+    timeoutSource.delaySeconds = 5;
+    impl.EventSourceAdd(&timeoutSource);
+    impl.PrepareEvents();
+
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool readyToWait     = false;
+    CHIP_ERROR workerErr = CHIP_NO_ERROR;
+
+    std::thread worker([&]() {
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            cv.wait(lock, [&]() { return readyToWait; });
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        DeviceLayer::StackLock lock;
+        if (flag == SocketEventFlags::kRead)
+        {
+            workerErr = impl.RequestCallbackOnPendingRead(token);
+        }
+        else
+        {
+            workerErr = impl.RequestCallbackOnPendingWrite(token);
+        }
+    });
+
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        readyToWait = true;
+    }
+    cv.notify_one();
+
+    const auto start = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp elapsed{};
+    {
+        DeviceLayer::StackUnlock unlock;
+        impl.WaitForEvents();
+        elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
+        worker.join();
+    }
+    impl.HandleEvents();
+    impl.EventSourceRemove(&timeoutSource);
+
+    EXPECT_EQ(workerErr, CHIP_NO_ERROR);
+    EXPECT_LT(elapsed.count(), 2000u);
+    EXPECT_EQ(callbackState.count.load(std::memory_order_relaxed), 0);
+
+    if (flag == SocketEventFlags::kRead)
+    {
+        const char byte = 1;
+        ASSERT_EQ(::write(fds[1], &byte, sizeof(byte)), 1);
+    }
+
+    TestSource readinessSource;
+    readinessSource.delaySeconds = 5;
+    impl.EventSourceAdd(&readinessSource);
+    impl.PrepareEvents();
+    {
+        DeviceLayer::StackUnlock unlock;
+        impl.WaitForEvents();
+    }
+    impl.HandleEvents();
+    impl.EventSourceRemove(&readinessSource);
+    EXPECT_EQ(callbackState.count.load(std::memory_order_relaxed), 1);
+
+    // Verify the 0 -> 1 guard does not emit a redundant wake when already pending.
+    if (flag == SocketEventFlags::kRead)
+    {
+        EXPECT_EQ(impl.RequestCallbackOnPendingRead(token), CHIP_NO_ERROR);
+        EXPECT_EQ(impl.ClearCallbackOnPendingRead(token), CHIP_NO_ERROR);
+    }
+    else
+    {
+        EXPECT_EQ(impl.RequestCallbackOnPendingWrite(token), CHIP_NO_ERROR);
+        EXPECT_EQ(impl.ClearCallbackOnPendingWrite(token), CHIP_NO_ERROR);
+    }
+
+    TestSource noWakeSource;
+    noWakeSource.delaySeconds = 1;
+    impl.EventSourceAdd(&noWakeSource);
+    impl.PrepareEvents();
+    const auto noWakeStart = System::SystemClock().GetMonotonicTimestamp();
+    {
+        DeviceLayer::StackUnlock unlock;
+        impl.WaitForEvents();
+    }
+    const auto noWakeElapsed = System::SystemClock().GetMonotonicTimestamp() - noWakeStart;
+    impl.HandleEvents();
+    impl.EventSourceRemove(&noWakeSource);
+    EXPECT_GE(noWakeElapsed.count(), 900u);
+}
+
+} // namespace
+
+TEST_F(TestSystemEventSource, RequestCallbackOnPendingReadWakesSelect)
+{
+    auto & impl = static_cast<LayerImplSelect &>(chip::DeviceLayer::SystemLayer());
+    VerifyCrossThreadRequestWake(impl, SocketEventFlags::kRead);
+}
+
+TEST_F(TestSystemEventSource, RequestCallbackOnPendingWriteWakesSelect)
+{
+    auto & impl = static_cast<LayerImplSelect &>(chip::DeviceLayer::SystemLayer());
+    VerifyCrossThreadRequestWake(impl, SocketEventFlags::kWrite);
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && CHIP_SYSTEM_CONFIG_POSIX_LOCKING &&
+       // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+
 #endif // !CHIP_DEVICE_LAYER_TARGET_FAKE
 #endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH

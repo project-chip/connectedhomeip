@@ -68,10 +68,19 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
-    async def wait_for_srp_update(self, timeout_seconds: int = 180):
-        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
+    async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
+        """Fetches the IPv6 (AAAA) addresses of the DUT's operational service.
 
+        Waits until the DUT's operational record is published via SRP and resolves to at least one
+        IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout_seconds
         mdns = MdnsDiscovery()
+
+        # The SRV record is needed first: it provides the DUT's host name, which the AAAA lookup requires
+        # (the host name can't be derived from the instance name), so the two lookups can't run in parallel.
+        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
         srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -80,7 +89,24 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         )
         srv_record_returned = srv_record is not None and srv_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "Unable to find device")
-        return srv_record
+
+        # SRV addresses may include IPv4 (A records); keep IPv6 only.
+        ipv6_addresses = [address for address in (srv_record.addresses or []) if ":" in address]
+        if ipv6_addresses:
+            return ipv6_addresses
+
+        # The SRV lookup returned no address. AAAA records in an SRV response are optional additional records
+        # (RFC 6763), and python-zeroconf can also drop AAAA records that precede the SRV record in the same
+        # packet. Query the host's AAAA records explicitly; get_quada_records resends the query until an answer
+        # arrives or the timeout expires.
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
+        log.info("SRV record for %s returned no IPv6 addresses, querying AAAA for %s",
+                 srv_record.service_name, srv_record.hostname)
+        quada_records = await mdns.get_quada_records(hostname=srv_record.hostname, query_timeout_sec=remaining)
+        asserts.assert_true(quada_records, f"No IP address found for {srv_record.hostname} within {timeout_seconds}s")
+        return [record.address for record in quada_records]
 
     async def validate_thread_dataset(self, dataset_bytes, dataset_name):
         """
@@ -401,9 +427,8 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
             pass
 
         log.info("Step #7: Awaiting device on SRP")
-        srv_record = await self.wait_for_srp_update()
-        asserts.assert_true(srv_record and srv_record.addresses, "No IP addresses found in SRP record")
-        th2_ip = srv_record.addresses[0]
+        th2_addresses = await self.wait_for_srp_addresses()
+        th2_ip = th2_addresses[0]
         self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #7: Sleep completed for Thread network connection and SRP record propagation")
 
@@ -458,13 +483,14 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
 
         while asyncio.get_running_loop().time() - start_time < timeout_seconds:
             try:
-                srv_record = await self.wait_for_srp_update(timeout_seconds=5)
+                addresses = await self.wait_for_srp_addresses(timeout_seconds=5)
                 # Check if we got an IP list that does NOT contain the old THREAD_2ND IP
-                if srv_record and srv_record.addresses and th2_ip not in srv_record.addresses:
-                    log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", srv_record.addresses)
+                if th2_ip not in addresses:
+                    log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", addresses)
                     break
             except (TimeoutError, signals.TestFailure, AssertionError):
-                # Catching expected assertion failures or timeouts from wait_for_srp_update while waiting for the SRP record to migrate subnets
+                # Catching expected assertion failures or timeouts from wait_for_srp_addresses
+                # while waiting for the SRP record to migrate subnets
                 pass
             await asyncio.sleep(1)
         else:
@@ -560,7 +586,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         log.info("Step #16: Awaiting device on SRP")
-        await self.wait_for_srp_update()
+        await self.wait_for_srp_addresses()
         self.default_controller.ExpireSessions(self.dut_node_id)
 
         log.info("Step #16: Sleep completed for Thread network connection and SRP record propagation")
@@ -674,7 +700,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         log.info("Step #21: Awaiting device on SRP")
-        await self.wait_for_srp_update()
+        await self.wait_for_srp_addresses()
         self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #21: Sleep completed for Thread network connection and SRP record propagation")
 

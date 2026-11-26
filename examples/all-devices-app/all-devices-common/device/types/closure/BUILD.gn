@@ -34,9 +34,10 @@ source_set("closure") {
 
 source_set("logging") {
   sources = [
+    "impl/ClosureVariants.cpp",
+    "impl/ClosureVariants.h",
     "impl/SimulatedClosure.cpp",
     "impl/SimulatedClosure.h",
-    "impl/ThreePanelCabinetClosure.cpp",
   ]
 
   public_deps = [

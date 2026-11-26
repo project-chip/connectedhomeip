@@ -22,12 +22,10 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
@@ -94,11 +92,16 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
 
 PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
-CHIP_ERROR PushAvStreamTransportServerLogic::Init()
+CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider & attributeStorage, const FabricTable & fabricTable)
 {
     VerifyOrDie(mCluster != nullptr);
 
-    LoadPersistentAttributes();
+    mAttributeStorage = &attributeStorage;
+    LogErrorOnFailure(LoadCurrentConnections());
+    RemoveConnectionsForMissingFabrics(fabricTable);
+
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
     return CHIP_NO_ERROR;
 }
 
@@ -108,6 +111,7 @@ void PushAvStreamTransportServerLogic::Shutdown()
     {
         DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
     }
+    mAttributeStorage = nullptr;
 }
 
 bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
@@ -165,29 +169,85 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     return result;
 }
 
-CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId,
+                                                                             bool revertOnStoreFailure)
 {
     auto it = std::find_if(
         mCurrentConnections.begin(), mCurrentConnections.end(),
         [transportConnectionId](const TransportConfigurationStorage & s) { return s.connectionID == transportConnectionId; });
+    VerifyOrReturnValue(it != mCurrentConnections.end(), CHIP_NO_ERROR);
 
-    if (it != mCurrentConnections.end())
+    TransportConfigurationStorage removedValue = *it;
+    mCurrentConnections.erase(it);
+
+    CHIP_ERROR err = StoreCurrentConnections();
+    if (err != CHIP_NO_ERROR && revertOnStoreFailure)
     {
-        TransportConfigurationStorage removedValue = *it;
-        mCurrentConnections.erase(it);
+        ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+        mCurrentConnections.push_back(removedValue);
+        return err;
+    }
 
-        CHIP_ERROR err = StoreCurrentConnections();
-        if (err != CHIP_NO_ERROR)
+    // Notify the stack that the CurrentConnections attribute has changed.
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    return err;
+}
+
+void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    std::vector<uint16_t> connectionIDs;
+    for (const TransportConfigurationStorage & connection : mCurrentConnections)
+    {
+        if (connection.GetFabricIndex() == fabricIndex)
         {
-            ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
-            mCurrentConnections.push_back(removedValue); // Revert
-            return err;
+            connectionIDs.push_back(connection.connectionID);
+        }
+    }
+    VerifyOrReturn(connectionIDs.empty() == false);
+
+    if (mDelegate != nullptr)
+    {
+        // DeallocatePushTransport returns Busy while a transport is uploading; setting the
+        // transports inactive first stops the upload so deallocation is not refused.
+        if (mDelegate->SetTransportStatus(connectionIDs, TransportStatusEnum::kInactive) != Status::Success)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Failed to set transports inactive", mEndpointId);
         }
 
-        // Notify the stack that the CurrentConnections attribute has changed.
-        mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        for (uint16_t connectionID : connectionIDs)
+        {
+            if (mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
+            {
+                ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId,
+                             connectionID);
+            }
+        }
     }
-    return CHIP_NO_ERROR;
+
+    for (uint16_t connectionID : connectionIDs)
+    {
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
+        RemoveTimerAppState(connectionID);
+    }
+}
+
+void PushAvStreamTransportServerLogic::RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable)
+{
+    std::vector<uint16_t> connectionIDs;
+    for (const TransportConfigurationStorage & connection : mCurrentConnections)
+    {
+        if (fabricTable.FindFabricWithIndex(connection.GetFabricIndex()) == nullptr)
+        {
+            connectionIDs.push_back(connection.connectionID);
+        }
+    }
+
+    for (uint16_t connectionID : connectionIDs)
+    {
+        ChipLogDetail(Zcl, "Push AV Stream Transport: dropping ConnectionID %u whose fabric no longer exists", connectionID);
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
+        RemoveTimerAppState(connectionID);
+    }
 }
 
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
@@ -205,15 +265,6 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
                              });
 
     mTimerContexts.erase(it, mTimerContexts.end());
-}
-
-void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
-{
-    // Load currentConnections
-    LogErrorOnFailure(LoadCurrentConnections());
-
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
 TransportConfigurationStorage * PushAvStreamTransportServerLogic::FindStreamTransportConnection(const uint16_t connectionID)
@@ -2032,6 +2083,8 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
 CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 {
+    VerifyOrReturnError(mAttributeStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     Platform::ScopedMemoryBuffer<uint8_t> currentConns;
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
@@ -2058,7 +2111,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributeStorage->WriteValue(path, bufferSpan));
 
     ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
     return CHIP_NO_ERROR;
@@ -2081,7 +2134,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
 
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributeStorage->ReadValue(path, bufferSpan);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogProgress(Zcl, "No persisted CurrentConnections found.");

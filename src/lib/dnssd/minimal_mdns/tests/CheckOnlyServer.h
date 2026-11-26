@@ -237,6 +237,17 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    using ServerBase::BroadcastSend;
+
+    // Announcements are only counted: what they carry is checked through queries.
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle &&, uint16_t, chip::Inet::InterfaceId interface,
+                             chip::Inet::IPAddressType) override
+    {
+        mBroadcasts++;
+        mLastBroadcastInterface = interface;
+        return CHIP_NO_ERROR;
+    }
+
     // Functions used for controlling testing.
     void AddExpectedRecord(chip::Dnssd::PtrResourceRecord * ptr)
     {
@@ -268,6 +279,8 @@ public:
         info->target = kIgnoreQname;
     }
     bool GetSendCalled() { return mSendCalled; }
+    size_t GetBroadcastCount() const { return mBroadcasts; }
+    chip::Inet::InterfaceId GetLastBroadcastInterface() const { return mLastBroadcastInterface; }
     bool GetHeaderFound() { return mHeaderFound; }
     void Reset()
     {
@@ -279,6 +292,7 @@ public:
         mHeaderFound  = false;
         mSendCalled   = false;
         mTotalRecords = 0;
+        mBroadcasts   = 0;
         ClearTxtRecords();
     }
 
@@ -315,6 +329,8 @@ private:
     int mTotalRecords                   = 0;
     chip::Dnssd::FullQName kIgnoreQname = chip::Dnssd::FullQName(kIgnoreQNameParts);
     chip::Dnssd::BytesRange mPacketData;
+    size_t mBroadcasts = 0;
+    chip::Inet::InterfaceId mLastBroadcastInterface;
 
     int GetNumExpectedRecords() const
     {

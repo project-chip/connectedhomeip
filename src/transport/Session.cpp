@@ -99,6 +99,26 @@ size_t Session::GetMaxAppMessageLen() const
     return std::min<size_t>(static_cast<size_t>(peerMaxMessageSize) - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen);
 }
 
+void Session::ForEachHolder(HolderVisitor visitor, void * context)
+{
+    // The cursor steps past each holder before the visitor runs, so the visitor can release any holder. Holders
+    // added during the walk go in front of the cursor (see AddHolder). Nested walks step over this cursor because
+    // it holds no session.
+    SessionHolder cursor;
+    mHolders.PushFront(&cursor);
+    auto position = mHolders.begin(); // Refers to the cursor, wherever it moves.
+    for (auto next = std::next(position); next != mHolders.end(); next = std::next(position))
+    {
+        SessionHolder & holder = *next;
+        mHolders.SwapWithNext(position);
+        if (holder)
+        {
+            visitor(holder, context);
+        }
+    }
+    mHolders.Remove(&cursor);
+}
+
 uint16_t Session::SessionIdForLogging() const
 {
     switch (GetSessionType())

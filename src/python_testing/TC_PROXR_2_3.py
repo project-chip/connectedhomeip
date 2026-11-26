@@ -77,8 +77,10 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         self.setup_reflector_device()
 
     def teardown_class(self):
-        self.teardown_reflector_device()
-        super().teardown_class()
+        try:
+            self.teardown_reflector_device()
+        finally:
+            super().teardown_class()
 
     def desc_TC_PROXR_2_3(self) -> str:
         return "[TC-PROXR-2.3] Instant Proximity Ranging Functionality (DUT as Server)"
@@ -263,7 +265,8 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
         self.step(2)
         caps_i = await self.read_proxr_attribute(_PROXR.Attributes.RangingCapabilities, node_id=self.dut_node_id)
-        caps_r = await self.read_proxr_attribute(_PROXR.Attributes.RangingCapabilities, node_id=self.reflector_node_id)
+        caps_r = await self.read_proxr_attribute(
+            _PROXR.Attributes.RangingCapabilities, node_id=self.reflector_node_id)
         matter_asserts.assert_list(caps_i, "DUT_I RangingCapabilities", min_length=1)
         matter_asserts.assert_list(caps_r, "DUT_R RangingCapabilities", min_length=1)
 
@@ -291,7 +294,8 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
         async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
-            self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
+            self.wifi_ik_r = await self.read_proxr_attribute(
+                _PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
             asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),

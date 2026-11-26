@@ -472,6 +472,35 @@ enum class RelativePositionTag : uint8_t
     kUnknownEnumValue = 7,
 };
 
+// Enum for SemanticTagNamespaceId
+enum class SemanticTagNamespaceId : uint8_t
+{
+    kCompassDirection          = 0x02,
+    kCompassLocation           = 0x03,
+    kDirection                 = 0x04,
+    kLevel                     = 0x05,
+    kLocation                  = 0x06,
+    kNumber                    = 0x07,
+    kPosition                  = 0x08,
+    kElectricalMeasurement     = 0x0A,
+    kCommodityTariffChronology = 0x0B,
+    kCommodityTariffDirection  = 0x0D,
+    kLaundry                   = 0x0E,
+    kPowerSource               = 0x0F,
+    kCommonArea                = 0x10,
+    kCommonLandmark            = 0x11,
+    kRelativePosition          = 0x12,
+    kClosure                   = 0x44,
+    kClosurePanel              = 0x45,
+    kClosureWindow             = 0x47,
+    kClosureCabinet            = 0x48,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for SoftwareVersionCertificationStatusEnum
 enum class SoftwareVersionCertificationStatusEnum : uint8_t
 {

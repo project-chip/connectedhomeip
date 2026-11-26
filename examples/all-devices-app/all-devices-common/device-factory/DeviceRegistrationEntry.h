@@ -23,12 +23,34 @@
 namespace chip::app {
 
 /// Bundles an allocated device with its post-registration and pre-unregistration callbacks.
-struct DeviceRegistrationEntry
+template <typename InterfaceT>
+struct DeviceRegistrationEntryOfConcreteType
 {
-    std::unique_ptr<DeviceInterface> device;
+    static_assert(std::is_base_of_v<DeviceInterface, InterfaceT> && std::is_convertible_v<InterfaceT *, DeviceInterface *>,
+                  "`InterfaceT` needs to be a publicly inherited descendant of `DeviceInterface`");
+    std::unique_ptr<InterfaceT> device;
     std::function<void()> afterDeviceRegistration;
     std::function<void()> beforeDeviceUnregistration;
     Span<const EndpointComposition::SemanticTag> defaultTags = {};
+
+    DeviceRegistrationEntryOfConcreteType() = default;
+
+    DeviceRegistrationEntryOfConcreteType(std::unique_ptr<InterfaceT> dev, std::function<void()> afterRegistration,
+                                          std::function<void()> beforeUnregistration,
+                                          Span<const EndpointComposition::SemanticTag> tags = {}) :
+        device(std::move(dev)),
+        afterDeviceRegistration(std::move(afterRegistration)), beforeDeviceUnregistration(std::move(beforeUnregistration)),
+        defaultTags(tags)
+    {}
+
+    template <typename OtherInterfaceT>
+    explicit DeviceRegistrationEntryOfConcreteType(DeviceRegistrationEntryOfConcreteType<OtherInterfaceT> && other) :
+        DeviceRegistrationEntryOfConcreteType(std::move(other.device), std::move(other.afterDeviceRegistration),
+                                              std::move(other.beforeDeviceUnregistration), other.defaultTags)
+    {
+        static_assert(std::is_base_of_v<InterfaceT, OtherInterfaceT> && std::is_convertible_v<OtherInterfaceT *, InterfaceT *>,
+                      "`OtherInterfaceT` needs to be a publicly inherited descendant of `InterfaceT`");
+    }
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {})
@@ -38,7 +60,9 @@ struct DeviceRegistrationEntry
         {
             composition.tagList = defaultTags;
         }
-        ReturnErrorOnFailure(device->Register(allocator, provider, composition));
+
+        // The static_cast's validness is enforced by the static_assert at the top of the class.
+        ReturnErrorOnFailure(static_cast<DeviceInterface *>(device.get())->Register(allocator, provider, composition));
 
         if (afterDeviceRegistration)
         {
@@ -59,5 +83,7 @@ struct DeviceRegistrationEntry
         device->Unregister(provider);
     }
 };
+
+using DeviceRegistrationEntry = DeviceRegistrationEntryOfConcreteType<DeviceInterface>;
 
 } // namespace chip::app

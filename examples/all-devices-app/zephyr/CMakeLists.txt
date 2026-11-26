@@ -87,6 +87,7 @@ endforeach()
 foreach(_variant_key
         FAN
         FLOW_SENSOR
+        HEAT_PUMP
         HUMIDITY_SENSOR
         LIGHT_SENSOR
         OVEN
@@ -101,8 +102,9 @@ foreach(_variant_key
     endif()
 endforeach()
 
+# closure registers one creator per entry of kVariants in ClosureVariants.cpp (8 in total).
 if(ALL_DEVICES_ENABLE_CLOSURE)
-    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 2")
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 7")
 endif()
 
 if(ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
@@ -111,6 +113,11 @@ endif()
 
 # window-covering registers one creator per entry of kVariants in WindowCoveringVariants.cpp (5 in total).
 if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
+
+# solar-power registers one creator per entry in SolarPowerVariants.cpp (5 in total).
+if(ALL_DEVICES_ENABLE_SOLAR_POWER)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
 
@@ -146,6 +153,10 @@ endif()
 
 target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
 
+if (CONFIG_SOC_FAMILY_NXP_RW OR CONFIG_SOC_FAMILY_MCXW)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/nxp/app_common.cmake)
+endif()    
+
 if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
     target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
 endif()
@@ -172,6 +183,7 @@ target_sources(app PRIVATE
     src/delegates/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
+    ${ALL_DEVICES_COMMON_DIR}/providers/AllDevicesExampleDeviceInfoProviderImpl.cpp
     ${ALL_DEVICES_DEVICE_SOURCES}
     ${ALL_DEVICES_CLUSTER_SOURCES}
 )
@@ -220,7 +232,7 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     endif()
 
     if(CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
+        chip_zephyr_ota_image(chip-ota-image
             INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
             OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
         )

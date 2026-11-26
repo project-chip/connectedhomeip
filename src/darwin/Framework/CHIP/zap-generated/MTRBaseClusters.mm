@@ -5831,10 +5831,12 @@ public:
            }
          }
      }
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.auxiliaryType != nil) {
        auto & definedValue_2 = listHolder_0->mList[i_0].auxiliaryType.Emplace();
          definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.auxiliaryType.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
      listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -8647,19 +8649,25 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                 nonNullValue_0.locationName = AsCharSpan(value.locationName);
+#if MTR_ENABLE_PROVISIONAL
+     nonNullValue_0.locationName = AsCharSpan(value.locationName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.floorNumber == nil) {
        nonNullValue_0.floorNumber.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.floorNumber.SetNonNull();
          nonNullValue_2 = value.floorNumber.shortValue;
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.areaType == nil) {
        nonNullValue_0.areaType.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.areaType.SetNonNull();
          nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.areaType.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -29331,19 +29339,25 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                 nonNullValue_0.locationName = AsCharSpan(value.locationName);
+#if MTR_ENABLE_PROVISIONAL
+     nonNullValue_0.locationName = AsCharSpan(value.locationName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.floorNumber == nil) {
        nonNullValue_0.floorNumber.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.floorNumber.SetNonNull();
          nonNullValue_2 = value.floorNumber.shortValue;
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.areaType == nil) {
        nonNullValue_0.areaType.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.areaType.SetNonNull();
          nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.areaType.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -52894,16 +52908,24 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRPowerTopologyClusterCircuitNodeStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                     listHolder_0->mList[i_0].node = element_0.node.unsignedLongLongValue;
+#if MTR_ENABLE_PROVISIONAL
+     listHolder_0->mList[i_0].node = element_0.node.unsignedLongLongValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.endpoint != nil) {
        auto & definedValue_2 = listHolder_0->mList[i_0].endpoint.Emplace();
          definedValue_2 = element_0.endpoint.unsignedShortValue;
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.label != nil) {
        auto & definedValue_2 = listHolder_0->mList[i_0].label.Emplace();
          definedValue_2 = AsCharSpan(element_0.label);
      }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -70627,8 +70649,13 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRThermostatClusterSensorScheduleTransitionStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                     listHolder_0->mList[i_0].dayOfWeek = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeek)>>(element_0.dayOfWeek.unsignedCharValue);
+#if MTR_ENABLE_PROVISIONAL
+     listHolder_0->mList[i_0].dayOfWeek = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeek)>>(element_0.dayOfWeek.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      {
        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].enabledSensorHandles)>;
        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -70652,6 +70679,7 @@ public:
          listHolder_0->mList[i_0].enabledSensorHandles = ListType_2();
        }
      }
+#endif // MTR_ENABLE_PROVISIONAL
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -94589,14 +94617,22 @@ public:
         ListFreer listFreer;
         using TypeInfo = AmbientContextSensing::Attributes::ObjectCountConfig::TypeInfo;
         TypeInfo::Type cppValue;
-                if (value.countingObject.mfgCode == nil) {
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+     if (value.countingObject.mfgCode == nil) {
        cppValue.countingObject.mfgCode.SetNull();
      } else {
        auto & nonNullValue_2 = cppValue.countingObject.mfgCode.SetNonNull();
          nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.countingObject.mfgCode.unsignedShortValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.countingObject.namespaceID = value.countingObject.namespaceID.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.countingObject.tag = value.countingObject.tag.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.countingObject.label != nil) {
        auto & definedValue_2 = cppValue.countingObject.label.Emplace();
          if (value.countingObject.label == nil) {
@@ -94606,7 +94642,11 @@ public:
              nonNullValue_3 = AsCharSpan(value.countingObject.label);
          }
      }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.objectCountThreshold = value.objectCountThreshold.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -111937,10 +111977,18 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::Viewport::TypeInfo;
         TypeInfo::Type cppValue;
-             cppValue.x1 = value.x1.unsignedShortValue;
+#if MTR_ENABLE_PROVISIONAL
+     cppValue.x1 = value.x1.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.y1 = value.y1.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.x2 = value.x2.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      cppValue.y2 = value.y2.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -123592,10 +123640,12 @@ public:
      nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(element_0.nullableStruct.f.unsignedCharValue);
      nonNullValue_2.g = element_0.nullableStruct.g.floatValue;
      nonNullValue_2.h = element_0.nullableStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.nullableStruct.i != nil) {
        auto & definedValue_4 = nonNullValue_2.i.Emplace();
          definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.nullableStruct.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
      if (element_0.optionalStruct != nil) {
        auto & definedValue_2 = listHolder_0->mList[i_0].optionalStruct.Emplace();
@@ -123607,10 +123657,12 @@ public:
      definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(element_0.optionalStruct.f.unsignedCharValue);
      definedValue_2.g = element_0.optionalStruct.g.floatValue;
      definedValue_2.h = element_0.optionalStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.optionalStruct.i != nil) {
        auto & definedValue_4 = definedValue_2.i.Emplace();
          definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.optionalStruct.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
      if (element_0.nullableOptionalStruct != nil) {
        auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalStruct.Emplace();
@@ -123626,10 +123678,12 @@ public:
      nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(element_0.nullableOptionalStruct.f.unsignedCharValue);
      nonNullValue_3.g = element_0.nullableOptionalStruct.g.floatValue;
      nonNullValue_3.h = element_0.nullableOptionalStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.nullableOptionalStruct.i != nil) {
        auto & definedValue_5 = nonNullValue_3.i.Emplace();
          definedValue_5 = static_cast<std::remove_reference_t<decltype(definedValue_5)>>(element_0.nullableOptionalStruct.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
      }
      if (element_0.nullableList == nil) {
@@ -123858,10 +123912,12 @@ public:
      cppValue.f = static_cast<std::remove_reference_t<decltype(cppValue.f)>>(value.f.unsignedCharValue);
      cppValue.g = value.g.floatValue;
      cppValue.h = value.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (value.i != nil) {
        auto & definedValue_1 = cppValue.i.Emplace();
          definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(value.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -124312,10 +124368,12 @@ public:
      listHolder_0->mList[i_0].fabricSensitiveStruct.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>>(element_0.fabricSensitiveStruct.f.unsignedCharValue);
      listHolder_0->mList[i_0].fabricSensitiveStruct.g = element_0.fabricSensitiveStruct.g.floatValue;
      listHolder_0->mList[i_0].fabricSensitiveStruct.h = element_0.fabricSensitiveStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (element_0.fabricSensitiveStruct.i != nil) {
        auto & definedValue_3 = listHolder_0->mList[i_0].fabricSensitiveStruct.i.Emplace();
          definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_0.fabricSensitiveStruct.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
      {
        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveInt8uList)>;
        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -124668,19 +124726,25 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::GlobalStruct::TypeInfo;
         TypeInfo::Type cppValue;
-             cppValue.name = AsCharSpan(value.name);
+#if MTR_ENABLE_PROVISIONAL
+     cppValue.name = AsCharSpan(value.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.myBitmap == nil) {
        cppValue.myBitmap.SetNull();
      } else {
        auto & nonNullValue_1 = cppValue.myBitmap.SetNonNull();
          nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(value.myBitmap.unsignedIntValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.myEnum == nil) {
        cppValue.myEnum.SetNull();
      } else {
        auto & nonNullValue_1 = cppValue.myEnum.SetNonNull();
          nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(value.myEnum.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -126944,10 +127008,12 @@ public:
      nonNullValue_0.f = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(value.f.unsignedCharValue);
      nonNullValue_0.g = value.g.floatValue;
      nonNullValue_0.h = value.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
      if (value.i != nil) {
        auto & definedValue_2 = nonNullValue_0.i.Emplace();
          definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(value.i.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -127425,19 +127491,25 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                 nonNullValue_0.name = AsCharSpan(value.name);
+#if MTR_ENABLE_PROVISIONAL
+     nonNullValue_0.name = AsCharSpan(value.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.myBitmap == nil) {
        nonNullValue_0.myBitmap.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.myBitmap.SetNonNull();
          nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myBitmap.unsignedIntValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
      if (value.myEnum == nil) {
        nonNullValue_0.myEnum.SetNull();
      } else {
        auto & nonNullValue_2 = nonNullValue_0.myEnum.SetNonNull();
          nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myEnum.unsignedCharValue);
   }
+#endif // MTR_ENABLE_PROVISIONAL
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);

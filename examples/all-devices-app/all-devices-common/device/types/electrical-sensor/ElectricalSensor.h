@@ -64,6 +64,13 @@ public:
     PowerTopologyClusterT & PowerTopologyCluster();
 
 protected:
+    virtual CHIP_ERROR RegisterAdditionalServerClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual void UnregisterAdditionalServerClusters(CodeDrivenDataModelProvider & provider) {}
+
     Config mConfig;
 
     LazyRegisteredServerCluster<ElectricalEnergyMeasurementClusterT> mElectricalEnergyMeasurementCluster;

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributePathParams.h>
@@ -27,6 +29,7 @@
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
+#include <app/RequestSession.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
@@ -122,24 +125,37 @@ public:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apCallback       Callback set by application.
+     *  @param[in]    aSession         The destination used to encode the write, or std::nullopt. The SessionHandle
+     *                                 reference is read only during construction. A unicast session is retained until
+     *                                 completion or destruction. Group ID and fabric index are copied without retaining
+     *                                 the group session.
+     *                                 Passing the session allows WriteClient to optimize the encoding of the request based
+     *                                 on the information available from the session. Passing std::nullopt keeps an encoding
+     *                                 that every receiver accepts; use it when the session is not known at construction time.
+     *                                 Unicast must use the construction session; groupcast must use the construction
+     *                                 group ID and fabric index. A different destination fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *                                 An unavailable or released construction session causes encoding and sending to fail
+     *                                 with CHIP_ERROR_INCORRECT_STATE. A newer CASE session does not replace that session.
+     *                                 A timed write cannot be sent on a group session: encoding an attribute in a timed
+     *                                 WriteClient created for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                bool aSuppressResponse = false) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
+                const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
+        mSuppressResponse(aSuppressResponse), mRequestSession(aSession), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                uint16_t aReservedSize) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
+                const Optional<uint16_t> & aTimedWriteTimeoutMs, uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize),
-        mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mRequestSession(aSession),
+        mReservedSize(aReservedSize), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -180,10 +196,11 @@ public:
      * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (if provided, action WILL be sent)
      * @param[in] aTimedRequestFieldValue The value of the TimedRequest field in WriteRequest (can mismatch the action for testing)
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                bool aTimedRequestFieldValue, TestOnlyOverrideTimedRequestFieldTag) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
+                const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aTimedRequestFieldValue,
+                TestOnlyOverrideTimedRequestFieldTag) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mRequestSession(aSession),
         mTimedRequestFieldValue(aTimedRequestFieldValue)
     {
         assertChipStackLockedByCurrentThread();
@@ -325,6 +342,10 @@ public:
      *  If the timeout is missing or is set to System::Clock::kZero, a value based on the MRP timeouts of the session will be used.
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
+     *  Timed writes on group sessions are rejected with CHIP_ERROR_INVALID_ARGUMENT.
+     *  If a unicast session was passed at construction, `session` must be that session. Group requests must use
+     *  the construction group ID and fabric index. A different destination returns CHIP_ERROR_INVALID_ARGUMENT.
+     *  An unavailable or released construction session returns CHIP_ERROR_INCORRECT_STATE.
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
@@ -561,6 +582,8 @@ private:
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
     bool mSuppressResponse = false;
+
+    RequestSession mRequestSession;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;

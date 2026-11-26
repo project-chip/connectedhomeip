@@ -483,6 +483,8 @@ class HostBuilder(GnBuilder):
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
+                 enable_tcp=True,
+                 packetbuffer_pool=False,
                  ):
         """
         Construct a host builder.
@@ -539,6 +541,13 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_thread=false')
+
+        if not enable_tcp:
+            self.extra_gn_options.append('chip_inet_config_enable_tcp_endpoint=false')
+
+        if packetbuffer_pool:
+            # 15 is the SDK default pool size (src/system/SystemConfig.h); a size above 0 selects the internal PacketBuffer pool.
+            self.extra_gn_options.append('target_defines=["CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE=15"]')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -711,8 +720,6 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode is required")
 
             # OTNS drives the node through the OpenThread CLI on stdin/stdout, so Matter logs go to syslog.
-            # TODO: Bump third_party/ot-ns/repo once https://github.com/openthread/ot-ns/pull/849 is merged. Until then,
-            # ot-rfsim clamps the process-wide syslog mask to LOG_WARNING, which drops non-error Matter logs.
             self.extra_gn_options.append('chip_logging_backend="syslog"')
             self.extra_gn_options.append('chip_enable_otns=true')
             self.extra_gn_options.append('openthread_config_otns_enable=true')

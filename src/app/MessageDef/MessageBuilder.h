@@ -17,16 +17,30 @@
 
 #pragma once
 
+#include <optional>
+
 #include "StructBuilder.h"
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+
+struct RequestFlagsOptions
+{
+    bool suppressResponse = false;
+    bool timedRequest     = false;
+    std::optional<uint16_t> peerRevision;
+    bool isGroupcast = false;
+};
+
 class MessageBuilder : public StructBuilder
 {
 public:
     CHIP_ERROR EncodeInteractionModelRevision();
+
+protected:
+    CHIP_ERROR EncodeRequestFlags(const RequestFlagsOptions & options, TLV::Tag suppressResponseTag, TLV::Tag timedRequestTag);
 };
 } // namespace app
 } // namespace chip

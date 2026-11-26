@@ -292,7 +292,8 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         }
     }
 
-    NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
+    NotifyEndpointChanged(registration.endpointEntry.id, registration.endpointEntry.parentId,
+                          DataModel::EndpointChangeType::kAdded);
 
     return CHIP_NO_ERROR;
 }
@@ -331,9 +332,19 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
+    EndpointId parentId = kInvalidEndpointId;
+    for (auto & entry : mEndpointInterfaceRegistry)
+    {
+        if (entry.endpointEntry.id == endpointId)
+        {
+            parentId = entry.endpointEntry.parentId;
+            break;
+        }
+    }
+
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
 
-    NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
+    NotifyEndpointChanged(endpointId, parentId, DataModel::EndpointChangeType::kRemoved);
 
     return CHIP_NO_ERROR;
 }

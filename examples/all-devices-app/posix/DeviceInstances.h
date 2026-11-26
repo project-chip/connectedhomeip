@@ -19,6 +19,7 @@
 #pragma once
 
 #include <AppRootNode.h>
+#include <PosixDeviceFactory.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/EventManagement.h>
 #include <app/FailSafeContext.h>
@@ -31,16 +32,19 @@
 #include <app/server/Dnssd.h>
 #include <app_options/DeviceTypeParser.h>
 #include <binding-handler/BindingHandler.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/api/Interface.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
@@ -52,9 +56,35 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace chip::app {
+
+class PosixBridgedDeviceManager : public BridgedDeviceManager
+{
+public:
+    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider,
+                              EndpointIdAllocator & endpointIdAllocator) :
+        BridgedDeviceManager(provider, endpointIdAllocator),
+        mFactory(factory)
+    {}
+
+    DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
+    {
+        return mFactory.Create(deviceName, nodeLabel);
+    }
+
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel) override
+    {
+        return mFactory.CreateBridgedNode(nodeLabel);
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() override { return mFactory.CreateAggregator(); }
+
+private:
+    PosixDeviceFactory & mFactory;
+};
 
 /**
  * Manages the lifecycle of the code-driven data model provider and all device
@@ -88,6 +118,7 @@ public:
         Access::AccessControl & accessControl;
         FailSafeContext & failSafeContext;
         DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -103,8 +134,9 @@ public:
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
         uint16_t minGuaranteedSubscriptionsPerFabric;
-        bool enableWiFi  = false;
-        bool emulateWiFi = false;
+        bool enableWiFi   = false;
+        bool emulateWiFi  = false;
+        bool enableThread = false;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -129,6 +161,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<DeviceRegistrationEntry> mConstructedDevices;
+
+    // using optional to defer creation
+    std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
+    std::optional<PosixBridgedDeviceManager> mBridgedDeviceManager;
 };
 
 } // namespace chip::app

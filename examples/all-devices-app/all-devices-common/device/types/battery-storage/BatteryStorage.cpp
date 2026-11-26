@@ -28,10 +28,14 @@ using EsaType    = Clusters::DeviceEnergyManagement::ESATypeEnum;
 
 // Battery Storage rev 2 component tags use the Power Source namespace (Grid / Battery).
 const EndpointComposition::SemanticTag kGridComponentTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPowerSourceId, .tag = 0x01 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource),
+      .tag         = 0x01 },
 };
 const EndpointComposition::SemanticTag kBatteryComponentTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPowerSourceId, .tag = 0x03 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource),
+      .tag         = 0x03 },
 };
 
 EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointComposition::SemanticTag> tags)
@@ -55,9 +59,7 @@ EnergyManagement::Config BatteryStorageEnergyManagementConfig()
 BatteryStorage::BatteryStorage(const Context & context) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBatteryStorage, 1)),
     mEnergyManagement(context.timerDelegate, BatteryStorageEnergyManagementConfig()),
-    mGridElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, {}, SimulatedElectricalSensor::Role::kGrid),
-    mBatteryElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, {},
-                             SimulatedElectricalSensor::Role::kBattery),
+    mGridElectricalSensor(context.gridElectricalSensor), mBatteryElectricalSensor(context.batteryElectricalSensor),
     mGridPowerSource("Battery storage grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0),
     mBatteryPowerSource("Battery storage pack"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
                         context.timerDelegate, 1, BatteryPowerSource::ChargingCapability::kRechargeable)

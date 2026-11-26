@@ -298,6 +298,118 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], no_failure)]
         evaluate_test_scenarios(clusters, tests, 1)
 
+    def test_provisional_choice(self):
+        provisional_choice_cluster_xml = jinja2.Environment().from_string(CLUSTER_TEMPLATE).render(
+            feature_string="""
+                <feature bit="0" code="F0" name="Feature0"><optionalConform choice="a"/></feature>
+                <feature bit="1" code="F1" name="Feature1"><otherwiseConform><provisionalConform/><optionalConform choice="a"/></otherwiseConform></feature>
+                <feature bit="2" code="F2" name="Feature2"><otherwiseConform><provisionalConform/><optionalConform choice="b"/></otherwiseConform></feature>
+                <feature bit="3" code="F3" name="Feature3"><otherwiseConform><provisionalConform/><optionalConform choice="b"/></otherwiseConform></feature>
+            """,
+            attribute_string="""
+                <attribute id="0" name="Attr0" type="uint16"><optionalConform choice="a"/></attribute>
+                <attribute id="1" name="Attr1" type="uint16"><otherwiseConform><provisionalConform/><optionalConform choice="a"/></otherwiseConform></attribute>
+                <attribute id="2" name="Attr2" type="uint16"><optionalConform choice="c"/></attribute>
+                <attribute id="3" name="Attr3" type="uint16"><otherwiseConform><provisionalConform/><optionalConform choice="c"><greaterOrEqualTerm><revision value="current"/><revision value="2"/></greaterOrEqualTerm></optionalConform></otherwiseConform></attribute>
+            """,
+            command_string="""
+                <command id="0" name="Cmd0" direction="commandToServer" response="Y"><optionalConform choice="a"/></command>
+                <command id="1" name="Cmd1" direction="commandToServer" response="Y"><otherwiseConform><provisionalConform/><optionalConform choice="a"/></otherwiseConform></command>
+            """,
+        )
+        clusters: dict[int, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
+        ids_by_name: dict[str, int] = {}
+        problems: list[ProblemNotice] = []
+        add_cluster_data_from_xml(ElementTree.fromstring(provisional_choice_cluster_xml),
+                                  clusters, pure_base_clusters, ids_by_name, problems)
+
+        # Features:
+        #   .a (mixed): F0=O.a, F1=P, O.a
+        #   .b (all-provisional): F2=P, O.b, F3=P, O.b
+        # When allow_provisional=False, provisional members are skipped for choice counting.
+        for feature_map, expected_failures in [
+            (0b0000, {'a'}),
+            (0b0001, set()),
+            (0b0010, {'a'}),
+            (0b0011, set()),
+            (0b0101, set()),
+            (0b1101, set()),
+        ]:
+            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
+            probs = evaluate_feature_choice_conformance(0, 1, clusters, info, allow_provisional=False)
+            self._evaluate_problems(probs, expected_failures)
+
+        # When allow_provisional=True on a non-provisional cluster:
+        #   - .a requires exactly 1 of {F0, F1}
+        #   - .b is all-provisional on a non-provisional cluster: 0 or 1 passes, 2 fails
+        for feature_map, expected_failures in [
+            (0b0000, {'a'}),
+            (0b0001, set()),
+            (0b0010, set()),
+            (0b0011, {'a'}),
+            (0b0101, set()),
+            (0b1010, set()),
+            (0b1101, {'b'}),
+            (0b1111, {'a', 'b'}),
+        ]:
+            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
+            probs = evaluate_feature_choice_conformance(0, 1, clusters, info, allow_provisional=True)
+            self._evaluate_problems(probs, expected_failures)
+
+        # On a provisional cluster (e.g. Groupcast / Ambient Context Sensing), an all-provisional choice group (.b)
+        # still requires selecting from .b when allow_provisional=True, and is skipped when False.
+        clusters[1].is_provisional = True
+        info_no_b = ConformanceAssessmentData(feature_map=0b0001, attribute_list=[], all_command_list=[], cluster_revision=1)
+        self._evaluate_problems(evaluate_feature_choice_conformance(0, 1, clusters, info_no_b, allow_provisional=True), {'b'})
+        self._evaluate_problems(evaluate_feature_choice_conformance(0, 1, clusters, info_no_b, allow_provisional=False), set())
+        info_one_b = ConformanceAssessmentData(feature_map=0b0101, attribute_list=[], all_command_list=[], cluster_revision=1)
+        self._evaluate_problems(evaluate_feature_choice_conformance(0, 1, clusters, info_one_b, allow_provisional=True), set())
+        clusters[1].is_provisional = False
+
+        # Attributes & Commands: 0=O.a, 1=P, O.a (tested with both allow_provisional=False and True)
+        # Attributes also include .c: 2=O.c, 3=P, [Rev>=2].c
+        for ids, false_failures, true_failures in [
+            ([], {'a'}, {'a'}),
+            ([0], set(), set()),
+            ([1], {'a'}, set()),
+            ([0, 1], set(), {'a'}),
+        ]:
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=ids + [2], all_command_list=ids, cluster_revision=1)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=False),
+                                    false_failures)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    true_failures)
+            self._evaluate_problems(evaluate_command_choice_conformance(0, 1, clusters, info, allow_provisional=False),
+                                    false_failures)
+            self._evaluate_problems(evaluate_command_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    true_failures)
+
+        # Conditional provisional fallback (.c): Attr2=O.c, Attr3=P, [Rev>=2].c
+        # At revision 1, [Rev>=2].c is NOT_APPLICABLE, so Attr3 is excluded from choice counts even with allow_provisional=True.
+        for attr_ids, expected_failures in [
+            ([0], {'c'}),
+            ([0, 2], set()),
+            ([0, 3], {'c'}),
+            ([0, 2, 3], set()),
+        ]:
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=attr_ids, all_command_list=[], cluster_revision=1)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    expected_failures)
+
+        # At revision 2, [Rev>=2].c is applicable, so Attr3 participates when allow_provisional=True and is skipped when False.
+        for attr_ids, false_failures, true_failures in [
+            ([0], {'c'}, {'c'}),
+            ([0, 2], set(), set()),
+            ([0, 3], {'c'}, set()),
+            ([0, 2, 3], set(), {'c'}),
+        ]:
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=attr_ids, all_command_list=[], cluster_revision=2)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=False),
+                                    false_failures)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    true_failures)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

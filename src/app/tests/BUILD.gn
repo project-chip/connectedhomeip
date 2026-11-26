@@ -226,6 +226,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/data-model-providers/codegen:instance-header",

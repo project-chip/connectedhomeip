@@ -92,6 +92,7 @@ private:
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
         kExtendedAdvertisingEnabled  = 0x0040, /**< The application has enabled extended advertising. */
+        kRasGattServiceRegistered    = 0x0080, /**< The system has currently RAS GATT service registered. */
     };
 
     struct ServiceData;
@@ -133,11 +134,13 @@ private:
     CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
-#if defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE) &&                                           \
-    !defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    /* Re-enables BLE advertising after commissioning completes (line-powered /
+     * Channel Sounding). Runs after CommissioningWindowManager::Cleanup() has
+     * disabled advertising, so the re-enable is not immediately overridden. */
     static void HandleConcurrentModeReAdv(intptr_t arg);
 #endif
-#if defined(CONFIG_CHIP_CONCURRENT_MODE) && defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
     /* k_work handler: runs in Zephyr sysworkq; only a delayed retry trigger
      * that defers the teardown state machine to the CHIP task. */
     static void HandleBleTeardownWork(struct k_work * work);
@@ -157,9 +160,9 @@ private:
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
+    bool mBLERadioInitialized = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     friend class InitScanCallback;
-    bool mBLERadioInitialized = false;
 
     enum class PrescanState : uint8_t
     {
@@ -194,6 +197,7 @@ public:
      * down yet or the resume failed. Must run in application task context
      * (blocking). Port of the ot_ble_pm sample ble_enable(). */
     bool ResumeBleAfterTeardown(void);
+    void RearmBleTeardown(void);
 #endif
 
 #ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA

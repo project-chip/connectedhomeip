@@ -71,6 +71,31 @@ TEST_F(TestThreadOperationalDataset, TestActiveTimestamp)
     EXPECT_EQ(activeTimestamp, kActiveTimestampValue);
 }
 
+TEST_F(TestThreadOperationalDataset, TestPendingTimestamp)
+{
+    static constexpr uint64_t kPendingTimestampValue = 0x0102030405060708;
+
+    uint64_t pendingTimestamp = 0;
+
+    EXPECT_EQ(dataset.GetPendingTimestamp(pendingTimestamp), CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    EXPECT_EQ(dataset.SetActiveTimestamp(1), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.GetPendingTimestamp(pendingTimestamp), CHIP_ERROR_TLV_TAG_NOT_FOUND);
+
+    EXPECT_EQ(dataset.SetPendingTimestamp(kPendingTimestampValue), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.GetPendingTimestamp(pendingTimestamp), CHIP_NO_ERROR);
+    EXPECT_EQ(pendingTimestamp, kPendingTimestampValue);
+
+    uint64_t activeTimestamp = 0;
+    EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
+    EXPECT_EQ(activeTimestamp, 1u);
+
+    const uint8_t expected[] = {
+        0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, // Active Timestamp 1
+        0x33, 0x08, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, // Pending Timestamp 0x0102030405060708
+    };
+    EXPECT_TRUE(dataset.AsByteSpan().data_equal(ByteSpan(expected)));
+}
+
 TEST_F(TestThreadOperationalDataset, TestChannel)
 {
     static constexpr uint16_t kChannelValue = 15;
@@ -172,6 +197,7 @@ TEST_F(TestThreadOperationalDataset, TestClear)
 {
     {
         EXPECT_EQ(dataset.SetActiveTimestamp(123), CHIP_NO_ERROR);
+        EXPECT_EQ(dataset.SetPendingTimestamp(456), CHIP_NO_ERROR);
         EXPECT_EQ(dataset.SetChannel(5), CHIP_NO_ERROR);
         uint8_t extendedPanId[Thread::kSizeExtendedPanId] = { 1, 2, 3, 4, 5, 6, 7, 8 };
         EXPECT_EQ(dataset.SetExtendedPanId(extendedPanId), CHIP_NO_ERROR);
@@ -190,6 +216,11 @@ TEST_F(TestThreadOperationalDataset, TestClear)
     {
         uint64_t activeTimestamp;
         EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    }
+
+    {
+        uint64_t pendingTimestamp;
+        EXPECT_EQ(dataset.GetPendingTimestamp(pendingTimestamp), CHIP_ERROR_TLV_TAG_NOT_FOUND);
     }
 
     {
@@ -312,6 +343,7 @@ static void TestInvalidExampleDatasetTemplate()
     T dataset;
     const uint8_t invalid[] = {
         0x0e, 0x01, 0x01,                                                                                     // Active Timestamp
+        0x33, 0x01, 0x01,                                                                                     // Pending Timestamp
         0x00, 0x01, 0x0f,                                                                                     // Channel
         0x35, 0x00,                                                                                           // Channel Mask
         0x02, 0x09, 0x39, 0x75, 0x8e, 0xc8, 0x14, 0x4b, 0x07, 0xfb, 0xff,                                     // Ext PAN ID
@@ -328,6 +360,9 @@ static void TestInvalidExampleDatasetTemplate()
 
     uint64_t activeTimestamp;
     EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    uint64_t pendingTimestamp;
+    EXPECT_EQ(dataset.GetPendingTimestamp(pendingTimestamp), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     uint16_t channel;
     EXPECT_EQ(dataset.GetChannel(channel), CHIP_ERROR_INVALID_TLV_ELEMENT);
