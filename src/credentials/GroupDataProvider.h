@@ -35,6 +35,12 @@ class GroupDataProvider
 public:
     using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
+<<<<<<< HEAD
+=======
+    // Concurrent listeners: Server::GroupDataProviderListener, GroupcastCluster,
+    // Transport::GroupPeerTable, plus one spare slot.
+    static constexpr size_t kMaxListeners = 4;
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
 
     struct GroupInfo
     {
@@ -109,8 +115,9 @@ public:
 
     struct GroupSession
     {
-        GroupSession()   = default;
-        GroupId group_id = kUndefinedGroupId;
+        GroupSession()     = default;
+        GroupId group_id   = kUndefinedGroupId;
+        KeysetId keyset_id = kInvalidKeysetId;
         FabricIndex fabric_index;
         SecurityPolicy security_policy;
         Crypto::SymmetricKeyContext * keyContext = nullptr;
@@ -180,13 +187,39 @@ public:
          *
          *  @param[in] new_group  GroupInfo structure of the new group.
          */
-        virtual void OnGroupAdded(FabricIndex fabric_index, const GroupInfo & new_group) = 0;
+        virtual void OnGroupAdded(FabricIndex fabric_index, const GroupInfo & new_group) {}
         /**
          *  Callback invoked when an existing group is removed.
          *
          *  @param[in] old_group  GroupInfo structure of the removed group.
          */
+<<<<<<< HEAD
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+=======
+        virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) {}
+        /**
+         *  Callback invoked when an existing group is modified.
+         *  The modifications may be any of the following:
+         *  - Endpoints List modified
+         *  - KeySetID modified
+         *  - Flags modified (kHasAuxiliaryACL or kMcastAddrPolicy)
+         *
+         * Note that this callback is not invoked when the group is added or removed.
+         * Those events are handled by the OnGroupAdded and OnGroupRemoved callbacks respectively.
+         *
+         *  @param[in] modified_group_id  ID of the modified group.
+         */
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
+        /**
+         *  Callback invoked when a keyset is removed, or overwritten with operational keys
+         *  that share no encryption key with the previous keyset. Overlapping epoch-key
+         *  rotations do not invoke this callback so replay counters remain continuous.
+         *
+         *  @param[in] fabric_index  Fabric owning the keyset.
+         *  @param[in] keyset_id     ID of the removed or replaced keyset.
+         */
+        virtual void OnKeySetRemoved(FabricIndex fabric_index, KeysetId keyset_id) {}
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
@@ -314,9 +347,37 @@ public:
     virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id)                        = 0;
     virtual Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) = 0;
 
+<<<<<<< HEAD
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
+=======
+    /**
+     * Registers a listener (up to kMaxListeners). Passing nullptr or an
+     * already-registered listener is a no-op; registrations beyond kMaxListeners
+     * are logged and ignored.
+     */
+    void SetListener(GroupListener * listener);
+    void RemoveListener(GroupListener * listener);
+
+    void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
+
+    bool IsGroupcastEnabled() const { return mGroupcastEnabled; }
+
+    // Groupcast
+    virtual uint16_t getMaxMembershipCount() const = 0;
+    virtual uint16_t getMaxMcastAddrCount() const  = 0;
+
+    /**
+     * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.
+     *
+     * This method returns true if the last set of operations (e.g., SetGroupInfo, RemoveGroupInfo)
+     * somehow changed the Auxiliary ACL status of a group. Calling this method resets the internal flag.
+     *
+     * @return true if a notification is needed, false otherwise.
+     */
+    virtual bool ConsumeAuxAclNotificationNeeded() = 0;
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
@@ -331,6 +392,16 @@ protected:
         if (mListener)
         {
             mListener->OnGroupRemoved(fabric_index, old_group);
+        }
+    }
+    void KeySetRemoved(FabricIndex fabric_index, KeysetId keyset_id)
+    {
+        for (auto * listener : mListeners)
+        {
+            if (listener != nullptr)
+            {
+                listener->OnKeySetRemoved(fabric_index, keyset_id);
+            }
         }
     }
     const uint16_t mMaxGroupsPerFabric;

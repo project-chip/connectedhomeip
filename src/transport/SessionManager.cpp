@@ -128,11 +128,33 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mConnClosedCb   = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
+<<<<<<< HEAD
+=======
+    // Ensure MessageStats struct is at default state on Init
+    mMessageStats = MessageStats();
+
+    mRegisteredGroupProvider = nullptr;
+    EnsureGroupPeerTableListenerRegistered(Credentials::GetGroupDataProvider());
+
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
     return CHIP_NO_ERROR;
+}
+
+void SessionManager::EnsureGroupPeerTableListenerRegistered(Credentials::GroupDataProvider * groups)
+{
+    if (groups == nullptr || groups == mRegisteredGroupProvider)
+    {
+        return;
+    }
+
+    groups->SetListener(&gGroupPeerTable.get());
+    mRegisteredGroupProvider = groups;
 }
 
 void SessionManager::Shutdown()
 {
+    mRegisteredGroupProvider = nullptr;
+
     if (mFabricTable != nullptr)
     {
         mFabricTable->RemoveFabricDelegate(this);
@@ -1207,10 +1229,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
     Transport::PeerMessageCounter * counter = nullptr;
+    EnsureGroupPeerTableListenerRegistered(groups);
 
     if (CHIP_NO_ERROR ==
-        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
-                                       packetHeaderCopy.IsSecureSessionControlMsg(), counter))
+        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, groupContext.keyset_id,
+                                       packetHeaderCopy.GetSourceNodeId().Value(), packetHeaderCopy.IsSecureSessionControlMsg(),
+                                       counter))
     {
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {

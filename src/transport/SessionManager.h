@@ -550,9 +550,10 @@ private:
         kPayloadIsUnencrypted,
     };
 
-    System::Layer * mSystemLayer               = nullptr;
-    FabricTable * mFabricTable                 = nullptr;
-    Crypto::SessionKeystore * mSessionKeystore = nullptr;
+    System::Layer * mSystemLayer                                    = nullptr;
+    FabricTable * mFabricTable                                      = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore                      = nullptr;
+    const Credentials::GroupDataProvider * mRegisteredGroupProvider = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
@@ -625,6 +626,13 @@ private:
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
+<<<<<<< HEAD
+=======
+
+    void CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void EnsureGroupPeerTableListenerRegistered(Credentials::GroupDataProvider * groups);
+>>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
 };
 
 namespace MessagePacketBuffer {
