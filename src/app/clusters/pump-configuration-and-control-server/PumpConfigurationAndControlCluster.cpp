@@ -23,6 +23,8 @@
 #include <lib/support/odd-sized-integers.h>
 #include <system/SystemClock.h>
 
+#include <cstring>
+
 namespace chip::app::Clusters {
 
 using namespace PumpConfigurationAndControl;
@@ -148,25 +150,58 @@ PumpStatusBitMask WithRemoteSensorBits(PumpStatusBitMask status, RemoteSensorTyp
     return status;
 }
 
-/// Loads a LifetimeRunningHours value stored in the 3-byte int24u attribute format (0xFFFFFF is
-/// null), as written by earlier implementations of this cluster. Returns false if there is no such
-/// value.
-bool LoadInt24uLifetimeRunningHours(AttributePersistenceProvider & provider, const ConcreteAttributePath & path,
-                                    DataModel::Nullable<uint32_t> & value)
+/// Loads LifetimeRunningHours in either the current 4-byte Nullable<uint32_t> format or the
+/// earlier 3-byte int24u format (0xFFFFFF is null). Falls back to `defaultValue` if no valid
+/// value is stored. Returns true when a 3-byte value was loaded and should be rewritten in the
+/// current format.
+bool LoadLifetimeRunningHours(AttributePersistenceProvider & provider, const ConcreteAttributePath & path,
+                              DataModel::Nullable<uint32_t> & value, DataModel::Nullable<uint32_t> defaultValue)
 {
-    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
-    Traits::StorageType storage;
-    MutableByteSpan buffer(storage);
-    VerifyOrReturnValue(provider.ReadValue(path, buffer) == CHIP_NO_ERROR && buffer.size() == sizeof(storage), false);
-    if (Traits::IsNullValue(storage))
+    using CurrentTraits = NumericAttributeTraits<uint32_t>;
+    using Int24uTraits  = NumericAttributeTraits<OddSizedInteger<3, false>>;
+
+    uint8_t raw[sizeof(CurrentTraits::StorageType)];
+    MutableByteSpan buffer(raw);
+    const CHIP_ERROR err = provider.ReadValue(path, buffer);
+    if (err != CHIP_NO_ERROR)
     {
-        value.SetNull();
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(Zcl, "PCC: failed to load attribute 0x%" PRIx32 ": %" CHIP_ERROR_FORMAT, path.mAttributeId, err.Format());
+        }
+        value = defaultValue;
+        return false;
     }
-    else
+
+    if (buffer.size() == sizeof(CurrentTraits::StorageType))
     {
-        value.SetNonNull(Traits::StorageToWorking(storage));
+        CurrentTraits::StorageType storage;
+        std::memcpy(&storage, raw, sizeof(storage));
+        DataModel::StorageToNullable(storage, value);
+        if (!IsValidNullableInt24u(value))
+        {
+            value = defaultValue;
+        }
+        return false;
     }
-    return true;
+
+    if (buffer.size() == sizeof(Int24uTraits::StorageType))
+    {
+        Int24uTraits::StorageType storage;
+        std::memcpy(&storage, raw, sizeof(storage));
+        if (Int24uTraits::IsNullValue(storage))
+        {
+            value.SetNull();
+        }
+        else
+        {
+            value.SetNonNull(Int24uTraits::StorageToWorking(storage));
+        }
+        return true;
+    }
+
+    value = defaultValue;
+    return false;
 }
 
 } // namespace
@@ -256,7 +291,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
     persistence.LoadNativeEndianValue({ endpointId, clusterId, OperationMode::Id }, mOperationMode, defaultOperationMode);
     if (!IsOperationModeSupported(mOperationMode))
     {
-        mOperationMode = OperationModeEnum::kNormal;
+        mOperationMode = defaultOperationMode;
     }
 
     if (mControlModeEnabled)
@@ -282,17 +317,11 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
 
     if (mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id))
     {
-        const DataModel::Nullable<uint32_t> defaultHours = mLifetimeRunningHours;
         const ConcreteAttributePath path(endpointId, clusterId, LifetimeRunningHours::Id);
-        if (!persistence.LoadNativeEndianValue(path, mLifetimeRunningHours, defaultHours) &&
-            LoadInt24uLifetimeRunningHours(context.attributeStorage, path, mLifetimeRunningHours))
+        if (LoadLifetimeRunningHours(context.attributeStorage, path, mLifetimeRunningHours, mLifetimeRunningHours))
         {
             // Store the value in the current format, so that later loads do not need the conversion.
             StoreAttribute(LifetimeRunningHours::Id, mLifetimeRunningHours);
-        }
-        if (!IsValidNullableInt24u(mLifetimeRunningHours))
-        {
-            mLifetimeRunningHours = defaultHours;
         }
     }
 

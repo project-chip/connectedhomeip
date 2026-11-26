@@ -1039,6 +1039,8 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersist
     PumpConfigurationAndControlCluster::Config config =
         ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure));
     config.optionalAttributes.Set(OptionalAttributes::kControlMode).Set(OptionalAttributes::kLifetimeRunningHours);
+    config.operationMode = OperationModeEnum::kMinimum;
+    config.controlMode   = ControlModeEnum::kConstantPressure;
 
     struct
     {
@@ -1070,9 +1072,9 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersist
             { kTestEndpointId, PumpConfigurationAndControl::Id, LifetimeRunningHours::Id }, static_cast<uint32_t>(0x01000000)));
 
         ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
-        EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kNormal);
-        EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantSpeed);
-        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
+        EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kMinimum);
+        EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantPressure);
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMinimum);
         EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
         EXPECT_EQ(cluster.GetLifetimeRunningHours(), DataModel::MakeNullable(static_cast<uint32_t>(0)));
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1270,18 +1272,68 @@ TEST_F(TestPumpConfigurationAndControlCluster, ReentrantSensorChangeKeepsStateCo
 
 TEST_F(TestPumpConfigurationAndControlCluster, StartupLoadsInt24uLifetimeRunningHours)
 {
+    class CountingPersistenceProvider : public AttributePersistenceProvider
+    {
+    public:
+        explicit CountingPersistenceProvider(AttributePersistenceProvider & inner) : mInner(inner) {}
+
+        CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override
+        {
+            if (path.mAttributeId == LifetimeRunningHours::Id)
+            {
+                ++mLifetimeHoursWriteCount;
+            }
+            return mInner.WriteValue(path, value);
+        }
+
+        CHIP_ERROR ReadValue(const ConcreteAttributePath & path, MutableByteSpan & value) override
+        {
+            if (path.mAttributeId == LifetimeRunningHours::Id)
+            {
+                ++mLifetimeHoursReadCount;
+            }
+            return mInner.ReadValue(path, value);
+        }
+
+        unsigned mLifetimeHoursReadCount  = 0;
+        unsigned mLifetimeHoursWriteCount = 0;
+
+    private:
+        AttributePersistenceProvider & mInner;
+    };
+
     using Int24uTraits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     const ConcreteAttributePath path(kTestEndpointId, PumpConfigurationAndControl::Id, LifetimeRunningHours::Id);
 
     PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed));
     config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
 
+    {
+        // Unpersisted LifetimeRunningHours performs a single storage read and no write.
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        TestServerClusterContext testContext;
+        CountingPersistenceProvider countingProvider(testContext.AttributePersistenceProvider());
+        ServerClusterContext & base = testContext.Get();
+        ServerClusterContext context{
+            .provider           = base.provider,
+            .storage            = base.storage,
+            .attributeStorage   = countingProvider,
+            .interactionContext = base.interactionContext,
+        };
+
+        ASSERT_SUCCESS(cluster.Startup(context));
+        EXPECT_EQ(countingProvider.mLifetimeHoursReadCount, 1u);
+        EXPECT_EQ(countingProvider.mLifetimeHoursWriteCount, 0u);
+        EXPECT_EQ(cluster.GetLifetimeRunningHours(), DataModel::MakeNullable(static_cast<uint32_t>(0)));
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
     for (const DataModel::Nullable<uint32_t> & stored :
          { DataModel::MakeNullable(static_cast<uint32_t>(1234)), DataModel::Nullable<uint32_t>() })
     {
         PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
-        ClusterTester tester(cluster);
-        AttributePersistenceProvider & provider = tester.GetServerClusterContext().attributeStorage;
+        TestServerClusterContext testContext;
+        AttributePersistenceProvider & provider = testContext.AttributePersistenceProvider();
 
         // Earlier implementations stored LifetimeRunningHours in the 3-byte int24u format, with 0xFFFFFF as null.
         Int24uTraits::StorageType int24uValue;
@@ -1295,7 +1347,18 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupLoadsInt24uLifetimeRunning
         }
         ASSERT_SUCCESS(provider.WriteValue(path, ByteSpan(int24uValue)));
 
-        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        CountingPersistenceProvider countingProvider(provider);
+        ServerClusterContext & base = testContext.Get();
+        ServerClusterContext context{
+            .provider           = base.provider,
+            .storage            = base.storage,
+            .attributeStorage   = countingProvider,
+            .interactionContext = base.interactionContext,
+        };
+
+        ASSERT_SUCCESS(cluster.Startup(context));
+        EXPECT_EQ(countingProvider.mLifetimeHoursReadCount, 1u);
+        EXPECT_EQ(countingProvider.mLifetimeHoursWriteCount, 1u);
         EXPECT_EQ(cluster.GetLifetimeRunningHours(), stored);
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
