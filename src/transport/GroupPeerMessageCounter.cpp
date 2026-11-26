@@ -392,12 +392,12 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
             }
         }
 =======
-    // Cleanup old entries at the end of the list. These were entries that were
-    // moved further up in the list, and the entries from the writeIndex onwards
-    // are in an unspecified state.
-    for (uint32_t i = writeIndex; i < size; i++)
-    {
-        list[i].Reset();
+        // Cleanup old entries at the end of the list. These were entries that were
+        // moved further up in the list, and the entries from the writeIndex onwards
+        // are in an unspecified state.
+        for (uint32_t i = writeIndex; i < size; i++)
+        {
+            list[i].Reset();
 >>>>>>> 6934a10 ([Transport] Scope GroupPeerTable message counters and eviction per GroupKeySet (#75511))
     }
 }

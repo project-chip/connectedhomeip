@@ -148,7 +148,7 @@ TEST(TestGroupMessageCounter, AddPeerTest)
     } while (err != CHIP_ERROR_TOO_MANY_PEER_NODES);
     EXPECT_EQ(i, CHIP_CONFIG_MAX_FABRICS + 1);
 =======
-    auto mGroupPeerMsgCounter                     = std::make_unique<TestGroupPeerTable>();
+    auto mGroupPeerMsgCounter = std::make_unique<TestGroupPeerTable>();
 
     // Add max number of group data peers
     for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
