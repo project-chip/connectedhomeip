@@ -55,7 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController (Test) <MTRDeviceControllerTestMethods, MTRDeviceControllerConcreteTestMethods
 #ifdef DEBUG
-    , MTRDeviceControllerCommissioningTestHooks
+    ,
+    MTRDeviceControllerCommissioningTestHooks
 #endif
     >
 // Implemented in the MatterPrivateForInternalDragonsDoNotFeed category in MTRDeviceController.mm, which is where

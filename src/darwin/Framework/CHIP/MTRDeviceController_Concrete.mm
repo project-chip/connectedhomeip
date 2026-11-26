@@ -98,7 +98,8 @@ using namespace chip::Tracing::DarwinFramework;
 // compiler checks them against this file.
 @interface MTRDeviceController_Concrete () <MTRDeviceControllerConcreteTestMethods
 #ifdef DEBUG
-    , MTRDeviceControllerCommissioningTestHooks
+    ,
+    MTRDeviceControllerCommissioningTestHooks
 #endif
     >
 
