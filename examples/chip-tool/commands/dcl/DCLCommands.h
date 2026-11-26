@@ -31,12 +31,22 @@ public:
         AddArgument("hostname", &mHostName,
                     "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
         AddArgument("port", 0, UINT16_MAX, &mPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+        AddArgument("disable-https-validation", 0, 1, &mDisableHttpsValidation,
+                    "Disable validation of the certificates of the DCL server and of the Terms and Conditions server. "
+                    "Defaults to false. "
+                    "To trust a private CA instead, set SSL_CERT_FILE.");
     }
 
     CHIP_ERROR Run()
     {
-        auto client = chip::tool::dcl::DCLClient(mHostName, mPort);
-        return RunCommand(client);
+        auto securityMode = mDisableHttpsValidation.ValueOr(false) ? chip::tool::https::HttpsSecurityMode::kDisableValidation
+                                                                   : chip::tool::https::HttpsSecurityMode::kDefault;
+        auto client       = chip::tool::dcl::DCLClient(mHostName, mPort, securityMode);
+        CHIP_ERROR error  = RunCommand(client);
+
+        // In interactive mode the command object is reused, and an optional argument that is not passed keeps its last value.
+        ResetArguments();
+        return error;
     }
 
     virtual CHIP_ERROR RunCommand(chip::tool::dcl::DCLClient & client) = 0;
@@ -44,6 +54,7 @@ public:
 private:
     chip::Optional<char *> mHostName;
     chip::Optional<uint16_t> mPort;
+    chip::Optional<bool> mDisableHttpsValidation;
 };
 
 class DCLPayloadCommandBase : public DCLCommandBase
