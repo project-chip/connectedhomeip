@@ -32,5 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
                                     error:(nullable NSError *)error;
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller;
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload;
+@optional
+// A commissionee that was not being commissioned has been released; error says why.
+- (void)controller:(MTRDeviceController *)controller commissioneeReleasedForNodeID:(NSNumber *)nodeID error:(NSError *)error;
 @end
 NS_ASSUME_NONNULL_END

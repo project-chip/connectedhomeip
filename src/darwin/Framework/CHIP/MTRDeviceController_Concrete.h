@@ -256,6 +256,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
 
 /**
+ * Notification that the commissionee of a commissioning has been released; error is the reason.
+ * If the commissioning was waiting after PASE, it is no longer waiting when this returns, and this
+ * returns YES; the caller must then report the error, and reporting it is what ends the
+ * commissioning (it stays the controller's current commissioning until then). Otherwise returns NO
+ * and changes nothing.
+ */
+- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning error:(NSError *)error;
+
+/**
  * Notification that a commissioning operation is done.
  */
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning;
