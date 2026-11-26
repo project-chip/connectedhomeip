@@ -147,6 +147,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         strcpy(buffer, "_I");
         return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2, Encoding::HexFlags::kUppercaseAndNullTerminate);
     case DiscoveryFilterType::kInstanceName:
+        VerifyOrReturnError(subtype.instanceName != nullptr && subtype.instanceName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
         break;
     case DiscoveryFilterType::kNone:

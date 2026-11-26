@@ -270,6 +270,19 @@ TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
     EXPECT_STREQ(buffer, "001122334455");
 }
 
+TEST(TestServiceNaming, TestMakeServiceSubtypeEmptyInstanceName)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+    filter.type = DiscoveryFilterType::kInstanceName;
+
+    filter.instanceName = nullptr;
+    EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_ERROR_INVALID_ARGUMENT);
+
+    filter.instanceName = "";
+    EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
 {
     char buffer[64];
