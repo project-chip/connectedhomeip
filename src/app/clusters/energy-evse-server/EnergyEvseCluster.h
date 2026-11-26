@@ -30,6 +30,7 @@
 #include <clusters/EnergyEvse/Events.h>
 #include <clusters/EnergyEvse/Structs.h>
 #include <lib/core/CHIPError.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -156,6 +157,13 @@ public:
     DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mSessionEnergyDischarged; }
     CHIP_ERROR SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue);
 
+    CHIP_ERROR LogEvConnectedEvent(const Events::EVConnected::Type & event);
+    CHIP_ERROR LogEvNotDetectedEvent(const Events::EVNotDetected::Type & event);
+    CHIP_ERROR LogEnergyTransferStartedEvent(const Events::EnergyTransferStarted::Type & event);
+    CHIP_ERROR LogEnergyTransferStoppedEvent(const Events::EnergyTransferStopped::Type & event);
+    CHIP_ERROR LogFaultEvent(const Events::Fault::Type & event);
+    CHIP_ERROR LogRfidEvent(const Events::Rfid::Type & event);
+
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -188,6 +196,8 @@ private:
 
     Protocols::InteractionModel::Status
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
+    std::optional<Protocols::InteractionModel::Status> RejectIfFaultOrDiagnosticsActive() const;
 
     EnergyEvse::Delegate & mDelegate;
     const BitFlags<EnergyEvse::Feature> mFeatureFlags;

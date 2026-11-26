@@ -209,4 +209,42 @@ TEST_F(TestStubbedGroupsCluster, TestRemoveAllGroupsRemovesEndpoint)
     EXPECT_TRUE(mGroupDataProvider.HasEndpoint(kTestFabricIndex, kGroupId1, kOtherEndpointId));
 }
 
+TEST_F(TestStubbedGroupsCluster, TestRemoveGroupAndRemoveAllGroupsReclaimKeyMapWhenGroupcastEnabled)
+{
+    constexpr GroupId kSingleEndpointGroup1 = 10;
+    constexpr GroupId kSingleEndpointGroup2 = 20;
+    constexpr GroupId kSharedGroup          = 30;
+
+    mGroupDataProvider.SetGroupcastEnabled(true);
+    SetupKeySet(kTestFabricIndex);
+
+    AddGroupWithEndpoint(kTestFabricIndex, kSingleEndpointGroup1, kTestEndpointId, 0);
+    AddGroupWithEndpoint(kTestFabricIndex, kSingleEndpointGroup2, kTestEndpointId, 1);
+    AddGroupWithEndpoint(kTestFabricIndex, kSharedGroup, kTestEndpointId, 2);
+    ASSERT_EQ(mGroupDataProvider.AddEndpoint(kTestFabricIndex, kSharedGroup, kOtherEndpointId), CHIP_NO_ERROR);
+
+    Groups::Commands::RemoveGroup::Type removeRequest;
+    removeRequest.groupID = kSingleEndpointGroup1;
+    auto removeResult     = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
+    ASSERT_TRUE(removeResult.response.has_value());
+    EXPECT_EQ(static_cast<Status>(removeResult.response->status), Status::Success);
+
+    KeysetId keysetId = kInvalidKeysetId;
+    GroupDataProvider::GroupInfo info;
+    EXPECT_EQ(mGroupDataProvider.GetGroupInfo(kTestFabricIndex, kSingleEndpointGroup1, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mGroupDataProvider.GetGroupKey(kTestFabricIndex, kSingleEndpointGroup1, keysetId), CHIP_ERROR_NOT_FOUND);
+
+    Groups::Commands::RemoveAllGroups::Type removeAllRequest;
+    auto removeAllResult = mClusterTester->Invoke<Groups::Commands::RemoveAllGroups::Type>(removeAllRequest);
+    EXPECT_TRUE(removeAllResult.IsSuccess());
+
+    EXPECT_EQ(mGroupDataProvider.GetGroupInfo(kTestFabricIndex, kSingleEndpointGroup2, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mGroupDataProvider.GetGroupKey(kTestFabricIndex, kSingleEndpointGroup2, keysetId), CHIP_ERROR_NOT_FOUND);
+
+    // kSharedGroup still has kOtherEndpointId, so both GroupInfo and GroupKeyMap must remain intact.
+    EXPECT_EQ(mGroupDataProvider.GetGroupInfo(kTestFabricIndex, kSharedGroup, info), CHIP_NO_ERROR);
+    EXPECT_EQ(mGroupDataProvider.GetGroupKey(kTestFabricIndex, kSharedGroup, keysetId), CHIP_NO_ERROR);
+    EXPECT_EQ(keysetId, kKeysetId);
+}
+
 } // namespace

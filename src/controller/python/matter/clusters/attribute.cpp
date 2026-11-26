@@ -414,12 +414,14 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
     uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
+    VerifyOrReturnError(device != nullptr && device->GetSecureSession().HasValue(),
+                        ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
+        device->GetSecureSession().Value(),
         timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), suppressResponse);
-
-    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     SuccessOrExit(err =
                       ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
@@ -452,6 +454,9 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
     uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
+    VerifyOrReturnError(device != nullptr && device->GetSecureSession().HasValue(),
+                        ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
 
     // Use the TestOnly constructor that allows decoupling the Timed Request action from the TimedRequest field value.
@@ -460,10 +465,9 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     // - timedWriteTimeoutMs > 0, timedRequestFieldValue = false: Action sent, but field=false (TIMED_REQUEST_MISMATCH)
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
+        device->GetSecureSession().Value(),
         timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), timedRequestFieldValue,
         WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
-
-    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
 
@@ -502,8 +506,11 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
     chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
     VerifyOrReturnError(exchangeManager != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
-        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */, Optional<uint16_t>::Missing());
+    chip::Transport::OutgoingGroupSession session(groupId, devCtrl->GetFabricIndex());
+    chip::SessionHandle sessionHandle(session);
+    std::unique_ptr<WriteClient> client =
+        std::make_unique<WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */,
+                                      sessionHandle, Optional<uint16_t>::Missing());
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {
@@ -527,12 +534,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
                 chip::app::ConcreteDataAttributePath(kInvalidEndpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
-    {
-        auto fabricIndex = devCtrl->GetFabricIndex();
-
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        SuccessOrExit(err = client->SendWriteRequest(chip::SessionHandle(session), System::Clock::kZero));
-    }
+    SuccessOrExit(err = client->SendWriteRequest(sessionHandle, System::Clock::kZero));
 
     if (busyWaitMs)
     {

@@ -15,13 +15,21 @@
 # limitations under the License.
 
 from collections.abc import Iterator
+import contextlib
 import difflib
+import io
 import os
 import subprocess
 import sys
 import unittest
 
-SCRIPT_ROOT = os.path.dirname(__file__)
+SCRIPT_ROOT = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_ROOT not in sys.path:
+    sys.path.insert(0, SCRIPT_ROOT)
+
+from builders.builder import OutDirLock  # noqa: E402
+from builders.esp32 import ESP32_GENERATE_LOCK_KEY, Esp32App, Esp32Board, Esp32Builder  # noqa: E402
+from runner import PrintOnlyRunner  # noqa: E402
 
 
 def build_expected_output(source: str, root: str, out: str) -> Iterator[str]:
@@ -128,6 +136,44 @@ class TestBuilder(unittest.TestCase):
         for target in TARGETS:
             expected = os.path.join('testdata', f'dry_run_{target}.txt')
             self.assertCommandOutput(expected, f'--target {target} --dry-run build'.split(' '))
+
+    def test_esp32_generate_serializes_across_apps(self):
+        class RecordingOutDirLock(OutDirLock):
+            def __init__(self) -> None:
+                super().__init__()
+                self.locked_keys: list[str] = []
+
+            @contextlib.contextmanager
+            def lock_dir(self, dir_path: str | None) -> Iterator[None]:
+                if dir_path is not None:
+                    self.locked_keys.append(dir_path)
+                with super().lock_dir(dir_path):
+                    yield
+
+        root = '/TEST/BUILD/ROOT'
+        lock = RecordingOutDirLock()
+        runner = PrintOnlyRunner(io.StringIO(), root=root)
+
+        all_clusters = Esp32Builder(root=root, runner=runner, output_dir_lock=lock,
+                                    board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+        all_clusters.identifier = 'esp32-m5stack-all-clusters'
+        all_clusters.output_dir = '/OUTPUT/DIR/esp32-m5stack-all-clusters'
+
+        ota_requestor = Esp32Builder(root=root, runner=runner, output_dir_lock=lock,
+                                     board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR)
+        ota_requestor.identifier = 'esp32-m5stack-ota-requestor'
+        ota_requestor.output_dir = '/OUTPUT/DIR/esp32-m5stack-ota-requestor'
+
+        all_clusters.generate()
+        ota_requestor.generate()
+        self.assertEqual(lock.locked_keys.count(ESP32_GENERATE_LOCK_KEY), 2)
+
+        lock.locked_keys.clear()
+        all_clusters._build()
+        ota_requestor._build()
+        self.assertNotIn(ESP32_GENERATE_LOCK_KEY, lock.locked_keys)
+        self.assertIn(os.path.join(root, all_clusters.ExamplePath), lock.locked_keys)
+        self.assertIn(os.path.join(root, ota_requestor.ExamplePath), lock.locked_keys)
 
 
 if __name__ == '__main__':

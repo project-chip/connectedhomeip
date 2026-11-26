@@ -251,9 +251,12 @@ protected:
 
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-            auto commandSender                       = std::make_unique<chip::app::CommandSender>(
-                mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false),
-                device->GetSecureSession().Value()->AllowsLargePayload());
+            auto secureSession                       = device->GetSecureSession();
+            VerifyOrReturnError(secureSession.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+            const chip::SessionHandle & session = secureSession.Value();
+            auto commandSender                  = std::make_unique<chip::app::CommandSender>(
+                mCallback, device->GetExchangeManager(), session, mTimedInteractionTimeoutMs.HasValue(),
+                mSuppressResponse.ValueOr(false), session->AllowsLargePayload());
 
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -266,7 +269,7 @@ protected:
                                                                                      mDelayReportJitterWindowMs.ValueOr(0) };
                 commandSender->SetDelayReportData(delayReportData);
             }
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
             mCommandSender.push_back(std::move(commandSender));
 
             if (mBusyWaitForMs.HasValue())
@@ -291,7 +294,9 @@ protected:
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        chip::app::CommandSender commandSender(mCallback, exchangeManager);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        chip::SessionHandle sessionHandle(session);
+        chip::app::CommandSender commandSender(mCallback, exchangeManager, sessionHandle);
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams;
         // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
         ReturnErrorOnFailure(commandSender.TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
@@ -302,8 +307,7 @@ protected:
             commandSender.SetDelayReportData(delayReportData);
         }
 
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        return commandSender.SendGroupCommandRequest(chip::SessionHandle(session));
+        return commandSender.SendGroupCommandRequest(sessionHandle);
     }
 
     void Shutdown()
@@ -419,7 +423,10 @@ protected:
         while (repeat--)
         {
 
-            mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
+            auto secureSession = device->GetSecureSession();
+            VerifyOrReturnError(secureSession.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+            const chip::SessionHandle & session = secureSession.Value();
+            mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback, session,
                                                                     mTimedInteractionTimeoutMs, mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -431,7 +438,7 @@ protected:
                 ReturnErrorOnFailure(EncodeAttribute<T>(path, dataVersion, value));
             }
 
-            ReturnErrorOnFailure(mWriteClient->SendWriteRequest(device->GetSecureSession().Value()));
+            ReturnErrorOnFailure(mWriteClient->SendWriteRequest(session));
 
             if (mBusyWaitForMs.HasValue())
             {
@@ -483,11 +490,12 @@ protected:
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        chip::app::WriteClient writeClient(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        chip::SessionHandle sessionHandle(session);
+        chip::app::WriteClient writeClient(exchangeManager, &mChunkedWriteCallback, sessionHandle, chip::NullOptional);
         ReturnErrorOnFailure(writeClient.EncodeAttribute(attributePathParams, value, dataVersion));
 
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        return writeClient.SendWriteRequest(chip::SessionHandle(session));
+        return writeClient.SendWriteRequest(sessionHandle);
     }
 
     void Shutdown() { mWriteClient.reset(); }

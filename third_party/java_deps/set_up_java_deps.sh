@@ -26,9 +26,15 @@ function download_jar() {
     _JAR_NAME=$3
 
     if [ ! -f "third_party/java_deps/artifacts/$_JAR_NAME" ]; then
-        curl --fail --location --silent --show-error \
+        _TMP_FILE="third_party/java_deps/artifacts/.$_JAR_NAME.$$"
+        if curl --fail --location --silent --show-error \
             "https://$_HOST/maven2/$_MAVEN_PATH/$_JAR_NAME" \
-            -o "third_party/java_deps/artifacts/$_JAR_NAME"
+            -o "$_TMP_FILE"; then
+            mv -f "$_TMP_FILE" "third_party/java_deps/artifacts/$_JAR_NAME"
+        else
+            rm -f "$_TMP_FILE"
+            return 1
+        fi
     fi
 }
 
@@ -44,4 +50,4 @@ download_jar "repo1.maven.org" "org/json/json/20220924" "json-20220924.jar"
 
 # Unit test requirements
 download_jar "repo1.maven.org" "org/hamcrest/hamcrest-all/1.3" "hamcrest-all-1.3.jar"
-download_jar "dist.wso2.org" "com/google/common/google-collect/1.0-rc1/" "google-collect-1.0-rc1.jar"
+download_jar "repo1.maven.org" "com/google/collections/google-collections/1.0-rc1" "google-collections-1.0-rc1.jar"

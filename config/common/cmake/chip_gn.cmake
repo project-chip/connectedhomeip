@@ -53,7 +53,12 @@ execute_process(
     OUTPUT_VARIABLE GN_VERSION
     COMMAND_ERROR_IS_FATAL ANY
 )
-if (GN_VERSION VERSION_LESS MIN_GN_VERSION)
+# gn computes its version from its git history. A gn built without the git
+# history reports 0, and Debian's generate-ninja package reports 1000. These
+# values do not tell the real revision of gn, so they are not rejected.
+if (GN_VERSION MATCHES "^(0|1000) ")
+    message(WARNING "Cannot check the gn version (${MIN_GN_VERSION}+ is required): gn reports a placeholder")
+elseif (GN_VERSION VERSION_LESS MIN_GN_VERSION)
     message(FATAL_ERROR "Found unsupported version of gn: ${MIN_GN_VERSION}+ is required")
 endif()
 

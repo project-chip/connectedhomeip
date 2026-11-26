@@ -346,6 +346,7 @@ CHIP_ERROR WiFiPAFEndPoint::Init(WiFiPAFLayer * WiFiPafLayer, WiFiPAFSession & S
     mReceiveWindowMaxSize    = 0;
     mSendQueue               = nullptr;
     mAckToSend               = nullptr;
+    ItemsInReorderQueue      = 0;
 
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "initialized local rx window, size = %u", mLocalReceiveWindowSize);
 
@@ -981,8 +982,9 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
         }
         // Consume the saved packets
         ChipLogProgress(WiFiPAF, "Rx processing from the re-order queue [%u]", qidx);
-        err = RxPacketProcess(std::move(ReorderQueue[qidx]));
+        PacketBufferHandle pkt = std::move(ReorderQueue[qidx]);
         ItemsInReorderQueue--;
+        ReturnErrorOnFailure(RxPacketProcess(std::move(pkt)));
     }
     // Has reached the 1st hole in the queue => move the rest items forward
     // Note: It's to continue => No need to reinit "i"

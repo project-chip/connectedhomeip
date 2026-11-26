@@ -283,6 +283,7 @@ static_library("support") {
     "LifetimePersistedCounter.h",
     "LinkedList.h",
     "ObjectLifeCycle.h",
+    "ParseDecimal.h",
     "PersistedCounter.h",
     "PersistentData.h",
     "PersistentStorageAudit.cpp",

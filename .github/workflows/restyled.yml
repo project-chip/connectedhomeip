@@ -14,10 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: restyled-io/actions/setup@ab22a0751549a3e4fe782295458b303a55f04f76 # v4
+      - uses: restyled-io/actions/setup@4f4c3dc169f17c48a68a9c7311c369fdef55e829 # v4
 
       - id: restyler
-        uses: restyled-io/actions/run@ab22a0751549a3e4fe782295458b303a55f04f76 # v4
+        uses: restyled-io/actions/run@4f4c3dc169f17c48a68a9c7311c369fdef55e829 # v4
 
       - name: Save restyle patch
         if: ${{ steps.restyler.outputs.git-patch }}
@@ -29,7 +29,7 @@ jobs:
 
       - id: upload
         if: ${{ steps.restyler.outputs.git-patch }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pr-${{ github.event.pull_request.number }}-restyled
           path: /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch

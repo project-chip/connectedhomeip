@@ -773,6 +773,13 @@ void RunAndValidateSequence(AttributeInstructionListType list)
  */
 TEST_F(TestClusterStateCache, TestCache)
 {
+    // The 200-item list in this test needs one PacketBuffer per item in the cache's BufferedReadCallback, more than a
+    // typical PacketBuffer pool holds.
+    if (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     ChipLogProgress(DataManagement, "Validating various sequences of attribute data IBs...");
 
     //

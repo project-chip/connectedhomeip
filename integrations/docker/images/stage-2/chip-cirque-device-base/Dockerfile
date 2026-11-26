@@ -1,4 +1,5 @@
 FROM ubuntu:24.04
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 
 ARG OT_BR_POSIX_CHECKOUT=main
 
@@ -39,6 +40,8 @@ RUN apt-get update \
   python3-pip \
   python3 \
   sudo \
+  tcpdump \
+  tshark \
   wireless-tools \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
@@ -50,7 +53,7 @@ RUN apt-get update \
       && git reset --hard FETCH_HEAD \
       && git submodule update --init --depth=1 \
       && ./script/bootstrap \
-      && ./script/setup)\
+      && OTBR_OPTIONS="-DOT_POSIX_INSTALL_EXTERNAL_ROUTES=ON" ./script/setup)\
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   git psmisc ninja-build cmake wget libreadline-dev libncurses-dev libcpputest-dev \
   libavahi-common-dev libavahi-client-dev libboost-dev libboost-filesystem-dev \

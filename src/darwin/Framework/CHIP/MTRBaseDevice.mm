@@ -1750,7 +1750,7 @@ private:
             decoder->SetOnDoneCallback(onDoneCb);
 
             bool isTimedRequest = (timeoutMs != nil);
-            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
+            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, session, isTimedRequest);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
@@ -1837,7 +1837,7 @@ private:
             decoder->SetOnDoneCallback(onDoneCb);
 
             bool isTimedRequest = (timeoutMs != nil);
-            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
+            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, session, isTimedRequest);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
             app::CommandSender::ConfigParameters configParams;

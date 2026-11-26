@@ -711,6 +711,14 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
+    if (!userIndex.IsNull() && !userIndexValid(commandPath.mEndpointId, userIndex.Value()))
+    {
+        ChipLogProgress(Zcl, "[SetCredential] User index is out of range [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
+                        userIndex.Value());
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
     if (DlStatus::kSuccess != status)
@@ -807,7 +815,7 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
     case DataOperationTypeEnum::kModify: {
-        // appclusters, 5.2.4.41.1: should send the INVALID_COMMAND in the response when the credential is in use
+        // appclusters: Modify requires the credential slot to be occupied; respond with INVALID_COMMAND otherwise.
         if (DlCredentialStatus::kAvailable == existingCredential.status)
         {
             ChipLogProgress(Zcl,
@@ -2437,12 +2445,19 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         return DlStatus::kFailure;
     }
 
+    if (user.userStatus == UserStatusEnum::kAvailable)
+    {
+        ChipLogProgress(Zcl, "[ModifyUserCredential] Unable to modify credential: user slot is empty [endpointId=%d,userIndex=%d]",
+                        endpointId, userIndex);
+        return DlStatus::kInvalidField;
+    }
+
     // return INVALID_COMMAND if the accessing fabric index doesn’t match the
     // CreatorFabricIndex in the user record pointed to by UserIndex
     if (user.createdBy != modifierFabricIdx)
     {
         ChipLogProgress(Zcl,
-                        "[createCredential] Unable to modify credential for user created by different fabric "
+                        "[ModifyUserCredential] Unable to modify credential for user created by different fabric "
                         "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
                         endpointId, userIndex, user.createdBy, modifierFabricIdx);
         return DlStatus::kInvalidField;
@@ -2467,22 +2482,15 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
             memcpy(newCredentials.Get(), user.credentials.data(), sizeof(CredentialStruct) * user.credentials.size());
             newCredentials[i] = credential;
 
-            ChipLogProgress(
-                Zcl,
-                "[ModifyUserCredential] Unable to add credential to user: credential with this index is already associated "
-                "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d]",
-                endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex);
-
             if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIdx, user.userName,
                                               user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
                                               newCredentials.Get(), user.credentials.size()))
             {
-                ChipLogProgress(
-                    Zcl,
-                    "[ModifyUserCredential] Unable to modify user credential: credential with this index is already associated "
-                    "with user [endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
-                    endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex,
-                    static_cast<unsigned int>(user.credentials.size()));
+                ChipLogProgress(Zcl,
+                                "[ModifyUserCredential] Unable to modify user credential: app error "
+                                "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
+                                endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex,
+                                static_cast<unsigned int>(user.credentials.size()));
                 return DlStatus::kFailure;
             }
 
