@@ -177,12 +177,7 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
     {
     case Binding::Attributes::Binding::Id: {
         return encoder.EncodeList([&](const auto & subEncoder) {
-            for (auto & entry : mClusterContext.bindingTable)
-            {
-                if (entry.local != request.path.mEndpointId)
-                {
-                    continue;
-                }
+            auto encodeBinding = [&](const Binding::TableEntry & entry) -> CHIP_ERROR {
                 if (entry.type == Binding::MATTER_UNICAST_BINDING)
                 {
                     Binding::Structs::TargetStruct::Type value = {
@@ -205,6 +200,48 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
                     };
                     ReturnErrorOnFailure(subEncoder.Encode(value));
                 }
+                return CHIP_NO_ERROR;
+            };
+            const auto * snapshot = mListWrite.has_value() && mListWrite->valid ? &mListWrite.value() : nullptr;
+            // Stable fabric ordering keeps unfiltered reads unchanged when entries are reinserted.
+            uint16_t minimumFabric = 0;
+            while (true)
+            {
+                uint16_t nextFabric = UINT16_MAX;
+                if (snapshot != nullptr && snapshot->fabric >= minimumFabric)
+                {
+                    nextFabric = snapshot->fabric;
+                }
+                for (const auto & entry : mClusterContext.bindingTable)
+                {
+                    if (entry.local == request.path.mEndpointId && entry.fabricIndex >= minimumFabric &&
+                        entry.fabricIndex < nextFabric)
+                    {
+                        nextFabric = entry.fabricIndex;
+                    }
+                }
+                if (nextFabric == UINT16_MAX)
+                {
+                    break;
+                }
+                if (snapshot != nullptr && snapshot->fabric == nextFabric)
+                {
+                    for (size_t i = 0; i < snapshot->count; ++i)
+                    {
+                        ReturnErrorOnFailure(encodeBinding(snapshot->entries[i]));
+                    }
+                }
+                else
+                {
+                    for (const auto & entry : mClusterContext.bindingTable)
+                    {
+                        if (entry.local == request.path.mEndpointId && entry.fabricIndex == nextFabric)
+                        {
+                            ReturnErrorOnFailure(encodeBinding(entry));
+                        }
+                    }
+                }
+                minimumFabric = static_cast<uint16_t>(nextFabric + 1);
             }
             return CHIP_NO_ERROR;
         });
@@ -302,11 +339,12 @@ void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath 
         SnapshotBindingList(path.mEndpointId, accessingFabric);
         return;
     }
-    if (mListWrite.has_value() && mListWrite->valid && !BindingListEqualsSnapshot(path.mEndpointId))
+    const bool changed = mListWrite.has_value() && mListWrite->valid && !BindingListEqualsSnapshot(path.mEndpointId);
+    mListWrite.reset();
+    if (changed)
     {
         LogErrorOnFailure(NotifyBindingsChanged(accessingFabric));
     }
-    mListWrite.reset();
 }
 
 CHIP_ERROR BindingCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)

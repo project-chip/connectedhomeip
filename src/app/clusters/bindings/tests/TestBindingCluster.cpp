@@ -56,6 +56,178 @@ BindingCluster::Context CreateStandardContext()
     };
 }
 
+void ExpectBindingRead(BindingCluster & cluster, FabricIndex fabric, bool filtered, DataVersion expectedVersion,
+                       const std::vector<TableEntry> & expected)
+{
+    chip::Testing::ReadOperation read(1, Binding::Id, Binding::Attributes::Binding::Id);
+    auto subject        = chip::Testing::kAdminSubjectDescriptor;
+    subject.fabricIndex = fabric;
+    read.SetSubjectDescriptor(subject);
+    const app::ConcreteClusterPath path(1, Binding::Id);
+    chip::Testing::ReadOperation::EncodingParams params;
+    params.SetDataVersion(cluster.GetDataVersion(path)).SetIsFabricFiltered(filtered);
+    auto encoder = read.StartEncoding(params);
+    ASSERT_NE(encoder, nullptr);
+    ASSERT_TRUE(cluster.ReadAttribute(read.GetRequest(), *encoder).IsSuccess());
+    ASSERT_SUCCESS(read.FinishEncoding());
+    std::vector<chip::Testing::DecodedAttributeData> reports;
+    ASSERT_SUCCESS(read.GetEncodedIBs().Decode(reports));
+    ASSERT_EQ(reports.size(), 1u);
+    EXPECT_EQ(reports[0].dataVersion, expectedVersion);
+    DecodableBindingListType bindings;
+    ASSERT_SUCCESS(app::DataModel::Decode(reports[0].dataReader, bindings));
+    std::vector<TableEntry> actual;
+    auto it = bindings.begin();
+    while (it.Next())
+    {
+        const auto & binding = it.GetValue();
+        if (binding.group.HasValue())
+        {
+            actual.push_back(TableEntry::ForGroup(binding.fabricIndex, binding.group.Value(), 1, binding.cluster.std_optional()));
+        }
+        else
+        {
+            ASSERT_TRUE(binding.node.HasValue());
+            ASSERT_TRUE(binding.endpoint.HasValue());
+            actual.push_back(TableEntry::ForNode(binding.fabricIndex, binding.node.Value(), 1, binding.endpoint.Value(),
+                                                 binding.cluster.std_optional()));
+        }
+    }
+    ASSERT_SUCCESS(it.GetStatus());
+    EXPECT_EQ(actual, expected);
+}
+
+class ReadBindingOnChange : public app::DataModel::AttributeChangeListener
+{
+public:
+    ReadBindingOnChange(BindingCluster & cluster, FabricIndex fabric, DataVersion version,
+                        const std::vector<TableEntry> & expected) :
+        mCluster(cluster), mFabric(fabric), mVersion(version), mExpected(expected)
+    {}
+    void OnAttributeChanged(const app::ConcreteAttributePath &, app::DataModel::AttributeChangeType) override
+    {
+        called = true;
+        ExpectBindingRead(mCluster, mFabric, true, mVersion, mExpected);
+    }
+    bool called = false;
+
+private:
+    BindingCluster & mCluster;
+    FabricIndex mFabric;
+    DataVersion mVersion;
+    const std::vector<TableEntry> & mExpected;
+};
+
+TEST_F(TestBindingCluster, ReadsBetweenChunksKeepOriginalValueAndVersionUntilCompletion)
+{
+    enum class Completion
+    {
+        kUnchanged,
+        kChanged,
+        kFailure
+    };
+    for (auto completion : { Completion::kUnchanged, Completion::kChanged, Completion::kFailure })
+    {
+        for (bool initiallyEmpty : { false, true })
+        {
+            TestPersistentStorageDelegate storage;
+            Binding::Manager manager;
+            auto & table = manager.GetBindingTable();
+            table.SetPersistentStorage(&storage);
+            constexpr auto fabric      = chip::Testing::kTestFabricIndex;
+            constexpr auto otherFabric = static_cast<FabricIndex>(fabric + 1);
+            std::vector<TableEntry> original;
+            const auto group = TableEntry::ForGroup(fabric, 1, 1, std::nullopt);
+            const auto node  = TableEntry::ForNode(fabric, 123, 1, 42, std::nullopt);
+            const auto other = TableEntry::ForGroup(otherFabric, 9, 1, std::nullopt);
+            if (!initiallyEmpty)
+            {
+                ASSERT_SUCCESS(table.Add(group));
+                original.push_back(group);
+                original.push_back(node);
+            }
+            ASSERT_SUCCESS(table.Add(other));
+            if (!initiallyEmpty)
+            {
+                ASSERT_SUCCESS(table.Add(node));
+            }
+            ASSERT_SUCCESS(table.Add(TableEntry::ForGroup(fabric, 88, 2, std::nullopt)));
+            BindingCluster cluster({ table, manager, DeviceLayer::PlatformMgr() }, 1);
+            chip::Testing::ClusterTester tester(cluster);
+            ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+            auto shutdown = MakeDefer([&] { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); });
+            const app::ConcreteClusterPath clusterPath(1, Binding::Id);
+            const app::ConcreteAttributePath attributePath(1, Binding::Id, Binding::Attributes::Binding::Id);
+            const auto version  = cluster.GetDataVersion(clusterPath);
+            auto expectOriginal = [&] {
+                ExpectBindingRead(cluster, fabric, true, version, original);
+                ExpectBindingRead(cluster, otherFabric, true, version, { other });
+                auto unfiltered = original;
+                unfiltered.push_back(other);
+                ExpectBindingRead(cluster, fabric, false, version, unfiltered);
+            };
+            expectOriginal();
+            cluster.ListAttributeWriteNotification(attributePath, app::DataModel::ListWriteOperation::kListWriteBegin, fabric);
+            chip::Testing::WriteOperation write(attributePath);
+            write.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+            write.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+            auto clear = write.DecoderFor(app::DataModel::List<const TargetStructType>());
+            ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), clear).IsSuccess());
+            expectOriginal();
+            write.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
+            std::vector<TableEntry> finalBindings;
+            if (completion == Completion::kUnchanged)
+            {
+                if (!initiallyEmpty)
+                {
+                    TargetStructType target{ .group = MakeOptional(GroupId{ 1 }), .fabricIndex = fabric };
+                    auto appendGroup = write.DecoderFor(target);
+                    ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), appendGroup).IsSuccess());
+                    expectOriginal();
+                    target          = TargetStructType{ .node        = MakeOptional(NodeId{ 123 }),
+                                                        .endpoint    = MakeOptional(EndpointId{ 42 }),
+                                                        .fabricIndex = fabric };
+                    auto appendNode = write.DecoderFor(target);
+                    ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), appendNode).IsSuccess());
+                    finalBindings = original;
+                }
+            }
+            else
+            {
+                TargetStructType target{ .group = MakeOptional(GroupId{ 3 }), .fabricIndex = fabric };
+                auto append = write.DecoderFor(target);
+                ASSERT_TRUE(cluster.WriteAttribute(write.GetRequest(), append).IsSuccess());
+                finalBindings.push_back(TableEntry::ForGroup(fabric, 3, 1, std::nullopt));
+                if (completion == Completion::kFailure)
+                {
+                    target.group.SetValue(kUndefinedGroupId);
+                    auto invalid = write.DecoderFor(target);
+                    EXPECT_EQ(cluster.WriteAttribute(write.GetRequest(), invalid),
+                              Protocols::InteractionModel::Status::ConstraintError);
+                }
+            }
+            expectOriginal();
+            const bool changed      = completion != Completion::kUnchanged;
+            const auto finalVersion = version + (changed ? 1u : 0u);
+            ReadBindingOnChange listener(cluster, fabric, finalVersion, finalBindings);
+            auto & provider = tester.GetServerClusterContext().provider;
+            provider.RegisterAttributeChangeListener(listener);
+            auto unregister = MakeDefer([&] { provider.UnregisterAttributeChangeListener(listener); });
+            cluster.ListAttributeWriteNotification(attributePath,
+                                                   completion == Completion::kFailure
+                                                       ? app::DataModel::ListWriteOperation::kListWriteFailure
+                                                       : app::DataModel::ListWriteOperation::kListWriteSuccess,
+                                                   fabric);
+            EXPECT_EQ(listener.called, changed);
+            EXPECT_EQ(tester.IsAttributeDirty(Binding::Attributes::Binding::Id), changed);
+            ExpectBindingRead(cluster, fabric, true, finalVersion, finalBindings);
+            ExpectBindingRead(cluster, otherFabric, true, finalVersion, { other });
+            finalBindings.push_back(other);
+            ExpectBindingRead(cluster, fabric, false, finalVersion, finalBindings);
+        }
+    }
+}
+
 TEST_F(TestBindingCluster, TestAttributes)
 {
     BindingCluster cluster(CreateStandardContext(), 1);
