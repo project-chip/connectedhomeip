@@ -232,12 +232,12 @@ void BuildAttributePathIB(AttributePathIB::Builder & aAttributePathBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = aAttributePathBuilder.EnableTagCompression(false)
-                         .Node(1)
-                         .Endpoint(2)
-                         .Cluster(3)
-                         .Attribute(4)
-                         .ListIndex(5)
-                         .EndOfAttributePathIB();
+              .Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(5)
+              .EndOfAttributePathIB();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
