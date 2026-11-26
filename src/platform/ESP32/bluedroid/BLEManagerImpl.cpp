@@ -908,8 +908,8 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
     VerifyOrReturnError(CanCastTo<uint16_t>(dataLength), CHIP_ERROR_MESSAGE_TOO_LONG);
 
     const int rc = esp_ble_gattc_write_char(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                                          gl_profile_tab[PROFILE_A_APP_ID].write_char_handle, static_cast<uint16_t>(dataLength),
-                                          pBuf->Start(), ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
+                                            gl_profile_tab[PROFILE_A_APP_ID].write_char_handle, static_cast<uint16_t>(dataLength),
+                                            pBuf->Start(), ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
