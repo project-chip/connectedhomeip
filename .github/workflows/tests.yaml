@@ -524,14 +524,14 @@ jobs:
                         "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: always()
               with:
                   name: test-summaries-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: test-summaries/
                   retention-days: 30
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -539,7 +539,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -730,14 +730,14 @@ jobs:
                         "scripts/tests/run_test_suite.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                   done
             - name: Upload test run summaries
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: always()
               with:
                   name: test-summaries-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: test-summaries/
                   retention-days: 30
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -745,13 +745,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -867,7 +867,7 @@ jobs:
                   --junit-suite-name 'OpenSSL 3.5 Tests'"
             - name: Upload test results
               if: always()
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: openssl-3.5-test-results
                   path: |
@@ -1393,7 +1393,7 @@ jobs:
                     scripts/run_in_python_env.sh out/venv \
                       'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ matrix.filter != '' && always() }}
               with:
                   name: test-summaries-python-${{ matrix.filter }}
@@ -1402,7 +1402,7 @@ jobs:
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: junit-results-repl-${{ matrix.filter }}
                   path: ${{matrix.junitxml}}
@@ -1422,7 +1422,7 @@ jobs:
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-repl-${{ matrix.filter }}
@@ -1430,7 +1430,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading packet captures for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: pcaps-linux-repl-${{ matrix.filter }}
@@ -1522,7 +1522,7 @@ jobs:
 
           - name: Upload Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
-            uses: actions/upload-artifact@v7
+            uses: actions/upload-artifact@v7.0.2
             with:
                 name: allure-report-ci-repl
                 path: allure-report
@@ -1601,7 +1601,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -1609,20 +1609,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl
