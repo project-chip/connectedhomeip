@@ -541,9 +541,10 @@ void PumpConfigurationAndControlCluster::UpdateQuietAttribute(QuieterReportingAt
                                                               const DataModel::Nullable<T> & value, AttributeId attributeId)
 {
     VerifyOrReturn(attr.value() != value);
-    const AttributeDirtyState dirtyState = attr.SetValue(
-        value, System::SystemClock().GetMonotonicMilliseconds64(),
-        [](const auto & candidate) { return (candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= kQuietReportingInterval; });
+    const AttributeDirtyState dirtyState =
+        attr.SetValue(value, System::SystemClock().GetMonotonicMilliseconds64(), [](const auto & candidate) {
+            return (candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= kQuietReportingInterval;
+        });
     NotifyQuietAttributeChanged(attributeId, dirtyState);
 }
 

@@ -1113,8 +1113,8 @@ TEST_F(TestPumpConfigurationAndControlCluster, OnRemoteSensorChangedIgnoredWhenN
         ClusterTester tester(cluster);
 
         AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
-        ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
-            { kTestEndpointId, PumpConfigurationAndControl::Id, OperationMode::Id }, OperationModeEnum::kMaximum));
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue({ kTestEndpointId, PumpConfigurationAndControl::Id, OperationMode::Id },
+                                                          OperationModeEnum::kMaximum));
 
         mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
         cluster.OnRemoteSensorChanged();
