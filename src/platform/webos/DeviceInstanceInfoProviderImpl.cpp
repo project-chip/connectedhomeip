@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2025 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
 
 #include "DeviceInstanceInfoProviderImpl.h"
 
-#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 #include <platform/webos/PosixConfig.h>
+#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 
 namespace chip {
 namespace DeviceLayer {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    Copyright (c) 2025 NXP
  *
@@ -24,11 +24,11 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/webos/ConnectivityUtils.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/webos/WirelessDefs.h>
+#include <platform/internal/BLEManager.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -1667,7 +1667,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
     // Iterate on the network interface to see if we already have beed assigned addresses.
-    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+    // The temporary hack for getting IP address change on webOS for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
@@ -1707,7 +1707,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // to run once the network has been connected, with a %s placeholder for the
     // interface name. E.g. "dhclient -nw %s"
     // Run dhclient for IP on WiFi.
-    // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+    // TODO: The wifi can be managed by networkmanager on webOS so we don't have to care about this.
     char cmdBuffer[128];
     sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, sWiFiIfName);
     int dhclientSystemRet = system(cmdBuffer);
@@ -1750,7 +1750,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
-    // On Linux simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
+    // On webOS simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
     // of local WiFi network card instead.
     if (getifaddrs(&ifaddr) == -1)
     {
@@ -1831,7 +1831,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
-    // We don't have direct API to get the WiFi version yet, return 802.11n on Linux simulation.
+    // We don't have direct API to get the WiFi version yet, return 802.11n on webOS simulation.
     wiFiVersion = WiFiVersionEnum::kN;
 
     return CHIP_NO_ERROR;
@@ -2244,7 +2244,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
         if (mpScanCallback != nullptr)
         {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
+            WebOSScanResponseIterator<WiFiScanResponse> iter(networkScanned);
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
             mpScanCallback = nullptr;
         }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 
@@ -509,7 +509,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
 CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
     (void) pollingInterval;
-    ChipLogError(DeviceLayer, "Set ICD Polling on linux");
+    ChipLogError(DeviceLayer, "Set ICD Polling on webOS");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
@@ -605,7 +605,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
             DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpScanCallback != nullptr)
                 {
-                    LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
+                    WebOSScanResponseIterator<ThreadScanResponse> iter(nullptr);
                     mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), &iter);
                 }
                 mpScanCallback = nullptr;
@@ -684,7 +684,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         // lambda.
         if (mpScanCallback != nullptr)
         {
-            LinuxScanResponseIterator<NetworkCommissioning::ThreadScanResponse> iter(
+            WebOSScanResponseIterator<NetworkCommissioning::ThreadScanResponse> iter(
                 const_cast<std::vector<ThreadScanResponse> *>(scanResult));
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
             mpScanCallback = nullptr;
