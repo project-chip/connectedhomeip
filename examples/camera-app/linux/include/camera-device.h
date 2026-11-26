@@ -409,7 +409,8 @@ private:
                                snapshotStreamAllocateArgs,
                            uint16_t & outStreamID);
 
-    GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
+    GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, uint32_t maxBitRate,
+                                     uint16_t keyFrameIntervalMs, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
     GstElement * CreateAudioPlaybackPipeline(CameraError & error);
 
