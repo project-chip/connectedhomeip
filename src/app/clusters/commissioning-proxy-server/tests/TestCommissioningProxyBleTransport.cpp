@@ -745,20 +745,18 @@ TEST_F(TestCommissioningProxyBleTransport, ConnectPausesTheBackgroundScanUntilIt
 
 TEST_F(TestCommissioningProxyBleTransport, ConnectRefusedByTheBleLayerFailsAndResumesTheBackgroundScan)
 {
-    // An uninitialised BleLayer refuses every connect.
-    Ble::BleLayer refusingLayer;
-    CommissioningProxyBleTransport refusingTransport{ adapter, mockTimer, &refusingLayer };
-    HostedTransport host{ mockTimer, refusingTransport };
+    // A BleLayer that is shut down refuses every connect.
+    bleLayer.Shutdown();
+    HostedTransport host{ mockTimer, transport };
     ClusterTester tester(host.cluster);
-    ASSERT_EQ(refusingTransport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1,
-                                            /*nodeId=*/0x11),
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
               Status::Success);
     const unsigned startsBeforeConnect = adapter.startScanCalls;
     const unsigned stopsBeforeConnect  = adapter.stopScanCalls;
 
     auto result = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
-    EXPECT_FALSE(refusingTransport.IsConnectPending());
+    EXPECT_FALSE(transport.IsConnectPending());
     EXPECT_EQ(adapter.stopScanCalls, stopsBeforeConnect + 1);
     EXPECT_EQ(adapter.startScanCalls, startsBeforeConnect + 1);
     EXPECT_TRUE(adapter.IsScanning());
