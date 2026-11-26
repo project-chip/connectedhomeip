@@ -370,13 +370,58 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
         )
         logger.info("%s - DUT Applying the software udpate", step_number_s1)
+        # Cancel subscription as is not needed anymore.
+        subscription_attr_s1.cancel()
         # DUT is applying the software update
+        # GetConnectedDevice succeeds (DUT is back online). Applying firmware on a real DUT
+        # (signature check, flash bank copy, reboot, mDNS re-advertisement) has no known
+        # upper bound and offers no observable liveness signal, so the polling loop itself
+        # is the liveness mechanism and runs until the remaining test budget is exhausted.
+        # ------------------------------------------------------------------------------------
+        logger.info('%s - Expiring stale session and waiting for DUT to reboot.', step_number_s1)
+        controller.ExpireSessions(self.requestor_node_id)
 
-        # BLOCK TO CHECK CONNECTED DEVICE
+        reboot_timeout_sec = self.remaining_test_budget_sec(reserve_sec=60)
+        poll_interval_sec = 5
+        reconnect_timeout_ms = 5000
+        reconnected = False
+        t_reboot_start = time.time()
+        attempt = 0
+        while time.time() - t_reboot_start < reboot_timeout_sec:
+            attempt += 1
+            await asyncio.sleep(poll_interval_sec)
+            try:
+                await controller.GetConnectedDevice(
+                    self.requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
+                reconnected = True
+                logger.info('%s- DUT reconnected after OTA reboot (attempt %s).', step_number_s1, attempt)
+                break
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError):
+                logger.info('%s - Waiting for DUT to come back online (attempt %s, elapsed %.0fs / %.0fs)...',
+                            step_number_s1, attempt, time.time() - t_reboot_start, reboot_timeout_sec)
+
+        asserts.assert_true(
+            reconnected,
+            f'{step_number_s1}: DUT did not come back online within {reboot_timeout_sec:.0f}s after OTA reboot '
+            '(remaining test budget exhausted).')
+
+        logger.info("%s - Wait some time for the DUT to stabilize after reboot", step_number_s1)
+        await asyncio.sleep(15)
 
         # Wait DUT go back to kIdle
-        await self._wait_for_idle_after_software_update(update_state_handler=subscription_attr_s1)
-        subscription_attr_s1.cancel()
+        current_update_state = await self.read_single_attribute_check_success(
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            dev_ctrl=self.controller,
+            node_id=self.requestor_node_id,
+            endpoint=self.get_endpoint(),
+        )
+        # DUT must be in kIdle after reboot
+        logger.info("%s - DUT UpdateStae is : %d", step_number_s1, current_update_state)
+        asserts.assert_equal(current_update_state,Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+
+        # DUT is running the expected version.
+        await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, self.expected_software_version)
 
 
 if __name__ == "__main__":
