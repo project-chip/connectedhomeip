@@ -463,8 +463,9 @@ class and_operation(Conformance):
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         for op in self.op_list:
             decision_with_choice = op(conformance_assessment_data)
-            # and operations can't happen on optional or disallowed
-            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and all(type(op) == device_feature for op in self.op_list):
+            # and operations can't happen on optional or disallowed, but if this is a device, it's a condition and we're just
+            # going to treat it as entirely optional because we have no way to evaluate conditions
+            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and any(type(op) == device_feature for op in self.op_list):
                 return decision_with_choice
             if decision_with_choice.decision in [ConformanceDecision.OPTIONAL, ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('AND operation on optional or disallowed item')
