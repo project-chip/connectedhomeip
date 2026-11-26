@@ -19,19 +19,6 @@ on:
         branches:
             - master
             - 'v*-branch'
-    pull_request:
-        paths:
-            - '.github/workflows/cirque.yaml'
-            - 'integrations/docker/images/stage-2/chip-build-cirque/**'
-            - 'integrations/docker/images/stage-2/chip-cirque-device-base/**'
-            - 'scripts/build/gn_gen_cirque.sh'
-            - 'scripts/tests/cirque_tests.sh'
-            - 'scripts/tests/setup_simulated_wifi.sh'
-            - 'scripts/tests/summarize_cirque_wifi_switch_test.sh'
-            - 'src/platform/Linux/**'
-            - 'src/python_testing/TC_CNET_4_11.py'
-            - 'src/test_driver/linux-cirque/**'
-            - 'third_party/cirque/**'
     workflow_dispatch:
 
 concurrency:
@@ -132,6 +119,7 @@ jobs:
                   bash scripts/tests/setup_simulated_wifi.sh 16
 
             - name: Run Tests
+              # TODO: Remove apt-get install of iw and kmod once the published chip-build-cirque image is bumped (added to Dockerfile).
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
@@ -148,10 +136,6 @@ jobs:
                        && apt-get install -y --no-install-recommends iw kmod \
                        && scripts/tests/cirque_tests.sh run_all_tests \
                       "
-
-            - name: Publish TC-CNET-4.11 summary
-              if: ${{ always() && !env.ACT }}
-              run: bash scripts/tests/summarize_cirque_wifi_switch_test.sh /tmp/cirque_test_output
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

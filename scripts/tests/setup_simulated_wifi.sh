@@ -219,6 +219,12 @@ EOF
 
 echo "=== Setting up mac80211_hwsim (radios=${RADIOS}, kernel=$(uname -r)) ==="
 
+if lsmod | grep -q '^mac80211_hwsim '; then
+    echo "mac80211_hwsim is already loaded."
+    require_wlan
+    exit 0
+fi
+
 if modinfo mac80211_hwsim >/dev/null 2>&1; then
     echo "mac80211_hwsim is already packaged for this kernel."
     load_packaged_hwsim

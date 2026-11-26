@@ -95,6 +95,7 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
         # 2. Install Python controller wheels and test dependencies on TH
         self.execute_device_cmd(self.th, MATTER_CONTROLLER_INSTALL_WHEELS, check=True)
         requirements = shlex.quote(str(CHIP_REPO_PATH / "src/python_testing/requirements.txt"))
+        # TODO: Bake src/python_testing/requirements.txt into chip-cirque-device-base to avoid runtime pip installs.
         self.execute_device_cmd(self.th, f"pip3 install --break-system-packages -r {requirements}", check=True)
         self.execute_device_cmd(
             self.th, f"pip3 install --break-system-packages {shlex.quote(str(testing_wheels[0]))}", check=True)
@@ -127,7 +128,7 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
             f"--string-arg PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:{SSID_2} "
             f"PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:{PSK_2}"
         )
-        ret = self.execute_device_cmd(self.th, f"bash -o pipefail -c {shlex.quote(command + ' 2>&1 | tee /tmp/cnet-test.log')}")
+        ret = self.execute_device_cmd(self.th, command)
         self.assertEqual(int(ret.get("return_code", -1)), 0, f"TC_CNET_4_11 failed: {ret.get('output')}")
         self.wait_for_wifi_network(self.dut, SSID_2)
         self.wait_for_wifi_network(self.th, SSID_1)

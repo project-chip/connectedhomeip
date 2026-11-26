@@ -33,6 +33,8 @@ RUN set -x \
 RUN set -x \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+   iw \
+   kmod \
    libdbus-glib-1-dev \
    libgirepository1.0-dev \
    psmisc \

@@ -226,7 +226,8 @@ class CHIPVirtualHome:
         except json.JSONDecodeError as exc:
             raise requests.exceptions.JSONDecodeError(exc.msg, exc.doc, exc.pos) from exc
 
-    def execute_device_cmd(self, device_id: str, cmd: str, stream: bool = False, *, check: bool = False) -> dict | requests.Response:
+    def execute_device_cmd(self, device_id: str, cmd: str, stream: bool = False, *, check: bool = False,
+                           check_description: str | None = None) -> dict | requests.Response:
         """Execute a device command, optionally requiring a successful exit status."""
         if stream and check:
             raise ValueError("Exit status checking requires a non-streaming command")
@@ -253,18 +254,17 @@ class CHIPVirtualHome:
             raise Exception("cannot get command output")
         self.logger.info("command output: \n%s", ret_struct.get('output', ''))
         if check:
-            self.assertEqual(int(command_ret_code), 0, f"Command failed on {device_id}: {cmd}\n{command_output}")
+            label = check_description if check_description is not None else f"Command {cmd!r}"
+            self.assertEqual(
+                int(command_ret_code),
+                0,
+                f"{label} failed on {self.get_device_pretty_id(device_id)} "
+                f"(return_code={command_ret_code}): {command_output}",
+            )
         return ret_struct
 
     def run_checked_device_cmd(self, device_id, command, description):
-        ret = self.execute_device_cmd(device_id, command)
-        self.assertEqual(
-            str(ret.get('return_code')),
-            '0',
-            f"{description} failed on {self.get_device_pretty_id(device_id)} "
-            f"(return_code={ret.get('return_code')}): {ret.get('output', '')}",
-        )
-        return ret
+        return self.execute_device_cmd(device_id, command, check=True, check_description=description)
 
     def sequenceMatch(self, string, patterns):
         last_find = 0
@@ -587,9 +587,20 @@ class CHIPVirtualHome:
         self.logger.info("device: %s: kill existing wpa_supplicant", self.get_device_pretty_id(device_id))
 
         kill_wpa_supplicant_command = (
-            "timeout 5 sh -c 'if test -S /run/wpa_supplicant/wlan0; then "
-            "wpa_cli -i wlan0 terminate || exit; "
-            "while test -S /run/wpa_supplicant/wlan0; do sleep 0.1; done; fi'")
+            "timeout 5 sh -c '"
+            "if test -S /run/wpa_supplicant/wlan0; then "
+            "if wpa_cli -i wlan0 terminate >/dev/null 2>&1; then "
+            "while test -S /run/wpa_supplicant/wlan0; do sleep 0.1; done; "
+            "exit 0; "
+            "fi; "
+            "fi; "
+            "pids=$(pidof wpa_supplicant 2>/dev/null || true); "
+            "if [ -n \"$pids\" ]; then "
+            "kill $pids 2>/dev/null || true; "
+            "while pidof wpa_supplicant >/dev/null 2>&1; do sleep 0.1; done; "
+            "fi; "
+            "rm -f /run/wpa_supplicant/wlan0 /var/run/wpa_supplicant/wlan0'"
+        )
 
         return self.execute_device_cmd(device_id, kill_wpa_supplicant_command, check=True)
 
@@ -606,7 +617,9 @@ class CHIPVirtualHome:
             self.get_device_pretty_id(ap_device_id), ssid, ap_ip)
 
         commands = [
-            "sh -c 'killall hostapd dnsmasq 2>/dev/null || true'",
+            "timeout 5 sh -c 'for proc in hostapd dnsmasq; do pids=$(pidof \"$proc\" 2>/dev/null || true); "
+            "if [ -n \"$pids\" ]; then kill $pids 2>/dev/null || true; fi; done; "
+            "while pidof hostapd >/dev/null 2>&1 || pidof dnsmasq >/dev/null 2>&1; do sleep 0.1; done'",
             "ip addr flush dev wlan0",
             f"ip addr add {ap_ip}/24 dev wlan0",
             "ip link set dev wlan0 up",
