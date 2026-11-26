@@ -27,6 +27,11 @@ pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"
 pw_unit_test_MAIN = "$dir_pw_unit_test:logging_main"
 pw_rpc_system_server_BACKEND = "${chip_root}/config/linux/lib/pw_rpc:pw_rpc"
+
+# Match the jf-admin-app encoding buffer so the Joint Fabric JF_MATERIALS
+# RequestOptions stream message decodes/encodes consistently on both ends.
+pw_rpc_CONFIG = "${chip_root}/config/linux/lib/pw_rpc:large_encoding_buffer"
+
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"

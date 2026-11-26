@@ -39,6 +39,10 @@ constexpr char kOperationalCredentialsIntermediateCertificateStorage[]   = "Exam
 constexpr char kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage[] = "ExampleOpCredsAnchorICAKey";
 constexpr char kOperationalCredentialsAnchorIntermediateCertificateStorage[]   = "ExampleCAAnchorIntermediateCert";
 
+constexpr char kJFMaterialsICACStorage[] = "ExampleJFMaterialsICAC";
+constexpr char kJFMaterialsRCACStorage[] = "ExampleJFMaterialsRCAC";
+constexpr char kJFMaterialsIPKStorage[]  = "ExampleJFMaterialsIPK";
+
 using namespace Credentials;
 using namespace Crypto;
 using namespace TLV;
@@ -185,19 +189,37 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
-        // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
-        ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+        if (mKeypairsInitialized)
+        {
+            // A keypair is already loaded in memory from a previous Initialize() under a different
+            // per-identity storage namespace. Reuse it (and write it through to this storage) rather
+            // than regenerating a fresh key, so the issuer keys stay stable across identities. This is
+            // required post-JCM: the cross-signed ICAC embeds the anchor intermediate public key and the
+            // Fabric-A controller NOC must be signed with the matching private key.
+            ChipLogProgress(Controller, "Reusing in-memory %s and persisting to current storage",
+                            kOperationalCredentialsIssuerKeypairStorage);
+            ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
+        else
+        {
+            // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+            ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
+            ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
-        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(
-                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
     }
     else
     {
         // Use the keypair from the storage
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
+
 
     {
         // Scope for keySize, because we use it as an in/out param.
@@ -212,19 +234,35 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIntermediateIssuerKeypairStorage,
                         ErrorStr(err));
-        // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
-        ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
+        if (mKeypairsInitialized)
+        {
+            // Reuse the in-memory intermediate keypair (loaded under a previous storage namespace) and
+            // persist it to this storage, rather than regenerating a fresh key. See the comment on the
+            // mIssuer block above for the rationale (stable issuer keys across identities post-JCM).
+            ChipLogProgress(Controller, "Reusing in-memory %s and persisting to current storage",
+                            kOperationalCredentialsIntermediateIssuerKeypairStorage);
+            ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
+        else
+        {
+            // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+            ReturnErrorOnFailure(mIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
+            ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
-        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(
-                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
     }
     else
     {
         // Use the keypair from the storage
         ReturnErrorOnFailure(mIntermediateIssuer.Deserialize(serializedKey));
     }
+
 
     {
         // Scope for keySize, because we use it as an in/out param.
@@ -239,13 +277,30 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s",
                         kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, ErrorStr(err));
-        // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mAnchorIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
-        ReturnErrorOnFailure(mAnchorIntermediateIssuer.Serialize(serializedKey));
+        if (mKeypairsInitialized)
+        {
+            // Reuse the in-memory anchor intermediate keypair (loaded under a previous storage
+            // namespace) and persist it to this storage, rather than regenerating a fresh key. This is
+            // the key fix: the cross-signed JF-materials ICAC embeds this public key, so the Fabric-A
+            // controller NOC issued for this identity must be signed with the SAME private key, or NOC
+            // chain validation on the migrated node fails (CA cert not found / AKID mismatch).
+            ChipLogProgress(Controller, "Reusing in-memory %s and persisting to current storage",
+                            kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage);
+            ReturnErrorOnFailure(mAnchorIntermediateIssuer.Serialize(serializedKey));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
+        else
+        {
+            // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+            ReturnErrorOnFailure(mAnchorIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
+            ReturnErrorOnFailure(mAnchorIntermediateIssuer.Serialize(serializedKey));
 
-        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(
-                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+            PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
+                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+        }
     }
     else
     {
@@ -253,8 +308,40 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mAnchorIntermediateIssuer.Deserialize(serializedKey));
     }
 
+    // All three issuer keypairs are now loaded (either from storage, reused from memory, or freshly
+    // generated). Mark them initialized so a later Initialize() under a different per-identity storage
+    // namespace reuses these same keys instead of regenerating.
+    mKeypairsInitialized = true;
+
     mStorage     = &storage;
     mInitialized = true;
+
+
+    // Restore persisted JF materials if present.
+    {
+        uint16_t icacLen = static_cast<uint16_t>(sizeof(mJFMaterialsICAC));
+        uint16_t rcacLen = static_cast<uint16_t>(sizeof(mJFMaterialsRCAC));
+        uint16_t ipkLen  = static_cast<uint16_t>(sizeof(mJFMaterialsIPK));
+
+        CHIP_ERROR icacErr = storage.SyncGetKeyValue(kJFMaterialsICACStorage, mJFMaterialsICAC, icacLen);
+        CHIP_ERROR rcacErr = storage.SyncGetKeyValue(kJFMaterialsRCACStorage, mJFMaterialsRCAC, rcacLen);
+        CHIP_ERROR ipkErr  = storage.SyncGetKeyValue(kJFMaterialsIPKStorage,  mJFMaterialsIPK,  ipkLen);
+
+        if (icacErr == CHIP_NO_ERROR && rcacErr == CHIP_NO_ERROR && ipkErr == CHIP_NO_ERROR)
+        {
+            mJFMaterialsICACLen = icacLen;
+            mJFMaterialsRCACLen = rcacLen;
+            mJFMaterialsIPKLen  = ipkLen;
+            mHasJFMaterials     = true;
+            ChipLogProgress(Controller, "Initialize: restored JF materials from storage (ICAC=%u, RCAC=%u, IPK=%u bytes)",
+                            static_cast<unsigned>(icacLen), static_cast<unsigned>(rcacLen), static_cast<unsigned>(ipkLen));
+        }
+        else
+        {
+            ChipLogProgress(Controller, "Initialize: no persisted JF materials found");
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -264,7 +351,48 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                                                                                 MutableByteSpan & rcac, MutableByteSpan & icac,
                                                                                 MutableByteSpan & noc)
 {
+    // After JCM / node migration, JFC-B must operate on Fabric A. When JF materials received from JFA-A are
+    // present, issue the controller NOC chain directly on Fabric A instead of minting a fresh local chain:
+    // return the Fabric-A RCAC and the cross-signed anchor ICAC as-is, derive the real Fabric-A fabric id from
+    // the anchor ICAC, and sign a NOC that carries the caller-provided CATs (Admin CAT) under that fabric.
+    if (mHasJFMaterials)
+    {
+        ChipLogProgress(Controller,
+                        "GenerateNOCChainAfterValidation: using JF materials from JFA-A (ICAC=%u, RCAC=%u bytes)",
+                        static_cast<unsigned>(mJFMaterialsICACLen), static_cast<unsigned>(mJFMaterialsRCACLen));
+
+        {
+            ByteSpan rcacTlv(mJFMaterialsRCAC, mJFMaterialsRCACLen);
+            ReturnErrorOnFailure(ConvertChipCertToX509Cert(rcacTlv, rcac));
+        }
+        {
+            ByteSpan icacTlv(mJFMaterialsICAC, mJFMaterialsICACLen);
+            ReturnErrorOnFailure(ConvertChipCertToX509Cert(icacTlv, icac));
+        }
+
+        ChipDN anchor_icac_dn;
+        {
+            ByteSpan icacTlv(mJFMaterialsICAC, mJFMaterialsICACLen);
+            ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(icacTlv, anchor_icac_dn));
+        }
+
+        FabricId anchorFabricId;
+        ReturnErrorOnFailure(anchor_icac_dn.GetCertFabricId(anchorFabricId));
+
+        ChipDN jf_noc_dn;
+        ReturnErrorOnFailure(jf_noc_dn.AddAttribute_MatterFabricId(anchorFabricId));
+        ReturnErrorOnFailure(jf_noc_dn.AddAttribute_MatterNodeId(nodeId));
+        ReturnErrorOnFailure(jf_noc_dn.AddCATs(cats));
+
+        ChipLogProgress(Controller, "GenerateNOCChainAfterValidation: generating Fabric-A controller NOC (fabricId=0x" ChipLogFormatX64 ")",
+                        ChipLogValueX64(anchorFabricId));
+        return IssueX509Cert(mNow, mValidity, anchor_icac_dn, jf_noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey,
+                             mAnchorIntermediateIssuer, noc);
+    }
+
+
     ChipDN rcac_dn;
+
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
@@ -434,23 +562,72 @@ ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElemen
     VerifyOrReturnError(rcac.Alloc(kMaxDERCertLength), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan rcacSpan(rcac.Get(), kMaxDERCertLength);
 
-    ReturnErrorOnFailure(
-        GenerateNOCChainAfterValidation(assignedId, mNextFabricId, mNextCATs, pubkey, rcacSpan, icacSpan, nocSpan));
+    if (mHasJFMaterials)
+    {
+        // Use the cross-signed ICAC and Fabric-A RCAC received from JFA-A.
+        // The NOC is signed by mAnchorIntermediateIssuer (whose public key is in the cross-signed ICAC).
+        ChipLogProgress(Controller, "GenerateNOCChain: using JF materials from JFA-A (ICAC=%u, RCAC=%u bytes)",
+                        static_cast<unsigned>(mJFMaterialsICACLen), static_cast<unsigned>(mJFMaterialsRCACLen));
 
-    // TODO(#13825): Should always generate some IPK. Using a temporary fixed value until APIs are plumbed in to set it end-to-end
-    // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.
-    ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        // The controller (AutoCommissioner::NOCChainGenerated) unconditionally treats the returned
+        // RCAC/ICAC/NOC as DER X509 and converts them to CHIP TLV. The JF materials received over the
+        // AddTrustedRootCertificate / AddICAC cluster commands are stored in CHIP TLV format, so they
+        // must be converted back to DER X509 before being returned. Do NOT reduce_size the output
+        // spans before converting; ConvertChipCertToX509Cert writes DER and shrinks the span itself.
+        {
+            ByteSpan rcacTlv(mJFMaterialsRCAC, mJFMaterialsRCACLen);
+            ReturnErrorOnFailure(ConvertChipCertToX509Cert(rcacTlv, rcacSpan));
+        }
+        {
+            ByteSpan icacTlv(mJFMaterialsICAC, mJFMaterialsICACLen);
+            ReturnErrorOnFailure(ConvertChipCertToX509Cert(icacTlv, icacSpan));
+        }
+
+        // Extract the ICAC DN to use as issuer for the NOC. The stored JF-materials ICAC is in CHIP TLV
+        // format (received over the AddICAC cluster command), so use the CHIP-cert DN extractor on the
+        // original TLV bytes (not the DER output span).
+        ChipDN icac_dn;
+        {
+            ByteSpan icacTlv(mJFMaterialsICAC, mJFMaterialsICACLen);
+            ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(icacTlv, icac_dn));
+        }
+
+        // Extract the fabricId from the cross-signed ICAC.
+        FabricId anchorFabricId;
+        ReturnErrorOnFailure(icac_dn.GetCertFabricId(anchorFabricId));
+
+        ChipDN noc_dn;
+        ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(anchorFabricId));
+        ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(assignedId));
+        ReturnErrorOnFailure(noc_dn.AddCATs(mNextCATs));
+
+        ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey,
+                                           mAnchorIntermediateIssuer, nocSpan));
+    }
+    else
+    {
+        ReturnErrorOnFailure(
+            GenerateNOCChainAfterValidation(assignedId, mNextFabricId, mNextCATs, pubkey, rcacSpan, icacSpan, nocSpan));
+    }
 
     // The below static assert validates a key assumption in types used (needed for public API conformance)
     static_assert(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == kAES_CCM128_Key_Length, "IPK span sizing must match");
 
-    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
-    // would obtain a suitable key per fabric.
+    // Use the Fabric-A IPK received from JFA-A if available; otherwise fall back to the default test IPK.
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     Crypto::IdentityProtectionKeySpan ipkSpan(ipkValue);
 
-    VerifyOrReturnError(defaultIpkSpan.size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL);
-    memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
+    if (mHasJFMaterials && mJFMaterialsIPKLen == CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)
+    {
+        memcpy(ipkValue, mJFMaterialsIPK, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+        ChipLogProgress(Controller, "GenerateNOCChain: using Fabric-A IPK from JF materials");
+    }
+    else
+    {
+        ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        VerifyOrReturnError(defaultIpkSpan.size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL);
+        memcpy(ipkValue, defaultIpkSpan.data(), defaultIpkSpan.size());
+    }
 
     // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
@@ -470,20 +647,45 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignICAC(const ByteSpan & icaCsr
     ChipDN rcac_dn;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ChipLogProgress(Controller, "SignICAC: anchorFabricId=0x%016" PRIx64 " csrSize=%u",
+                    anchorFabricId, static_cast<unsigned>(icaCsr.size()));
+
     P256PublicKey pubkey;
-    ReturnErrorOnFailure(VerifyCertificateSigningRequest(icaCsr.data(), icaCsr.size(), pubkey));
+    err = VerifyCertificateSigningRequest(icaCsr.data(), icaCsr.size(), pubkey);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "SignICAC: VerifyCertificateSigningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcacSpan.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
                       err = mStorage->SyncGetKeyValue(key, rcacSpan.data(), rcacBufLen));
-    ReturnErrorOnFailure(err);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "SignICAC: failed to load RCAC from storage: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
     {
         uint64_t rcacId;
         // Found root certificate in the storage.
         rcacSpan.reduce_size(rcacBufLen);
-        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcacSpan, rcac_dn));
-        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+        ChipLogProgress(Controller, "SignICAC: RCAC loaded, size=%u", static_cast<unsigned>(rcacSpan.size()));
+        err = ExtractSubjectDNFromX509Cert(rcacSpan, rcac_dn);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "SignICAC: ExtractSubjectDNFromX509Cert failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+        err = rcac_dn.GetCertChipId(rcacId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "SignICAC: GetCertChipId failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+        ChipLogProgress(Controller, "SignICAC: RCAC issuerId=0x%016" PRIx64 " mIssuerId=0x%08" PRIx32, rcacId,
+                        static_cast<uint32_t>(mIssuerId));
         VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
     }
 
@@ -491,10 +693,32 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignICAC(const ByteSpan & icaCsr
     ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId(anchorFabricId));
     ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mIntermediateIssuerId));
 
-    ChipLogProgress(Controller, "Signing ICA CSR");
+    ChipLogProgress(Controller, "SignICAC: issuing ICAC with intermediateIssuerId=0x%08" PRIx32,
+                    static_cast<uint32_t>(mIntermediateIssuerId));
 
-    ReturnErrorOnFailure(
-        IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts, pubkey, mIssuer, icac));
+    // IssueX509Cert produces a DER-encoded cert; the AddICAC cluster command
+    // expects CHIP TLV format, so convert before returning.
+    Platform::ScopedMemoryBuffer<uint8_t> derBuf;
+    VerifyOrReturnError(derBuf.Alloc(kMaxDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan derSpan(derBuf.Get(), kMaxDERCertLength);
+
+    err = IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts, pubkey, mIssuer, derSpan);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "SignICAC: IssueX509Cert failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    ChipLogProgress(Controller, "SignICAC: ICAC DER size=%u, converting to CHIP TLV", static_cast<unsigned>(derSpan.size()));
+
+    err = ConvertX509CertToChipCert(derSpan, icac);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "SignICAC: ConvertX509CertToChipCert failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    ChipLogProgress(Controller, "SignICAC: ICAC CHIP TLV size=%u", static_cast<unsigned>(icac.size()));
 
     VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
 
@@ -520,6 +744,128 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOC(const ByteSpan & icac, c
     ChipLogProgress(Controller, "Generating NOC");
     return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
                          noc);
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::SignDeviceNOC(const ByteSpan & nocCsr, FabricId anchorFabricId,
+                                                              NodeId deviceNodeId, MutableByteSpan & noc)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(mHasJFMaterials, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "SignDeviceNOC: anchorFabricId=0x%016" PRIx64 " deviceNodeId=0x%016" PRIx64 " csrSize=%u",
+                    anchorFabricId, deviceNodeId, static_cast<unsigned>(nocCsr.size()));
+
+    P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(nocCsr.data(), nocCsr.size(), pubkey));
+
+    // Use the cross-signed JF-materials ICAC as the issuer for the device NOC. Its subject DN carries
+    // the Fabric-A fabric id and the ICAC id, and its public key corresponds to mAnchorIntermediateIssuer.
+    // The ICAC was received over the AddICAC cluster command in CHIP TLV format (not DER X509), so the
+    // subject DN must be extracted with the CHIP-cert helper.
+    ByteSpan icacSpan(mJFMaterialsICAC, mJFMaterialsICACLen);
+    ChipDN icac_dn;
+    ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(icacSpan, icac_dn));
+
+    // The Fabric-A fabric id for the device NOC is derived internally from the cross-signed ICAC.
+    // The caller no longer transmits it; the anchorFabricId parameter is ignored.
+    (void) anchorFabricId;
+    FabricId icacFabricId;
+    ReturnErrorOnFailure(icac_dn.GetCertFabricId(icacFabricId));
+    ChipLogProgress(Controller, "SignDeviceNOC: derived anchorFabricId=0x%016" PRIx64 " from cross-signed ICAC", icacFabricId);
+
+    ChipDN noc_dn;
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(icacFabricId));
+
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(deviceNodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(mNextCATs));
+
+    // IssueX509Cert produces a DER-encoded cert; the AddNOC cluster command expects CHIP TLV, so convert.
+    Platform::ScopedMemoryBuffer<uint8_t> derBuf;
+    VerifyOrReturnError(derBuf.Alloc(kMaxDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan derSpan(derBuf.Get(), kMaxDERCertLength);
+
+    ChipLogProgress(Controller, "SignDeviceNOC: issuing device NOC signed by anchor intermediate issuer");
+    ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey,
+                                       mAnchorIntermediateIssuer, derSpan));
+
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(derSpan, noc));
+    VerifyOrReturnError(CanCastTo<uint16_t>(noc.size()), CHIP_ERROR_INTERNAL);
+
+    ChipLogProgress(Controller, "SignDeviceNOC: device NOC CHIP TLV size=%u", static_cast<unsigned>(noc.size()));
+    return CHIP_NO_ERROR;
+}
+
+void ExampleOperationalCredentialsIssuer::SetJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk)
+
+{
+    VerifyOrReturn(icac.size() <= sizeof(mJFMaterialsICAC),
+                   ChipLogError(Controller, "SetJFMaterials: ICAC too large (%u bytes)", static_cast<unsigned>(icac.size())));
+    VerifyOrReturn(rcac.size() <= sizeof(mJFMaterialsRCAC),
+                   ChipLogError(Controller, "SetJFMaterials: RCAC too large (%u bytes)", static_cast<unsigned>(rcac.size())));
+    VerifyOrReturn(ipk.size() <= sizeof(mJFMaterialsIPK),
+                   ChipLogError(Controller, "SetJFMaterials: IPK too large (%u bytes)", static_cast<unsigned>(ipk.size())));
+
+    memcpy(mJFMaterialsICAC, icac.data(), icac.size());
+    mJFMaterialsICACLen = icac.size();
+    memcpy(mJFMaterialsRCAC, rcac.data(), rcac.size());
+    mJFMaterialsRCACLen = rcac.size();
+    memcpy(mJFMaterialsIPK, ipk.data(), ipk.size());
+    mJFMaterialsIPKLen  = ipk.size();
+    mHasJFMaterials     = true;
+
+    // Persist JF materials to storage so they survive a reboot.
+    if (mStorage != nullptr)
+    {
+        CHIP_ERROR err;
+        err = mStorage->SyncSetKeyValue(kJFMaterialsICACStorage, mJFMaterialsICAC, static_cast<uint16_t>(mJFMaterialsICACLen));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "SetJFMaterials: failed to persist ICAC: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        err = mStorage->SyncSetKeyValue(kJFMaterialsRCACStorage, mJFMaterialsRCAC, static_cast<uint16_t>(mJFMaterialsRCACLen));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "SetJFMaterials: failed to persist RCAC: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        err = mStorage->SyncSetKeyValue(kJFMaterialsIPKStorage, mJFMaterialsIPK, static_cast<uint16_t>(mJFMaterialsIPKLen));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "SetJFMaterials: failed to persist IPK: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    ChipLogProgress(Controller, "SetJFMaterials: stored ICAC=%u bytes, RCAC=%u bytes, IPK=%u bytes",
+                    static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()),
+                    static_cast<unsigned>(ipk.size()));
+}
+
+void ExampleOperationalCredentialsIssuer::ClearJFMaterials()
+{
+    mHasJFMaterials     = false;
+    mJFMaterialsICACLen = 0;
+    mJFMaterialsRCACLen = 0;
+    mJFMaterialsIPKLen  = 0;
+
+    // Remove persisted JF materials from storage.
+    if (mStorage != nullptr)
+    {
+        CHIP_ERROR err;
+        err = mStorage->SyncDeleteKeyValue(kJFMaterialsICACStorage);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(Controller, "ClearJFMaterials: failed to delete ICAC: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        err = mStorage->SyncDeleteKeyValue(kJFMaterialsRCACStorage);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(Controller, "ClearJFMaterials: failed to delete RCAC: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        err = mStorage->SyncDeleteKeyValue(kJFMaterialsIPKStorage);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(Controller, "ClearJFMaterials: failed to delete IPK: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 }
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::ObtainICACSR(MutableByteSpan & icaCsr)

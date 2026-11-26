@@ -246,10 +246,20 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
     const FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
+    // The NodeId of the peer that invoked this command (JFA-A). For a CASE
+    // session the subject descriptor carries the authenticated caller NodeId.
+    // Note: GetFabricTable().FindFabricWithIndex(accessingFabricIndex)->GetNodeId()
+    // would return our own NodeId on that fabric, not the caller's, so use the
+    // subject descriptor instead.
+    const Access::SubjectDescriptor subjectDescriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    const NodeId peerJFANodeId =
+        (subjectDescriptor.authMode == Access::AuthMode::kCase) ? subjectDescriptor.subject : kUndefinedNodeId;
+
     // Ensure that the accessing fabric is not marked as verified before we proceed
     Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
 
-    auto onComplete = [this, cachedPath, accessingFabricIndex](const CHIP_ERROR & err) {
+    auto onComplete = [this, cachedPath, accessingFabricIndex, peerJFANodeId](const CHIP_ERROR & err) {
+
         if (mActiveCommandHandle.has_value())
         {
             auto * commandHandler = mActiveCommandHandle.value().Get();
@@ -257,6 +267,26 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
             {
                 ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
                 Server::GetInstance().GetJointFabricAdministrator().SetVidVerificationForFabric(accessingFabricIndex);
+
+                // Record the NodeId of the peer JFA (JFA-A) that invoked this command so the
+                // delegate (JFAManager) can expose it as an indicator that JCM is in progress.
+                // peerJFANodeId is the authenticated caller NodeId from the CASE subject
+                // descriptor, not our own NodeId on the accessing fabric.
+                auto * delegate = Server::GetInstance().GetJointFabricAdministrator().GetDelegate();
+                if (delegate != nullptr && peerJFANodeId != kUndefinedNodeId)
+                {
+                    // JFA-A invoked this command over the joint fabric; the device must reach
+                    // JFA-A on that same fabric index (accessingFabricIndex), not on its own
+                    // locally-commissioned fabric index.
+                    delegate->SetPeerJFANodeId(peerJFANodeId, accessingFabricIndex);
+                    ChipLogProgress(JointFabric,
+                                    "HandleAnnounceJointFabricAdministrator: peer JFA-A NodeId=0x" ChipLogFormatX64
+                                    " on fabric index %u",
+                                    ChipLogValueX64(peerJFANodeId), static_cast<unsigned>(accessingFabricIndex));
+                }
+
+
+
                 commandHandler->AddStatus(cachedPath, Status::Success);
             }
             else
@@ -300,6 +330,20 @@ void JointFabricAdministratorGlobalInstance::OnFailSafeTimerExpired()
     CleanupAnnounceJFA();
     Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
+
+    // If JF materials were already pushed to the local commissioner (JFC-B),
+    // tell it to discard them so stale credentials cannot be used.
+    // Also clear the recorded peer JFA-A NodeId since this JCM attempt is aborted.
+    auto * delegate = Server::GetInstance().GetJointFabricAdministrator().GetDelegate();
+    if (delegate != nullptr)
+    {
+        CHIP_ERROR clearErr = delegate->ClearJFMaterials();
+        if (clearErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OnFailSafeTimerExpired: ClearJFMaterials failed: %" CHIP_ERROR_FORMAT, clearErr.Format());
+        }
+        delegate->ClearPeerJFANodeId();
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,
@@ -372,22 +416,127 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
     failSafeContext.SetAddICACHasBeenInvoked();
 
-    VerifyOrExit(VerifyAddICACStep1(ctx.mCommandHandler.GetAccessingFabricIndex(), commandData) == CHIP_NO_ERROR,
-                 status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
+    {
+        CHIP_ERROR step1Err = VerifyAddICACStep1(ctx.mCommandHandler.GetAccessingFabricIndex(), commandData);
+        if (step1Err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "AddICAC: VerifyAddICACStep1 failed: %" CHIP_ERROR_FORMAT, step1Err.Format());
+            status.Emplace(ICACResponseStatusEnum::kInvalidICAC);
+            goto exit;
+        }
+    }
 
-    VerifyOrExit(VerifyAddICACPublicKey(commandData) == CHIP_NO_ERROR, status.Emplace(ICACResponseStatusEnum::kInvalidPublicKey));
+    {
+        CHIP_ERROR step2Err = VerifyAddICACPublicKey(commandData);
+        if (step2Err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "AddICAC: VerifyAddICACPublicKey failed: %" CHIP_ERROR_FORMAT, step2Err.Format());
+            status.Emplace(ICACResponseStatusEnum::kInvalidPublicKey);
+            goto exit;
+        }
+    }
 
-    VerifyOrExit(VerifyAddICACDNEncodingRules(commandData) == CHIP_NO_ERROR, status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
+    {
+        CHIP_ERROR step3Err = VerifyAddICACDNEncodingRules(commandData);
+        if (step3Err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "AddICAC: VerifyAddICACDNEncodingRules failed: %" CHIP_ERROR_FORMAT, step3Err.Format());
+            status.Emplace(ICACResponseStatusEnum::kInvalidICAC);
+            goto exit;
+        }
+    }
+
+    {
+        auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
+        if (jointFabricAdministrator.GetDelegate() != nullptr)
+        {
+            CHIP_ERROR storeErr = jointFabricAdministrator.GetDelegate()->StoreCrossSignedICAC(commandData.ICACValue);
+            if (storeErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "JointFabricAdministrator: StoreCrossSignedICAC failed: %" CHIP_ERROR_FORMAT, storeErr.Format());
+                status.Emplace(ICACResponseStatusEnum::kInvalidICAC);
+                goto exit;
+            }
+
+            // After storing the cross-signed ICAC, push the JF materials to the
+            // local commissioner (JFC-B) so it can issue Fabric-A NOCs for device
+            // migration. The RCAC and IPK are taken from the accessing fabric which
+            // is the joint fabric (Fabric A) this device was just admitted to.
+            {
+                FabricIndex accessingFabric = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+                uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+                MutableByteSpan rcacSpan(rcacBuf, sizeof(rcacBuf));
+                CHIP_ERROR rcacErr = Server::GetInstance().GetFabricTable().FetchRootCert(accessingFabric, rcacSpan);
+                if (rcacErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "HandleAddICAC: FetchRootCert failed: %" CHIP_ERROR_FORMAT, rcacErr.Format());
+                    // Non-fatal for the AddICAC response; log and skip PushJFMaterials.
+                }
+                else
+                {
+                    uint8_t ipkBuf[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+                    ByteSpan ipkSpan;
+
+                    // IMPORTANT: The IPK pushed into the migration pipeline is ultimately delivered to
+                    // the migrated device as the AddNOC IPKValue. Per the Matter spec, AddNOC IPKValue
+                    // must be the RAW EPOCH IPK; the receiving device internally derives its operational
+                    // group key as DeriveGroupOperationalKey(IPKValue, compressedFabricId). It must NOT be
+                    // the already-derived operational key.
+                    //
+                    // GroupDataProvider::GetIpkKeySet() returns the OPERATIONAL (derived) key, not the raw
+                    // epoch key (the epoch key is not retained in storage). Using it here would make the
+                    // device double-derive: Derive(operationalA, cfidA) != operationalA, so the device's
+                    // CASE destinationId HMAC key would differ from JFA-B's, producing the "No shared
+                    // trusted root" (0xC9) failure on the Fabric-A reconnect.
+                    //
+                    // In this Joint Fabric example setup, Fabric A's epoch IPK is the default test IPK
+                    // (the same value ExampleOperationalCredentialsIssuer falls back to). Push that raw
+                    // epoch IPK so the migrated device re-derives the correct operational key for Fabric A
+                    // and the CASE destinationId matches.
+                    {
+                        ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+                        if (defaultIpkSpan.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)
+                        {
+                            memcpy(ipkBuf, defaultIpkSpan.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                            ipkSpan = ByteSpan(ipkBuf, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                        }
+                        else
+                        {
+                            ChipLogError(Zcl, "HandleAddICAC: unexpected default IPK size %u",
+                                         static_cast<unsigned>(defaultIpkSpan.size()));
+                        }
+                    }
+
+                    if (!ipkSpan.empty())
+                    {
+                        CHIP_ERROR pushErr =
+                            jointFabricAdministrator.GetDelegate()->PushJFMaterials(commandData.ICACValue, rcacSpan, ipkSpan);
+                        if (pushErr == CHIP_NO_ERROR)
+                        {
+                            ChipLogProgress(Zcl, "HandleAddICAC: JF materials pushed to local commissioner");
+                        }
+                        else
+                        {
+                            ChipLogError(Zcl, "HandleAddICAC: PushJFMaterials failed: %" CHIP_ERROR_FORMAT, pushErr.Format());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 exit:
-    if (status.HasValue())
     {
         Commands::ICACResponse::Type response;
-        response.statusCode = status.Value();
+        response.statusCode = status.ValueOr(ICACResponseStatusEnum::kOk);
+        if (nonDefaultStatus != Status::Success && !status.HasValue())
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+            return;
+        }
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-        return;
     }
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
 }
 
 CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const FabricIndex accessFabric,
@@ -399,15 +548,53 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const Fabr
     ChipCertificateSet certificates;
     ValidationContext validContext;
 
-    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().FetchRootCert(accessFabric, rcacSpan));
-    ReturnErrorOnFailure(certificates.Init(kMaxCertsInChain));
-    ReturnErrorOnFailure(certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-    ReturnErrorOnFailure(
-        certificates.LoadCert(commandData.ICACValue, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    CHIP_ERROR err;
+
+    err = Server::GetInstance().GetFabricTable().FetchRootCert(accessFabric, rcacSpan);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACStep1: FetchRootCert failed (fabric %u): %" CHIP_ERROR_FORMAT,
+                     static_cast<unsigned>(accessFabric), err.Format());
+        return err;
+    }
+    ChipLogProgress(Zcl, "VerifyAddICACStep1: RCAC fetched, size=%u, ICAC size=%u",
+                    static_cast<unsigned>(rcacSpan.size()),
+                    static_cast<unsigned>(commandData.ICACValue.size()));
+
+    err = certificates.Init(kMaxCertsInChain);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACStep1: certificates.Init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    err = certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACStep1: LoadCert(RCAC) failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    err = certificates.LoadCert(commandData.ICACValue, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACStep1: LoadCert(ICAC) failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
     validContext.Reset();
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kKeyCertSign);
     validContext.mRequiredCertType = CertType::kICA;
-    return certificates.ValidateCert(certificates.GetLastCert(), validContext);
+    err = certificates.ValidateCert(certificates.GetLastCert(), validContext);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACStep1: ValidateCert failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "VerifyAddICACStep1: ICAC validated against RCAC successfully");
+    }
+    return err;
 }
 
 CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACPublicKey(const Commands::AddICAC::DecodableType & commandData)
@@ -417,15 +604,39 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACPublicKey(const 
     Crypto::P256PublicKey csrPubKey;
     Credentials::P256PublicKeySpan icacPubKeySpan;
 
+    CHIP_ERROR err;
     auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
     VerifyOrReturnError(jointFabricAdministrator.GetDelegate() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr));
-    ReturnErrorOnFailure(Crypto::VerifyCertificateSigningRequest(icacCsr.data(), icacCsr.size(), csrPubKey));
-    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(commandData.ICACValue, icacPubKeySpan));
+
+    err = jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACPublicKey: GetIcacCsr failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    ChipLogProgress(Zcl, "VerifyAddICACPublicKey: CSR size=%u", static_cast<unsigned>(icacCsr.size()));
+
+    err = Crypto::VerifyCertificateSigningRequest(icacCsr.data(), icacCsr.size(), csrPubKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACPublicKey: VerifyCertificateSigningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    err = Credentials::ExtractPublicKeyFromChipCert(commandData.ICACValue, icacPubKeySpan);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "VerifyAddICACPublicKey: ExtractPublicKeyFromChipCert failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
     Credentials::P256PublicKeySpan csrPubKeySpan(csrPubKey.ConstBytes());
-    VerifyOrReturnError(memcmp(icacPubKeySpan.data(), csrPubKeySpan.data(), icacPubKeySpan.size()) == 0,
-                        CHIP_ERROR_INVALID_ARGUMENT);
+    if (memcmp(icacPubKeySpan.data(), csrPubKeySpan.data(), icacPubKeySpan.size()) != 0)
+    {
+        ChipLogError(Zcl, "VerifyAddICACPublicKey: public key mismatch between CSR and ICAC");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    ChipLogProgress(Zcl, "VerifyAddICACPublicKey: public key match OK");
     return CHIP_NO_ERROR;
 }
 

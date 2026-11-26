@@ -28,17 +28,37 @@ message OwnershipContext {
 enum TransactionType {
   ICAC_CSR = 0;
   CROSS_SIGNED_ICAC = 1;
+  // JFA-A pushes the cross-signed ICAC and Fabric-A RCAC to JFC-B so
+  // that JFC-B can issue NOCs for Fabric-B devices being migrated to Fabric A.
+  JF_MATERIALS = 2;
+  // JFA-B tells JFC-B to discard previously received JF materials (e.g. on
+  // fail-safe expiry or commissioning abort).
+  CLEAR_JF_MATERIALS = 3;
+  // JFA-B asks JFC-B to issue a Fabric-A NOC from a Fabric-B device CSR so the
+  // device can be migrated into Fabric A (JCM device onboarding, AddNOC step).
+  DEVICE_NOC = 4;
 }
 
 message RequestOptions {
   TransactionType transaction_type = 1;
-  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC_REQUEST
+  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC (DEVICE_NOC derives it internally from the stored cross-signed ICAC)
+  bytes csr_bytes = 3;         // required for CROSS_SIGNED_ICAC / DEVICE_NOC: the CSR to sign
+  bytes icac_bytes = 4;        // required only for JF_MATERIALS: cross-signed ICAC (DER)
+  bytes rcac_bytes = 5;        // required only for JF_MATERIALS: Fabric-A root CA (DER)
+  bytes ipk_bytes = 6;         // required only for JF_MATERIALS: Fabric-A IPK epoch key 0 (16 bytes)
+  uint64 node_id = 7;          // required only for DEVICE_NOC: the device node id to embed in the NOC
 }
 
 message Response {
   TransactionType transaction_type = 1;
-  bytes response_bytes = 2;
+  bytes response_bytes = 2;    // ICAC CSR / cross-signed ICAC / device NOC depending on transaction_type
+  // For DEVICE_NOC: JFC-B also returns the JF materials it holds so JFA-B can populate the
+  // AddTrustedRootCertificate / AddNOC commands without needing a local cached copy.
+  bytes icac_bytes = 3;        // DEVICE_NOC: cross-signed ICAC (CHIP TLV)
+  bytes rcac_bytes = 4;        // DEVICE_NOC: Fabric-A root CA (CHIP TLV)
+  bytes ipk_bytes = 5;         // DEVICE_NOC: Fabric-A IPK epoch key 0 (16 bytes)
 }
+
 
 service JointFabric {
   /* JFC executes the commissioner role and JFA the administrator steps */

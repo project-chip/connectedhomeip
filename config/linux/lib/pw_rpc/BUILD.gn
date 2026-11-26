@@ -16,6 +16,24 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/target_types.gni")
 
+# The Joint Fabric JF_MATERIALS RPC message carries the cross-signed ICAC, the
+# Fabric-A RCAC and the IPK in a single RequestOptions (roughly 490 bytes of
+# payload plus protobuf field and pw_rpc packet overhead). The pw_rpc default
+# PW_RPC_ENCODING_BUFFER_SIZE_BYTES of 512 is too small and the encode fails
+# with "stream full". Raise the encoding buffer so the full message fits.
+config("large_encoding_buffer_config") {
+  defines = [
+    "PW_RPC_USE_GLOBAL_MUTEX=0",
+    "PW_RPC_YIELD_MODE=PW_RPC_YIELD_MODE_BUSY_LOOP",
+    "PW_RPC_ENCODING_BUFFER_SIZE_BYTES=1024",
+  ]
+}
+
+# Use this target as pw_rpc_CONFIG to get the larger encoding buffer.
+group("large_encoding_buffer") {
+  public_configs = [ ":large_encoding_buffer_config" ]
+}
+
 static_library("pw_rpc") {
   output_name = "libPwRpc"
 

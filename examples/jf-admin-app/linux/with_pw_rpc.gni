@@ -27,6 +27,12 @@ pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"
 pw_unit_test_MAIN = "$dir_pw_unit_test:logging_main"
 pw_rpc_system_server_BACKEND = "${chip_root}/config/linux/lib/pw_rpc:pw_rpc"
+
+# The Joint Fabric JF_MATERIALS RPC message (cross-signed ICAC + Fabric-A RCAC +
+# IPK in a single RequestOptions) exceeds the default 512-byte pw_rpc encoding
+# buffer and fails to encode ("stream full"). Use the larger encoding buffer.
+pw_rpc_CONFIG = "${chip_root}/config/linux/lib/pw_rpc:large_encoding_buffer"
+
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"

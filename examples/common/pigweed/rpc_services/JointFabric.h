@@ -17,8 +17,18 @@ public:
     ::pw::Status ResponseStream(const ::Response & ResponseBytes, ::pw_protobuf_Empty & response);
 
     /* JFARpc overrides */
-    CHIP_ERROR GetICACCSRForJF(chip::MutableByteSpan & icacCSR);
-    void CloseStreams();
+    CHIP_ERROR GetICACCSRForJF(chip::MutableByteSpan & icacCSR) override;
+    CHIP_ERROR GetCrossSignedICAC(chip::FabricId anchorFabricId, chip::ByteSpan csr, chip::MutableByteSpan & icac) override;
+    CHIP_ERROR PushJFMaterials(chip::ByteSpan crossSignedICAC, chip::ByteSpan anchorRCAC, chip::ByteSpan anchorIPK) override;
+    // Tell JFC-B to discard any JF materials received in a failed JCM flow.
+    CHIP_ERROR ClearJFMaterials() override;
+    // Ask JFC-B to issue a Fabric-A NOC from a Fabric-B device CSR (device migration).
+    // JFC-B also returns the cross-signed ICAC, Fabric-A RCAC and IPK it holds.
+    CHIP_ERROR GetNOCForDevice(chip::NodeId deviceNodeId, chip::ByteSpan csr, chip::MutableByteSpan & noc,
+                               chip::MutableByteSpan & icac, chip::MutableByteSpan & rcac,
+                               chip::MutableByteSpan & ipk) override;
+    void CloseStreams() override;
+
 
 private:
     struct OwnershipTransferContext

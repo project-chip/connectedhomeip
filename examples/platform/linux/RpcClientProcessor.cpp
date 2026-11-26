@@ -32,7 +32,14 @@ namespace client {
 namespace {
 
 // Constants
-constexpr size_t kMaxTransmissionUnit = 256;
+// The HDLC decode buffer must be able to hold a complete HDLC-framed RPC packet.
+// The Joint Fabric JF_MATERIALS RequestOptions (cross-signed ICAC + Fabric-A RCAC
+// + IPK in a single message) encodes to ~1.8 KB (nanopb RequestOptions_size=1851)
+// before HDLC byte-stuffing. With the previous 256-byte buffer, pw::hdlc::Decoder
+// returned RESOURCE_EXHAUSTED on that frame and the packet was silently dropped,
+// so JF_MATERIALS (transaction_type=2) never reached OnGetStreamOnNext while the
+// small ICAC_CSR / DEVICE_NOC frames did. Size the buffer above the largest frame.
+constexpr size_t kMaxTransmissionUnit = 2048;
 const char * kDefaultRpcServerAddress = "127.0.0.1";
 
 // RPC Stream and Channel Setup
