@@ -95,7 +95,7 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
         # 2. Install Python controller wheels and test dependencies on TH
         self.execute_device_cmd(self.th, MATTER_CONTROLLER_INSTALL_WHEELS, check=True)
         requirements = shlex.quote(str(CHIP_REPO_PATH / "src/python_testing/requirements.txt"))
-        # TODO: Bake src/python_testing/requirements.txt into chip-cirque-device-base to avoid runtime pip installs.
+        # TODO(#75583): Bake src/python_testing/requirements.txt into chip-cirque-device-base to avoid runtime pip installs.
         self.execute_device_cmd(self.th, f"pip3 install --break-system-packages -r {requirements}", check=True)
         self.execute_device_cmd(
             self.th, f"pip3 install --break-system-packages {shlex.quote(str(testing_wheels[0]))}", check=True)

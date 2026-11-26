@@ -119,7 +119,7 @@ jobs:
                   bash scripts/tests/setup_simulated_wifi.sh 16
 
             - name: Run Tests
-              # TODO: Remove apt-get install of iw and kmod once the published chip-build-cirque image is bumped (added to Dockerfile).
+              # TODO(#75583): Add iw and kmod to chip-build-cirque/Dockerfile in a follow-up image bump and remove this apt-get install.
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
