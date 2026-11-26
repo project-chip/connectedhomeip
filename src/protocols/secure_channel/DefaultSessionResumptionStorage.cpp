@@ -105,10 +105,11 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
     // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     VerifyOrReturnError(index.mSize < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE, CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
-    ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
     index.mNodes[index.mSize++] = node;
     ReturnErrorOnFailure(SaveIndex(index));
+
+    ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
     return CHIP_NO_ERROR;
 }
