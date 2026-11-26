@@ -29,8 +29,9 @@ BatteryPowerSource::BatteryPowerSource(TimerDelegate & timerDelegate) :
 
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                                        TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)), mTimerDelegate(timerDelegate),
-    mDescription(description), mReplaceability(replaceability), mOrder(order), mChargingCapability(chargingCapability)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
+    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order),
+    mChargingCapability(chargingCapability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

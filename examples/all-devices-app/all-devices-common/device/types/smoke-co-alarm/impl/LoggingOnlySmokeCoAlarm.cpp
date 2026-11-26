@@ -38,7 +38,8 @@ namespace app {
 // the cluster is registered.
 LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config,
                                                  Span<const EndpointComposition::SemanticTag> powerSourceTagList) :
-    SmokeCoAlarm(timerDelegate, *this, config), mPowerSourceTagList(powerSourceTagList),
+    SmokeCoAlarm(timerDelegate, *this, config),
+    mPowerSourceTagList(powerSourceTagList),
     mPowerSource("Smoke CO Alarm Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
 {}
 
