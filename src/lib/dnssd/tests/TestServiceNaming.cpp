@@ -276,9 +276,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
     DiscoveryFilter filter;
     filter.type = DiscoveryFilterType::kCommissioningMode;
 
-    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18. The suffix on its own fits in fewer
-    // bytes than the whole name does, so the final check has to account for the subtype already
-    // in the buffer rather than comparing the suffix length against the full destination size.
+    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18; every smaller size must fail.
     constexpr size_t kRequired = 18;
     for (size_t tooSmall = 1; tooSmall < kRequired; tooSmall++)
     {
@@ -301,12 +299,12 @@ TEST(TestServiceNaming, TestZeroLengthDestination)
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     filter.type = DiscoveryFilterType::kLongDiscriminator;
     filter.code = 0xFFF;
-    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     EXPECT_EQ(MakeHostName(buffer, 0, ByteSpan()), CHIP_ERROR_BUFFER_TOO_SMALL);

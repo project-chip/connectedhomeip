@@ -160,57 +160,36 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
+    // StringBuilderBase requires a non-empty buffer.
     VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // Space available at the offset the service type is written to. The subtype branch writes
-    // past a subtype already in the buffer, so this is not always the whole destination, and
-    // requiredSize below is measured against it rather than against bufferLen.
-    size_t availableLen = bufferLen;
-    int requiredSize;
-    if (nameDesc.type == DiscoveryFilterType::kNone)
+    const char * serviceName;
+    switch (type)
     {
-        if (type == DiscoveryType::kCommissionableNode)
-        {
-            requiredSize = snprintf(buffer, availableLen, kCommissionableServiceName);
-        }
-        else if (type == DiscoveryType::kCommissionerNode)
-        {
-            requiredSize = snprintf(buffer, availableLen, kCommissionerServiceName);
-        }
-        else if (type == DiscoveryType::kOperational)
-        {
-            requiredSize = snprintf(buffer, availableLen, kOperationalServiceName);
-        }
-        else
-        {
-            return CHIP_ERROR_NOT_IMPLEMENTED;
-        }
-    }
-    else
-    {
-        ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
-        size_t subtypeLen = strlen(buffer);
-        availableLen      = bufferLen - subtypeLen;
-        if (type == DiscoveryType::kCommissionableNode)
-        {
-            requiredSize =
-                snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
-        }
-        else if (type == DiscoveryType::kCommissionerNode)
-        {
-            requiredSize = snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionerServiceName);
-        }
-        else if (type == DiscoveryType::kOperational)
-        {
-            requiredSize = snprintf(buffer + subtypeLen, availableLen, ".%s.%s", kSubtypeServiceNamePart, kOperationalServiceName);
-        }
-        else
-        {
-            return CHIP_ERROR_NOT_IMPLEMENTED;
-        }
+    case DiscoveryType::kCommissionableNode:
+        serviceName = kCommissionableServiceName;
+        break;
+    case DiscoveryType::kCommissionerNode:
+        serviceName = kCommissionerServiceName;
+        break;
+    case DiscoveryType::kOperational:
+        serviceName = kOperationalServiceName;
+        break;
+    default:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    return (static_cast<size_t>(requiredSize) < availableLen) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    StringBuilderBase builder(buffer, bufferLen);
+    if (nameDesc.type != DiscoveryFilterType::kNone)
+    {
+        char subtype[Common::kSubTypeMaxLength + 1];
+        ReturnErrorOnFailure(MakeServiceSubtype(subtype, sizeof(subtype), nameDesc));
+        builder.Add(subtype).Add(".").Add(kSubtypeServiceNamePart).Add(".");
+    }
+    builder.Add(serviceName);
+
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_NO_MEMORY);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Dnssd
