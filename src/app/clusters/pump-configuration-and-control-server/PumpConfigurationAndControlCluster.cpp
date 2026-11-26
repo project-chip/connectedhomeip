@@ -657,6 +657,7 @@ bool PumpConfigurationAndControlCluster::IsAttributeEnabled(AttributeId attribut
 
 void PumpConfigurationAndControlCluster::OnRemoteSensorChanged()
 {
+    VerifyOrReturn(IsStarted());
     const RemoteSensorType sensorType = GetActiveRemoteSensor();
     VerifyOrReturn(sensorType != mActiveRemoteSensor);
     UpdateEffectiveModes(kInvalidAttributeId, sensorType);

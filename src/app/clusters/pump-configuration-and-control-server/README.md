@@ -104,10 +104,11 @@ remote sensor handling depend on the OperationMode attribute, not on
 LocalOverride.
 
 Call `OnRemoteSensorChanged()` when the value returned by `GetRemoteSensorType`
-changes. It only has an effect while OperationMode is Normal and the active
-remote sensor differs from the one used for the last computation. It never
-changes EffectiveOperationMode, never overwrites the EffectiveControlMode set by
-the application in Local mode and never calls `OnOperationModeMinMax`.
+changes. It only has an effect while the cluster is started, OperationMode is
+Normal, and the active remote sensor differs from the one used for the last
+computation. It never changes EffectiveOperationMode, never overwrites the
+EffectiveControlMode set by the application in Local mode and never calls
+`OnOperationModeMinMax`.
 
 The effective modes are not persisted. At startup, they are computed from the
 restored OperationMode and ControlMode:
@@ -160,8 +161,8 @@ if (auto * pump = PumpConfigurationAndControl::FindClusterOnEndpoint(endpointId)
 }
 ```
 
-`SetApplicationDelegate` queries the remote sensor again if the cluster already
-exists. If the new delegate reports the same remote sensor, nothing changes: an
+`SetApplicationDelegate` queries the remote sensor again if the cluster is
+already started. If the new delegate reports the same remote sensor, nothing changes: an
 EffectiveControlMode override set by the application is kept. The
 `ApplicationDelegate` is preserved across temporary endpoint shutdowns and
 removed when the endpoint is permanently removed.

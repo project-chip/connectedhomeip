@@ -1100,6 +1100,59 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupQueriesRemoteSensorInNorma
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestPumpConfigurationAndControlCluster, OnRemoteSensorChangedIgnoredWhenNotStarted)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+
+    {
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+
+        AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
+            { kTestEndpointId, PumpConfigurationAndControl::Id, OperationMode::Id }, OperationModeEnum::kMaximum));
+
+        mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+        cluster.OnRemoteSensorChanged();
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+        EXPECT_FALSE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kMaximum);
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+        EXPECT_FALSE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+
+        cluster.OnRemoteSensorChanged();
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+        EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+        mDelegate.mRemoteSensorType = RemoteSensorType::kNoSensor;
+        cluster.OnRemoteSensorChanged();
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+        EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+    }
+}
+
 TEST_F(TestPumpConfigurationAndControlCluster, StartupRebuildsEffectiveModesFromRestoredModes)
 {
     PumpConfigurationAndControlCluster::Config config =

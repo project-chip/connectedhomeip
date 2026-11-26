@@ -142,8 +142,9 @@ public:
     /// the one used for the last computation, updates EffectiveControlMode and the remote sensor bits
     /// of PumpStatus. Call it when the value returned by Delegate::GetRemoteSensorType changes.
     ///
-    /// Has no effect unless OperationMode is Normal: a remote sensor only applies in Normal mode.
-    /// Never changes EffectiveOperationMode.
+    /// Has no effect unless the cluster is started and OperationMode is Normal: Startup queries the
+    /// remote sensor directly, and a remote sensor only applies in Normal mode. Never changes
+    /// EffectiveOperationMode.
     void OnRemoteSensorChanged();
 
     /// Overrides EffectiveControlMode. The application owns EffectiveControlMode while

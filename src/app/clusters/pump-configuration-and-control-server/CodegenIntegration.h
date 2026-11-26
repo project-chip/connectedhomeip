@@ -47,8 +47,8 @@ public:
 
 /// Installs `delegate` for the cluster on `endpointId`, or removes it if `delegate` is nullptr.
 ///
-/// Can be called before or after the cluster is created. If it is installed before, the cluster asks
-/// it for the remote sensor during startup. If the cluster already exists, the remote sensor is
+/// Can be called before or after the cluster is started. Before startup, the cluster asks
+/// it for the remote sensor during startup. If the cluster is already started, the remote sensor is
 /// queried again (see PumpConfigurationAndControlCluster::OnRemoteSensorChanged). The delegate is
 /// preserved across temporary endpoint shutdowns, removed when the endpoint is permanently removed,
 /// and must outlive its installation.
