@@ -68,8 +68,11 @@ public:
      * @param adapter        platform BLE hooks; must outlive this transport.
      * @param timerDelegate  drives the connect timeout and the foreground-scan window,
      *                       and is handed to the background-scan registry.
+     * @param bleLayer       the BleLayer to connect through; must outlive this transport.
+     *                       nullptr uses DeviceLayer::ConnectivityMgr().GetBleLayer().
      */
-    CommissioningProxyBleTransport(CommissioningProxyBleAdapter & adapter, TimerDelegate & timerDelegate);
+    CommissioningProxyBleTransport(CommissioningProxyBleAdapter & adapter, TimerDelegate & timerDelegate,
+                                   Ble::BleLayer * bleLayer = nullptr);
     ~CommissioningProxyBleTransport() override;
 
     CommissioningProxyBleTransport(const CommissioningProxyBleTransport &)             = delete;
@@ -217,9 +220,12 @@ private:
     void OnCentralRoleRetry();
     void OnScanWindowExpired();
 
-    /// Switch BLE to central role and start the scan/connect for mPendingConnect, ending a
-    /// running foreground scan first. If the switch is refused, start mCentralRoleRetryTimer,
-    /// which tries it again.
+    /// Stop the foreground scan and report its results to the scan aggregator. A paused
+    /// background scan stays paused.
+    void FinishForegroundScan();
+
+    /// Switch BLE to central role and start the scan/connect for mPendingConnect. If the
+    /// switch is refused, start mCentralRoleRetryTimer, which tries it again.
     CHIP_ERROR TryStartCentralConnect();
 
     /// Build the kBle ScanResultStruct the cluster stores. Shared by the foreground and
@@ -242,6 +248,7 @@ private:
 
     CommissioningProxyBleAdapter & mAdapter;
     TimerDelegate & mTimerDelegate;
+    Ble::BleLayer * mBleLayer;
 
     ProxyBleDelegate mProxyDelegate{ *this };
     BgScanHardware mBgScanHardware{ *this };
