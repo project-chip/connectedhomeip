@@ -23,12 +23,15 @@
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
+#include <clusters/Descriptor/Enums.h>
 #include <clusters/PowerSource/AttributeIds.h>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/ClusterId.h>
+#include <clusters/shared/Enums.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <algorithm>
@@ -43,7 +46,7 @@ namespace {
 class SmokeCoAlarmTestFixture : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite() { ASSERT_SUCCESS(Platform::MemoryInit()); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
 protected:
@@ -110,7 +113,7 @@ private:
 std::vector<DataModel::EndpointEntry> GetEndpoints(CodeDrivenDataModelProvider & provider)
 {
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> builder;
-    EXPECT_EQ(provider.Endpoints(builder), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider.Endpoints(builder));
     const auto buffer = builder.TakeBuffer();
     return std::vector<DataModel::EndpointEntry>(buffer.begin(), buffer.end());
 }
@@ -119,11 +122,29 @@ void ExpectSingleDeviceType(CodeDrivenDataModelProvider & provider, EndpointId e
                             const DataModel::DeviceTypeEntry & expected)
 {
     ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> builder;
-    ASSERT_EQ(provider.DeviceTypes(endpoint, builder), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(provider.DeviceTypes(endpoint, builder));
     const auto deviceTypes = builder.TakeBuffer();
     ASSERT_EQ(deviceTypes.size(), 1u);
     EXPECT_EQ(deviceTypes[0].deviceTypeId, expected.deviceTypeId);
     EXPECT_EQ(deviceTypes[0].deviceTypeRevision, expected.deviceTypeRevision);
+}
+
+void ExpectPowerSourceEndpointList(ProviderAttributeReader & reader, EndpointId powerSourceEndpoint,
+                                   std::vector<EndpointId> expectedEndpoints)
+{
+    Clusters::PowerSource::Attributes::EndpointList::TypeInfo::DecodableType endpointList;
+    ASSERT_SUCCESS(reader.Read(powerSourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::EndpointList::Id,
+                               endpointList));
+    std::vector<EndpointId> actualEndpoints;
+    auto epIter = endpointList.begin();
+    while (epIter.Next())
+    {
+        actualEndpoints.push_back(epIter.GetValue());
+    }
+    EXPECT_SUCCESS(epIter.GetStatus());
+    std::sort(actualEndpoints.begin(), actualEndpoints.end());
+    std::sort(expectedEndpoints.begin(), expectedEndpoints.end());
+    EXPECT_EQ(actualEndpoints, expectedEndpoints);
 }
 
 TEST_F(SmokeCoAlarmTestFixture, RegistersPeerPowerSourceEndpointWithMatchingEndpointList)
@@ -131,8 +152,8 @@ TEST_F(SmokeCoAlarmTestFixture, RegistersPeerPowerSourceEndpointWithMatchingEndp
     ConsecutiveEndpointIdAllocator allocator;
     LoggingOnlySmokeCoAlarm device(mTimerDelegate, DefaultSmokeCoConfig());
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     const EndpointId alarmEndpoint       = device.GetEndpointId();
     const EndpointId powerSourceEndpoint = device.GetPowerSource().GetEndpointId();
@@ -158,25 +179,20 @@ TEST_F(SmokeCoAlarmTestFixture, RegistersPeerPowerSourceEndpointWithMatchingEndp
 
     // Verify SmokeCoAlarm's Descriptor::PartsList is empty.
     Clusters::Descriptor::Attributes::PartsList::TypeInfo::DecodableType partsList;
-    ASSERT_EQ(reader.Read(alarmEndpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id, partsList),
-              CHIP_NO_ERROR);
+    ASSERT_SUCCESS(
+        reader.Read(alarmEndpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id, partsList));
     auto partsIter = partsList.begin();
     EXPECT_FALSE(partsIter.Next());
-    EXPECT_EQ(partsIter.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(partsIter.GetStatus());
 
-    // Verify PowerSource::EndpointList references the SmokeCoAlarm endpoint.
-    Clusters::PowerSource::Attributes::EndpointList::TypeInfo::DecodableType endpointList;
-    ASSERT_EQ(reader.Read(powerSourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::EndpointList::Id,
-                          endpointList),
-              CHIP_NO_ERROR);
-    std::vector<EndpointId> actualEndpoints;
-    auto epIter = endpointList.begin();
-    while (epIter.Next())
-    {
-        actualEndpoints.push_back(epIter.GetValue());
-    }
-    EXPECT_EQ(epIter.GetStatus(), CHIP_NO_ERROR);
-    EXPECT_EQ(actualEndpoints, std::vector<EndpointId>{ alarmEndpoint });
+    // By default (no powerSourceTagList provided), TagList feature is not enabled on the standalone Power Source endpoint.
+    uint32_t descriptorFeatureMap = 0;
+    ASSERT_SUCCESS(reader.Read(powerSourceEndpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::FeatureMap::Id,
+                               descriptorFeatureMap));
+    EXPECT_EQ(descriptorFeatureMap & to_underlying(Clusters::Descriptor::Feature::kTagList), 0u);
+
+    // Verify PowerSource::EndpointList includes both the PowerSource endpoint itself and the SmokeCoAlarm endpoint.
+    ExpectPowerSourceEndpointList(reader, powerSourceEndpoint, { powerSourceEndpoint, alarmEndpoint });
 
     ExpectSingleDeviceType(mProvider, alarmEndpoint, Device::Type::kSmokeCoAlarm);
     ExpectSingleDeviceType(mProvider, powerSourceEndpoint, Device::Type::kPowerSource);
@@ -185,17 +201,25 @@ TEST_F(SmokeCoAlarmTestFixture, RegistersPeerPowerSourceEndpointWithMatchingEndp
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
     EXPECT_EQ(device.GetPowerSource().GetEndpointId(), kInvalidEndpointId);
     EXPECT_TRUE(GetEndpoints(mProvider).empty());
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
-TEST_F(SmokeCoAlarmTestFixture, PropagatesBridgedParentToSiblingPowerSourceEndpoint)
+TEST_F(SmokeCoAlarmTestFixture, PropagatesBridgedParentAndForwardsPowerSourceTagList)
 {
-    constexpr EndpointId kBridgedNodeEndpoint = 10;
+    constexpr EndpointId kBridgedNodeEndpoint          = 10;
+    static const EndpointComposition::SemanticTag kTag = {
+        .mfgCode     = DataModel::NullNullable,
+        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+        .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle),
+    };
     ConsecutiveEndpointIdAllocator allocator;
-    LoggingOnlySmokeCoAlarm device(mTimerDelegate, DefaultSmokeCoConfig());
+    LoggingOnlySmokeCoAlarm device(mTimerDelegate, DefaultSmokeCoConfig(), Span(&kTag, 1));
 
-    ASSERT_EQ(device.Register(allocator, mProvider, EndpointComposition::WithParent(kBridgedNodeEndpoint)), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider, EndpointComposition::WithParent(kBridgedNodeEndpoint)));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+
+    const EndpointId alarmEndpoint       = device.GetEndpointId();
+    const EndpointId powerSourceEndpoint = device.GetPowerSource().GetEndpointId();
 
     const auto endpoints = GetEndpoints(mProvider);
     ASSERT_EQ(endpoints.size(), 2u);
@@ -204,8 +228,21 @@ TEST_F(SmokeCoAlarmTestFixture, PropagatesBridgedParentToSiblingPowerSourceEndpo
         EXPECT_EQ(entry.parentId, kBridgedNodeEndpoint);
     }
 
+    ProviderAttributeReader reader(mProvider);
+    ExpectPowerSourceEndpointList(reader, powerSourceEndpoint, { powerSourceEndpoint, alarmEndpoint });
+
+    Clusters::Descriptor::Attributes::TagList::TypeInfo::DecodableType tagList;
+    ASSERT_SUCCESS(
+        reader.Read(powerSourceEndpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::TagList::Id, tagList));
+    auto tagIter = tagList.begin();
+    ASSERT_TRUE(tagIter.Next());
+    EXPECT_EQ(tagIter.GetValue().namespaceID, to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition));
+    EXPECT_EQ(tagIter.GetValue().tag, static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle));
+    EXPECT_FALSE(tagIter.Next());
+    EXPECT_SUCCESS(tagIter.GetStatus());
+
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SmokeCoAlarmTestFixture, RollsBackWhenPowerSourceEndpointAllocationFails)

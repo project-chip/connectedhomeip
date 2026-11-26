@@ -36,8 +36,9 @@ namespace app {
 // The device is its own delegate: SmokeCoAlarm only stores the reference, so passing *this
 // (the not-yet-fully-constructed SmokeCoAlarmDelegate base) is safe as long as it is not used until
 // the cluster is registered.
-LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config) :
-    SmokeCoAlarm(timerDelegate, *this, config),
+LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config,
+                                                 Span<const EndpointComposition::SemanticTag> powerSourceTagList) :
+    SmokeCoAlarm(timerDelegate, *this, config), mPowerSourceTagList(powerSourceTagList),
     mPowerSource("Smoke CO Alarm Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
 {}
 
@@ -50,19 +51,14 @@ LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
 CHIP_ERROR LoggingOnlySmokeCoAlarm::RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                                         EndpointId parentId)
 {
-    // Tagged with PositionTag::kMiddle to disambiguate from the standalone power-source (PositionTag::kTop)
-    // and power-source-simulated (PositionTag::kBottom) devices under wildcard allocation (*).
-    static const EndpointComposition::SemanticTag kSmokeCoBatteryTag = {
-        .mfgCode     = DataModel::NullNullable,
-        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
-        .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle),
-    };
-    EndpointComposition composition(parentId, DataModel::EndpointCompositionPattern::kTree, Span(&kSmokeCoBatteryTag, 1));
+    EndpointComposition composition(parentId, DataModel::EndpointCompositionPattern::kTree, mPowerSourceTagList);
 
     ReturnErrorOnFailure(mPowerSource.Register(allocator, provider, composition));
-    // PowerSourceCluster::SetEndpointList stores the Span by view; mEndpointId remains valid
-    // for the lifetime of the registered SmokeCoAlarm endpoint.
-    return mPowerSource.SetEndpointList(Span<const EndpointId>(&mEndpointId, 1));
+    // Per the Power Source cluster spec, any non-empty EndpointList SHALL include the endpoint on which
+    // the Power Source cluster resides. SetEndpointList stores the Span by view; mPowerSourceEndpoints is
+    // declared before mPowerSource so it outlives the cluster.
+    mPowerSourceEndpoints = { mPowerSource.GetEndpointId(), mEndpointId };
+    return mPowerSource.BatteryPowerSourceCluster().SetEndpointList(Span<const EndpointId>(mPowerSourceEndpoints));
 }
 
 void LoggingOnlySmokeCoAlarm::UnregisterPowerSource(CodeDrivenDataModelProvider & provider)
@@ -71,6 +67,7 @@ void LoggingOnlySmokeCoAlarm::UnregisterPowerSource(CodeDrivenDataModelProvider 
     {
         mPowerSource.Unregister(provider);
     }
+    mPowerSourceEndpoints = { kInvalidEndpointId, kInvalidEndpointId };
 }
 
 void LoggingOnlySmokeCoAlarm::OnSelfTestRequested()

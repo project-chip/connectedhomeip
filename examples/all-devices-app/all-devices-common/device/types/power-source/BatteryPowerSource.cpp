@@ -29,9 +29,8 @@ BatteryPowerSource::BatteryPowerSource(TimerDelegate & timerDelegate) :
 
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                                        TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order),
-    mChargingCapability(chargingCapability)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)), mTimerDelegate(timerDelegate),
+    mDescription(description), mReplaceability(replaceability), mOrder(order), mChargingCapability(chargingCapability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -89,12 +88,6 @@ BatteryPowerSource::SimpleBatteryPowerSourceCluster & BatteryPowerSource::Batter
 {
     VerifyOrDie(mBatteryPowerSourceCluster.IsConstructed());
     return mBatteryPowerSourceCluster.Cluster();
-}
-
-CHIP_ERROR BatteryPowerSource::SetEndpointList(Span<const EndpointId> endpoints)
-{
-    VerifyOrReturnError(mBatteryPowerSourceCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    return mBatteryPowerSourceCluster.Cluster().SetEndpointList(endpoints);
 }
 
 } // namespace chip::app

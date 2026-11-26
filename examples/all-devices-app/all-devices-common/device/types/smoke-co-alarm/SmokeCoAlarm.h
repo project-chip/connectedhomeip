@@ -42,8 +42,9 @@ namespace app {
 ///
 /// Therefore, concrete subclasses MUST implement `RegisterPowerSource` and `UnregisterPowerSource`
 /// (they cannot be left empty) to register a separate Power Source endpoint and configure its
-/// `PowerSource::EndpointList` attribute to reference `GetEndpointId()`. The Power Source endpoint
-/// is registered as a separate sibling endpoint (not a child part in this endpoint's `PartsList`).
+/// `PowerSource::EndpointList` attribute to include both the Power Source endpoint itself and
+/// `GetEndpointId()`. The Power Source endpoint is registered as a separate sibling endpoint
+/// (not a child part in this endpoint's `PartsList`).
 class SmokeCoAlarm : public DeviceInterface
 {
 public:
@@ -88,7 +89,7 @@ protected:
     /// Called during `Register` after the Smoke CO Alarm endpoint has been registered and `GetEndpointId()`
     /// is valid. Subclasses MUST register a separate Power Source endpoint as a sibling under `parentId`
     /// (not as a child in this endpoint's `PartsList`) and set its `EndpointList` attribute to include
-    /// `GetEndpointId()`.
+    /// both the Power Source endpoint itself and `GetEndpointId()`.
     virtual CHIP_ERROR RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                            EndpointId parentId) = 0;
 
