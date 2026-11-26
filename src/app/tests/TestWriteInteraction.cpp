@@ -632,44 +632,50 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
     {
         for (bool passSessionAtConstruction : { false, true })
         {
-            TestWriteClientCallback callback;
-            SessionHandle groupSession = GetSessionBobToFriends();
-            app::WriteClient writeClient(&GetExchangeManager(), &callback,
-                                         passSessionAtConstruction ? OptionalSessionHandleRef(groupSession) : std::nullopt,
-                                         /* aTimedWriteTimeoutMs = */ NullOptional);
-
-            AddAttributeDataIB(writeClient, encodingMethod);
-            chip::Testing::MessageCapturer messageLog(*this);
-            ASSERT_SUCCESS(writeClient.SendWriteRequest(groupSession));
-
-            DrainAndServiceIO();
-
-            ASSERT_EQ(messageLog.MessageCount(), 1u);
-            ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::WriteRequest));
-            System::PacketBufferTLVReader reader;
-            reader.Init(messageLog.MessagePayload(0).Retain());
-            WriteRequestMessage::Parser parser;
-            ASSERT_SUCCESS(parser.Init(reader));
-            bool flag = true;
-            if (passSessionAtConstruction)
+            for (bool forceOmitFalseFlags : { false, true })
             {
-                EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
-                EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
-            }
-            else
-            {
-                ASSERT_SUCCESS(parser.GetSuppressResponse(&flag));
-                EXPECT_FALSE(flag);
-                flag = true;
-                ASSERT_SUCCESS(parser.GetTimedRequest(&flag));
-                EXPECT_FALSE(flag);
-            }
+                TestWriteClientCallback callback;
+                SessionHandle groupSession = GetSessionBobToFriends();
+                app::WriteClient writeClient(&GetExchangeManager(), &callback,
+                                             passSessionAtConstruction ? OptionalSessionHandleRef(groupSession) : std::nullopt,
+                                             /* aTimedWriteTimeoutMs = */ NullOptional);
+                ASSERT_SUCCESS(writeClient.SetForceOmitFalseRequestFlags(forceOmitFalseFlags));
 
-            EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
-            EXPECT_EQ(callback.mOnDoneCalled, 1);
-            EXPECT_EQ(callback.mOnSuccessCalled, 0);
-            EXPECT_EQ(callback.mOnErrorCalled, 0);
-            EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+                AddAttributeDataIB(writeClient, encodingMethod);
+                chip::Testing::MessageCapturer messageLog(*this);
+                ASSERT_SUCCESS(writeClient.SendWriteRequest(groupSession));
+
+                DrainAndServiceIO();
+
+                ASSERT_EQ(messageLog.MessageCount(), 1u);
+                ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::WriteRequest));
+                System::PacketBufferTLVReader reader;
+                reader.Init(messageLog.MessagePayload(0).Retain());
+                WriteRequestMessage::Parser parser;
+                ASSERT_SUCCESS(parser.Init(reader));
+                bool flag = true;
+                // Groupcast has no peer revision, so the fields are only omitted when the caller forces it.
+                if (forceOmitFalseFlags)
+                {
+                    EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+                    EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+                }
+                else
+                {
+                    ASSERT_SUCCESS(parser.GetSuppressResponse(&flag));
+                    EXPECT_FALSE(flag);
+                    flag = true;
+                    ASSERT_SUCCESS(parser.GetTimedRequest(&flag));
+                    EXPECT_FALSE(flag);
+                }
+
+                EXPECT_EQ(writeClient.SetForceOmitFalseRequestFlags(false), CHIP_ERROR_INCORRECT_STATE);
+                EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
+                EXPECT_EQ(callback.mOnDoneCalled, 1);
+                EXPECT_EQ(callback.mOnSuccessCalled, 0);
+                EXPECT_EQ(callback.mOnErrorCalled, 0);
+                EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+            }
         }
     }
 }
@@ -741,7 +747,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientUnicastOmitsFalseReques
         bool timedRequest;
     };
 
-    auto encodeUnicastWrite = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedWrite, bool aSuppressResponse) {
+    auto encodeUnicastWrite = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedWrite, bool aSuppressResponse,
+                                     bool aForceOmitFalseFlags = false) {
         SessionParameters peerParameters;
         peerParameters.SetMRPConfig(GetDefaultMRPConfig());
         if (aPeerRevision.has_value())
@@ -754,6 +761,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientUnicastOmitsFalseReques
         TestWriteClientCallback callback;
         app::WriteClient writeClient(&GetExchangeManager(), &callback, session,
                                      aIsTimedWrite ? MakeOptional(static_cast<uint16_t>(1000)) : NullOptional, aSuppressResponse);
+        EXPECT_SUCCESS(writeClient.SetForceOmitFalseRequestFlags(aForceOmitFalseFlags));
         EXPECT_SUCCESS(writeClient.EncodeAttribute(
             AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id), true));
         EXPECT_SUCCESS(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false));
@@ -799,6 +807,18 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientUnicastOmitsFalseReques
         EXPECT_FALSE(flags.suppressResponse);
         EXPECT_SUCCESS(flags.timedRequestError);
         EXPECT_FALSE(flags.timedRequest);
+
+        // Forcing omission applies to any peer revision, and still encodes TRUE fields.
+        flags = encodeUnicastWrite(peerRevision, /* aIsTimedWrite = */ false, /* aSuppressResponse = */ false,
+                                   /* aForceOmitFalseFlags = */ true);
+        EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+        EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+        flags = encodeUnicastWrite(peerRevision, /* aIsTimedWrite = */ true, /* aSuppressResponse = */ false,
+                                   /* aForceOmitFalseFlags = */ true);
+        EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+        EXPECT_SUCCESS(flags.timedRequestError);
+        EXPECT_TRUE(flags.timedRequest);
     }
 }
 
@@ -1447,6 +1467,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerOptionalRequestFlags)
         TestWriteClientCallback callback;
         SessionHandle groupSession = GetSessionBobToFriends();
         app::WriteClient writeClient(&GetExchangeManager(), &callback, groupSession, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.SetForceOmitFalseRequestFlags(true));
         EXPECT_SUCCESS(writeClient.EncodeAttribute(
             AttributePathParams(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id), true));
         EXPECT_SUCCESS(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false));

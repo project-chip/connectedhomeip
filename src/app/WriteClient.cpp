@@ -210,10 +210,11 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     RequestFlagsOptions flags;
-    flags.suppressResponse = mSuppressResponse;
-    flags.timedRequest     = mTimedRequestFieldValue;
-    flags.peerRevision     = mRequestSession.GetPeerInteractionModelRevision();
-    flags.isGroupcast      = mRequestSession.IsGroupSession();
+    flags.suppressResponse    = mSuppressResponse;
+    flags.timedRequest        = mTimedRequestFieldValue;
+    flags.peerRevision        = mRequestSession.GetPeerInteractionModelRevision();
+    flags.isGroupcast         = mRequestSession.IsGroupSession();
+    flags.forceOmitFalseFlags = mForceOmitFalseRequestFlags;
     mWriteRequestBuilder.RequestFlags(flags);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();

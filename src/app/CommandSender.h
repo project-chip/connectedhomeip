@@ -378,6 +378,17 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
+    /**
+     * Omit the SuppressResponse and TimedRequest fields of the InvokeRequestMessage when their value is false,
+     * regardless of the interaction model revision reported by the session. By default the fields are omitted
+     * only for unicast sessions whose peer reported an interaction model revision >= 14.
+     *
+     * Intended for groupcast, when the caller knows every group member supports IM revision >= 14.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if called after PrepareCommand or AddRequestData.
+     */
+    CHIP_ERROR SetForceOmitFalseRequestFlags(bool aForce);
+
     void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
     {
         mDelayReportData = aDelayReportData;
@@ -696,13 +707,14 @@ private:
 
     RequestSession mRequestSession;
 
-    State mState                = State::Idle;
-    bool mSuppressResponse      = false;
-    bool mTimedRequest          = false;
-    bool mBufferAllocated       = false;
-    bool mBatchCommandsEnabled  = false;
-    bool mUseExtendableCallback = false;
-    bool mAllowLargePayload     = false;
+    State mState                     = State::Idle;
+    bool mSuppressResponse           = false;
+    bool mTimedRequest               = false;
+    bool mBufferAllocated            = false;
+    bool mBatchCommandsEnabled       = false;
+    bool mUseExtendableCallback      = false;
+    bool mAllowLargePayload          = false;
+    bool mForceOmitFalseRequestFlags = false;
     std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 

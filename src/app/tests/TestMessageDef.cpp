@@ -232,12 +232,12 @@ void BuildAttributePathIB(AttributePathIB::Builder & aAttributePathBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = aAttributePathBuilder.EnableTagCompression(false)
-              .Node(1)
-              .Endpoint(2)
-              .Cluster(3)
-              .Attribute(4)
-              .ListIndex(5)
-              .EndOfAttributePathIB();
+                         .Node(1)
+                         .Endpoint(2)
+                         .Cluster(3)
+                         .Attribute(4)
+                         .ListIndex(5)
+                         .EndOfAttributePathIB();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -2216,6 +2216,7 @@ struct RequestFlagsCase
     bool timedRequest;
     std::optional<uint16_t> peerRevision;
     bool isGroupcast;
+    bool forceOmitFalseFlags;
     bool expectSuppressResponseEncoded;
     bool expectTimedRequestEncoded;
 };
@@ -2223,21 +2224,26 @@ struct RequestFlagsCase
 constexpr uint16_t kRevisionWithOptionalFlags = chip::Revision::kFirstRevisionWithOptionalRequestFlags;
 
 const RequestFlagsCase kRequestFlagsCases[] = {
-    // Groupcast cannot be timed and omits both fields, regardless of SuppressResponse or peer revision.
-    { false, false, std::nullopt, true, false, false },
-    { true, false, std::nullopt, true, false, false },
-    { false, false, kRevisionWithOptionalFlags, true, false, false },
-    { true, false, kRevisionWithOptionalFlags, true, false, false },
+    // Groupcast has no peer revision and cannot be timed: both fields are encoded unless omission is forced.
+    { false, false, std::nullopt, true, false, true, true },
+    { true, false, std::nullopt, true, false, true, true },
+    { false, false, std::nullopt, true, true, false, false },
+    { true, false, std::nullopt, true, true, true, false },
     // Peer at the first revision with optional flags: only TRUE fields are encoded.
-    { false, false, kRevisionWithOptionalFlags, false, false, false },
-    { true, false, kRevisionWithOptionalFlags, false, true, false },
-    { false, true, kRevisionWithOptionalFlags, false, false, true },
-    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags + 1), false, true, true },
+    { false, false, kRevisionWithOptionalFlags, false, false, false, false },
+    { true, false, kRevisionWithOptionalFlags, false, false, true, false },
+    { false, true, kRevisionWithOptionalFlags, false, false, false, true },
+    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags + 1), false, false, true, true },
     // Older or unknown peer revision: both fields are always encoded.
-    { false, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true },
-    { false, false, std::nullopt, false, true, true },
-    { false, true, std::nullopt, false, true, true },
-    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true },
+    { false, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, false, true, true },
+    { false, false, std::nullopt, false, false, true, true },
+    { false, true, std::nullopt, false, false, true, true },
+    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, false, true, true },
+    // Forced omission applies to unicast too, whatever the peer revision.
+    { false, false, std::nullopt, false, true, false, false },
+    { false, true, std::nullopt, false, true, false, true },
+    { true, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true, false },
+    { false, false, kRevisionWithOptionalFlags, false, true, false, false },
 };
 
 template <typename Parser>
@@ -2275,10 +2281,11 @@ TEST_F(TestMessageDef, TestInvokeRequestMessageRequestFlags)
         InvokeRequestMessage::Builder builder;
         ASSERT_SUCCESS(builder.Init(&writer));
         RequestFlagsOptions options;
-        options.suppressResponse = testCase.suppressResponse;
-        options.timedRequest     = testCase.timedRequest;
-        options.peerRevision     = testCase.peerRevision;
-        options.isGroupcast      = testCase.isGroupcast;
+        options.suppressResponse    = testCase.suppressResponse;
+        options.timedRequest        = testCase.timedRequest;
+        options.peerRevision        = testCase.peerRevision;
+        options.isGroupcast         = testCase.isGroupcast;
+        options.forceOmitFalseFlags = testCase.forceOmitFalseFlags;
         EXPECT_SUCCESS(builder.RequestFlags(options).GetError());
         EXPECT_SUCCESS(builder.CreateInvokeRequests().EndOfInvokeRequests());
         ASSERT_SUCCESS(builder.EndOfInvokeRequestMessage());
@@ -2302,10 +2309,11 @@ TEST_F(TestMessageDef, TestWriteRequestMessageRequestFlags)
         WriteRequestMessage::Builder builder;
         ASSERT_SUCCESS(builder.Init(&writer));
         RequestFlagsOptions options;
-        options.suppressResponse = testCase.suppressResponse;
-        options.timedRequest     = testCase.timedRequest;
-        options.peerRevision     = testCase.peerRevision;
-        options.isGroupcast      = testCase.isGroupcast;
+        options.suppressResponse    = testCase.suppressResponse;
+        options.timedRequest        = testCase.timedRequest;
+        options.peerRevision        = testCase.peerRevision;
+        options.isGroupcast         = testCase.isGroupcast;
+        options.forceOmitFalseFlags = testCase.forceOmitFalseFlags;
         EXPECT_SUCCESS(builder.RequestFlags(options).GetError());
         EXPECT_SUCCESS(builder.CreateWriteRequests().EndOfAttributeDataIBs());
         ASSERT_SUCCESS(builder.EndOfWriteRequestMessage());

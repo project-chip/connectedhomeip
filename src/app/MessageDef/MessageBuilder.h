@@ -32,6 +32,10 @@ struct RequestFlagsOptions
     bool timedRequest     = false;
     std::optional<uint16_t> peerRevision;
     bool isGroupcast = false;
+    // Omit SuppressResponse and TimedRequest when false, even if peerRevision does not allow it. Mostly used for
+    // groupcast, where peerRevision is not available. The caller sets this when it knows, through other means, that the receiver(s)
+    // support(s) IM revision >= 14.
+    bool forceOmitFalseFlags = false;
 };
 
 class MessageBuilder : public StructBuilder

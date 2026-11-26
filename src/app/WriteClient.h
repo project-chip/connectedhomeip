@@ -210,6 +210,22 @@ public:
     ~WriteClient() { assertChipStackLockedByCurrentThread(); }
 
     /**
+     * Omit the SuppressResponse and TimedRequest fields of the WriteRequestMessage when their value is false,
+     * regardless of the interaction model revision reported by the session. By default the fields are omitted
+     * only for unicast sessions whose peer reported an interaction model revision >= 14.
+     *
+     * Intended for groupcast, when the caller knows every group member supports IM revision >= 14.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if called after the first attribute was encoded.
+     */
+    CHIP_ERROR SetForceOmitFalseRequestFlags(bool aForce)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mForceOmitFalseRequestFlags = aForce;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.
      */
     template <class T>
@@ -581,7 +597,8 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
-    bool mSuppressResponse = false;
+    bool mSuppressResponse           = false;
+    bool mForceOmitFalseRequestFlags = false;
 
     RequestSession mRequestSession;
 

@@ -116,10 +116,11 @@ CHIP_ERROR CommandSender::AllocateBuffer()
             mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         RequestFlagsOptions flags;
-        flags.suppressResponse = mSuppressResponse;
-        flags.timedRequest     = mTimedRequest;
-        flags.peerRevision     = mRequestSession.GetPeerInteractionModelRevision();
-        flags.isGroupcast      = mRequestSession.IsGroupSession();
+        flags.suppressResponse    = mSuppressResponse;
+        flags.timedRequest        = mTimedRequest;
+        flags.peerRevision        = mRequestSession.GetPeerInteractionModelRevision();
+        flags.isGroupcast         = mRequestSession.IsGroupSession();
+        flags.forceOmitFalseFlags = mForceOmitFalseRequestFlags;
         mInvokeRequestBuilder.RequestFlags(flags);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
@@ -551,6 +552,13 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
     {
         VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandSender::SetForceOmitFalseRequestFlags(bool aForce)
+{
+    VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
+    mForceOmitFalseRequestFlags = aForce;
     return CHIP_NO_ERROR;
 }
 
