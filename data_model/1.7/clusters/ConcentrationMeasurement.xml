@@ -77,16 +77,14 @@ Davis, CA 95616, USA
     <clusterId id="0x042D" name="PM10 Concentration Measurement" picsCode="PMKCONC"/>
     <clusterId id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement" picsCode="TVOCCONC"/>
     <clusterId id="0x042F" name="Radon Concentration Measurement" picsCode="RNCONC"/>
-    <clusterId id="0x0434" name="Smoke Concentration Measurement" picsCode="SMOKECONC">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0434" name="Smoke Concentration Measurement" picsCode="SMOKECONC"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+    <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the LevelValueEnum enum">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
@@ -185,32 +183,26 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
       <item value="8" name="DBPM" summary="Decibels per meter (dB/m)">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <andTerm>
-              <greaterOrEqualTerm>
-                <revision value="current"/>
-                <revision value="5"/>
-              </greaterOrEqualTerm>
-              <feature name="MEA"/>
-            </andTerm>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="6"/>
+            </greaterOrEqualTerm>
+            <feature name="MEA"/>
+          </andTerm>
+        </mandatoryConform>
       </item>
       <item value="9" name="PCFT" summary="Percent obscuration per foot (%/ft)">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <andTerm>
-              <greaterOrEqualTerm>
-                <revision value="current"/>
-                <revision value="5"/>
-              </greaterOrEqualTerm>
-              <feature name="MEA"/>
-            </andTerm>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="6"/>
+            </greaterOrEqualTerm>
+            <feature name="MEA"/>
+          </andTerm>
+        </mandatoryConform>
       </item>
     </enum>
   </dataTypes>

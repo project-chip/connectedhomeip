@@ -82,7 +82,6 @@ The following markers are used in this document (matches the ID master list):
 |326           |0x0146    |Chime                            |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |327           |0x0147    |Camera Controller                |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |328           |0x0148    |Doorbell                         |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
-|329           |0x0149    |AV Analysis Node                 |   |   |   |   |   |     |     |   |     |   |     |C  |
 |336           |0x0150    |Ambient Context Sensor           |   |   |   |   |   |     |     |   |     |   |     |C  |
 |338           |0x0152    |Proximity Ranger                 |   |   |   |   |   |     |     |   |     |   |     |C  |
 |514           |0x0202    |Window Covering                  |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |

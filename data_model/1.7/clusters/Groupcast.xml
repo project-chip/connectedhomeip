@@ -190,7 +190,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="UsedMcastAddrCount" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="FabricUnderTest" type="fabric-idx">

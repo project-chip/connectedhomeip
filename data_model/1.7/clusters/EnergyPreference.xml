@@ -123,6 +123,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
+      <constraint>
+        <max value="9"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="EnergyPriorities" type="list">
       <entry type="EnergyPriorityEnum"/>
@@ -155,6 +158,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
+      <constraint>
+        <max value="9"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

@@ -108,10 +108,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="9" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -352,14 +349,11 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="GroupedMoveTo" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <notTerm>
-            <feature name="ACC"/>
-          </notTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="ACC"/>
+        </notTerm>
+      </mandatoryConform>
       <field id="0" name="Position" type="TargetPositionEnum">
         <optionalConform choice="a" more="true" min="1"/>
       </field>

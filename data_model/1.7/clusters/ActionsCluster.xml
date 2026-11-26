@@ -262,7 +262,7 @@ Davis, CA 95616, USA
       <field id="1" name="InvokeID" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="TransitionTime" type="uint16" default="MS">
+      <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
@@ -285,7 +285,7 @@ Davis, CA 95616, USA
       <field id="1" name="InvokeID" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="Duration" type="uint32" default="MS">
+      <field id="2" name="Duration" type="uint32">
         <mandatoryConform/>
       </field>
     </command>
@@ -318,7 +318,7 @@ Davis, CA 95616, USA
       <field id="1" name="InvokeID" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="Duration" type="uint32" default="MS">
+      <field id="2" name="Duration" type="uint32">
         <mandatoryConform/>
       </field>
     </command>
@@ -351,7 +351,7 @@ Davis, CA 95616, USA
       <field id="1" name="InvokeID" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="Duration" type="uint32" default="MS">
+      <field id="2" name="Duration" type="uint32">
         <mandatoryConform/>
       </field>
     </command>
@@ -374,7 +374,7 @@ Davis, CA 95616, USA
       <field id="1" name="InvokeID" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="Duration" type="uint32" default="MS">
+      <field id="2" name="Duration" type="uint32">
         <mandatoryConform/>
       </field>
     </command>

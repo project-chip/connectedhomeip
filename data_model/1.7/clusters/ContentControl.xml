@@ -385,7 +385,7 @@ Davis, CA 95616, USA
           <maxLength value="6"/>
         </constraint>
       </field>
-      <field id="1" name="BonusTime" type="elapsed-s" default="300">
+      <field id="1" name="BonusTime" type="elapsed-s">
         <mandatoryConform/>
         <constraint>
           <desc/>

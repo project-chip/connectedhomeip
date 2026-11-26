@@ -68,9 +68,9 @@ Davis, CA 95616, USA
     <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced Presets and MatterScheduleConfiguration features"/>
     <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation"/>
     <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type"/>
-    <revision revision="10" summary="Removed Zigbee related elements and P quality, deprecated ThermostatProgrammingOperationMode and removed ProgrammingOperationModeBitmap. and deprecated Setback feature and related elements."/>
-    <revision revision="11" summary="Added support for Thermostat suggestions. Added events."/>
-    <revision revision="12" summary="Mandate minimum value of 1 for TemperatureSetpointHoldDuration. Added Critical Protection attributes. Added support for scheduling sensors."/>
+    <revision revision="10" summary="Removed Zigbee related elements and P quality, deprecated ThermostatProgrammingOperationMode and removed ProgrammingOperationModeBitmap and deprecated Setback feature and related elements"/>
+    <revision revision="11" summary="Added support for Thermostat suggestions"/>
+    <revision revision="12" summary="Added support for Thermostat sensors and events, added CriticalProtection attributes, and mandated minimum value of 1 for TemperatureSetpointHoldDuration"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0201" name="Thermostat"/>
@@ -96,12 +96,6 @@ Davis, CA 95616, USA
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="SCH" name="ScheduleConfiguration">
-      <obsoleteConform/>
-    </feature>
-    <feature bit="4" code="SB" name="Setback">
-      <obsoleteConform/>
-    </feature>
     <feature bit="5" code="AUTO" name="AutoMode" summary="Supports a System Mode of Auto">
       <optionalConform/>
     </feature>
@@ -115,10 +109,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="9" code="TEVT" name="Events" summary="Thermostat supports events">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="10" code="TSUGGEST" name="ThermostatSuggestions" summary="Thermostat supports suggestions">
       <optionalConform>
@@ -126,7 +117,7 @@ Davis, CA 95616, USA
       </optionalConform>
     </feature>
     <feature bit="11" code="SENSORS" name="ThermostatSensors" summary="Thermostat supports scheduling sensors">
-      <provisionalConform/>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -270,7 +261,7 @@ Davis, CA 95616, USA
           <feature name="MSCH"/>
         </optionalConform>
       </item>
-      <item value="2" name="External" summary="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)">
+      <item value="2" name="External" summary="Externally-initiated setpoint change (e.g., Demand Response Load Control cluster command, attribute write)">
         <optionalConform/>
       </item>
     </enum>
@@ -292,29 +283,6 @@ Davis, CA 95616, USA
             <feature name="COOL"/>
           </orTerm>
         </mandatoryConform>
-      </item>
-    </enum>
-    <enum name="StartOfWeekEnum">
-      <item value="0" name="Sunday">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Monday">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Tuesday">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Wednesday">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Thursday">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Friday">
-        <mandatoryConform/>
-      </item>
-      <item value="6" name="Saturday">
-        <mandatoryConform/>
       </item>
     </enum>
     <enum name="SystemModeEnum">
@@ -396,20 +364,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="HVACSystemTypeBitmap">
-      <bitfield name="CoolingStage" from="0x00" to="0x01" summary="Stage of cooling the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingStage" from="0x02" to="0x03" summary="Stage of heating the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingIsHeatPump" bit="4" summary="Is the heating type Heat Pump.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingUsesFuel" bit="5" summary="Does the HVAC system use fuel.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <bitmap name="OccupancyBitmap">
       <bitfield name="Occupied" bit="0" summary="Indicates the occupancy state">
         <mandatoryConform/>
@@ -420,17 +374,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
       <bitfield name="SupportsNames" bit="1" summary="Preset supports user-provided names">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="ProgrammingOperationModeBitmap">
-      <bitfield name="ScheduleActive" bit="0" summary="Schedule programming mode. This enables any programmed weekly schedule configurations.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AutoRecovery" bit="1" summary="Auto/recovery mode">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Economy" bit="2" summary="Economy/EnergyStar mode">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -498,14 +441,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="ScheduleModeBitmap">
-      <bitfield name="HeatSetpointPresent" bit="0" summary="Adjust Heat Setpoint">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="CoolSetpointPresent" bit="1" summary="Adjust Cool Setpoint">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <bitmap name="ScheduleTypeFeaturesBitmap">
       <bitfield name="SupportsPresets" bit="0" summary="Supports presets">
         <optionalConform choice="b" more="true" min="1">
@@ -566,7 +501,7 @@ Davis, CA 95616, USA
           <maxLength value="64"/>
         </constraint>
       </field>
-      <field id="3" name="CoolingSetpoint" type="temperature" default="2600">
+      <field id="3" name="CoolingSetpoint" type="temperature">
         <mandatoryConform>
           <feature name="COOL"/>
         </mandatoryConform>
@@ -574,7 +509,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="HeatingSetpoint" type="temperature" default="2000">
+      <field id="4" name="HeatingSetpoint" type="temperature">
         <mandatoryConform>
           <feature name="HEAT"/>
         </mandatoryConform>
@@ -779,22 +714,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="WeeklyScheduleTransitionStruct">
-      <field id="0" name="TransitionTime" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <max value="1439"/>
-        </constraint>
-      </field>
-      <field id="1" name="HeatSetpoint" type="temperature">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="CoolSetpoint" type="temperature">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="LocalTemperature" type="temperature">
@@ -853,30 +772,6 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from value="0"/>
-          <to value="100"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from value="0"/>
-          <to value="100"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap">
-      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <obsoleteConform/>
-    </attribute>
     <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
@@ -886,7 +781,7 @@ Davis, CA 95616, USA
         </notTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature" default="2600">
+    <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -896,7 +791,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature" default="2000">
+    <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -906,7 +801,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature" default="2600">
+    <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -919,7 +814,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature" default="2000">
+    <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -984,7 +879,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature" default="20">
+    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -1035,21 +930,6 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <obsoleteConform/>
-    </attribute>
-    <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <obsoleteConform/>
-    </attribute>
-    <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <obsoleteConform/>
-    </attribute>
     <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHoldEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
@@ -1067,13 +947,6 @@ Davis, CA 95616, USA
           <from value="1"/>
           <to value="1440"/>
         </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <obsoleteConform/>
-      <constraint>
-        <desc/>
       </constraint>
     </attribute>
     <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap">
@@ -1098,82 +971,6 @@ Davis, CA 95616, USA
     <attribute id="0x0032" name="SetpointChangeSourceTimestamp" type="epoch-s" default="MS">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-    </attribute>
-    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="OccupiedSetbackMin"/>
-          </from>
-          <to>
-            <attribute name="OccupiedSetbackMax"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <obsoleteConform/>
-      <constraint>
-        <max>
-          <attribute name="OccupiedSetbackMax"/>
-        </max>
-      </constraint>
-    </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="OccupiedSetbackMin"/>
-          </from>
-          <to value="254"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="UnoccupiedSetbackMin"/>
-          </from>
-          <to>
-            <attribute name="UnoccupiedSetbackMax"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <obsoleteConform/>
-      <constraint>
-        <max>
-          <attribute name="UnoccupiedSetbackMax"/>
-        </max>
-      </constraint>
-    </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <obsoleteConform/>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="UnoccupiedSetbackMin"/>
-          </from>
-          <to value="254"/>
-        </between>
-      </constraint>
     </attribute>
     <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -1393,32 +1190,23 @@ Davis, CA 95616, USA
     <attribute id="0x0057" name="CriticalFreezeProtection" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
     <attribute id="0x0058" name="CriticalOverheatProtection" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
     <attribute id="0x0059" name="Sensors" type="list">
       <entry type="ThermostatSensorStruct"/>
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SENSORS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SENSORS"/>
+      </mandatoryConform>
       <constraint>
         <maxCount value="32"/>
       </constraint>
@@ -1431,12 +1219,9 @@ Davis, CA 95616, USA
       </entry>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SENSORS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SENSORS"/>
+      </mandatoryConform>
       <constraint>
         <maxCount value="32"/>
       </constraint>
@@ -1449,12 +1234,9 @@ Davis, CA 95616, USA
       </entry>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SENSORS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SENSORS"/>
+      </mandatoryConform>
       <constraint>
         <maxCount value="32"/>
       </constraint>
@@ -1462,23 +1244,17 @@ Davis, CA 95616, USA
     <attribute id="0x005C" name="NumberOfSensorScheduleTransitions" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SENSORS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SENSORS"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x005D" name="SensorSchedule" type="list">
       <entry type="SensorScheduleTransitionStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile" atomicWrite="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SENSORS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SENSORS"/>
+      </mandatoryConform>
       <constraint>
         <maxCount>
           <attribute name="NumberOfSensorScheduleTransitions"/>
@@ -1500,73 +1276,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
-      <obsoleteConform/>
-      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="Transitions" type="list">
-        <entry type="WeeklyScheduleTransitionStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxCount value="10"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
-      <obsoleteConform/>
-      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="Transitions" type="list">
-        <entry type="WeeklyScheduleTransitionStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxCount value="10"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
-      <access invokePrivilege="operate"/>
-      <obsoleteConform/>
-      <field id="0" name="DaysToReturn" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="ModeToReturn" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
     <command id="0x02" name="AddThermostatSuggestionResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="TSUGGEST"/>
@@ -1574,10 +1283,6 @@ Davis, CA 95616, USA
       <field id="0" name="UniqueID" type="uint8">
         <mandatoryConform/>
       </field>
-    </command>
-    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
-      <obsoleteConform/>
     </command>
     <command id="0x05" name="SetActiveScheduleRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
@@ -1645,12 +1350,9 @@ Davis, CA 95616, USA
   <events>
     <event id="0x00" name="SystemModeChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TEVT"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
       <field id="0" name="PreviousSystemMode" type="SystemModeEnum">
         <optionalConform/>
       </field>
@@ -1660,17 +1362,14 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="LocalTemperatureChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TEVT"/>
-            <notTerm>
-              <feature name="LTNE"/>
-            </notTerm>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TEVT"/>
+          <notTerm>
+            <feature name="LTNE"/>
+          </notTerm>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="CurrentLocalTemperature" type="temperature">
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -1678,15 +1377,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x02" name="OccupancyChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TEVT"/>
-            <feature name="OCC"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="PreviousOccupancy" type="OccupancyBitmap">
         <optionalConform/>
       </field>
@@ -1696,12 +1392,9 @@ Davis, CA 95616, USA
     </event>
     <event id="0x03" name="SetpointChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TEVT"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
       <field id="0" name="SystemMode" type="SystemModeEnum">
         <mandatoryConform/>
         <constraint>
@@ -1729,12 +1422,9 @@ Davis, CA 95616, USA
     </event>
     <event id="0x04" name="RunningStateChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TEVT"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TEVT"/>
+      </mandatoryConform>
       <field id="0" name="PreviousRunningState" type="RelayStateBitmap">
         <optionalConform/>
       </field>
@@ -1744,15 +1434,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x05" name="RunningModeChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TEVT"/>
-            <feature name="AUTO"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="AUTO"/>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum">
         <optionalConform/>
       </field>
@@ -1762,15 +1449,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x06" name="ActiveScheduleChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TEVT"/>
-            <feature name="MSCH"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="MSCH"/>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="PreviousScheduleHandle" type="octstr">
         <quality nullable="true"/>
         <optionalConform/>
@@ -1788,15 +1472,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x07" name="ActivePresetChange" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TEVT"/>
-            <feature name="PRES"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TEVT"/>
+          <feature name="PRES"/>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="PreviousPresetHandle" type="octstr">
         <quality nullable="true"/>
         <optionalConform/>

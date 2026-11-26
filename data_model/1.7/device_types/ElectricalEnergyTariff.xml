@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0513" name="Electrical Energy Tariff" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0513" name="Electrical Energy Tariff" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Added AuxiliarySwitch condition and conformance"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions>

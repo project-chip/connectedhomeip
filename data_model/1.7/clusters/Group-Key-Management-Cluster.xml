@@ -70,21 +70,16 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP">
-      <provisionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="1" code="GCAST" name="Groupcast" summary="The device supports groups using the Groupcast cluster">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="GroupKeyMulticastPolicyEnum">
-      <item value="0" name="PerGroupID" summary="Indicates filtering of multicast messages for a specific Group ID">
-        <obsoleteConform/>
-      </item>
-      <item value="1" name="AllNodes" summary="Indicates not filtering of multicast messages">
-        <obsoleteConform/>
-      </item>
-    </enum>
     <enum name="GroupKeySecurityPolicyEnum">
       <item value="0" name="TrustFirst" summary="Message counter synchronization using trust-first">
         <mandatoryConform/>
@@ -171,9 +166,6 @@ Davis, CA 95616, USA
       <field id="7" name="EpochStartTime2" type="epoch-us">
         <quality nullable="true"/>
         <mandatoryConform/>
-      </field>
-      <field id="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum">
-        <obsoleteConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>

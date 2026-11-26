@@ -137,10 +137,10 @@ Davis, CA 95616, USA
       <item value="14" name="ElectricalEnergy" summary="Electrical energy in milliwatt-hours (mWh)">
         <mandatoryConform/>
       </item>
-      <item value="15" name="ReactiveEnergy" summary="Reactive power in millivolt-amp-hours reactive (mVARh)">
+      <item value="15" name="ReactiveEnergy" summary="Reactive energy in millivolt-amp-hours reactive (mVARh)">
         <mandatoryConform/>
       </item>
-      <item value="16" name="ApparentEnergy" summary="Apparent power in millivolt-amp-hours (mVAh)">
+      <item value="16" name="ApparentEnergy" summary="Apparent energy in millivolt-amp-hours (mVAh)">
         <mandatoryConform/>
       </item>
     </enum>
@@ -201,7 +201,7 @@ Davis, CA 95616, USA
         </optionalConform>
         <constraint>
           <max>
-            <field name="PercentTypical"/>
+            <field name="PercentMax"/>
           </max>
         </constraint>
       </field>

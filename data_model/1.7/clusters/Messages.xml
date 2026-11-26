@@ -86,27 +86,18 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="4" code="SPKN" name="SpokenMessages">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="5" code="AUDO" name="AudioMessages">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="6" code="MMSG" name="MultiModalMessages">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <orTerm>
-            <feature name="SPKN"/>
-            <feature name="AUDO"/>
-          </orTerm>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <orTerm>
+          <feature name="SPKN"/>
+          <feature name="AUDO"/>
+        </orTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -237,24 +228,18 @@ Davis, CA 95616, USA
       </field>
       <field id="7" name="LanguageCode" type="string">
         <access fabricSensitive="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="SPKN"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="SPKN"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
       <field id="8" name="MessageURI" type="string">
         <access fabricSensitive="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="AUDO"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="AUDO"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="256"/>
         </constraint>
@@ -286,12 +271,9 @@ Davis, CA 95616, USA
         </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="SPKN"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="SPKN"/>
+      </mandatoryConform>
       <constraint>
         <maxCount value="32"/>
       </constraint>
@@ -303,12 +285,9 @@ Davis, CA 95616, USA
         </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="AUDO"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="AUDO"/>
+      </mandatoryConform>
       <constraint>
         <maxCount value="64"/>
       </constraint>
@@ -354,23 +333,17 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="7" name="LanguageCode" type="string">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="SPKN"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="SPKN"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
       <field id="8" name="MessageURI" type="string">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="AUDO"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="AUDO"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="256"/>
         </constraint>
@@ -440,10 +413,7 @@ Davis, CA 95616, USA
     </event>
     <event id="0x03" name="MessageNotPresented" priority="info">
       <access readPrivilege="view" fabricSensitive="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
         <constraint>

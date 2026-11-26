@@ -129,9 +129,6 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="AudioStreamID" type="uint16"/>
-    <number name="SnapshotStreamID" type="uint16"/>
-    <number name="VideoStreamID" type="uint16"/>
     <enum name="AudioCodecEnum">
       <item value="0" name="OPUS" summary="Open source IETF standard codec.">
         <mandatoryConform/>

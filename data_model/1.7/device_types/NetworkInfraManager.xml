@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; subclause"/>
-    <revision revision="3" summary="Added optional Network Identity Management cluster. Added optional Commissioning Proxy Cluster."/>
+    <revision revision="3" summary="Added optional Commissioning Proxy Cluster."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
@@ -116,10 +116,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0455" name="Commissioning Proxy" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

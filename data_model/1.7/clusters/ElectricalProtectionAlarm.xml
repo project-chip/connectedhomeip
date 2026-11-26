@@ -142,14 +142,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="UtilizationCategoryEnum">
-      <item value="0" name="CategoryA" summary="No short time-delay">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="CategoryB" summary="Intentional short time-delay">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <bitmap name="AlarmBitmap">
       <bitfield name="ShortCircuitFault" bit="0" summary="A short circuit fault is detected">
         <mandatoryConform>
@@ -304,9 +296,7 @@ Davis, CA 95616, USA
     </struct>
     <struct name="OverVoltageRatingsStruct">
       <field id="0" name="TripMechanism" type="VoltageTripMechanismBitmap">
-        <optionalConform choice="d" more="true" min="1">
-          <feature name="SP"/>
-        </optionalConform>
+        <optionalConform choice="d" more="true" min="1"/>
         <constraint>
           <min value="1"/>
         </constraint>

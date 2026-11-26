@@ -165,7 +165,7 @@ Davis, CA 95616, USA
       <item value="2" name="NotPlaying" summary="Media is not currently playing">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Buffering" summary="Media is not currently buffering and playback will start when buffer has been filled">
+      <item value="3" name="Buffering" summary="Media is currently buffering and playback will start when buffer has been filled">
         <mandatoryConform/>
       </item>
     </enum>
@@ -408,10 +408,7 @@ Davis, CA 95616, USA
     <attribute id="0x000B" name="AvailableCommands" type="list">
       <entry type="uint32"/>
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
@@ -419,10 +416,7 @@ Davis, CA 95616, USA
     <attribute id="0x000C" name="ContentInfo" type="ContentInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>

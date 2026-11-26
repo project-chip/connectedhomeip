@@ -84,22 +84,13 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="5" code="CR" name="ContentReplication" summary="Device supports replicating currently playing content to another device for playback continuation">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="6" code="CQ" name="ContentQueueing" summary="Device supports content queueing and enhanced URL launching with content type, headers, offset, and next URL">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="7" code="PS" name="Presets" summary="Device supports a list of presets that can be started without further details">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -196,52 +187,34 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
       <item value="5" name="InvalidData" summary="Invalid data provided for replication">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </item>
       <item value="6" name="AccountMismatch" summary="Account mismatch during replication">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </item>
       <item value="7" name="ContentAppNotAvailable" summary="Content app not available for replication">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </item>
       <item value="8" name="ReplicationNotAllowed" summary="Replication not allowed">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </item>
       <item value="9" name="ReplicationNotSupported" summary="Replication not supported">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </item>
       <item value="10" name="PresetNotFound" summary="The requested preset is not in the Presets attribute">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="PS"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="PS"/>
+        </mandatoryConform>
       </item>
     </enum>
     <bitmap name="SupportedProtocolsBitmap">
@@ -501,23 +474,17 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="Movable" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="CR"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="CR"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0003" name="Presets" type="list" default="empty">
       <entry type="ContentPresetStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PS"/>
+      </mandatoryConform>
       <constraint>
         <countBetween>
           <from value="1"/>
@@ -561,21 +528,15 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="ContentAppVendorID" type="uint16" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </field>
       <field id="6" name="ContentAppProductID" type="uint16" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CR"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CR"/>
+        </mandatoryConform>
       </field>
     </command>
     <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">
@@ -603,12 +564,9 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="ContentType" type="string" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CQ"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CQ"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="256"/>
         </constraint>
@@ -620,45 +578,33 @@ Davis, CA 95616, USA
           </constraint>
         </entry>
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CQ"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CQ"/>
+        </mandatoryConform>
         <constraint>
           <maxCount value="10"/>
         </constraint>
       </field>
       <field id="6" name="OffsetMillisecs" type="uint32" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CQ"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CQ"/>
+        </mandatoryConform>
       </field>
       <field id="7" name="QueueType" type="QueueTypeEnum" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CQ"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CQ"/>
+        </mandatoryConform>
         <constraint>
           <desc/>
         </constraint>
       </field>
       <field id="8" name="NextURL" type="string" default="null">
         <quality nullable="true"/>
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="CQ"/>
-          </mandatoryConform>
-        </otherwiseConform>
+        <mandatoryConform>
+          <feature name="CQ"/>
+        </mandatoryConform>
         <constraint>
           <maxLength value="8192"/>
         </constraint>
@@ -680,20 +626,14 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="ContentReplicationRequest" direction="commandToServer" response="ContentReplicationResponse">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="CR"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="CR"/>
+      </mandatoryConform>
     </command>
     <command id="0x04" name="ContentReplicationResponse" direction="responseFromServer">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="CR"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="CR"/>
+      </mandatoryConform>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
       </field>
@@ -704,12 +644,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="PlayPreset" direction="commandToServer" response="N">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PS"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PS"/>
+      </mandatoryConform>
       <field id="0" name="PresetID" type="uint8">
         <mandatoryConform/>
       </field>
@@ -718,12 +655,9 @@ Davis, CA 95616, USA
   <events>
     <event id="0x00" name="ContentReplication" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="CR"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="CR"/>
+      </mandatoryConform>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
       </field>

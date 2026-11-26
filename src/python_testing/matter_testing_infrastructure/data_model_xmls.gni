@@ -2190,14 +2190,12 @@ data_model_XMLS_1_6_1 = [
 
 data_model_XMLS_1_7 = [
   "${chip_root}/data_model/1.7/clusters/ACL-Cluster.xml",
-  "${chip_root}/data_model/1.7/clusters/AVAnalysis.xml",
   "${chip_root}/data_model/1.7/clusters/AccountLogin.xml",
   "${chip_root}/data_model/1.7/clusters/ActionsCluster.xml",
   "${chip_root}/data_model/1.7/clusters/AdminCommissioningCluster.xml",
   "${chip_root}/data_model/1.7/clusters/AirQuality.xml",
   "${chip_root}/data_model/1.7/clusters/AlarmBase.xml",
   "${chip_root}/data_model/1.7/clusters/AmbientContextSensing.xml",
-  "${chip_root}/data_model/1.7/clusters/AmbientSensingUnion.xml",
   "${chip_root}/data_model/1.7/clusters/ApplicationBasic.xml",
   "${chip_root}/data_model/1.7/clusters/ApplicationLauncher.xml",
   "${chip_root}/data_model/1.7/clusters/AudioControl.xml",
@@ -2328,7 +2326,6 @@ data_model_XMLS_1_7 = [
   "${chip_root}/data_model/1.7/clusters/WiFiNetworkManagement.xml",
   "${chip_root}/data_model/1.7/clusters/WindowCovering.xml",
   "${chip_root}/data_model/1.7/clusters/ZoneManagement.xml",
-  "${chip_root}/data_model/1.7/device_types/AVAnalysisNode.xml",
   "${chip_root}/data_model/1.7/device_types/Aggregator.xml",
   "${chip_root}/data_model/1.7/device_types/AirPurifier.xml",
   "${chip_root}/data_model/1.7/device_types/AirQualitySensor.xml",

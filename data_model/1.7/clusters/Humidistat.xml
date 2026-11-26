@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0205" name="Humidistat">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0205" name="Humidistat"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="HSTAT" scope="Endpoint"/>
   <features>
@@ -174,7 +172,10 @@ Davis, CA 95616, USA
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <maxCount value="4"/>
+        <countBetween>
+          <from value="1"/>
+          <to value="4"/>
+        </countBetween>
       </constraint>
     </attribute>
     <attribute id="0x0001" name="Mode" type="ModeEnum">

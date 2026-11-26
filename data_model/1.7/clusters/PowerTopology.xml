@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009C" name="Power Topology Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009C" name="Power Topology Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Added ElectricalCircuit feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009C" name="Power Topology"/>

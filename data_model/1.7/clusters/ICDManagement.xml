@@ -174,14 +174,6 @@ Davis, CA 95616, USA
         <quality persistence="nonVolatile"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="Key" type="octstr">
-        <access fabricSensitive="true"/>
-        <quality persistence="nonVolatile"/>
-        <obsoleteConform/>
-        <constraint>
-          <allowed value="16"/>
-        </constraint>
-      </field>
       <field id="4" name="ClientType" type="ClientTypeEnum" default="0">
         <access fabricSensitive="true"/>
         <quality persistence="nonVolatile"/>

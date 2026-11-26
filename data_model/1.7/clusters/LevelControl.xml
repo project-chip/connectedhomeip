@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="8">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
@@ -66,7 +66,6 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation"/>
     <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
     <revision revision="7" summary="Simplify constraint, added F quality, changed the conformance to mandatory for MinLevel and MaxLevel, and removed P quality"/>
-    <revision revision="8" summary="Mark provisional Frequency feature and associated elements as obsolete"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
@@ -78,9 +77,6 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="1" code="LT" name="Lighting" summary="Behavior that supports lighting applications">
       <optionalConform/>
-    </feature>
-    <feature bit="2" code="FQ" name="Frequency" summary="Supports frequency attributes and behavior.">
-      <obsoleteConform/>
     </feature>
   </features>
   <dataTypes>
@@ -174,40 +170,6 @@ Davis, CA 95616, USA
           </from>
           <to value="254"/>
         </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0004" name="CurrentFrequency" type="uint16">
-      <access read="true" readPrivilege="view"/>
-      <quality scene="true" quieterReporting="true"/>
-      <mandatoryConform>
-        <feature name="FQ"/>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="MinFrequency"/>
-          </from>
-          <to>
-            <attribute name="MaxFrequency"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0005" name="MinFrequency" type="uint16">
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="FQ"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0006" name="MaxFrequency" type="uint16">
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="FQ"/>
-      </mandatoryConform>
-      <constraint>
-        <min>
-          <attribute name="MinFrequency"/>
-        </min>
       </constraint>
     </attribute>
     <attribute id="0x000F" name="Options" type="OptionsBitmap">
@@ -378,15 +340,6 @@ Davis, CA 95616, USA
     <command id="0x07" name="StopWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-    </command>
-    <command id="0x08" name="MoveToClosestFrequency" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="FQ"/>
-      </mandatoryConform>
-      <field id="0" name="Frequency" type="uint16">
-        <mandatoryConform/>
-      </field>
     </command>
   </commands>
 </cluster>

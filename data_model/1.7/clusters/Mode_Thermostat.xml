@@ -62,21 +62,14 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0063" name="Thermostat Mode">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0063" name="Thermostat Mode"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="TSTATM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff">
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the On/Off cluster">
       <disallowConform/>
     </feature>
-    <feature bit="1" code="COREMODES" name="CoreModes">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </feature>
+    <feature bit="1" code="COREMODES" name="CoreModes" summary="One or more core modes are supported"/>
   </features>
   <dataTypes>
     <enum name="ModeTag">

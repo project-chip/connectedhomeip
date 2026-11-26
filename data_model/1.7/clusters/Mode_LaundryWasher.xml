@@ -69,7 +69,10 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="LWM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the On/Off cluster">
+      <disallowConform/>
+    </feature>
+    <feature bit="1" code="COREMODES" name="CoreModes" summary="One or more core modes are supported">
       <disallowConform/>
     </feature>
   </features>
@@ -91,14 +94,9 @@ Davis, CA 95616, USA
       <item value="0x4003" name="Whites"/>
     </enum>
     <struct name="ModeOptionStruct">
-      <field id="0" name="Label">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Mode">
-        <mandatoryConform/>
-      </field>
+      <field id="0" name="Label"/>
+      <field id="1" name="Mode"/>
       <field id="2" name="ModeTags">
-        <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
@@ -109,17 +107,14 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
+    <attribute id="0x0000" name="SupportedModes"/>
+    <attribute id="0x0001" name="CurrentMode"/>
     <attribute id="0x0002" name="StartUpMode">
       <disallowConform/>
     </attribute>
     <attribute id="0x0003" name="OnMode">
       <disallowConform/>
     </attribute>
+    <attribute id="0x0004" name="CoreModeTags"/>
   </attributes>
 </cluster>

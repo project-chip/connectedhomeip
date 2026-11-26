@@ -70,7 +70,7 @@ The following markers are used in this document (matches the ID master list):
 |96            |0x0060    |Operational State                                         |OPSTATE        |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C    |C  |C    |C  |C    |C  |
-|99            |0x0063    |Thermostat Mode                                           |TSTATM         |   |   |   |   |   |     |     |   |     |   |     |P  |
+|99            |0x0063    |Thermostat Mode                                           |TSTATM         |   |   |   |   |   |     |     |   |     |   |     |C  |
 |100           |0x0064    |Temperature Alarm                                         |TEMPALM        |   |   |   |   |   |     |     |   |     |P  |P    |P  |
 |101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |     |   |     |P  |C    |C  |
 |113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
@@ -103,7 +103,7 @@ The following markers are used in this document (matches the ID master list):
 |513           |0x0201    |Thermostat                                                |TSTAT          |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |514           |0x0202    |Fan Control                                               |FAN            |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |516           |0x0204    |Thermostat User Interface Configuration                   |TSUIC          |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
-|517           |0x0205    |Humidistat                                                |HSTAT          |   |   |   |   |   |     |     |   |     |   |     |P  |
+|517           |0x0205    |Humidistat                                                |HSTAT          |   |   |   |   |   |     |     |   |     |   |     |C  |
 |768           |0x0300    |Color Control                                             |CC             |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |769           |0x0301    |Ballast Configuration                                     |BC             |C  |C  |C  |P  |P  |P    |     |   |     |   |     |   |
 |1024          |0x0400    |Illuminance Measurement                                   |ILL            |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
@@ -126,14 +126,13 @@ The following markers are used in this document (matches the ID master list):
 |1071          |0x042F    |Radon Concentration Measurement                           |RNCONC         |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1073          |0x0431    |Ambient Context Sensing                                   |ACS            |   |   |   |   |   |     |     |   |     |P  |P    |P  |
-|1074          |0x0432    |Ambient Sensing Union                                     |ASU            |   |   |   |   |   |     |     |   |     |   |     |P  |
-|1075          |0x0433    |Proximity Ranging                                         |PROXR          |   |   |   |   |   |     |     |   |     |   |     |P  |
-|1076          |0x0434    |Smoke Concentration Measurement                           |SMOKECONC      |   |   |   |   |   |     |     |   |     |   |     |P  |
+|1075          |0x0433    |Proximity Ranging                                         |PROXR          |   |   |   |   |   |     |     |   |     |   |     |C  |
+|1076          |0x0434    |Smoke Concentration Measurement                           |SMOKECONC      |   |   |   |   |   |     |     |   |     |   |     |C  |
 |1104          |0x0450    |Network Identity Management                               |NETIM          |   |   |   |   |   |     |     |   |     |   |     |P  |
 |1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |1107          |0x0453    |Thread Network Directory                                  |THNETDIR       |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
-|1109          |0x0455    |Commissioning Proxy                                       |COMPRO         |   |   |   |   |   |     |     |   |     |   |     |P  |
+|1109          |0x0455    |Commissioning Proxy                                       |COMPRO         |   |   |   |   |   |     |     |   |     |   |     |C  |
 |1283          |0x0503    |Wake On LAN                                               |WAKEONLAN      |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |1284          |0x0504    |Channel                                                   |CHANNEL        |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |1285          |0x0505    |Target Navigator                                          |TGTNAV         |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
@@ -148,8 +147,8 @@ The following markers are used in this document (matches the ID master list):
 |1294          |0x050E    |Account Login                                             |ALOGIN         |C  |C  |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |1295          |0x050F    |Content Control                                           |CONCON         |   |   |   |P  |P  |P    |P    |P  |P    |P  |P    |P  |
 |1296          |0x0510    |Content App Observer                                      |APPOBSERVER    |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
-|1297          |0x0511    |Media File Management                                     |MFILEMAN       |   |   |   |   |   |     |     |   |     |   |     |P  |
-|1298          |0x0512    |Audio Control                                             |AUDIOCONTROL   |   |   |   |   |   |     |     |   |     |   |     |P  |
+|1297          |0x0511    |Media File Management                                     |MFILEMAN       |   |   |   |   |   |     |     |   |     |   |     |C  |
+|1298          |0x0512    |Audio Control                                             |AUDIOCONTROL   |   |   |   |   |   |     |     |   |     |   |     |C  |
 |1360          |0x0550    |Zone Management                                           |ZONEMGMT       |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1361          |0x0551    |Camera AV Stream Management                               |AVSM           |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1362          |0x0552    |Camera AV Settings User Level Management                  |AVSUM          |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
@@ -157,7 +156,6 @@ The following markers are used in this document (matches the ID master list):
 |1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
-|1367          |0x0557    |AV Analysis                                               |AVANALY        |   |   |   |   |   |     |     |   |     |   |     |P  |
 |1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |   |   |     |     |C  |C    |C  |C    |C  |
 |1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
