@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/on-off-sensor"
+      app: all-devices
+      args: ["--device", "on-off-sensor:1"]
+
 name: 57.2.1. [TC-I-2.1] Attributes with server as DUT
 
 PICS:
