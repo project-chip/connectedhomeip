@@ -80,7 +80,7 @@ static NSArray * _Nullable DecodeInterestedPaths(id encodedPaths, NSString * lea
             if ([leafKey isEqualToString:MTRDeviceControllerRegistrationInterestedPathAttributeIDKey]) {
                 [paths addObject:[MTRAttributeRequestPath requestPathWithEndpointID:([endpointID isKindOfClass:[NSNumber class]] ? endpointID : nil)
                                                                           clusterID:([clusterID isKindOfClass:[NSNumber class]] ? clusterID : nil)
-                                                                        attributeID:([leafID isKindOfClass:[NSNumber class]] ? leafID : nil)]];
+                                                                          attributeID:([leafID isKindOfClass:[NSNumber class]] ? leafID : nil)]];
             }
             continue;
         }
