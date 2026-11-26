@@ -1351,7 +1351,8 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = State::kSentSigma2;
+    mState          = State::kSentSigma2;
+    mSigma2SentTime = System::SystemClock().GetMonotonicTimestamp();
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
     MATTER_TRACE_COUNTER("Sigma2");
@@ -2654,6 +2655,21 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
 {
     // Sigma2 is never the first message on the exchange.
     return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
+}
+
+bool CASESession::IsSigma2Undeliverable()
+{
+    return mState == State::kSentSigma2 && mExchangeCtxt && mExchangeCtxt->HasGivenUpRetransmittingUnackedMessage();
+}
+
+System::Clock::Milliseconds32 CASESession::RemainingSigma2ResponseTime()
+{
+    VerifyOrReturnValue(mState == State::kSentSigma2, System::Clock::kZero);
+
+    auto timeout = std::chrono::duration_cast<System::Clock::Milliseconds32>(ComputeSigma2ResponseTimeout(GetRemoteMRPConfig()));
+    auto elapsed = std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp() -
+                                                                              mSigma2SentTime);
+    return elapsed < timeout ? timeout - elapsed : System::Clock::kZero;
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

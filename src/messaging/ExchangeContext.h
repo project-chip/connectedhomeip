@@ -222,6 +222,18 @@ public:
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
+     * Determine whether a message that expects a response was sent on this
+     * exchange, was never acknowledged, and is no longer being retransmitted
+     * (the reliable messaging layer gave up on it).  The response timer may
+     * still be running in that case, but the peer will not see any further
+     * copies of the message.
+     */
+    bool HasGivenUpRetransmittingUnackedMessage() const
+    {
+        return IsResponseExpected() && WaitingForResponseOrAck() && !IsWaitingForAck();
+    }
+
+    /**
      * Tracks whether we have received at least one application level message
      * during the life-time of this exchange
      *
