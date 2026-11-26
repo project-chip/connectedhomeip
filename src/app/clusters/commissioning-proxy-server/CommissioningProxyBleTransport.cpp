@@ -740,9 +740,9 @@ Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
         }
     }
 
-    // The spec states a ProxyConnectRequest terminates an active ProxyScanRequest, which
-    // reports the results collected so far. The background scan stays paused for the
-    // connect, and every way the connect ends resumes it.
+    // BLE cannot scan while it connects, so a ProxyConnectRequest ends a running
+    // ProxyScanRequest, which reports the results collected so far. The background scan
+    // stays paused until the connect fails or the session it opens closes.
     if (mScanInProgress)
     {
         FinishForegroundScan();

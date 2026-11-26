@@ -66,8 +66,9 @@ class CommissioningProxyBleTransport : public CommissioningProxyTransport
 public:
     /**
      * @param adapter        platform BLE hooks; must outlive this transport.
-     * @param timerDelegate  drives the connect timeout and the foreground-scan window,
-     *                       and is handed to the background-scan registry.
+     * @param timerDelegate  drives the connect timeout, the central-role retry and the
+     *                       foreground-scan window, and is handed to the background-scan
+     *                       registry.
      * @param bleLayer       the BleLayer to connect through; must outlive this transport.
      *                       nullptr uses DeviceLayer::ConnectivityMgr().GetBleLayer().
      */
