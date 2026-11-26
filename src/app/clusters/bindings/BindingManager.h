@@ -23,6 +23,8 @@
 #include <app/server/Server.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/IntrusiveList.h>
 
 namespace chip {
 namespace app {
@@ -68,6 +70,11 @@ struct ManagerInitParams
  *  - The binding cluster adds a unicast entry to the binding table.
  *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *
+ * All operations, including destruction, require the Matter event loop or the Matter stack lock.
+ * Destruction cancels this manager's outstanding CASE callbacks, so shared session setups may outlive it.
+ * Owners must unregister the manager from its FabricTable before destroying it. Dependencies used by
+ * pending notifications must remain available until those notifications have been released.
+ *
  * The class uses an LRU mechanism to choose the connection to eliminate when there is no space for a new connection.
  * The BindingManager class will not actively re-establish connection and will connect on-demand (when binding cluster
  * or watched cluster is changed).
@@ -77,7 +84,7 @@ class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}
-    ~Manager() override { mPendingNotificationMap.Shutdown(); }
+    ~Manager() override;
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -181,13 +188,21 @@ private:
      * that was called when it establishes the connections asynchronously.
      *
      */
-    class ConnectionCallback
+    class ConnectionCallback : public IntrusiveListNodeBase<>
     {
     public:
         ConnectionCallback(Manager & bindingManager) :
             mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
             mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
-        {}
+        {
+            mBindingManager.mConnectionCallbacks.PushBack(this);
+        }
+
+        ~ConnectionCallback()
+        {
+            mOnConnectedCallback.Cancel();
+            mOnConnectionFailureCallback.Cancel();
+        }
 
         Callback::Callback<OnDeviceConnected> * GetOnDeviceConnected() { return &mOnConnectedCallback; }
         Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
@@ -196,15 +211,17 @@ private:
         static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                           const SessionHandle & sessionHandle)
         {
-            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
-            _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
-            Platform::Delete(_this);
+            Platform::UniquePtr<ConnectionCallback> self(static_cast<ConnectionCallback *>(context));
+            auto & manager = self->mBindingManager;
+            manager.mConnectionCallbacks.Remove(self.get());
+            manager.HandleDeviceConnected(exchangeMgr, sessionHandle);
         }
         static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
         {
-            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
-            _this->mBindingManager.HandleDeviceConnectionFailure(peerId, error);
-            Platform::Delete(_this);
+            Platform::UniquePtr<ConnectionCallback> self(static_cast<ConnectionCallback *>(context));
+            auto & manager = self->mBindingManager;
+            manager.mConnectionCallbacks.Remove(self.get());
+            manager.HandleDeviceConnectionFailure(peerId, error);
         }
 
         Manager & mBindingManager;
@@ -234,11 +251,13 @@ private:
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
+    IntrusiveList<ConnectionCallback> mConnectionCallbacks;
     Table mBindingTable;
     PendingNotificationMap mPendingNotificationMap{ mBindingTable };
     BoundDeviceChangedHandler mBoundDeviceChangedHandler = nullptr;
     ManagerInitParams mInitParams;
     bool mRemovingBindings = false;
+    bool mIsShuttingDown   = false;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);

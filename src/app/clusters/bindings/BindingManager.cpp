@@ -29,6 +29,18 @@ namespace Binding {
 
 Manager Manager::sBindingManager;
 
+Manager::~Manager()
+{
+    mIsShuttingDown = true;
+    while (!mConnectionCallbacks.Empty())
+    {
+        auto * callback = &*mConnectionCallbacks.begin();
+        mConnectionCallbacks.Remove(callback);
+        Platform::Delete(callback);
+    }
+    mPendingNotificationMap.Shutdown();
+}
+
 CHIP_ERROR Manager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
     return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
@@ -43,6 +55,7 @@ CHIP_ERROR Manager::UnicastBindingRemoved(uint8_t bindingEntryId)
 
 CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 {
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -79,6 +92,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 
 CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 {
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
@@ -163,7 +177,8 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(!mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsShuttingDown && !mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(),
+                        CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
@@ -217,7 +232,8 @@ CHIP_ERROR Manager::DispatchCommand(EndpointId endpoint, ClusterId cluster, void
                                     System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(!mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsShuttingDown && !mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(),
+                        CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
     VerifyOrReturnError(failureHandler != nullptr && timeout.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
     bool hasUnicast = false;

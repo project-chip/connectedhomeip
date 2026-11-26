@@ -21,6 +21,8 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/Resolver.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
@@ -106,6 +108,152 @@ protected:
     Binding::Manager mManager;
     int mContext = 0;
 };
+
+class PendingResolver : public Dnssd::Resolver
+{
+public:
+    PendingResolver() : mPrevious(Dnssd::Resolver::Instance()) { Dnssd::Resolver::SetInstance(*this); }
+    ~PendingResolver() override { Dnssd::Resolver::SetInstance(mPrevious); }
+    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
+    bool IsInitialized() override { return true; }
+    void Shutdown() override {}
+    void SetOperationalDelegate(Dnssd::OperationalResolveDelegate *) override {}
+    CHIP_ERROR ResolveNodeId(const PeerId &) override
+    {
+        ++lookups;
+        return CHIP_NO_ERROR;
+    }
+    void NodeIdResolutionNoLongerNeeded(const PeerId &) override {}
+    CHIP_ERROR StartDiscovery(Dnssd::DiscoveryType, Dnssd::DiscoveryFilter, Dnssd::DiscoveryContext &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StopDiscovery(Dnssd::DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ReconfirmRecord(const char *, Inet::IPAddress, Inet::InterfaceId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    int lookups = 0;
+
+private:
+    Dnssd::Resolver & mPrevious;
+};
+
+struct ConnectionRecord
+{
+    int connected    = 0;
+    int failed       = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    static void Connected(void * context, Messaging::ExchangeManager &, const SessionHandle &)
+    {
+        ++static_cast<ConnectionRecord *>(context)->connected;
+    }
+    static void Failed(void * context, const ScopedNodeId &, CHIP_ERROR error)
+    {
+        auto & record = *static_cast<ConnectionRecord *>(context);
+        ++record.failed;
+        record.error = error;
+    }
+};
+
+TEST_F(TestBindingManager, SharedCaseSetupCanCompleteAfterLocalManagerDestruction)
+{
+    for (bool succeed : { false, true })
+    {
+        PendingResolver resolver;
+        TestPersistentStorageDelegate storage;
+        const ScopedNodeId peer(GetAliceFabric()->GetNodeId(), GetBobFabricIndex());
+        auto manager = Platform::MakeUnique<Binding::Manager>();
+        ASSERT_NE(manager, nullptr);
+        auto cleanup = MakeDefer([&] {
+            if (manager != nullptr)
+            {
+                GetFabricTable().RemoveFabricDelegate(manager.get());
+                manager.reset();
+            }
+            mSessionSetupPool.ReleaseAllSessionSetup();
+        });
+        ASSERT_SUCCESS(manager->Init({ &GetFabricTable(), &mCASESessionManager, &storage, false }));
+        manager->RegisterBoundDeviceChangedHandler(TestBoundDeviceChangedHandler);
+        manager->RegisterBoundDeviceContextReleaseHandler(TestContextReleaseHandler);
+        ASSERT_SUCCESS(manager->GetBindingTable().Add(
+            Binding::TableEntry::ForNode(peer.GetFabricIndex(), peer.GetNodeId(), kLocalEndpoint, 2, kTestClusterId)));
+        const int releasedBefore = gRecord.releaseCount;
+        ASSERT_SUCCESS(manager->NotifyBoundClusterChanged(kLocalEndpoint, kTestClusterId, &mContext));
+        ASSERT_SUCCESS(manager->UnicastBindingCreated(peer.GetFabricIndex(), peer.GetNodeId()));
+        ASSERT_SUCCESS(manager->UnicastBindingCreated(peer.GetFabricIndex(), peer.GetNodeId()));
+        ASSERT_NE(mSessionSetupPool.FindSessionSetup(peer, false), nullptr);
+        EXPECT_EQ(resolver.lookups, 1);
+
+        ConnectionRecord record;
+        Callback::Callback<OnDeviceConnected> connected(ConnectionRecord::Connected, &record);
+        Callback::Callback<OnDeviceConnectionFailure> failed(ConnectionRecord::Failed, &record);
+        mCASESessionManager.FindOrEstablishSession(peer, &connected, &failed);
+        EXPECT_EQ(record.connected, 0);
+        EXPECT_EQ(record.failed, 0);
+        GetFabricTable().RemoveFabricDelegate(manager.get());
+        manager.reset();
+        EXPECT_EQ(gRecord.releaseCount, releasedBefore + 1);
+        auto * setup = mSessionSetupPool.FindSessionSetup(peer, false);
+        ASSERT_NE(setup, nullptr);
+        if (succeed)
+        {
+            ExpireSessionBobToAlice();
+            ExpireSessionAliceToBob();
+            ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+            ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+            setup->Connect(nullptr, static_cast<Callback::Callback<OnDeviceConnectionFailure> *>(nullptr));
+            EXPECT_EQ(record.connected, 1);
+            EXPECT_EQ(record.failed, 0);
+        }
+        else
+        {
+            // Releasing an unfinished setup reports cancellation to its remaining owner.
+            mSessionSetupPool.ReleaseAllSessionSetup();
+            EXPECT_EQ(record.connected, 0);
+            EXPECT_EQ(record.failed, 1);
+            EXPECT_EQ(record.error, CHIP_ERROR_CANCELLED);
+        }
+        EXPECT_EQ(mSessionSetupPool.FindSessionSetup(peer, false), nullptr);
+        EXPECT_EQ(gRecord.changedCount, 0);
+        EXPECT_EQ(gRecord.releaseCount, releasedBefore + 1);
+    }
+}
+
+TEST_F(TestBindingManager, TeardownRejectsCaseRequestsFromContextRelease)
+{
+    PendingResolver resolver;
+    TestPersistentStorageDelegate storage;
+    struct Record
+    {
+        Binding::Manager * manager;
+        ScopedNodeId peer;
+        int releases         = 0;
+        CHIP_ERROR admission = CHIP_NO_ERROR;
+    } record{ nullptr, ScopedNodeId(GetAliceFabric()->GetNodeId(), GetBobFabricIndex()) };
+    auto local = Platform::MakeUnique<Binding::Manager>();
+    ASSERT_NE(local, nullptr);
+    ASSERT_SUCCESS(local->Init({ &GetFabricTable(), &mCASESessionManager, &storage, false }));
+    record.manager = local.get();
+    auto cleanup   = MakeDefer([&] {
+        if (local != nullptr)
+        {
+            GetFabricTable().RemoveFabricDelegate(local.get());
+            local.reset();
+        }
+        mSessionSetupPool.ReleaseAllSessionSetup();
+    });
+    local->RegisterBoundDeviceChangedHandler(TestBoundDeviceChangedHandler);
+    local->RegisterBoundDeviceContextReleaseHandler([](void * context) {
+        auto & result = *static_cast<Record *>(context);
+        ++result.releases;
+        result.admission = result.manager->UnicastBindingCreated(result.peer.GetFabricIndex(), result.peer.GetNodeId());
+    });
+    ASSERT_SUCCESS(local->GetBindingTable().Add(
+        Binding::TableEntry::ForNode(record.peer.GetFabricIndex(), record.peer.GetNodeId(), kLocalEndpoint, 2, kTestClusterId)));
+    ASSERT_SUCCESS(local->NotifyBoundClusterChanged(kLocalEndpoint, kTestClusterId, &record));
+    GetFabricTable().RemoveFabricDelegate(local.get());
+    local.reset();
+    EXPECT_EQ(record.releases, 1);
+    EXPECT_EQ(record.admission, CHIP_ERROR_INCORRECT_STATE);
+}
 
 class FailingTimerLayer : public System::Layer
 {
