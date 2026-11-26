@@ -922,6 +922,58 @@
     }
 }
 
+- (void)testSecondJumperWaitsForJumperAboveWidthWhenNormalSlotFrees
+{
+    // A user command running above the width beside an unsent read holds a second user command back when the read
+    // completes and frees the normal slot: the second must not start in that slot and send before the first.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSObject * lock = [[NSObject alloc] init];
+
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    dispatch_semaphore_t readRelease = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(readRunning);
+        dispatch_semaphore_wait(readRelease, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    __block int started = 0;
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        jumper.jumpsUnsentWork = YES;
+        jumper.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
+        jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
+            dispatch_semaphore_signal(jumperStarted);
+            if (first) {
+                dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+            }
+            completion(MTRAsyncWorkComplete);
+        };
+        [workQueue enqueueWorkItem:jumper descriptionWithFormat:@"send-tracking jumper J%d", i + 1];
+    }
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the first jumper runs above width beside the unsent read");
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"the second jumper does not start above width beside the first");
+
+    dispatch_semaphore_signal(readRelease);
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"the second jumper does not start in the freed normal slot while the first has not sent");
+
+    dispatch_semaphore_signal(j1Release);
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
+}
+
 - (void)testReadSendAfterJumperSendReturns
 {
     MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];

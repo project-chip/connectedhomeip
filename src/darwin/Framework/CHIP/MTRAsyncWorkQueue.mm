@@ -426,6 +426,21 @@ struct ContextSnapshot {
     return YES;
 }
 
+// Whether a user command is running and has not sent yet, in a normal slot or above the width.  A later user
+// command waits for it, so user commands keep their order.
+- (BOOL)_runningJumperHasNotSentWithContext
+{
+    os_unfair_lock_assert_owner(&_lock);
+    NSUInteger runningCount = [self _runningCount];
+    for (NSUInteger i = 0; i < runningCount; i++) {
+        MTRAsyncWorkItem * item = _items[i];
+        if (item.jumpsUnsentWork && !item.sent) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)_postProcessWorkItem:(MTRAsyncWorkItem *)workItem
                      context:(ContextSnapshot const &)context
                        retry:(BOOL)retry
@@ -531,6 +546,9 @@ struct ContextSnapshot {
 
     NSUInteger nextWorkItemToRunIndex = [self _runningCount];
     MTRAsyncWorkItem * workItem = _items[nextWorkItemToRunIndex];
+    if (workItem.jumpsUnsentWork && [self _runningJumperHasNotSentWithContext]) {
+        return; // it starts when the earlier user command completes
+    }
     _runningWorkItemCount++;
 
     // Check if batching is possible or needed.
