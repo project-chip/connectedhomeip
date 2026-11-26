@@ -732,9 +732,8 @@ void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy &
     VerifyOrReturn(IsIdleCommissionee(device));
 
     // The proxy does not touch itself after calling us, so it can be released here.
-    NodeId deviceId = device.GetDeviceId();
     ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing the commissionee",
-                    ChipLogValueX64(deviceId));
+                    ChipLogValueX64(device.GetDeviceId()));
     ReleaseCommissioneeDevice(&device, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
 }
 
