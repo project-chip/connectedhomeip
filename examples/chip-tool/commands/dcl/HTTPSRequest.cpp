@@ -145,6 +145,9 @@ public:
 
     ~HTTPSSessionHolder()
     {
+        // Leave the per-thread OpenSSL error queue empty for later callers.
+        ERR_clear_error();
+
         if (nullptr != mContext)
         {
             SSL_free(mSSL);
