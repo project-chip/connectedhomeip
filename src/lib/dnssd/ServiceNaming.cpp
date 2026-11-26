@@ -22,6 +22,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <inttypes.h>
 #include <string.h>
@@ -183,7 +184,7 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
     StringBuilderBase builder(buffer, bufferLen);
     if (nameDesc.type != DiscoveryFilterType::kNone)
     {
-        char subtype[Common::kSubTypeMaxLength + 1];
+        char subtype[std::max(Common::kSubTypeMaxLength, Common::kInstanceNameMaxLength) + 1];
         ReturnErrorOnFailure(MakeServiceSubtype(subtype, sizeof(subtype), nameDesc));
         builder.Add(subtype).Add(".").Add(kSubtypeServiceNamePart).Add(".");
     }
