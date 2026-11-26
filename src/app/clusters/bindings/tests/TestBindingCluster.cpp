@@ -147,7 +147,8 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
 
         chip::Testing::WriteOperation writeOp(bindingAttrPath);
-        writeOp.SetSubjectDescriptor(tester.GetCommandHandler().GetSubjectDescriptor());
+        const Access::SubjectDescriptor subjectDescriptor = tester.GetCommandHandler().GetSubjectDescriptor();
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
         writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
         TargetStructType valid{ .group       = MakeOptional(static_cast<GroupId>(kMinApplicationGroupId + 1)),
                                 .fabricIndex = chip::Testing::kTestFabricIndex };
@@ -164,7 +165,8 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
 
         chip::Testing::WriteOperation writeOp(bindingAttrPath);
-        writeOp.SetSubjectDescriptor(tester.GetCommandHandler().GetSubjectDescriptor());
+        const Access::SubjectDescriptor subjectDescriptor = tester.GetCommandHandler().GetSubjectDescriptor();
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
         writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
         TargetStructType invalid{ .group = MakeOptional(kUndefinedGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
         auto decoder = writeOp.DecoderFor(invalid);
