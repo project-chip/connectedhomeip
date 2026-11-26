@@ -62,7 +62,20 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
+    Optional<SessionHandle> session = device->GetSecureSession();
+    if (!session.HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        if (callback != nullptr)
+        {
+            callback->OnError(CHIP_ERROR_MISSING_SECURE_SESSION);
+            callback->mWrapperCallbackRef.Reset();
+        }
+        return CHIP_ERROR_MISSING_SECURE_SESSION;
+    }
+    app::ReadPrepareParams params(session.Value());
 
     uint16_t aImTimeoutMs             = static_cast<uint16_t>(imTimeoutMs);
     params.mMinIntervalFloorSeconds   = static_cast<uint16_t>(minInterval);
@@ -208,7 +221,20 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
+    Optional<SessionHandle> session = device->GetSecureSession();
+    if (!session.HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        if (callback != nullptr)
+        {
+            callback->OnError(CHIP_ERROR_MISSING_SECURE_SESSION);
+            callback->mWrapperCallbackRef.Reset();
+        }
+        return CHIP_ERROR_MISSING_SECURE_SESSION;
+    }
+    app::ReadPrepareParams params(session.Value());
 
     SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
     SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
