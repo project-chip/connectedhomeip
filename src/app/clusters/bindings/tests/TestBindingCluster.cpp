@@ -107,7 +107,8 @@ class ReadBindingOnChange : public app::DataModel::AttributeChangeListener
 public:
     ReadBindingOnChange(BindingCluster & cluster, FabricIndex fabric, DataVersion version,
                         const std::vector<TableEntry> & expected) :
-        mCluster(cluster), mFabric(fabric), mVersion(version), mExpected(expected)
+        mCluster(cluster),
+        mFabric(fabric), mVersion(version), mExpected(expected)
     {}
     void OnAttributeChanged(const app::ConcreteAttributePath &, app::DataModel::AttributeChangeType) override
     {
