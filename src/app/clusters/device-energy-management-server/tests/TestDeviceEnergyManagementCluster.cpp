@@ -28,6 +28,7 @@
 #include <clusters/DeviceEnergyManagement/Commands.h>
 #include <clusters/DeviceEnergyManagement/Events.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/SystemClock.h>
 
 using namespace chip;
