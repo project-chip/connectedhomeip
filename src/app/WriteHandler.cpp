@@ -648,19 +648,35 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
-    err       = writeRequestParser.GetSuppressResponse(&boolValue);
-    if (err == CHIP_END_OF_TLV)
+    if (mExchangeCtx->IsGroupExchangeContext())
     {
-        err = CHIP_NO_ERROR;
-    }
-    SuccessOrExit(err);
-    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
+        // Groupcast may omit SuppressResponse and TimedRequest; a missing field is FALSE.
+        boolValue = false;
+        err       = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
+        SuccessOrExit(err);
+        mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
-    err       = writeRequestParser.GetTimedRequest(&boolValue);
-    SuccessOrExit(err);
-    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+        boolValue = false;
+        err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
+        SuccessOrExit(err);
+        mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+    }
+    else
+    {
+        boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+        err       = writeRequestParser.GetSuppressResponse(&boolValue);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        SuccessOrExit(err);
+        mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
+
+        boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+        err       = writeRequestParser.GetTimedRequest(&boolValue);
+        SuccessOrExit(err);
+        mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+    }
 
     boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
