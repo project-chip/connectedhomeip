@@ -22,7 +22,7 @@ store.
 | EffectiveOperationMode                           | Follows OperationMode, Local while LocalOverride is set (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode.     |
 | EffectiveControlMode                             | Computed by the cluster, or set by the application when owned by the application (see [Effective modes](#effective-modes)). Not persisted.                            |
 | LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                                                                                                                   |
-| PumpStatus, Capacity, Speed, Power               | Set by the application. Capacity, Speed and Power use quieter reporting (`Q` quality): changes are marked reportable at most once per second and on null transitions. |
+| PumpStatus, Capacity, Speed, Power               | Set by the application. Capacity, Speed and Power use quieter reporting (`Q` quality): changes are reported at most once per second and on null transitions.          |
 
 `LifetimeRunningHours` values stored in the 3-byte `int24u` format by earlier
 implementations are loaded at startup and stored again in the current format.
