@@ -32,7 +32,6 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -234,6 +233,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ResetNetworkHandoff();
+    mBleLinks = {};
+#endif
     if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
     {
         ChipLogProgress(DeviceLayer, "Ble already deinitialized, returning from ShutDown flow");
@@ -344,6 +347,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    VerifyOrReturn(!HandleBleHandoffEvent(*event));
+#endif
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
@@ -360,8 +366,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
-                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
+        HandleMatterBleWrite(*event);
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -662,31 +667,18 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 #endif
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-    ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
-    LogErrorOnFailure(CloseConnection(conId));
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (!IsInitialized())
-    {
-        // Continue the deferred ConnectNetwork command after the commissioning transport has been shut down.
-        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
-    }
-#endif
-}
-
-void BLEManagerImpl::CheckNonConcurrentBleClosing()
+CHIP_ERROR BLEManagerImpl::DisconnectBleLink(BleLink & link)
 {
-    // ESP32 supports Wi-Fi/Thread and BLE coexistence. This handoff is only needed
-    // when concurrent connections are explicitly disabled in the configuration.
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (IsBleClosing())
+    const int result = ble_gap_terminate(link.Connection, BLE_ERR_REM_USER_CONN_TERM);
+    if (result == BLE_HS_ENOTCONN)
     {
-        // The ConnectNetwork response has finished transmitting, so the commissioning transport can now be closed.
-        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent());
+        link = {};
+        return CHIP_NO_ERROR;
     }
-#endif
+    return result == BLE_HS_EALREADY ? CHIP_NO_ERROR : MapBLEError(result);
 }
+#endif
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
@@ -1752,6 +1744,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %u reason 0x%02x)", gapEvent->disconnect.conn.conn_handle,
                     gapEvent->disconnect.reason);
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkDisconnected };
+    linkEvent.Platform.BLELink.Connection = gapEvent->disconnect.conn.conn_handle;
+    PlatformMgr().PostEventOrDie(&linkEvent);
+#endif
+
     // Update the number of GAP connections.
     if (mNumGAPCons > 0)
     {
@@ -1861,6 +1859,14 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
     switch (event->type)
     {
     case BLE_GAP_EVENT_CONNECT:
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (event->connect.status == 0)
+        {
+            ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkConnected };
+            linkEvent.Platform.BLELink.Connection = event->connect.conn_handle;
+            PlatformMgr().PostEventOrDie(&linkEvent);
+        }
+#endif
         /* A new connection was established or a connection attempt failed */
         err = sInstance.HandleGAPConnect(event);
         SuccessOrExit(err);

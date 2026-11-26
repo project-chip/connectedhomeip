@@ -24,6 +24,7 @@
  */
 
 #pragma once
+#include <array>
 #include <sdkconfig.h>
 #include <string>
 
@@ -32,6 +33,7 @@
 #endif
 
 #include <lib/core/Optional.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
 
@@ -296,6 +298,39 @@ private:
     uint16_t mC3CharAttrHandle;
 #endif
     uint16_t mTXCharCCCDAttrHandle;
+    void HandleMatterBleWrite(const ChipDeviceEvent & event);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    struct BleLink
+    {
+        uint16_t Connection = BLE_CONNECTION_UNINITIALIZED;
+        bool UsedByMatter   = false;
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+        esp_bd_addr_t PeerAddress = {};
+#endif
+    };
+
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+    static constexpr size_t kMaxBleLinks = CONFIG_BT_ACL_CONNECTIONS;
+#else
+    static constexpr size_t kMaxBleLinks = CONFIG_BT_NIMBLE_MAX_CONNECTIONS;
+#endif
+
+    std::array<BleLink, kMaxBleLinks> mBleLinks{};
+    bool mNetworkHandoffPending             = false;
+    bool mCloseAllBleConnectionsPosted      = false;
+    uint8_t mNetworkHandoffRetriesRemaining = 0;
+
+    bool HandleBleHandoffEvent(const ChipDeviceEvent & event);
+    BleLink * FindBleLink(uint16_t connection);
+    CHIP_ERROR DisconnectBleLink(BleLink & link);
+    void PostCloseAllBleConnections();
+    void DisconnectCommissioningLinks();
+    void FinishNetworkHandoffIfReady();
+    void ResetNetworkHandoff();
+    static void RetryNetworkHandoff(System::Layer *, void *);
+    static void RestoreBleLayerAfterFailedHandoff(intptr_t);
+#endif
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     CHIP_ERROR MapBLEError(int bleErr);

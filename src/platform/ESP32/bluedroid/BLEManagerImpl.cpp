@@ -35,7 +35,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/DeviceControlServer.h>
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/ESP32/BLEManagerImpl.h>
@@ -225,6 +224,10 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ResetNetworkHandoff();
+    mBleLinks = {};
+#endif
     CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
@@ -336,6 +339,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    VerifyOrReturn(!HandleBleHandoffEvent(*event));
+#endif
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
@@ -352,8 +358,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
-                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
+        HandleMatterBleWrite(*event);
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -903,31 +908,12 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 #endif
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-    ChipLogProgress(Ble, "Got notification regarding chip connection closure");
-    LogErrorOnFailure(CloseConnection(conId));
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (!IsInitialized())
-    {
-        // Continue the deferred ConnectNetwork command after the commissioning transport has been shut down.
-        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
-    }
-#endif
-}
-
-void BLEManagerImpl::CheckNonConcurrentBleClosing()
+CHIP_ERROR BLEManagerImpl::DisconnectBleLink(BleLink & link)
 {
-    // ESP32 supports Wi-Fi/Thread and BLE coexistence. This handoff is only needed
-    // when concurrent connections are explicitly disabled in the configuration.
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (IsBleClosing())
-    {
-        // The ConnectNetwork response has finished transmitting, so the commissioning transport can now be closed.
-        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent());
-    }
-#endif
+    return MapBLEError(esp_ble_gap_disconnect(link.PeerAddress));
 }
+#endif
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
@@ -1469,11 +1455,18 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
 
     switch (event)
     {
-    case ESP_GATTS_CONNECT_EVT:
+    case ESP_GATTS_CONNECT_EVT: {
         ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", param->connect.conn_id);
 
         // Allocate a connection state record for the new connection.
         GetConnectionState(param->mtu.conn_id, true);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkConnected };
+        linkEvent.Platform.BLELink.Connection = param->connect.conn_id;
+        memcpy(linkEvent.Platform.BLELink.PeerAddress, param->connect.remote_bda, sizeof(linkEvent.Platform.BLELink.PeerAddress));
+        PlatformMgr().PostEventOrDie(&linkEvent);
+#endif
 
         // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
         // state.
@@ -1482,6 +1475,7 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
         LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
         break;
+    }
 
     case ESP_GATTS_DISCONNECT_EVT:
         HandleDisconnect(param);
@@ -1713,6 +1707,12 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
 {
     ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", param->disconnect.conn_id,
                     param->disconnect.reason);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkDisconnected };
+    linkEvent.Platform.BLELink.Connection = param->disconnect.conn_id;
+    PlatformMgr().PostEventOrDie(&linkEvent);
+#endif
 
     // If this was a CHIPoBLE connection, release the associated connection state record
     // and post an event to deliver a connection error to the CHIPoBLE layer.

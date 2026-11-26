@@ -45,7 +45,6 @@ enum
     kESPSystemEvent = kRange_PublicPlatformSpecific,
 };
 
-#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 /**
  * Enumerates ESP32 platform-specific event types that are internal to the Chip Device Layer.
  */
@@ -57,9 +56,10 @@ enum InternalPlatformSpecificEventTypes
     kPlatformESP32BLEWriteComplete,
     kPlatformESP32BLESubscribeOpComplete,
     kPlatformESP32BLEIndicationReceived,
+    kPlatformESP32BLELinkConnected,
+    kPlatformESP32BLELinkDisconnected,
 };
 
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 } // namespace DeviceEventType
 
 /**
@@ -94,6 +94,13 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
+        struct
+        {
+            uint16_t Connection;
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+            uint8_t PeerAddress[6];
+#endif
+        } BLELink;
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         struct
         {

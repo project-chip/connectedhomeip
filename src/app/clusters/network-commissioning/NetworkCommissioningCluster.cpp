@@ -981,6 +981,9 @@ void NetworkCommissioningCluster::OnPlatformEventHandler(const DeviceLayer::Chip
              (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted))
 
     {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        VerifyOrReturn(this_->mConnectNetworkResponseSentEarly && this_->mClusterContext.failSafeContext.IsFailSafeArmed());
+#endif
         // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
