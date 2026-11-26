@@ -133,72 +133,103 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
 DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                              AttributeValueDecoder & decoder)
 {
+    class ScopedAttributeChangeNotifier
+    {
+    public:
+        ScopedAttributeChangeNotifier(BindingCluster & cluster, AttributeId attributeId) :
+            mCluster(cluster), mAttributeId(attributeId)
+        {}
+
+        ScopedAttributeChangeNotifier(const ScopedAttributeChangeNotifier &)             = delete;
+        ScopedAttributeChangeNotifier & operator=(const ScopedAttributeChangeNotifier &) = delete;
+
+        ~ScopedAttributeChangeNotifier()
+        {
+            if (mChanged)
+            {
+                mCluster.NotifyAttributeChanged(mAttributeId);
+            }
+        }
+
+        CHIP_ERROR MarkChangedOnSuccess(CHIP_ERROR err)
+        {
+            if (err == CHIP_NO_ERROR)
+            {
+                mChanged = true;
+            }
+            return err;
+        }
+
+    private:
+        BindingCluster & mCluster;
+        const AttributeId mAttributeId;
+        bool mChanged = false;
+    };
+
     switch (request.path.mAttributeId)
     {
-    case Binding::Attributes::Binding::Id:
-        return NotifyAttributeChangedIfSuccess(Binding::Attributes::Binding::Id, WriteBindingAttribute(request, decoder));
+    case Binding::Attributes::Binding::Id: {
+        ScopedAttributeChangeNotifier notifier(*this, Binding::Attributes::Binding::Id);
+
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            DecodableBindingListType newBindingList;
+
+            ReturnErrorOnFailure(decoder.Decode(newBindingList));
+            ReturnErrorOnFailure(
+                CheckValidBindingList(request.path.mEndpointId, newBindingList, request.GetAccessingFabricIndex()));
+
+            // Clear all entries for the current accessing fabric and endpoint
+            auto bindingTableIter = mClusterContext.bindingTable.begin();
+            while (bindingTableIter != mClusterContext.bindingTable.end())
+            {
+                if (bindingTableIter->local == request.path.mEndpointId &&
+                    bindingTableIter->fabricIndex == request.GetAccessingFabricIndex())
+                {
+                    if (bindingTableIter->type == Binding::MATTER_UNICAST_BINDING)
+                    {
+                        TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
+                    }
+                    ReturnErrorOnFailure(notifier.MarkChangedOnSuccess(mClusterContext.bindingTable.RemoveAt(bindingTableIter)));
+                }
+                else
+                {
+                    ++bindingTableIter;
+                }
+            }
+
+            // Add new entries
+            auto iter      = newBindingList.begin();
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            while (iter.Next() && err == CHIP_NO_ERROR)
+            {
+                err = notifier.MarkChangedOnSuccess(CreateBindingEntry(iter.GetValue(), request.path.mEndpointId));
+            }
+
+            // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
+            // so a notification is sent here.
+            if (!request.path.IsListOperation())
+            {
+                // Notify binding table has changed
+                LogErrorOnFailure(NotifyBindingsChanged(request.GetAccessingFabricIndex()));
+            }
+            return err;
+        }
+        if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            TargetStructType target;
+            ReturnErrorOnFailure(decoder.Decode(target));
+            if (!IsValidBinding(request.path.mEndpointId, target))
+            {
+                return Protocols::InteractionModel::Status::ConstraintError;
+            }
+            return notifier.MarkChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
+        }
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
-}
-
-DataModel::ActionReturnStatus BindingCluster::WriteBindingAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                    AttributeValueDecoder & decoder)
-{
-    if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-    {
-        DecodableBindingListType newBindingList;
-
-        ReturnErrorOnFailure(decoder.Decode(newBindingList));
-        ReturnErrorOnFailure(CheckValidBindingList(request.path.mEndpointId, newBindingList, request.GetAccessingFabricIndex()));
-
-        // Clear all entries for the current accessing fabric and endpoint
-        auto bindingTableIter = mClusterContext.bindingTable.begin();
-        while (bindingTableIter != mClusterContext.bindingTable.end())
-        {
-            if (bindingTableIter->local == request.path.mEndpointId &&
-                bindingTableIter->fabricIndex == request.GetAccessingFabricIndex())
-            {
-                if (bindingTableIter->type == Binding::MATTER_UNICAST_BINDING)
-                {
-                    TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
-                }
-                ReturnErrorOnFailure(mClusterContext.bindingTable.RemoveAt(bindingTableIter));
-            }
-            else
-            {
-                ++bindingTableIter;
-            }
-        }
-
-        // Add new entries
-        auto iter      = newBindingList.begin();
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        while (iter.Next() && err == CHIP_NO_ERROR)
-        {
-            err = CreateBindingEntry(iter.GetValue(), request.path.mEndpointId);
-        }
-
-        // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
-        // so a notification is sent here.
-        if (!request.path.IsListOperation())
-        {
-            // Notify binding table has changed
-            LogErrorOnFailure(NotifyBindingsChanged(request.GetAccessingFabricIndex()));
-        }
-        return err;
-    }
-    if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-    {
-        TargetStructType target;
-        ReturnErrorOnFailure(decoder.Decode(target));
-        if (!IsValidBinding(request.path.mEndpointId, target))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-        return CreateBindingEntry(target, request.path.mEndpointId);
-    }
-    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,

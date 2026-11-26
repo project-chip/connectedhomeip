@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
@@ -184,6 +185,64 @@ TEST_F(TestBindingCluster, NotifiesAttributeChangedOnWrite)
         app::DataModel::List<const TargetStructType> empty;
         EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll),
                   Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
+        EXPECT_NE(cluster.GetDataVersion(clusterPath), versionBefore);
+    }
+
+    // Replacing an empty list with an empty list must not mark attribute dirty or advance DataVersion.
+    {
+        ASSERT_EQ(manager.GetBindingTable().Size(), 0u);
+        tester.GetDirtyList().clear();
+        const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
+
+        app::DataModel::List<const TargetStructType> empty;
+        EXPECT_EQ(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(tester.GetDirtyList().empty());
+        EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
+    }
+
+    // Storage failure before any table mutation must not mark attribute dirty or advance DataVersion.
+    {
+        TargetStructType initial{ .group = MakeOptional(kMinApplicationGroupId), .fabricIndex = chip::Testing::kTestFabricIndex };
+        app::DataModel::List<const TargetStructType> initialList(&initial, 1);
+        ASSERT_EQ(
+            tester.WriteAttribute(Binding::Attributes::Binding::Id, initialList, chip::Testing::ListWritingPattern::ReplaceAll),
+            Protocols::InteractionModel::Status::Success);
+        ASSERT_EQ(manager.GetBindingTable().Size(), 1u);
+
+        tester.GetDirtyList().clear();
+        const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
+        storage.SetRejectWrites(true);
+
+        app::DataModel::List<const TargetStructType> empty;
+        EXPECT_FALSE(tester.WriteAttribute(Binding::Attributes::Binding::Id, empty, chip::Testing::ListWritingPattern::ReplaceAll)
+                         .IsSuccess());
+        storage.SetRejectWrites(false);
+
+        EXPECT_EQ(manager.GetBindingTable().Size(), 1u);
+        EXPECT_TRUE(tester.GetDirtyList().empty());
+        EXPECT_EQ(cluster.GetDataVersion(clusterPath), versionBefore);
+    }
+
+    // Mid-write storage failure after removing an existing entry must still mark attribute dirty and advance DataVersion.
+    {
+        ASSERT_EQ(manager.GetBindingTable().Size(), 1u);
+        tester.GetDirtyList().clear();
+        const DataVersion versionBefore = cluster.GetDataVersion(clusterPath);
+
+        // Allow RemoveAt to delete entry 0, then fail SaveEntryToStorage when writing the replacement entry 0.
+        storage.AddPoisonKey(DefaultStorageKeyAllocator::BindingTableEntry(0).KeyName(), -1, 0b1);
+
+        TargetStructType replacement{ .group       = MakeOptional(static_cast<GroupId>(kMinApplicationGroupId + 1)),
+                                      .fabricIndex = chip::Testing::kTestFabricIndex };
+        app::DataModel::List<const TargetStructType> replacementList(&replacement, 1);
+        EXPECT_FALSE(
+            tester.WriteAttribute(Binding::Attributes::Binding::Id, replacementList, chip::Testing::ListWritingPattern::ReplaceAll)
+                .IsSuccess());
+        storage.ClearPoisonKeys();
+
+        EXPECT_EQ(manager.GetBindingTable().Size(), 0u);
         EXPECT_TRUE(tester.IsAttributeDirty(Binding::Attributes::Binding::Id));
         EXPECT_NE(cluster.GetDataVersion(clusterPath), versionBefore);
     }
