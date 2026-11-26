@@ -59,7 +59,7 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     _binding = AddressUpdateFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
@@ -69,7 +69,7 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    ChipClient.setICDCheckInCallback(this)
+    ChipClient.addICDCheckInCallback(this)
 
     val compressedFabricId = deviceController.compressedFabricId
     binding.fabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16, '0'))
@@ -141,7 +141,7 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
             cont.resume(promisedActiveDuration)
           }
         },
-        duration
+        duration,
       )
     }
     isSendingStayActiveCommand = false
@@ -160,6 +160,7 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
+    ChipClient.removeICDCheckInCallback(this)
     _binding = null
   }
 

@@ -21,20 +21,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_CLUSTERS_NO_GROUPCAST_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -48,9 +34,37 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run3:
+#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device color-temperature-light:1 --discriminator 1234 --groupcast
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device extended-color-light:1 --discriminator 1234 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -76,7 +90,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -90,7 +104,7 @@ _USE_IANA_ADDR = 0
 _USE_PER_GROUP_ADDR = 2
 
 
-class TC_S_2_3(MatterBaseTest):
+class TC_S_2_3(MatterTestCommissionedDevice):
     def desc_TC_S_2_3(self) -> str:
         return "[TC-S-2.3] Secondary functionality with DUT as Server"
 
@@ -99,7 +113,7 @@ class TC_S_2_3(MatterBaseTest):
 
     def steps_TC_S_2_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(
                 "0a",
                 "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT with GroupKeySetID 0x01a1.",

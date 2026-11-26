@@ -129,7 +129,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 JniUtfString name(env, jname);
                 Platform::CopyString(ifp->Name, name.c_str());
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-                ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
+                ifp->name                                          = CharSpan::fromCharString(ifp->Name);
             }
 
             jfieldID isOperationalField = env->GetFieldID(nifClass, "isOperational", "Z");

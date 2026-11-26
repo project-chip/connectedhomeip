@@ -49,11 +49,11 @@ from TC_DEMTestBase import DEMTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_8(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_8."""
 
     def desc_TC_DEM_2_8(self) -> str:
@@ -70,8 +70,7 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
     def steps_TC_DEM_2_8(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify ConstraintBasedAdjustment feature is supported on the cluster. Verify StateForecastReporting feature is supported on the cluster. Verify PowerForecastReporting feature is not supported on the cluster."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -103,7 +102,7 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
             TestStep("12a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("12b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("13", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("14", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization",

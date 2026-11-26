@@ -57,6 +57,10 @@ void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         .productId = info.productId,
     };
 
+    const bool supportsRequestedProfile = (info.attestationProfile == DeviceAttestationCertProfile::kEcdsaMatterLegacy) ||
+        (info.attestationProfile == DeviceAttestationCertProfile::kMlDsa44 && IsMlDsa44Supported()) ||
+        (info.attestationProfile == DeviceAttestationCertProfile::kMlDsa65 && IsMlDsa65Supported());
+
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
                      !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
                      !info.attestationNonceBuffer.empty(),
@@ -64,6 +68,14 @@ void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
+
+    if (!supportsRequestedProfile)
+    {
+        ChipLogError(Support, "PQC device attestation verification is not implemented for requested profile %u",
+                     to_underlying(info.attestationProfile));
+        attestationError = AttestationVerificationResult::kNotImplemented;
+        ExitNow();
+    }
 
     // match DAC and PAI VIDs
     {

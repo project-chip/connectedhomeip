@@ -106,6 +106,7 @@ enum class Feature : uint32_t
     kPerZoneSensitivity          = 0x2,
     kUserDefined                 = 0x4,
     kFocusZones                  = 0x8,
+    kRemoteZones                 = 0x10,
 };
 } // namespace ZoneManagement
 } // namespace Clusters

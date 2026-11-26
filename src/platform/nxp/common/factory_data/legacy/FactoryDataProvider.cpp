@@ -25,6 +25,17 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #include <psa/crypto.h>
+
+// EL2GO PSA persistent key-id range.
+// For Kconfig-based builds (Zephyr / cmake-freertos) these come from
+// CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_{BASE,END} in config/nxp/cmake/Kconfig.matter.nxp.
+// For the GN build (no Kconfig), fall back to the hardcoded defaults below.
+#ifndef CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE
+#define CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE 0x40000
+#endif
+#ifndef CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END
+#define CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END 0x4FFFF
+#endif
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
@@ -100,24 +111,67 @@ void FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
 
 #endif
 
-CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
+CHIP_ERROR FactoryDataProvider::ImportDacPrivateKey()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-    Crypto::P256SerializedKeypair serializedKeypair;
     uint8_t keyBuf[kDacKeyBlobSize];
-
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
 
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     psa_key_id_t key_id             = 0;
-    psa_key_lifetime_t lifetime     = PSA_KEY_LIFETIME_VOLATILE;
-    psa_algorithm_t alg             = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
-    psa_key_usage_t usage           = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE;
-    psa_key_type_t key_type         = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
-    size_t bits                     = 256;
+    psa_status_t status;
+
+    // Already imported: nothing to do.
+    if (mDacKeyId != 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Fast path: if a persistent key already exists at the expected EL2GO key id
+    // from a previous boot, reuse it and skip the (potentially slow) import.
+    key_id = static_cast<psa_key_id_t>(CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE);
+    if (psa_get_key_attributes(key_id, &attributes) == PSA_SUCCESS)
+    {
+        ChipLogProgress(DeviceLayer, "ImportDacPrivateKey: reusing existing PSA key 0x%08" PRIx32, key_id);
+        mDacKeyId = key_id;
+        goto exit;
+    }
+    // Reset attributes populated by the probe above before configuring for import.
+    psa_reset_key_attributes(&attributes);
+
+    // Fetch the (possibly blob-wrapped) DAC private key from factory data.
+    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
+    SuccessOrExit(error);
+    dacPrivateKeySpan.reduce_size(keySize);
+
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, 256);
+    psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
+    /* KeyID should be in the EL2GO range:
+    >= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE and <= CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END */
+    psa_set_key_id(&attributes, CONFIG_CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE);
+    UpdateKeyAttributes(attributes);
+
+    status = psa_import_key(&attributes, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), &key_id);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    mDacKeyId = key_id;
+
+exit:
+    psa_reset_key_attributes(&attributes);
+    memset(keyBuf, 0, sizeof(keyBuf));
+    return error;
+}
+
+CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    Crypto::P256ECDSASignature signature;
+
+    psa_algorithm_t alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
     psa_status_t status;
     uint8_t digest[Crypto::kSHA256_Hash_Length];
     unsigned char ecc_signature[PSA_SIGNATURE_MAX_SIZE] = { 0 };
@@ -127,38 +181,27 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
     VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(outSignBuffer.size() >= signature.Capacity(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    /* Get private key of DAC certificate from reserved section */
-    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
-    SuccessOrExit(error);
-    dacPrivateKeySpan.reduce_size(keySize);
+    // Ensure the DAC private key was imported into PSA. This is normally done once
+    // at Init() time; the lazy call here is a safety net for providers that don't
+    // pre-import the key.
+    if (mDacKeyId == 0)
+    {
+        error = ImportDacPrivateKey();
+        SuccessOrExit(error);
+    }
 
     /* Calculate message HASH to sign */
     memset(&digest[0], 0, sizeof(digest));
     error = chip::Crypto::Hash_SHA256(messageToSign.data(), messageToSign.size(), &digest[0]);
     SuccessOrExit(error);
 
-    psa_set_key_usage_flags(&attributes, usage);
-    psa_set_key_algorithm(&attributes, alg);
-    psa_set_key_type(&attributes, key_type);
-    psa_set_key_bits(&attributes, bits);
-    psa_set_key_lifetime(&attributes, lifetime);
-    UpdateKeyAttributes(attributes);
-
-    /* Import blob DAC key into PSA */
-    status = psa_import_key(&attributes, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), &key_id);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_sign_hash(key_id, alg, digest, sizeof(digest), ecc_signature, sizeof(ecc_signature), &signature_length);
-
+    status = psa_sign_hash(mDacKeyId, alg, digest, sizeof(digest), ecc_signature, sizeof(ecc_signature), &signature_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
     error = CopySpanToMutableSpan(ByteSpan{ ecc_signature, signature_length }, outSignBuffer);
 
 exit:
-    psa_destroy_key(key_id);
-    psa_reset_key_attributes(&attributes);
-    memset(keyBuf, 0, sizeof(keyBuf));
     memset(digest, 0, sizeof(digest));
     memset(ecc_signature, 0, sizeof(ecc_signature));
     return error;
@@ -745,16 +788,21 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlobs(const uint8_t * blobArea, size_t
             }
         }
 
-        // Import into PSA
-        psa_key_id_t keyId  = PSA_KEY_ID_NULL;
-        psa_status_t status = psa_import_key(&psaAttrs, currentBlobPtr, currentBlobSize, &keyId);
-
-        if (status == PSA_ERROR_ALREADY_EXISTS)
+        // Fast path: if a persistent key already exists at this id from a previous
+        // boot, reuse it and skip the (potentially slow) blob import.
+        psa_key_id_t keyId              = PSA_KEY_ID_NULL;
+        psa_status_t status             = PSA_SUCCESS;
+        psa_key_attributes_t probeAttrs = PSA_KEY_ATTRIBUTES_INIT;
+        if (psa_get_key_attributes(static_cast<psa_key_id_t>(blobCtx.keyId), &probeAttrs) == PSA_SUCCESS)
         {
-            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Key 0x%08" PRIx32 " already exists, using existing key", blobCtx.keyId);
-            // Key already exists, use it - don't re-import
-            keyId  = blobCtx.keyId;
-            status = PSA_SUCCESS;
+            ChipLogProgress(DeviceLayer, "ParseEl2GoBlobs: Key 0x%08" PRIx32 " already exists, skipping import", blobCtx.keyId);
+            keyId = static_cast<psa_key_id_t>(blobCtx.keyId);
+            psa_reset_key_attributes(&probeAttrs);
+        }
+        else
+        {
+            psa_reset_key_attributes(&probeAttrs);
+            status = psa_import_key(&psaAttrs, currentBlobPtr, currentBlobSize, &keyId);
         }
 
         VerifyOrExit(status == PSA_SUCCESS, {

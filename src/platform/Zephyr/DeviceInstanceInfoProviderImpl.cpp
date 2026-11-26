@@ -18,6 +18,7 @@
 
 #include "DeviceInstanceInfoProviderImpl.h"
 #include <lib/support/BytesToHex.h>
+#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 
 namespace chip {
 namespace DeviceLayer {

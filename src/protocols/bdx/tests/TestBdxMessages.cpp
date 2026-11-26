@@ -1,3 +1,4 @@
+#include <cstring>
 #include <limits>
 
 #include <pw_unit_test/framework.h>
@@ -6,6 +7,7 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/bdx/BdxMessages.h>
 
 using namespace chip;
@@ -73,6 +75,38 @@ TEST_F(TestBdxMessages, TestTransferInitMessage)
     TestHelperWrittenAndParsedMatch<TransferInit>(testMsg);
 }
 
+TEST_F(TestBdxMessages, TestTransferInitOversizedFileDesignator)
+{
+    // A FileDesLength larger than kMaxFileDesignatorLen must be rejected while parsing, before it feeds the
+    // metadata start index computation. A designator of exactly kMaxFileDesignatorLen bytes still round-trips.
+    uint8_t designator[kMaxFileDesignatorLen + 1] = { 0 };
+
+    TransferInit testMsg;
+    testMsg.TransferCtlOptions.ClearAll().Set(TransferControlFlags::kReceiverDrive, true);
+    testMsg.Version        = 1;
+    testMsg.MaxBlockSize   = 256;
+    testMsg.FileDesLength  = kMaxFileDesignatorLen + 1;
+    testMsg.FileDesignator = designator;
+
+    size_t msgSize = testMsg.MessageSize();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
+    ASSERT_FALSE(bbuf.IsNull());
+    testMsg.WriteToBuffer(bbuf);
+    EXPECT_TRUE(bbuf.Fit());
+
+    System::PacketBufferHandle msgBuf = bbuf.Finalize();
+    ASSERT_FALSE(msgBuf.IsNull());
+    System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
+    ASSERT_FALSE(rcvBuf.IsNull());
+
+    TransferInit parsed;
+    EXPECT_NE(parsed.Parse(std::move(rcvBuf)), CHIP_NO_ERROR);
+
+    // A designator sized exactly at the maximum is still accepted.
+    testMsg.FileDesLength = kMaxFileDesignatorLen;
+    TestHelperWrittenAndParsedMatch<TransferInit>(testMsg);
+}
+
 TEST_F(TestBdxMessages, TestSendAcceptMessage)
 {
     SendAccept testMsg;
@@ -98,7 +132,6 @@ TEST_F(TestBdxMessages, TestReceiveAcceptMessage)
     // Make sure Length is greater than UINT32_MAX to test widerange being set
     testMsg.Length = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-    testMsg.StartOffset  = 42;
     testMsg.MaxBlockSize = 256;
 
     uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
@@ -106,6 +139,37 @@ TEST_F(TestBdxMessages, TestReceiveAcceptMessage)
     testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
     TestHelperWrittenAndParsedMatch<ReceiveAccept>(testMsg);
+}
+
+// Older versions of this SDK put a start offset, flagged by Range Control bit 1, in a ReceiveAccept. Parse() skips it, so the
+// fields after it are read correctly, and fails when the message is too short to hold it.
+TEST_F(TestBdxMessages, TestReceiveAcceptWithStartOffsetFromOlderPeer)
+{
+    const uint64_t length    = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
+    const uint8_t metadata[] = { 7, 6, 5, 4, 3 };
+
+    uint8_t msg[4 + 2 * sizeof(uint64_t) + sizeof(metadata)];
+    Encoding::LittleEndian::BufferWriter writer(msg, sizeof(msg));
+    writer
+        .Put(static_cast<uint8_t>(to_underlying(TransferControlFlags::kReceiverDrive) | 1)) // Version 1
+        .Put(static_cast<uint8_t>(to_underlying(RangeControlFlags::kDefLen) | to_underlying(RangeControlFlags::kStartOffset) |
+                                  to_underlying(RangeControlFlags::kWiderange)))
+        .Put16(256)
+        .Put64(42)
+        .Put64(length)
+        .Put(metadata, sizeof(metadata));
+    ASSERT_TRUE(writer.Fit());
+
+    ReceiveAccept parsed;
+    EXPECT_EQ(parsed.Parse(System::PacketBufferHandle::NewWithData(msg, writer.Needed())), CHIP_NO_ERROR);
+    EXPECT_EQ(parsed.MaxBlockSize, 256);
+    EXPECT_EQ(parsed.Length, length);
+    ASSERT_EQ(parsed.MetadataLength, sizeof(metadata));
+    EXPECT_EQ(memcmp(parsed.Metadata, metadata, sizeof(metadata)), 0);
+
+    // The same message cut off in the middle of the start offset.
+    ReceiveAccept truncated;
+    EXPECT_NE(truncated.Parse(System::PacketBufferHandle::NewWithData(msg, 4 + sizeof(uint32_t))), CHIP_NO_ERROR);
 }
 
 TEST_F(TestBdxMessages, TestCounterMessage)

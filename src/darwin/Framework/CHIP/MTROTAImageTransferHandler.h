@@ -51,7 +51,7 @@ private:
 
     CHIP_ERROR OnTransferSessionBegin(const chip::bdx::TransferSession::OutputEventType event);
 
-    CHIP_ERROR OnTransferSessionEnd(const chip::bdx::TransferSession::OutputEventType eventType);
+    CHIP_ERROR OnTransferSessionEnd(const chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnBlockQuery(const chip::bdx::TransferSession::OutputEventType eventType, uint64_t bytesToSkip);
 
@@ -74,6 +74,11 @@ private:
     MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
 
     bool mNeedToCallTransferSessionEnd = false;
+
+    // The MTRBDXErrorDomain error, if any, that the delegate rejected the transfer with.  When set,
+    // this is the error passed to handleBDXTransferSessionEnd, instead of creating an NSError from
+    // the CHIP_ERROR that ended the transfer.
+    NSError * _Nullable mBDXRejectionError = nil;
 
     bool mIsPeerNodeAKnownThreadDevice = NO;
 

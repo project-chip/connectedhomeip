@@ -17,7 +17,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/thread-network-directory-server/MigrateThreadNetworkDirectoryServerStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -111,25 +111,6 @@ app::ThreadNetworkDirectoryStorage::ExtendedPanId MakeExPanId3()
     return app::ThreadNetworkDirectoryStorage::ExtendedPanId(ByteSpan(kExPanId3Bytes));
 }
 
-/// RAII helper that sets the global SafeAttributePersistenceProvider for tests that need
-/// attribute persistence (e.g. PreferredExtendedPanID reads/writes, RemoveNetwork checks).
-/// The previous global is restored on destruction.
-class ScopedSafeAttributePersistence
-{
-public:
-    explicit ScopedSafeAttributePersistence(chip::Testing::TestServerClusterContext & context) :
-        mOldPersistence(app::GetSafeAttributePersistenceProvider())
-    {
-        VerifyOrDie(mPersistence.Init(&context.StorageDelegate()) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistence);
-    }
-    ~ScopedSafeAttributePersistence() { app::SetSafeAttributePersistenceProvider(mOldPersistence); }
-
-private:
-    app::SafeAttributePersistenceProvider * mOldPersistence;
-    app::DefaultSafeAttributePersistenceProvider mPersistence;
-};
-
 struct TestThreadNetworkDirectoryCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -187,7 +168,6 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestPreferredExtendedPanId)
     ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
     chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ScopedSafeAttributePersistence scopedPersistence(context);
     ClusterTester tester(cluster);
 
     // Initially null.
@@ -290,7 +270,6 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
     ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
     chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ScopedSafeAttributePersistence scopedPersistence(context);
     ClusterTester tester(cluster);
 
     // ConstraintError: empty dataset is structurally invalid.
@@ -384,7 +363,6 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestRemoveNetworkCommand)
     ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
     chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ScopedSafeAttributePersistence scopedPersistence(context);
     ClusterTester tester(cluster);
 
     EXPECT_EQ(storage.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1)), CHIP_NO_ERROR);
@@ -462,7 +440,6 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
     ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
     chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ScopedSafeAttributePersistence scopedPersistence(context);
     ClusterTester tester(cluster);
 
     EXPECT_EQ(storage.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1)), CHIP_NO_ERROR);
@@ -525,6 +502,41 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
             EXPECT_TRUE(result.response->operationalDataset.data_equal(ByteSpan(kDataset1)));
         }
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
+// MigrationTest_PreferredExtendedPanIdMigratesCorrectly: a value stored in
+// SafeAttributePersistenceProvider is migrated to AttributePersistenceProvider
+// and readable through the cluster.
+// ---------------------------------------------------------------------------
+TEST_F(TestThreadNetworkDirectoryCluster, MigrationTest_PreferredExtendedPanIdMigratesCorrectly)
+{
+    app::Testing::FakeThreadNetworkDirectoryStorage storage;
+    ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
+    chip::Testing::TestServerClusterContext context;
+
+    app::DefaultSafeAttributePersistenceProvider safePersistence;
+    ASSERT_EQ(safePersistence.Init(&context.StorageDelegate()), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath path(kTestEndpointId, Id, Attributes::PreferredExtendedPanID::Id);
+    ASSERT_EQ(safePersistence.SafeWriteValue(path, ByteSpan(kExPanId1Bytes)), CHIP_NO_ERROR);
+
+    ASSERT_EQ(MigrateThreadNetworkDirectoryServerStorage(kTestEndpointId, safePersistence, context.AttributePersistenceProvider()),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Attributes::PreferredExtendedPanID::TypeInfo::DecodableType value;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PreferredExtendedPanID::Id, value), CHIP_NO_ERROR);
+    ASSERT_FALSE(value.IsNull());
+    EXPECT_TRUE(value.Value().data_equal(ByteSpan(kExPanId1Bytes)));
+
+    uint8_t safeReadBuf[sizeof(kExPanId1Bytes)] = {};
+    MutableByteSpan safeReadBuffer(safeReadBuf);
+    EXPECT_EQ(safePersistence.SafeReadValue(path, safeReadBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

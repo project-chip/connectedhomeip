@@ -559,6 +559,10 @@
 #include <clusters/Thermostat/Commands.h>
 #include <clusters/Thermostat/Events.h>
 #include <clusters/Thermostat/Structs.h>
+#include <clusters/ThermostatMode/Attributes.h>
+#include <clusters/ThermostatMode/Commands.h>
+#include <clusters/ThermostatMode/Events.h>
+#include <clusters/ThermostatMode/Structs.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Attributes.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.h>

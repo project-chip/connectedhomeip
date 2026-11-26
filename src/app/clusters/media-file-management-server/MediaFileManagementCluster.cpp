@@ -31,6 +31,7 @@ namespace app {
 namespace Clusters {
 
 using namespace MediaFileManagement;
+using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
 
 namespace {
@@ -100,18 +101,50 @@ CHIP_ERROR MediaFileManagementCluster::ReadSupportedMimeTypes(const AttributeVal
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MediaFileManagementCluster::IsSupportedMimeType(CharSpan mimeType, bool & supported)
+{
+    for (size_t i = 0; i < kMaxSupportedMimeTypes; i++)
+    {
+        char buffer[kMaxMimeTypeLength] = {};
+        MutableCharSpan entry(buffer);
+        CHIP_ERROR err = mDelegate.GetSupportedMimeTypeAtIndex(i, entry);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            // An empty SupportedMimeTypes list places no restriction on what can be stored.
+            supported = (i == 0);
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+        if (entry.data_equal(mimeType))
+        {
+            supported = true;
+            return CHIP_NO_ERROR;
+        }
+    }
+    supported = false;
+    return CHIP_NO_ERROR;
+}
+
 std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                        chip::TLV::TLVReader & input_arguments,
                                                                                        CommandHandler * handler)
 {
     using namespace Commands;
+
+    // The peer node-id is needed by the delegate to bootstrap the out-of-band
+    // BDX file transfers that back the sharing commands.
+    const ScopedNodeId peer(request.subjectDescriptor.subject, request.subjectDescriptor.fabricIndex);
+
     switch (request.path.mCommandId)
     {
     case AddFile::Id: {
         AddFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+        // The delegate pulls the file bytes back from `peer` over BDX, which only
+        // addresses operational node IDs. Reject group/PASE subjects up front.
+        VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
         AddFileResponse::Type response;
-        Status status = mDelegate.HandleAddFile(req.name, req.size, req.mimeType, req.imageUri, response);
+        Status status = mDelegate.HandleAddFile(peer, req.name, req.size, req.mimeType, req.imageURI, response);
         VerifyOrReturnValue(status == Status::Success, status);
         handler->AddResponse(request.path, response);
         return std::nullopt;
@@ -124,13 +157,15 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
     case RequestSharedFiles::Id: {
         RequestSharedFiles::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
-        return mDelegate.HandleRequestSharedFiles(req.clientName, req.requestID, req.supportedMimeTypes);
+        VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
+        return mDelegate.HandleRequestSharedFiles(peer, req.clientName, req.requestID, req.supportedMimeTypes);
     }
     case GetSharedFile::Id: {
         GetSharedFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+        VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
         GetSharedFileResponse::Type response;
-        Status status = mDelegate.HandleGetSharedFile(req.responseID, response);
+        Status status = mDelegate.HandleGetSharedFile(peer, req.responseID, response);
         VerifyOrReturnValue(status == Status::Success, status);
         handler->AddResponse(request.path, response);
         return std::nullopt;
@@ -138,7 +173,13 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
     case OfferFile::Id: {
         OfferFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
-        return mDelegate.HandleOfferFile(req.clientName, req.name, req.size, req.mimeType, req.imageUri);
+        VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
+        // OfferFile has no response payload, so an unadvertised MIME type is rejected with a
+        // cluster-specific status before the delegate is asked to download the file.
+        bool mimeTypeSupported = false;
+        ReturnErrorOnFailure(IsSupportedMimeType(req.mimeType, mimeTypeSupported));
+        VerifyOrReturnValue(mimeTypeSupported, ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+        return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageURI);
     }
     default:
         return Status::UnsupportedCommand;

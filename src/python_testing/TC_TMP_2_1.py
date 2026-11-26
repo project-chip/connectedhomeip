@@ -36,11 +36,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_TMP_2_1(MatterBaseTest):
+class TC_TMP_2_1(MatterTestCommissionedDevice):
     def desc_TC_TMP_2_1(self) -> str:
         return "[TC-TMP-2.1] Attributes with Server as DUT"
 
@@ -49,7 +49,7 @@ class TC_TMP_2_1(MatterBaseTest):
 
     def steps_TC_TMP_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "Set default bounds `min_bound` = -27315, `max_bound` = 32767"),
             TestStep(3, "TH reads the MinMeasuredValue attribute from the DUT and saves as `min_measured_value`. If `min_measured_value` is not null, set `min_bound` to `min_measured_value`"),

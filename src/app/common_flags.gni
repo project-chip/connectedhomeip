@@ -64,3 +64,11 @@ declare_args() {
   # When empty (default), the full generated sources are used.
   chip_data_model_overrides_dir = ""
 }
+
+declare_args() {
+  # Select the compatibility-only Groups cluster implementation used for
+  # cluster revision 5 and later. Default to the Groupcast configuration for
+  # backwards compatibility, while allowing applications to select the
+  # implementation independently.
+  chip_config_use_stubbed_groups_cluster = chip_config_enable_groupcast
+}

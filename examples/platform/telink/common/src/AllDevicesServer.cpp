@@ -23,7 +23,9 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
@@ -31,8 +33,10 @@
 #include <device/api/Interface.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -70,10 +74,12 @@ bool gServerStarted = false;
 DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
+BindingHandler gBindingHandler;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
-std::unique_ptr<DeviceInterface> gRootNodeDevice;
+std::unique_ptr<RootNode> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -84,24 +90,25 @@ RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initPar
                                       DeviceInstanceInfoProvider & deviceInfoProvider)
 {
     return RootNode::Context{
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager       = ConfigurationMgr(),
-        .deviceControlServer        = DeviceControlServer::DeviceControlSvr(),
-        .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .accessControl              = Server::GetInstance().GetAccessControl(),
-        .persistentStorage          = Server::GetInstance().GetPersistentStorage(),
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider = deviceInfoProvider,
-        .platformManager            = PlatformMgr(),
-        .groupDataProvider          = gGroupDataProvider,
-        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                = DnssdServer::Instance(),
-        .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),
-        .diagnosticDataProvider     = GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,
-        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .eventManagement            = EventManagement::GetInstance(),
-        .timerDelegate              = gTimerDelegate,
+        .commissioningWindowManager          = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager                = ConfigurationMgr(),
+        .deviceControlServer                 = DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                         = Server::GetInstance().GetFabricTable(),
+        .accessControl                       = Server::GetInstance().GetAccessControl(),
+        .persistentStorage                   = Server::GetInstance().GetPersistentStorage(),
+        .failSafeContext                     = Server::GetInstance().GetFailSafeContext(),
+        .deviceInstanceInfoProvider          = deviceInfoProvider,
+        .platformManager                     = PlatformMgr(),
+        .groupDataProvider                   = gGroupDataProvider,
+        .sessionManager                      = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                         = DnssdServer::Instance(),
+        .deviceLoadStatusProvider            = *InteractionModelEngine::GetInstance(),
+        .diagnosticDataProvider              = GetDiagnosticDataProvider(),
+        .testEventTriggerDelegate            = initParams.testEventTriggerDelegate,
+        .dacProvider                         = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .eventManagement                     = EventManagement::GetInstance(),
+        .timerDelegate                       = gTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 }
 
@@ -112,12 +119,12 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     gRootNodeDevice = std::make_unique<WifiRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                     WifiRootNode::WifiContext{
+                                                     WifiFeature::Context{
                                                          .wifiDriver = NetworkCommissioning::TelinkWiFiDriver::Instance(),
                                                      });
 #elif CHIP_ENABLE_OPENTHREAD
     gRootNodeDevice = std::make_unique<ThreadRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                       ThreadRootNode::ThreadContext{
+                                                       ThreadFeature::Context{
                                                            .threadDriver = gThreadDriver,
                                                        });
 #else
@@ -132,6 +139,9 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
 CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams & initParams)
 {
+    DeviceInfoProvider * deviceInfoProvider = GetDeviceInfoProvider();
+    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(gAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
     ReturnErrorOnFailure(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
 
@@ -148,18 +158,31 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         std::make_unique<CodeDrivenDataModelProvider>(*initParams.persistentStorageDelegate, gAttributePersistenceProvider);
     VerifyOrReturnError(gDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    static SimpleTestEventTriggerDelegate testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     ReturnErrorOnFailure(CreateAndRegisterRootNode(initParams));
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,
-        .fabricTable       = Server::GetInstance().GetFabricTable(),
-        .timerDelegate     = gTimerDelegate,
-        .storageDelegate   = *initParams.persistentStorageDelegate,
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
+        .groupDataProvider        = gGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = gTimerDelegate,
+        .storageDelegate          = *initParams.persistentStorageDelegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = gRootNodeDevice->GeneralCommissioning(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = gBindingHandler,
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
+        .deviceInfoProvider       = *deviceInfoProvider,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceFactory = DeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
 
     if (!deviceFactory.IsValidDevice(gDeviceType))
     {
@@ -167,11 +190,12 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    gConstructedDevice = deviceFactory.Create(gDeviceType);
-    VerifyOrReturnError(gConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto created = deviceFactory.Create(gDeviceType);
+    VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(gConstructedDevice->Register(allocator, *gDataModelProvider));
+    ReturnErrorOnFailure(created.Register(allocator, *gDataModelProvider));
+    gConstructedDevice = std::move(created.device);
 
     initParams.dataModelProvider = gDataModelProvider.get();
 
@@ -188,6 +212,14 @@ CHIP_ERROR DoStartAllDevicesServer(const std::string & deviceType, bool persistD
 
     ReturnErrorOnFailure(PopulateAllDevicesDataModelProvider(*gInitParams));
     ReturnErrorOnFailure(Server::GetInstance().Init(*gInitParams));
+
+    {
+        auto & server = Server::GetInstance();
+        LogErrorOnFailure(
+            gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                 { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                 server.GetExchangeManager()));
+    }
 
     if (persistDeviceType)
     {

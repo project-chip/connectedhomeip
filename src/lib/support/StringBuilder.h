@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cctype>
+#include <cstdarg>
 #include <cstdio>
 #include <lib/support/Assertions.h>
 
@@ -77,6 +78,9 @@ public:
 
     /// Write a formatted string to the stringbuilder
     StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3);
+
+    /// Write a formatted string to the stringbuilder using va_list
+    StringBuilderBase & AddFormatV(const char * format, va_list args) ENFORCE_FORMAT(2, 0);
 
     /// For strings we often want to know when they were truncated. If the underlying writer did
     /// not fit, this replaces the last 3 characters with "."

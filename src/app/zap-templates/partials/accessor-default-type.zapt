@@ -1,0 +1,13 @@
+{{~#if (isString type)~}}
+  {{~#if (isOctetString type)~}}
+    {{~#if isNullable~}}DataModel::Nullable<chip::ByteSpan> &{{~else~}}chip::ByteSpan &{{~/if~}}
+  {{~else~}}
+    {{~#if isNullable~}}DataModel::Nullable<chip::CharSpan> &{{~else~}}chip::CharSpan &{{~/if~}}
+  {{~/if~}}
+{{~else~}}
+  {{~#if isNullable~}}
+    DataModel::Nullable<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}}> &
+  {{~else~}}
+    {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} &
+  {{~/if~}}
+{{~/if~}}

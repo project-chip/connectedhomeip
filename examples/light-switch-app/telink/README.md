@@ -13,11 +13,11 @@ creating your own application.
 
 The example supports building and running on the following devices:
 
-| Board/SoC                                                                                                                                                              | Build target                                                  | Zephyr Board Info                                                                                              |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
-| [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
-| [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
+| Board/SoC                                                                                                                                                              | Build target                                                  | Zephyr Board Info                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
+| [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
+| [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
 
 ## Build and flash
 
@@ -32,12 +32,6 @@ The example supports building and running on the following devices:
 
     ```bash
     $ integrations/docker/images/stage-2/chip-build-telink/Dockerfile
-    ```
-
-    If you need to use Zephyr 3.3.0, use the following container instead:
-
-    ```bash
-    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink-zephyr_3_3:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink-zephyr_3_3 | awk -F: '{print $NF}')
     ```
 
     You can check the compatible Docker image version in:
@@ -111,7 +105,7 @@ following states:
 | :-------------------------- | :--------------------------------------------------------------------------- |
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
 | Blinks with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
-| Blinks with wide pulses     | Device commissioned and joined to thread network as CHILD                    |
+| Blinks with wide pulses     | Device commissioned and joined Thread network as CHILD                       |
 
 #### Indicate identify of device
 
@@ -217,7 +211,10 @@ In this scenario, commands are provided for a light switch device with the
 `nodeId = <light-switch-node-id>` and a light bulb device with
 `nodeId = <lighting-node-id>`, both commissioned to the same Matter network.
 
-To perform the unicast binding process, complete the following steps:
+For builds with `CONFIG_CHIP_ENABLE_GROUPCAST=y` (Groups cluster revision 5),
+use `Groupcast.JoinGroup` instead of the legacy `TestGroupDemoConfig` commands.
+
+To perform the group multicast binding process, complete the following steps:
 
 1.  Add an ACL to the lighting endpoint permissions by running the following
     command:
@@ -241,7 +238,7 @@ To perform the unicast binding process, complete the following steps:
     command:
 
     ```bash
-    $ ./chip-tool tests TestGroupDemoConfig --nodeId <light-switch-node-id>
+    $ ./chip-tool groupcast join-group 257 '[]' 1 <light-switch-node-id> 0 --Key hex:00112233445566778899aabbccddeeff
     ```
 
 3.  Add all light bulbs to the same multicast group by applying command below
@@ -251,8 +248,10 @@ To perform the unicast binding process, complete the following steps:
     light-switch) for each of them:
 
     ```bash
-    $ ./chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
+    $ ./chip-tool groupcast join-group 257 '[1]' 1 <lighting-node-id> 0 --Key hex:00112233445566778899aabbccddeeff --UseAuxiliaryACL 1
     ```
+
+    The same key must be used on all devices (example key for testing only).
 
 4.  Add Binding commands for group multicast:
 

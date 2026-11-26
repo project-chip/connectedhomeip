@@ -248,6 +248,19 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
+def all_of(*checks: EndpointCheckFunction) -> EndpointCheckFunction:
+    """Combines EndpointCheckFunctions so an endpoint must satisfy every one.
+
+    run_if_endpoint_matches and run_on_singleton_matching_endpoint each take a single
+    EndpointCheckFunction. Composing checks with `and` does not work: `a and b` returns
+    only `b` because both are truthy callables, silently dropping `a`. Use
+    all_of(a, b, ...) instead.
+    """
+    def check(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int) -> bool:
+        return all(c(wildcard, endpoint) for c in checks)
+    return check
+
+
 def _async_runner(body, test_instance, *args, **kwargs):
     timeout = getattr(test_instance.matter_test_config,
                       'timeout', None) or test_instance.default_timeout
@@ -261,9 +274,10 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
 
-    For teardown_test overrides: MatterBaseTest.__init_subclass__ wraps every
-    teardown_test override so the base always runs after the override completes,
-    regardless of whether the override is async or sync, or whether it calls super().
+    For teardown_test overrides: the framework's own per-test teardown runs from
+    MatterBaseTest._teardown_test, after the override, whether the override is async
+    or sync. An override should still call super().teardown_test(), which is what
+    runs the teardown of every other class in the hierarchy.
     """
     @wraps(body)
     def async_runner(self: "MatterBaseTest", *args, **kwargs):

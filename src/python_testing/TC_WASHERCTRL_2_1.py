@@ -41,13 +41,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 MAX_SPIN_SPEEDS = 16
 
 
-class TC_WASHERCTRL_2_1(MatterBaseTest):
+class TC_WASHERCTRL_2_1(MatterTestCommissionedDevice):
 
     def desc_TC_WASHERCTRL_2_1(self) -> str:
         """Returns a description of this test"""
@@ -62,8 +62,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
     def steps_TC_WASHERCTRL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, description="TH reads from the DUT the SpinSpeeds attribute",
                      expectation="Verify that the DUT response contains a list of strings. The maximum size of the list is 16."),
             TestStep(3, description="TH reads from the DUT the SpinSpeedCurrent attribute",

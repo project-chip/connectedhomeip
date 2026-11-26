@@ -32,7 +32,6 @@ class Efr32App(Enum):
     LIGHT = auto()
     LOCK = auto()
     SWITCH = auto()
-    WINDOW_COVERING = auto()
     THERMOSTAT = auto()
     PUMP = auto()
     UNIT_TEST = auto()
@@ -52,8 +51,6 @@ class Efr32App(Enum):
             return 'lock-app'
         if self == Efr32App.SWITCH:
             return 'light-switch-app'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'window-app'
         if self == Efr32App.THERMOSTAT:
             return 'thermostat'
         if self == Efr32App.PUMP:
@@ -79,8 +76,6 @@ class Efr32App(Enum):
             return 'matter-silabs-lock-example'
         if self == Efr32App.SWITCH:
             return 'matter-silabs-light-switch-example'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'matter-silabs-window-example'
         if self == Efr32App.THERMOSTAT:
             return 'matter-silabs-thermostat-example'
         if self == Efr32App.PUMP:
@@ -108,8 +103,6 @@ class Efr32App(Enum):
             return 'lock_app.flashbundle.txt'
         if self == Efr32App.SWITCH:
             return 'light_switch_app.flashbundle.txt'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'window_app.flashbundle.txt'
         if self == Efr32App.THERMOSTAT:
             return 'thermostat_app.flashbundle.txt'
         if self == Efr32App.PUMP:
@@ -147,6 +140,8 @@ class Efr32Board(Enum):
     BRD4342A = 12
     BRD2708A = 13
     BRD2911A = 14
+    BRD4343C = 15
+    BRD4118A = 16
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -159,6 +154,8 @@ class Efr32Board(Enum):
             return 'BRD4318A'
         if self == Efr32Board.BRD4319A:
             return 'BRD4319A'
+        if self == Efr32Board.BRD4118A:
+            return 'BRD4118A'
         if self == Efr32Board.BRD4186C:
             return 'BRD4186C'
         if self == Efr32Board.BRD4187C:
@@ -177,6 +174,8 @@ class Efr32Board(Enum):
             return 'BRD2708A'
         if self == Efr32Board.BRD2911A:
             return 'BRD2911A'
+        if self == Efr32Board.BRD4343C:
+            return 'BRD4343C'
         raise Exception(f'Unknown board #: {self!r}')
 
 

@@ -15,6 +15,30 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_4_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_4_admin_storage.json
+#       --commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import random
 import string
@@ -25,15 +49,15 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_4(MatterBaseTest):
+class TC_CNET_4_4(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_4(self):
-        return [TestStep("precondition", "TH is commissioned", is_commissioning=True),
+        return [TestStep("precondition", "TH is commissioned"),
                 TestStep(1, 'TH reads from the DUT the Network Commissioning Cluster FeatureMap. If the FeatureMap does not include the WI flag (bit 0), skip the remaining steps in this test case'),
                 TestStep(2, 'TH reads from the DUT the SupportedWifiBands attribute and saves as supported_wifi_bands'),
                 TestStep(3, 'TH reads from the DUT the Networks attribute.'),
@@ -68,6 +92,10 @@ class TC_CNET_4_4(MatterBaseTest):
         connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
+        # Dynamically compute the interaction timeout based on the DUT's reported max scan time
+        scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
+        scan_interaction_timeout_ms = self.default_controller.ComputeRoundTripTimeout(
+            self.dut_node_id, upperLayerProcessingTimeoutMs=scan_max_time_s * 1000)
 
         async def scan_and_check(ssid_to_scan: bytes | None, breadcrumb: int, expect_results: bool = True):
             all_security = 0
@@ -76,7 +104,7 @@ class TC_CNET_4_4(MatterBaseTest):
 
             ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
             cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
-            scan_results = await self.send_single_cmd(cmd=cmd)
+            scan_results = await self.send_single_cmd(cmd=cmd, interactionTimeoutMs=scan_interaction_timeout_ms)
             asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
             log.info("Scan results: %s", scan_results)

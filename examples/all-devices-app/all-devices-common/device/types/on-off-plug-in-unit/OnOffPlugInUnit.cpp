@@ -14,14 +14,15 @@
  *    limitations under the License.
  */
 
-#include "OnOffPlugInUnit.h"
-
+#include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
 #include <devices/Types.h>
 
 namespace chip::app {
 
-OnOffPlugInUnit::OnOffPlugInUnit(const Context & context) :
-    LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1), context)
+OnOffPlugInUnit::OnOffPlugInUnit(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                                 Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1), onOffDelegate, effectDelegate,
+              identifyDelegate, context)
 {}
 
 } // namespace chip::app

@@ -18,6 +18,7 @@
 
 #include "app_common.h"
 #include "app_conf.h"
+#include "app_entry.h"
 
 #if (OTA_SUPPORT == 1)
 /* Matter cluster */
@@ -77,6 +78,7 @@ bool OTAImageProcessorImpl::WriteMagicValue(uint32_t dest)
 
 bool OTAImageProcessorImpl::WriteFlashChunk(uint32_t dest, uint8_t * pSrc, uint32_t size, OTAImageProcessorImpl * imageProcessor)
 {
+
     ChipLogProgress(DeviceLayer, "WriteFlashChunk:  @ %p , size = %lu", (void *) dest, size);
 
     STM_OTA_StatusTypeDef status;
@@ -84,11 +86,25 @@ bool OTAImageProcessorImpl::WriteFlashChunk(uint32_t dest, uint8_t * pSrc, uint3
         F_OTA_FLASH_WriteChunk(reinterpret_cast<uint32_t *>(dest), reinterpret_cast<uint32_t *>(pSrc), static_cast<uint32_t>(size));
     if (status != STM_OTA_FLASH_OK)
     {
+        // retry 5 times
+        for (int i = 0; i < 5; i++)
+        {
+            ChipLogProgress(DeviceLayer, "WriteFlashChunk: fail try again in 50 ms");
+            osDelay(50);
+            status = F_OTA_FLASH_WriteChunk(reinterpret_cast<uint32_t *>(dest), reinterpret_cast<uint32_t *>(pSrc),
+                                            static_cast<uint32_t>(size));
+            if (status == STM_OTA_FLASH_OK)
+            {
+                break;
+            }
+        }
+    }
+    if (status != STM_OTA_FLASH_OK)
+    {
         ChipLogError(SoftwareUpdate, "Flash write failed");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return false;
     }
-
     return true;
 }
 
@@ -164,8 +180,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 
     mHeaderParser.Init();
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return (DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this)));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -205,23 +220,52 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     ChipLogProgress(DeviceLayer, "OTA Finalize");
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return (DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this)));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     ChipLogProgress(SoftwareUpdate, "Applying - resetting device");
+    uint8_t error = 0;
 
-    // TODO call DFU module to apply the ota
+    if (mCPU1Size != 0)
+    {
+        // update NonSecure App
+        // if (mCPU1Size <= (SLOT_DWL_A_SIZE - sizeof(MagicTrailerValue))) // if FW always same size, overwrite last 32 bits
+        if (mCPU1Size <= SLOT_DWL_A_SIZE)
+        {
+            uint32_t MagicAddress = SLOT_DWL_A_END - sizeof(MagicTrailerValue) + 1;
 
+            // write Magic number
+            if (!WriteMagicValue(MagicAddress))
+            {
+                ChipLogError(SoftwareUpdate, "Flash write failed (Magic value)");
+                return CHIP_ERROR_INTERNAL;
+            }
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Not enough space to write Magic value");
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    // write  software version in nvm for validation for next reboot
+    error = NVM_SetKeyValue((char *) X_CUBE_MATTER_VERSION, SOFTWARE_VERSION_KEY, sizeof(X_CUBE_MATTER_VERSION), SECTOR_MATTER);
+    if (error != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    NVM_Dump();
+    // wait the write in flash is finish
+    NVM_DumpFinish();
+    /* Trigger system reset */
+    NVIC_SystemReset();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return (DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this)));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
@@ -233,10 +277,9 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     }
 
     CHIP_ERROR err = ProcessHeader(block);
-    ChipLogProgress(DeviceLayer, "OTA Process Block");
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Matter image header parser error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(err));
         this->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return err;
     }
@@ -249,14 +292,14 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    err = DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    return err;
 }
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "OTA Prepare DL");
 
     /* check pointers */
@@ -284,12 +327,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mParams.downloadedBytes = 0;
     mFlashWriteOffset                       = 0;
     stm_header_decoded                      = false;
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    err                                     = imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    ChipLogProgress(SoftwareUpdate, "HandleFinalize, extra_bytes=%lu", extra_bytes);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogProgress(SoftwareUpdate, "HandleFinalize");
 
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     /* check pointers */
@@ -310,7 +354,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         }
     }
 
-    imageProcessor->ReleaseBlock();
+    err = imageProcessor->ReleaseBlock();
     // Start from scratch
     // imageProcessor->mParams.downloadedBytes = 0;
     mFlashWriteOffset  = 0;
@@ -322,6 +366,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     /* check pointers */
     if (imageProcessor == nullptr)
@@ -337,7 +382,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    imageProcessor->ReleaseBlock();
+    err = imageProcessor->ReleaseBlock();
 
     // Start from scratch
     imageProcessor->mParams.downloadedBytes = 0;
@@ -348,6 +393,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     /* check pointers */
@@ -405,7 +451,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
             extra_bytes        = (static_cast<std::uint32_t>(imageProcessor->mBlock.size()) - STM_HEADER_SIZE) % 16;
 
             // ChipLogProgress(SoftwareUpdate, "nb_blocks=%lu extra_bytes=%lu", nb_blocks, extra_bytes);
-            // write data buffer to flash (truncated for alignment to 128 bits)
+            //  write data buffer to flash (truncated for alignment to 128 bits)
             if (nb_blocks != 0U)
             {
                 // write in DWL_SLOT_A data without STM header
@@ -519,14 +565,15 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         }
     }
 
-    imageProcessor->mDownloader->FetchNextData();
+    err = imageProcessor->mDownloader->FetchNextData();
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (block.empty())
     {
-        ReleaseBlock();
+        err = ReleaseBlock();
         return CHIP_NO_ERROR;
     }
 
@@ -534,7 +581,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            err = ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
@@ -543,7 +590,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         }
         mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
-    CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
+    err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());

@@ -158,6 +158,17 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
     ASSERT_TRUE(p.GetAttemptWiFiNetworkScan().HasValue());
     EXPECT_FALSE(p.GetAttemptWiFiNetworkScan().Value());
 
+    // Per-Device Credentials state
+    const uint8_t nonce[CommissioningParameters::kPossessionNonceLen] = {};
+    p.SetPDCPossessionNonce(ByteSpan{ nonce });
+    EXPECT_TRUE(p.GetPDCPossessionNonce().HasValue());
+
+    // The commissioner manages rollback of the Network Client Identity registration unless the
+    // delegate takes that over.
+    EXPECT_TRUE(p.GetManagePDCClientIdentityRollback());
+    p.SetManagePDCClientIdentityRollback(false);
+    EXPECT_FALSE(p.GetManagePDCClientIdentityRollback());
+
     const uint8_t tds[] = { 0x07, 0x07, 0x07 }; // any opaque dataset bytes ok for exercising API
     p.SetThreadOperationalDataset(ByteSpan{ tds });
     EXPECT_TRUE(p.GetThreadOperationalDataset().HasValue());
@@ -248,6 +259,7 @@ TEST_F(CommissioningDelegateTest, CommissioningParameters_DefaultsAndSettersExer
     EXPECT_FALSE(p.GetCSRNonce().HasValue());
     EXPECT_FALSE(p.GetAttestationNonce().HasValue());
     EXPECT_FALSE(p.GetWiFiCredentials().HasValue());
+    EXPECT_FALSE(p.GetPDCPossessionNonce().HasValue());
     EXPECT_FALSE(p.GetCountryCode().HasValue());
     EXPECT_FALSE(p.GetThreadOperationalDataset().HasValue());
     EXPECT_FALSE(p.GetNOCChainGenerationParameters().HasValue());

@@ -572,6 +572,34 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         // Found a stream that can be reused
         outStreamID = reusableStreamId.value();
         ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+
+        for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
+        {
+            if (stream.snapshotStreamParams.snapshotStreamID == outStreamID && stream.isAllocated)
+            {
+                uint16_t origMinWidth  = stream.snapshotStreamParams.minResolution.width;
+                uint16_t origMinHeight = stream.snapshotStreamParams.minResolution.height;
+
+                stream.snapshotStreamParams.minResolution.width =
+                    std::max(stream.snapshotStreamParams.minResolution.width, allocateArgs.minResolution.width);
+                stream.snapshotStreamParams.minResolution.height =
+                    std::max(stream.snapshotStreamParams.minResolution.height, allocateArgs.minResolution.height);
+                stream.snapshotStreamParams.maxResolution.width =
+                    std::min(stream.snapshotStreamParams.maxResolution.width, allocateArgs.maxResolution.width);
+                stream.snapshotStreamParams.maxResolution.height =
+                    std::min(stream.snapshotStreamParams.maxResolution.height, allocateArgs.maxResolution.height);
+
+                if ((origMinWidth != stream.snapshotStreamParams.minResolution.width ||
+                     origMinHeight != stream.snapshotStreamParams.minResolution.height) &&
+                    stream.snapshotContext != nullptr)
+                {
+                    mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(outStreamID);
+                    mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+                }
+                break;
+            }
+        }
+
         return Status::Success;
     }
 
@@ -597,27 +625,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     {
         mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
         return Status::Success;
-    }
-
-    // Try to find an unused compatible available stream
-    for (auto & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
-    {
-        if (!stream.isAllocated && stream.IsCompatible(allocateArgs))
-        {
-            stream.isAllocated = true;
-            outStreamID        = stream.snapshotStreamParams.snapshotStreamID;
-
-            // Set the optional Watermark and OSD values that may have been provided.  This is the initial
-            // setting of these values, they may be subsequently modified. If the values have no value that
-            // is ok, the allocated stream will store as such and ignore.
-            stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
-            stream.snapshotStreamParams.OSDEnabled       = allocateArgs.OSDEnabled;
-
-            // Start the snapshot stream for serving.
-            mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
-
-            return Status::Success;
-        }
     }
 
     // No compatible stream available for use.
@@ -653,11 +660,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
+    auto & availableStreams = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams();
+    for (auto it = availableStreams.begin(); it != availableStreams.end(); ++it)
     {
-        if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
+        if (it->snapshotStreamParams.snapshotStreamID == streamID && it->isAllocated)
         {
-            if (stream.snapshotStreamParams.referenceCount > 0)
+            if (it->snapshotStreamParams.referenceCount > 0)
             {
                 ChipLogError(Camera, "Snapshot stream with ID: %d still in use", streamID);
                 return Status::InvalidInState;
@@ -665,7 +673,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
             // Stop the snapshot stream for serving.
             mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(streamID);
 
-            stream.isAllocated = false;
+            if (it != availableStreams.begin())
+            {
+                availableStreams.erase(it);
+            }
+            else
+            {
+                it->isAllocated = false;
+            }
 
             return Status::Success;
         }
@@ -909,8 +924,8 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
             snapshotStreamArgs.minResolution    = persistedStream.minResolution;
             snapshotStreamArgs.maxResolution    = persistedStream.maxResolution;
             snapshotStreamArgs.quality          = persistedStream.quality;
-            snapshotStreamArgs.encodedPixels    = false;
-            snapshotStreamArgs.hardwareEncoder  = false;
+            snapshotStreamArgs.encodedPixels    = persistedStream.encodedPixels;
+            snapshotStreamArgs.hardwareEncoder  = persistedStream.hardwareEncoder;
             snapshotStreamArgs.watermarkEnabled = persistedStream.watermarkEnabled;
             snapshotStreamArgs.OSDEnabled       = persistedStream.OSDEnabled;
 
@@ -921,6 +936,12 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
             if (halErr == CameraError::SUCCESS)
             {
                 ChipLogProgress(Camera, "Successfully allocated HAL Snapshot Stream for persisted ID %u.", streamID);
+
+                // Start the snapshot stream for serving.
+                if (mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(streamID) != CameraError::SUCCESS)
+                {
+                    ChipLogError(Camera, "Failed to start HAL Snapshot Stream for persisted ID %u.", streamID);
+                }
             }
             else
             {

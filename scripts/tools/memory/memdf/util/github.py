@@ -84,6 +84,12 @@ CONFIG: ConfigDescription = {
 }
 
 
+def _sync_paged(*args, **kwargs):
+    """Synchronous pagination helper compatible with ghapi v1 and v2+."""
+    paged_fn = getattr(ghapi.all, 'sync_paged', getattr(ghapi.all, 'paged'))
+    return paged_fn(*args, **kwargs)
+
+
 class Gh:
     """Utility wrapper for GitHub operations."""
 
@@ -96,7 +102,7 @@ class Gh:
         repo = config['github.repo']
         token = config['github.token']
         if owner and repo and token and token != 'SKIP':
-            self.ghapi = ghapi.all.GhApi(owner=owner, repo=repo, token=token)
+            self.ghapi = ghapi.all.GhApi(owner=owner, repo=repo, token=token, sync=True)
 
     def __bool__(self):
         return self.ghapi is not None
@@ -106,7 +112,7 @@ class Gh:
         assert self.ghapi
         try:
             return itertools.chain.from_iterable(
-                ghapi.all.paged(self.ghapi.issues.list_comments, pr))
+                _sync_paged(self.ghapi.issues.list_comments, pr))
         except Exception as e:
             log.exception("Failed to get comments for PR #%d: %r", pr, e)
             return []
@@ -116,7 +122,7 @@ class Gh:
         assert self.ghapi
         try:
             return itertools.chain.from_iterable(
-                ghapi.all.paged(self.ghapi.pulls.list_commits, pr))
+                _sync_paged(self.ghapi.pulls.list_commits, pr))
         except Exception as e:
             log.exception("Failed to get commits for PR #%d: %r", pr, e)
             return []
@@ -130,7 +136,7 @@ class Gh:
 
         assert self.ghapi
         try:
-            for page, i in enumerate(ghapi.all.paged(
+            for page, i in enumerate(_sync_paged(
                     self.ghapi.actions.list_artifacts_for_repo,
                     per_page=per_page)):
                 if not i.artifacts:

@@ -28,6 +28,11 @@ source_set("types") {
     "types_stub.h",
   ]
 
+  public_deps = [
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+
   deps = [
     "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",

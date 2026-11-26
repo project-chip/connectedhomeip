@@ -38,6 +38,7 @@ class TelinkApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     ALL_DEVICES = auto()
     BRIDGE = auto()
+    CLOSURE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
@@ -49,7 +50,6 @@ class TelinkApp(Enum):
     SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
-    WINDOW_COVERING = auto()
 
     def ExampleName(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
@@ -62,6 +62,8 @@ class TelinkApp(Enum):
             return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
+        if self == TelinkApp.CLOSURE:
+            return 'closure-app'
         if self == TelinkApp.CONTACT_SENSOR:
             return 'contact-sensor-app'
         if self == TelinkApp.LIGHT:
@@ -84,8 +86,6 @@ class TelinkApp(Enum):
             return 'temperature-measurement-app'
         if self == TelinkApp.THERMOSTAT:
             return 'thermostat'
-        if self == TelinkApp.WINDOW_COVERING:
-            return 'window-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
@@ -99,6 +99,8 @@ class TelinkApp(Enum):
             return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
+        if self == TelinkApp.CLOSURE:
+            return 'chip-telink-closure-example'
         if self == TelinkApp.CONTACT_SENSOR:
             return 'chip-telink-contact-sensor-example'
         if self == TelinkApp.LIGHT:
@@ -123,8 +125,6 @@ class TelinkApp(Enum):
             return 'chip-telink-temperature-measurement-example'
         if self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
-        if self == TelinkApp.WINDOW_COVERING:
-            return 'chip-telink-window-example'
         raise Exception(f'Unknown app type: {self!r}')
 
 
@@ -133,9 +133,12 @@ class TelinkBoard(Enum):
     TLSR9518ADK80D = auto()
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
-    TL3218X = auto()
-    TL3218X_ML3M = auto()
-    TL3218X_RETENTION = auto()
+    TL3228X = auto()
+    TL3228X_RETENTION = auto()
+    TL3238X = auto()
+    TL3238X_RETENTION = auto()
+    TL5218X = auto()
+    TL5218X_RETENTION = auto()
     TL7218X = auto()
     TL7218X_ML7G = auto()
     TL7218X_ML7M = auto()
@@ -150,12 +153,18 @@ class TelinkBoard(Enum):
             return 'tlsr9528a'
         if self == TelinkBoard.TLSR9528A_RETENTION:
             return 'tlsr9528a_retention'
-        if self == TelinkBoard.TL3218X:
-            return 'tl3218x'
-        if self == TelinkBoard.TL3218X_ML3M:
-            return 'tl3218x_ml3m'
-        if self == TelinkBoard.TL3218X_RETENTION:
-            return 'tl3218x_retention'
+        if self == TelinkBoard.TL3228X:
+            return 'tl3228x'
+        if self == TelinkBoard.TL3228X_RETENTION:
+            return 'tl3228x_retention'
+        if self == TelinkBoard.TL3238X:
+            return 'tl3238x'
+        if self == TelinkBoard.TL3238X_RETENTION:
+            return 'tl3238x_retention'
+        if self == TelinkBoard.TL5218X:
+            return 'tl5218x'
+        if self == TelinkBoard.TL5218X_RETENTION:
+            return 'tl5218x_retention'
         if self == TelinkBoard.TL7218X:
             return 'tl7218x'
         if self == TelinkBoard.TL7218X_ML7G:
@@ -184,6 +193,7 @@ class TelinkBuilder(Builder):
                  mars_board_config: bool = False,
                  usb_board_config: bool = False,
                  compress_lzma_config: bool = False,
+                 enable_concurrent_connection: bool = False,
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
@@ -203,6 +213,7 @@ class TelinkBuilder(Builder):
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
         self.compress_lzma_config = compress_lzma_config
+        self.enable_concurrent_connection = enable_concurrent_connection
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
@@ -255,6 +266,10 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.enable_concurrent_connection:
+            flags.append("-DCONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION=y")
+            flags.append("-DCONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING=y")
 
         if self.chip_enable_nfc_onboarding_payload:
             flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")

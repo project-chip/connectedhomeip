@@ -42,6 +42,16 @@ public:
             mNodeLookupHandle);
     }
 
+    void Shutdown() override
+    {
+        if (mNodeLookupHandle.IsActive())
+        {
+            LogErrorOnFailure(chip::AddressResolve::Resolver::Instance().CancelLookup(
+                mNodeLookupHandle, chip::AddressResolve::Resolver::FailureCallback::Skip));
+        }
+        DiscoverCommand::Shutdown();
+    }
+
     void OnNodeAddressResolved(const PeerId & peerId, const chip::AddressResolve::ResolveResult & result) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];

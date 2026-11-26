@@ -143,7 +143,7 @@ private:
 
         const char * rootName = "My Test Root CA";
         ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(
-            chip::ASN1::kOID_AttributeType_CommonName, CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
+            chip::ASN1::kOID_AttributeType_CommonName, CharSpan::fromCharString(rootName), true /* isPrintableString */
             ));
         ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId));
         rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;

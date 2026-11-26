@@ -1,1 +1,1 @@
-208 : [Silabs] Add Libs for series3
+222 : [CI] Publish chip-build and chip-build-minimal as multi-arch (amd64 + arm64) images

@@ -23,8 +23,10 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
+#include <clusters/OperationalCredentials/Enums.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace app {
@@ -56,10 +58,10 @@ public:
         Access::AccessControl & accessControl;
         DeviceLayer::PlatformManager & platformManager;
         app::EventManagement & eventManagement;
+        BitFlags<OperationalCredentials::Feature> featureMap;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
-        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
+    OperationalCredentialsCluster(EndpointId endpoint, const Context context);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -101,6 +103,8 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
+
+    bool HasFeature(OperationalCredentials::Feature feature) const { return mOpCredsContext.featureMap.Has(feature); }
     ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields] = {};
 };
 

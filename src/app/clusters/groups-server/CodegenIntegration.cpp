@@ -23,7 +23,6 @@
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/CodegenIntegration.h> // nogncheck
 #endif
-
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
 #include <app/clusters/identify-server/CodegenIntegration.h> // nogncheck
 #endif
@@ -54,15 +53,10 @@ public:
                                                   .groupDataProvider = *groupDataProvider,
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
                                                   .scenesIntegration = ScenesManagement::FindClusterOnEndpoint(endpointId),
-#else
-                                                  .scenesIntegration   = nullptr,
 #endif
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
                                                   .identifyIntegration = FindIdentifyClusterOnEndpoint(endpointId),
-#else
-                                                  .identifyIntegration = nullptr,
 #endif
-
                                               });
         return gServers[clusterInstanceIndex].Registration();
     }

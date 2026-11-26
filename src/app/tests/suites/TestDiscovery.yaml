@@ -155,7 +155,6 @@ tests:
       command: "FindCommissionableByCommissioningMode"
 
     - label: "Check Vendor ID (_V)"
-      PICS: MCORE.SC.VENDOR_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByVendorId"
       arguments:
@@ -164,7 +163,6 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -186,7 +184,6 @@ tests:
                     maxValue: 4096
 
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -197,7 +194,6 @@ tests:
     # Maybe it should be a PICS code to differentiate between manufacturer that wants to broadcast the
     # product id ?
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: MCORE.SC.VP_KEY
       disabled: true # [TestDiscovery] Enable back TXT key for Vendor ID and Product ID (VP) #25017
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -207,7 +203,6 @@ tests:
                 value: productId
 
     - label: "Optional TXT key for MRP Session Idle Interval (SII)"
-      PICS: MCORE.SC.SII_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -218,7 +213,6 @@ tests:
                     maxValue: 3600000
 
     - label: "Optional TXT key for MRP Session Active Interval (SAI)"
-      PICS: MCORE.SC.SAI_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -237,7 +231,6 @@ tests:
                 value: 1
 
     - label: "Optional TXT key for device type (DT)"
-      PICS: MCORE.SC.DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -246,7 +239,6 @@ tests:
                 value: deviceType
 
     - label: "Optional TXT key for device name (DN)"
-      PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -256,7 +248,8 @@ tests:
                     maxLength: 32
 
     - label: "Optional TXT key for rotating device identifier (RI)"
-      PICS: MCORE.SC.RI_KEY
+      # Optional key, and the app CI tests against does not advertise it.
+      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -266,7 +259,6 @@ tests:
                     maxValue: 100
 
     - label: "Optional TXT key for pairing hint (PH)"
-      PICS: MCORE.SC.PH_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -276,7 +268,6 @@ tests:
                     notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
-      PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

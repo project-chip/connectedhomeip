@@ -83,6 +83,10 @@ def merge_event_into(e: Event, cluster: Cluster):
     cluster.events.append(e)
 
 
+# The attribute qualities that an attribute's <quality> element sets.
+_QUALITY_ELEMENT_QUALITIES = AttributeQuality.FIXED | AttributeQuality.CHANGES_OMITTED
+
+
 def merge_attribute_into(a: Attribute, cluster: Cluster):
     """Pushes an attribute from a base cluster into an already
        parsed cluster.
@@ -107,9 +111,11 @@ def merge_attribute_into(a: Attribute, cluster: Cluster):
             api_maturity=existing.definition.api_maturity,
         )
 
-        # Inherit attribute quality
-        if existing.qualities == AttributeQuality.NONE:
-            existing.qualities = a.qualities
+        # A derived attribute can override its access and its <quality> qualities independently,
+        # so each one is inherited unless the derived attribute sets it.
+        for group in (_QUALITY_ELEMENT_QUALITIES, ~_QUALITY_ELEMENT_QUALITIES):
+            if not (existing.qualities & group):
+                existing.qualities |= a.qualities & group
 
         return
 

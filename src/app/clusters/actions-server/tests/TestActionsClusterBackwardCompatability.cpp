@@ -19,16 +19,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/actions-server/actions-server.h>
 
-// Stub for the ZAP-generated SetupURL::GetDefault accessor. CodegenIntegration.cpp calls this
-// at construction time to read the initial URL from Ember RAM. In tests there is no Ember
-// storage, so we return an empty string to simulate "attribute not populated".
-namespace chip::app::Clusters::Actions::Attributes::SetupURL {
-chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::MutableCharSpan & value)
-{
-    value.reduce_size(0);
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-} // namespace chip::app::Clusters::Actions::Attributes::SetupURL
 #include <app/tests/test-ember-api.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/ErrorStr.h>
@@ -42,6 +32,16 @@ chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::Mut
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
 #include <pw_unit_test/framework.h>
+
+// Stub for the ZAP-generated SetupURL::GetDefault accessor. CodegenIntegration.cpp calls this at
+// construction time to read the URL configured in ZAP. These tests have no ZAP configuration, so
+// the stub reports the attribute as having no configured default.
+namespace chip::app::Clusters::Actions::Attributes::SetupURL {
+chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::CharSpan &)
+{
+    return chip::Protocols::InteractionModel::Status::NotFound;
+}
+} // namespace chip::app::Clusters::Actions::Attributes::SetupURL
 
 namespace chip {
 namespace app {

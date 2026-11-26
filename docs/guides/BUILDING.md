@@ -306,6 +306,27 @@ source scripts/bootstrap.sh
 The `scripts/bootstrap.sh` script re-creates the environment from scratch, which
 is expensive, so avoid running it unless the environment is out of date.
 
+### Sharing an environment between checkouts
+
+Additional checkouts of the repository (e.g. created with `git worktree`) can
+use the environment of an existing checkout instead of bootstrapping their own:
+
+```shell
+source scripts/activate.sh --environment-root /path/to/connectedhomeip/.environment
+```
+
+With `--environment-root`, `activate.sh` fails instead of bootstrapping a new
+environment if the directory does not contain one. Note that:
+
+-   The additional checkout still needs its own submodules (at least
+    `third_party/pigweed/repo`).
+-   The checkouts should be at similar revisions, because the environment
+    provides the tool and Python package versions of the revision it was
+    bootstrapped from.
+-   Only run `bootstrap.sh` in the checkout the environment was created from.
+    Bootstrapping it from another checkout ties the environment to that checkout
+    instead.
+
 ## Build for the host OS (Linux or macOS)
 
 Run the following commands to build all sources, libraries, and tests for the
@@ -429,14 +450,14 @@ point for the external OSS-Fuzz automation, which drives it from its own
 `$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py` target.
 
 For local testing you likely want `libfuzzer` + `asan` builds, or -- for the
-`pw_fuzzer` `FuzzTests` below -- the `-ossfuzz` modifier, which reproduces the
+`FuzzTest` targets below -- the `-ossfuzz` modifier, which reproduces the
 OSS-Fuzz (libFuzzer-compatibility) build with the local toolchain.
 
-### `pw_fuzzer` `FuzzTests`
+### Google `FuzzTest` targets
 
 An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
-framework, integrated through `pw_fuzzer`. The Tests will have to be built and
-executed manually.
+framework, built by Matter's GN files in `third_party/fuzztest/`. The Tests will
+have to be built and executed manually.
 
 ```shell
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
@@ -471,7 +492,7 @@ Tests will be located in:
     [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
 
 -   FAQ: In the event of a build failure related to missing files or
-    dependencies for pw_fuzzer, check the
+    dependencies for FuzzTest, check the
     [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration

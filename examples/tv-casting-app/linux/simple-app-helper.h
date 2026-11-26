@@ -50,6 +50,16 @@ const char kMediaFileName[]     = "demo-clip.mp4";
 const uint64_t kMediaFileSize   = 1024;
 const char kMediaFileMimeType[] = "video/mp4";
 const char kMediaFileImageUri[] = "https://www.test.com/thumb.jpg";
+// Local path whose bytes the BDX server serves when the Media Device pulls the
+// file added above (the BDX designator matches kMediaFileName).
+const char kMediaFileLocalPath[] = "/tmp/demo-clip.mp4";
+
+// Demo ResponseID for the GetSharedFile flow. In a full flow this value is
+// learned from the SharedFilesAdded event emitted after RequestSharedFiles; the
+// demo uses a fixed value the tv-app allocates first.
+const uint16_t kSharedFileResponseId = 1;
+// Local path the GetSharedFile download is written to.
+const char kSharedFileDownloadPath[] = "/tmp/shared-download.bin";
 
 /**
  * @brief Singleton that reacts to CastingPlayer discovery results

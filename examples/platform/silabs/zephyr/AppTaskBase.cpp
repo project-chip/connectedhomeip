@@ -20,7 +20,8 @@
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
 #if CONFIG_CHIP_FACTORY_DATA
-#include "headers/ProvisionStorage.h"
+#include <platform/Zephyr/ZephyrConfig.h>
+#include <provision/ProvisionStorageReader.h>
 #endif
 
 #include <app/server/Dnssd.h>
@@ -168,6 +169,10 @@ void chip::Zephyr::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::Zephyr::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -180,13 +185,10 @@ void chip::Zephyr::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 #if CONFIG_OPERATIONAL_KEYSTORE
+    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
     chip::Zephyr::App::OperationalKeystore::Init(persistentStorage);
 #endif
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(persistentStorage);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     GetAppTask().PostInitMatterServerInstance();
     ChipLogDetail(DeviceLayer, "finishing init");
@@ -453,11 +455,11 @@ void chip::Zephyr::App::AppTaskBase::PrintCurrentVersion()
 CHIP_ERROR chip::Zephyr::App::AppTaskBase::InitFactoryDataProvider(void)
 {
 #if CONFIG_CHIP_FACTORY_DATA
-    static Silabs::Provision::Storage sStorage;
-    ReturnErrorOnFailure(sStorage.Initialize());
-    SetDeviceInstanceInfoProvider(&sStorage);
-    SetDeviceAttestationCredentialsProvider(&sStorage);
-    SetCommissionableDataProvider(&sStorage);
+    ReturnErrorOnFailure(Internal::ZephyrConfig::Init());
+    auto & storageReader = Silabs::Provision::ProvisionStorageReader::GetInstance();
+    SetDeviceInstanceInfoProvider(&storageReader);
+    SetDeviceAttestationCredentialsProvider(&storageReader);
+    SetCommissionableDataProvider(&storageReader);
 #else
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

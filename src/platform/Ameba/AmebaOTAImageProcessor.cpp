@@ -242,11 +242,14 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
+    ChipLogProgress(SoftwareUpdate, "Rebooting");
 
-    // Delay action time before calling HandleRestart
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10 * 1000),
-                                                                         HandleRestart, nullptr);
+#if CONFIG_ENABLE_AMEBA_OTA_RESTART_TIMER
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(CONFIG_AMEBA_OTA_RESTART_DELAY_MS), HandleRestart, nullptr);
+#else
+    matter_ota_platform_reset();
+#endif
 }
 
 void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer * systemLayer, void * appState)

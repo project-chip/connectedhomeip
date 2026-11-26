@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2025 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ namespace DeviceLayer {
 
 namespace {
 
+#if defined(CONFIG_THREAD_MONITOR)
 static void GetThreadInfo(const struct k_thread * thread, void * user_data)
 {
     size_t unusedStackSize;
@@ -91,6 +92,7 @@ static void GetThreadInfo(const struct k_thread * thread, void * user_data)
     threadMetrics->Next    = *threadMetricsListHead;
     *threadMetricsListHead = threadMetrics;
 }
+#endif // CONFIG_THREAD_MONITOR
 
 BootReasonType DetermineBootReason()
 {
@@ -278,7 +280,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-#if CONFIG_HWINFO
+#ifdef CONFIG_HWINFO
     bootReason = mBootReason;
     return CHIP_NO_ERROR;
 #else

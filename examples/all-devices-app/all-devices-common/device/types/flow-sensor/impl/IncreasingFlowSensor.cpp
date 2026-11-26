@@ -26,22 +26,13 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseFlowIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kFlowStepValue                           = 100;
-constexpr uint16_t kDefaultMinFlow                          = 0;
-constexpr uint16_t kDefaultMaxFlow                          = 10000;
-constexpr uint16_t kDefaultFlowTolerance                    = 10;
-
-const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
-    FlowMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinFlow);
-    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxFlow);
-    config.WithTolerance(kDefaultFlowTolerance);
-    return config;
-}();
+constexpr uint16_t kFlowStepDeciCubicMetersPerHour          = 100;
 
 } // namespace
 
-IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate, kDefaultFlowConfig) {}
+IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate, FlowMeasurementCluster::Config flowConfig) :
+    FlowSensor(timerDelegate, flowConfig)
+{}
 
 IncreasingFlowSensor::~IncreasingFlowSensor()
 {
@@ -54,8 +45,7 @@ CHIP_ERROR IncreasingFlowSensor::Register(EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(FlowSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
-    ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
+    ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(mFlowConfig.minMeasuredValue));
 
     // Kick off the timer loop to increase flow every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseFlowIntervalSec);
@@ -69,14 +59,21 @@ void IncreasingFlowSensor::Unregister(CodeDrivenDataModelProvider & provider)
 
 void IncreasingFlowSensor::TimerFired()
 {
-    mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
-    if (mFlowMeasuredValue > kDefaultFlowConfig.maxMeasuredValue.Value())
+    auto & cluster = mFlowMeasurementCluster.Cluster();
+
+    const uint16_t minFlow = cluster.GetMinMeasuredValue().ValueOr(0);
+    const uint16_t maxFlow = cluster.GetMaxMeasuredValue().ValueOr(static_cast<uint16_t>(UINT16_MAX - 1));
+
+    const DataModel::Nullable<uint16_t> currentFlow = cluster.GetMeasuredValue();
+    uint16_t nextFlowValue                          = minFlow;
+    if (!currentFlow.IsNull() && currentFlow.Value() >= minFlow &&
+        static_cast<uint32_t>(currentFlow.Value()) + kFlowStepDeciCubicMetersPerHour <= maxFlow)
     {
-        mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
+        nextFlowValue = static_cast<uint16_t>(currentFlow.Value() + kFlowStepDeciCubicMetersPerHour);
     }
 
-    ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue));
-    LogErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
+    ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(nextFlowValue));
+    LogErrorOnFailure(cluster.SetMeasuredValue(DataModel::MakeNullable(nextFlowValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseFlowIntervalSec));
 }

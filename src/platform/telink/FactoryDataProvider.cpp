@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 #include <assert.h>
 #include <zephyr/logging/log.h>
 
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+
 namespace chip {
 namespace {
 
@@ -51,6 +53,7 @@ void GetFactoryData(uint8_t * buf, const void * const data, const size_t len)
 
 CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_t bufSize)
 {
+    VerifyOrReturnError(str.data != nullptr, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     VerifyOrReturnError(bufSize >= str.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     GetFactoryData((uint8_t *) buf, str.data, str.len);
@@ -63,11 +66,18 @@ CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_
 
 namespace DeviceLayer {
 
+#ifdef CONFIG_SECURE_PROGRAMMING
+static constexpr uint32_t kFactoryDataOffset = 6;
+#endif
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 {
     uint8_t * factoryData = nullptr;
     size_t factoryDataSize;
+#ifdef CONFIG_SECURE_PROGRAMMING
+    uint8_t * dacData = nullptr;
+    size_t dacDataSize;
+#endif
 
     CHIP_ERROR error = mFlashFactoryData.ProtectFactoryDataPartitionAgainstWrite();
 
@@ -98,14 +108,29 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to read factory data partition");
+        free(ptr); // Only free on failure
         return error;
     }
 
+#ifdef CONFIG_SECURE_PROGRAMMING
+    if (!ParseFactoryData(factoryData + kFactoryDataOffset, factoryDataSize - kFactoryDataOffset, &mFactoryData))
+#else
     if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
+#endif
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
+        free(ptr); // Only free on failure
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
+
+#ifdef CONFIG_SECURE_PROGRAMMING
+    if (!LoadDACCertAndKey(mFactoryDataBuffer, &mFactoryData))
+    {
+        ChipLogError(DeviceLayer, "Failed to inject dac data");
+        free(ptr); // Only free on failure
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+#endif
 
     // Release the memory of mFactoryDataBuffer after complete parse
     free(ptr);
@@ -153,7 +178,11 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetDeviceAttestationCert(Mutab
     VerifyOrReturnError(outBuffer.size() >= mFactoryData.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrReturnError(mFactoryData.dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
+#ifdef CONFIG_SECURE_PROGRAMMING
+    memcpy(outBuffer.data(), mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
+#else
     GetFactoryData(outBuffer.data(), mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
+#endif
 
     outBuffer.reduce_size(mFactoryData.dac_cert.len);
 
@@ -195,13 +224,18 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
         return CHIP_ERROR_NO_MEMORY;
     }
 
+#ifdef CONFIG_SECURE_PROGRAMMING
+    memcpy(P_DACCert, mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
+#else
     GetFactoryData(P_DACCert, mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
+#endif
 
     // Extract public key from DAC cert.
     ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(P_DACCert), mFactoryData.dac_cert.len };
     chip::Crypto::P256PublicKey dacPublicKey;
 
     error = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
+
     free(P_DACCert);
     if (error != CHIP_NO_ERROR)
     {
@@ -219,7 +253,11 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
         return CHIP_ERROR_NO_MEMORY;
     }
 
+#ifdef CONFIG_SECURE_PROGRAMMING
+    memcpy(P_DACPrivKey, mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
+#else
     GetFactoryData(P_DACPrivKey, mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
+#endif
 
     // Load keypair from raw.
     error = LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(P_DACPrivKey), mFactoryData.dac_priv_key.len),
@@ -359,6 +397,37 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDate(uint16_t 
     year  = mFactoryData.date_year;
     month = mFactoryData.date_month;
     day   = mFactoryData.date_day;
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
+{
+    if (mFactoryData.mfg_date_str.data == nullptr)
+    {
+        suffixBuffer.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    constexpr size_t kDateLength    = 8;
+    constexpr size_t kMaxDateLength = 16;
+    char date[kMaxDateLength + 1];
+    ReturnErrorOnFailure(GetFactoryDataString(mFactoryData.mfg_date_str, date, sizeof(date)));
+
+    const size_t dateLen = mFactoryData.mfg_date_str.len;
+    VerifyOrReturnError(dateLen >= kDateLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // YYYY-MM-DD has no vendor suffix; the date prefix is provided by GetManufacturingDate().
+    if (dateLen == kDateLength || (dateLen == 10 && date[4] == '-' && date[7] == '-'))
+    {
+        suffixBuffer.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    const size_t suffixLen = dateLen - kDateLength;
+    VerifyOrReturnError(suffixBuffer.size() >= suffixLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(suffixBuffer.data(), date + kDateLength, suffixLen);
+    suffixBuffer.reduce_size(suffixLen);
     return CHIP_NO_ERROR;
 }
 

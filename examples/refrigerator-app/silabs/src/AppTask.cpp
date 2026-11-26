@@ -372,7 +372,13 @@ void AppTask::CabinetModeClusterInit(chip::EndpointId endpointId)
     VerifyOrDie(gCabinetModeInstance->Init() == CHIP_NO_ERROR);
 }
 
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     AppInstance().CabinetModeClusterInit(endpointId);
+}
+
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
+                                                                                  MatterClusterShutdownType)
+{
+    AppInstance().CabinetModeClusterShutdown(endpointId);
 }

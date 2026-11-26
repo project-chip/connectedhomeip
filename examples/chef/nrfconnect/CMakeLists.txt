@@ -121,6 +121,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
     ${CHEF}/common/clusters/switch/SwitchManager.cpp
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
+    ${CHEF}/common/clusters/thermostat/CodegenIntegration.cpp
+    ${CHEF}/common/clusters/thermostat/chef-thermostat.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/clusters/water-heater-management/chef-water-heater-management.cpp
@@ -150,8 +152,8 @@ include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 
 pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert.check pw_assert_log.check_backend)
-pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_assert.check pw_assert_zephyr.check)
+pw_set_backend(pw_assert.assert pw_assert_zephyr.assert)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 

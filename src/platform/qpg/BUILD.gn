@@ -60,7 +60,10 @@ static_library("qpg") {
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   public_configs = []
 
@@ -83,6 +86,8 @@ static_library("qpg") {
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
+        "../OpenThread/OpenThreadTxtEntries.h",
+        "../OpenThread/TxtEntries.h",
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }

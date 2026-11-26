@@ -25,6 +25,13 @@
 
 if (CONFIG_CHIP)
 
+if (CONFIG_SECURE_PROGRAMMING AND CONFIG_CHIP_FACTORY_DATA_BUILD)
+    message(FATAL_ERROR
+        "Secure programming requires per-device factory provisioning. "
+        "Disable CONFIG_CHIP_FACTORY_DATA_BUILD and flash factory_data_ext.bin "
+        "and dac_cert_key.bin to factory_partition and dac_keypair_partition separately.")
+endif()
+
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
@@ -56,7 +63,7 @@ endif()
 matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
 
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
-zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/wifi/${ZEPHYR_VERSION_STRING})
+zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/wifi/)
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
@@ -72,6 +79,9 @@ matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<${CONFIG_MBEDTLS_CFG_FILE}>)
 if (CONFIG_OPENTHREAD_TELINK_LIBRARY)
     set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib CACHE STRING INTERNAL)
     message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
+else()
+    set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread CACHE STRING INTERNAL)
+    message(STATUS "OpenThread used from source, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
 endif()
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
@@ -205,7 +215,7 @@ add_dependencies(process_binaries ${ZEPHYR_FINAL_EXECUTABLE})
 # Define 'build_mcuboot' target for building the MCUBoot bootloader
 # ==============================================================================
 
-if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_RISCV_TELINK_B9X OR CONFIG_SOC_RISCV_TELINK_TLX))
+if (CONFIG_BOOTLOADER_MCUBOOT AND (CONFIG_SOC_RISCV_TELINK_B9X OR CONFIG_SOC_FAMILY_TELINK_TLX))
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
@@ -237,8 +247,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 endif()
 
 # ==============================================================================
-# Define 'dfu-smp-image' target for building DFU over BT SMP image
+# DFU over BT SMP support: compile the DFUOverSMP source, common for all
+# Telink applications, and define 'dfu-smp-image' target for building
+# the DFU over BT SMP image
 # ==============================================================================
+
+if (CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library()
+    zephyr_library_sources(${CHIP_ROOT}/examples/platform/telink/util/src/DFUOverSMP.cpp)
+    target_include_directories(${ZEPHYR_CURRENT_LIBRARY} PRIVATE
+        ${CHIP_ROOT}/examples/platform/telink/util/include
+    )
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL chip)
+endif()
 
 if (CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD)
     file(WRITE "${PROJECT_BINARY_DIR}/empty.txt" "")

@@ -18,6 +18,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Keys for the configuration dictionary a client sends with -deviceController:updateControllerConfiguration:,
+ * and that a server sends with -controller:controllerConfigurationUpdated: (MTRXPCClientProtocol.h).
+ *
+ * The dictionary holds:
+ *
+ * - MTRDeviceControllerRegistrationControllerContextKey: a dictionary of controller-wide values. A server
+ *   includes MTRDeviceControllerRegistrationControllerNodeIDKey and
+ *   MTRDeviceControllerRegistrationControllerCompressedFabricIDKey (NSNumber values).
+ * - MTRDeviceControllerRegistrationNodeIDsKey: despite its name, an array of per-node dictionaries, not of
+ *   node IDs. Each holds the node's ID under MTRDeviceControllerRegistrationNodeIDKey (NSNumber). From a
+ *   server, each also holds MTRDeviceControllerRegistrationDeviceInternalStateKey (NSDictionary); from a client,
+ *   each may hold the interested-path keys below.
+ */
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDsKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationNodeIDKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerContextKey MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
@@ -25,6 +39,29 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey M
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
+
+/**
+ * Each node dictionary in the MTRDeviceControllerRegistrationNodeIDsKey array may also hold:
+ *
+ * - MTRDeviceControllerRegistrationInterestedPathsForAttributesKey: an array of the attribute paths the
+ *   client's delegates and pending attribute-value waiters for that node are interested in.
+ * - MTRDeviceControllerRegistrationInterestedPathsForEventsKey: an array of the event paths the client's
+ *   delegates for that node are interested in.
+ *
+ * A missing key means every attribute (or event) path.  Each element of either array is one of:
+ *
+ * - An NSNumber: an endpoint ID, meaning every path on that endpoint.
+ * - A dictionary with NSNumber values under MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and
+ *   MTRDeviceControllerRegistrationInterestedPathClusterIDKey: every path in that cluster.
+ * - The same dictionary plus MTRDeviceControllerRegistrationInterestedPathAttributeIDKey (attribute array)
+ *   or MTRDeviceControllerRegistrationInterestedPathEventIDKey (event array): that single path.
+ */
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>

@@ -17,22 +17,43 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_15_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_15_admin_storage.json
+#       --commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_15(MatterBaseTest):
+class TC_CNET_4_15(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_15(self):
         return [
-            TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned"),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900'),
             TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to '
                      'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '

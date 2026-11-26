@@ -133,6 +133,9 @@ public:
     // Get mode value by mode tag
     CHIP_ERROR GetModeValueByModeTag(uint16_t modeTag, uint8_t & value);
 
+    // This function returns true if the core mode tag given matches one of the supported core mode tags, otherwise false.
+    bool IsSupportedCoreModeTag(uint16_t coreModeTag);
+
     bool GetFailTransition() const { return mFailTransition; }
     void ToggleFailTransition() { mFailTransition = !mFailTransition; }
 

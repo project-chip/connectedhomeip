@@ -59,8 +59,7 @@ if [ "$#" == "0" ]; then
     <stm32_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            STM32WB5MM-DK
-            STM32WBA651-DK1
+            STM32WBA65I-DK1
 
     <Build options> - optional noteworthy build options for stm32
         chip_build_libshell

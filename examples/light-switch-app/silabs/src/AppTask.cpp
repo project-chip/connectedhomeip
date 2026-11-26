@@ -780,8 +780,10 @@ void AppTask::SwitchWorkerFunction(intptr_t context)
     CHIP_ERROR err            = Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
                                                                                           static_cast<void *>(data));
 
-    if (err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_HANDLER_NOT_SET || err == CHIP_ERROR_NO_MEMORY)
+    // On failure the binding manager did not take the data, so it is not released by LightSwitchContextReleaseHandler.
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(NotSpecified, "SwitchWorkerFunction - NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
         Platform::Delete(data);
     }
 }

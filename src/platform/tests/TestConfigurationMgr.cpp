@@ -254,6 +254,20 @@ static int SnprintfBuildTimeOfDay(char * s, size_t n, System::Clock::Seconds32 c
     return SnprintfBuildTimeOfDay(s, n, hour, minute, second);
 }
 
+TEST_F(TestConfigurationMgr, DeviceTypeId)
+{
+    // Without an override, GetDeviceTypeId() returns the compile-time default.
+    uint32_t deviceType = 0;
+    EXPECT_EQ(ConfigurationMgr().GetDeviceTypeId(deviceType), CHIP_NO_ERROR);
+    EXPECT_EQ(deviceType, static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE));
+
+    // The setter overrides the value returned by the getter for this session.
+    constexpr uint32_t kBasicVideoPlayer = 0x0028;
+    EXPECT_EQ(ConfigurationMgr().SetDeviceTypeId(kBasicVideoPlayer), CHIP_NO_ERROR);
+    EXPECT_EQ(ConfigurationMgr().GetDeviceTypeId(deviceType), CHIP_NO_ERROR);
+    EXPECT_EQ(deviceType, kBasicVideoPlayer);
+}
+
 TEST_F(TestConfigurationMgr, FirmwareBuildTime)
 {
     // Read the firmware build time from the configuration manager.
@@ -267,11 +281,11 @@ TEST_F(TestConfigurationMgr, FirmwareBuildTime)
     EXPECT_EQ(ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime), CHIP_NO_ERROR);
     EXPECT_EQ(overrideValue, chipEpochTime);
 
-    // Verify that the BuildTime.h parser can parse current CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE / TIME.
+    // Verify that the BuildTime.h parser can parse the current __DATE__ / __TIME__.
     do
     {
-        const char * date      = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
-        const char * timeOfDay = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+        const char * date      = __DATE__;
+        const char * timeOfDay = __TIME__;
 
         // Check that strings look good.
         EXPECT_FALSE(BUILD_DATE_IS_BAD(date));

@@ -88,11 +88,17 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
-    PyObject mAppContext                = nullptr;
+    PyObject mAppContext = nullptr;
 
-    // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
-    std::string mSdpString;
+    // Copy of the caller's command payload. The spans in mSolicitOfferData / mProvideOfferData (SDP, SFrame keys,
+    // ICE server strings, ICE transport policy) point into this buffer, so it must stay unchanged until the command
+    // is sent.
+    std::vector<uint8_t> mPayload;
+    // Backing storage for the list fields in mSolicitOfferData / mProvideOfferData.
+    std::vector<uint16_t> mVideoStreams;
+    std::vector<uint16_t> mAudioStreams;
+    std::vector<chip::app::Clusters::Globals::Structs::ICEServerStruct::Type> mICEServers;
+    std::vector<std::vector<chip::CharSpan>> mICEServerURLs; // URLs of each entry in mICEServers
     State mState = State::Idle;
 
     // Store the ICECandidates here to use to send asynchronously.
@@ -119,7 +125,7 @@ private:
                            chip::CommandId commandId, const T & requestData)
     {
         mCommandSender =
-            std::make_unique<chip::app::CommandSender>(this, &exchangeMgr,
+            std::make_unique<chip::app::CommandSender>(this, &exchangeMgr, sessionHandle,
                                                        /* isTimedRequest = */ false,
                                                        /* suppressResponse   = */ false, sessionHandle->AllowsLargePayload());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);

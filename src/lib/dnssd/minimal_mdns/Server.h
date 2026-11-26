@@ -45,10 +45,10 @@ public:
     virtual ~ServerDelegate() {}
 
     // Callback of when a query is received
-    virtual void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
+    virtual void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 
     // Callback of when a response is received
-    virtual void OnResponse(const BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
+    virtual void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 };
 
 // Defines an mDNS server that listens on one or more interfaces.
@@ -80,6 +80,16 @@ public:
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         chip::Inet::UDPEndPointHandle mUnicastQueryUdp;
 #endif
+        bool mMarked = false; ///< Temporary mark used by Listen()
+    };
+
+    /// Told about each endpoint a Listen() call opens.
+    class ListenDelegate
+    {
+    public:
+        virtual ~ListenDelegate() = default;
+
+        virtual void OnEndpointAdded(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType) = 0;
     };
 
     /**
@@ -124,9 +134,15 @@ public:
     /// Listen on the given interfaces/address types.
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
-    /// non-loopback interfaces.
-    CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
-                      uint16_t port);
+    /// non-loopback interfaces. An interface that cannot be listened on is skipped;
+    /// IsListening() tells whether any could be.
+    ///
+    /// Endpoints already open for a listed interface and address type are kept, and
+    /// those for one no longer listed are closed, so that calling this again after
+    /// the interfaces change opens only what is new. `delegate`, if given, is told
+    /// about each endpoint this call opens.
+    CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it, uint16_t port,
+                      ListenDelegate * delegate = nullptr);
 
     /// Send the specified packet to a destination IP address over the specified address
     virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
@@ -164,6 +180,8 @@ public:
 
 private:
     CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate);
+
+    EndpointInfo * FindEndpoint(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType);
 
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);

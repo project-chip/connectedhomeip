@@ -31,8 +31,14 @@ namespace Revision {
  * See section 8.1.1. "Revision History" in the "Interaction Model
  * Specification" chapter of the core Matter specification.
  */
-inline constexpr InteractionModelRevision kInteractionModelRevision = 12;
+inline constexpr InteractionModelRevision kInteractionModelRevision = 14;
 inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
+
+/**
+ * First interaction model revision where SuppressResponse and TimedRequest are
+ * optional in Write Request and Invoke Request messages.
+ */
+inline constexpr InteractionModelRevision kFirstRevisionWithOptionalRequestFlags = 14;
 
 /**
  * A monotonic number identifying the revision number of the Data Model against
@@ -41,7 +47,7 @@ inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
  * See section 7.1.1. "Revision History" in the "Data Model Specification"
  * chapter of the core Matter specification.
  */
-inline constexpr uint16_t kDataModelRevision = 21;
+inline constexpr uint16_t kDataModelRevision = 22;
 
 /*
  * A number identifying the specification version against which the
@@ -50,7 +56,7 @@ inline constexpr uint16_t kDataModelRevision = 21;
  * See section 11.1.5.22. "SpecificationVersion Attribute" in "Service and
  * Device Management" chapter of the core Matter specification.
  */
-inline constexpr uint32_t kSpecificationVersion = 0x01060100;
+inline constexpr uint32_t kSpecificationVersion = 0x01070000;
 
 } // namespace Revision
 } // namespace chip

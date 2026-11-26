@@ -39,11 +39,11 @@ from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_TLSCLIENT_2_1(MatterBaseTest):
+class TC_TLSCLIENT_2_1(MatterTestCommissionedDevice):
     def pics_TC_TLSCLIENT_2_1(self):
         return ["TLSCLIENT.S"]
 
@@ -52,7 +52,7 @@ class TC_TLSCLIENT_2_1(MatterBaseTest):
 
     def steps_TC_TLSCLIENT_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required('CR1'), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required('CR1')),
             TestStep(2, "TH reads MaxProvisioned attribute", "DUT replies with an uint8 value between 5 and 254."),
             TestStep(3, "TH reads ProvisionedEndpoints attribute", "DUT replies with an empty list of TLSEndpointStruct."),
         ]

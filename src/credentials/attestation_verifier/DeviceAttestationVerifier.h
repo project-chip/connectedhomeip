@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
@@ -26,6 +27,14 @@
 
 namespace chip {
 namespace Credentials {
+
+/**
+ * Check a DER certificate's subject key and both signature AlgorithmIdentifiers against the requested profiles.
+ * This does not authenticate the certificate; normal attestation chain verification is still required.
+ * Algorithm mismatches return CHIP_ERROR_FAILED_DEVICE_ATTESTATION. Malformed DER returns a parsing error.
+ */
+CHIP_ERROR ValidateAttestationCertificateProfile(ByteSpan certificate, DeviceAttestationCertProfile subjectProfile,
+                                                 DeviceAttestationCertProfile issuerProfile);
 
 enum class AttestationVerificationResult : uint16_t
 {
@@ -274,11 +283,12 @@ public:
     {
         AttestationInfo(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
                         const ByteSpan & attestationSignature, const ByteSpan & paiDer, const ByteSpan & dacDer,
-                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId) :
+                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId,
+                        DeviceAttestationCertProfile remoteAttestationProfile = DeviceAttestationCertProfile::kEcdsaMatterLegacy) :
             attestationElementsBuffer(attestationElements),
             attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
             paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
-            productId(remoteProductId)
+            productId(remoteProductId), attestationProfile(remoteAttestationProfile)
         {}
         const ByteSpan
             attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
@@ -289,6 +299,7 @@ public:
         const ByteSpan attestationNonceBuffer;     // Buffer containing attestation nonce.
         VendorId vendorId;
         uint16_t productId;
+        DeviceAttestationCertProfile attestationProfile;
     };
 
     // Copies the bytes passed to it, and holds the PAI, DAC, and CD for additional verification step

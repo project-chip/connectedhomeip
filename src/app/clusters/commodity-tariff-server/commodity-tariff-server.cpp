@@ -740,11 +740,11 @@ bool DayIsValid(Structs::DayStruct::Type * aDay)
 
 std::pair<const Structs::DayEntryStruct::Type *, const Structs::DayEntryStruct::Type *>
 FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight,
-             uint16_t * currentEntryMinutesRemain)
+             uint16_t * newCurrentDayEntryMinutesRemain)
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *currentEntryMinutesRemain                       = 0;
+    *newCurrentDayEntryMinutesRemain                 = 0;
 
     for (size_t i = 0; i < dayEntryIDs.size(); i++)
     {
@@ -789,7 +789,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         // Check if current entry matches the current time
         if (currentPtr->startTime <= minutesSinceMidnight && (currentPtr->startTime + duration) > minutesSinceMidnight)
         {
-            *currentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
+            *newCurrentDayEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
             break;
         }
     }
@@ -835,7 +835,6 @@ FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t comp
 CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
                                                   TariffComponentsDataClass & mgmtObj)
 {
-    CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
     // Use a fixed-size array with maximum expected components
@@ -849,28 +848,19 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
     const size_t componentCount                          = componentIDs.size();
 
-    // Validate component count
-    if (componentCount == 0 || componentCount > kTariffPeriodItemMaxIDs)
-    {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
+    // Validate component count with VerifyOrReturnError
+    VerifyOrReturnError(componentCount > 0 && componentCount <= kTariffPeriodItemMaxIDs, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     // Allocate memory for the component array
-    if (!tempBuffer.Calloc(componentCount))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrReturnError(tempBuffer.Calloc(componentCount), CHIP_ERROR_NO_MEMORY);
 
     for (size_t i = 0; i < componentIDs.size(); i++)
     {
         Structs::TariffComponentStruct::Type entry;
         auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(),
                                                                               componentIDs[i]);
-        if (current == nullptr)
-        {
-            err = CHIP_ERROR_NOT_FOUND;
-            break;
-        }
+        VerifyOrReturnError(current != nullptr, CHIP_ERROR_NOT_FOUND);
+
         entry = *current;
         if (current->label.HasValue())
         {
@@ -886,22 +876,18 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         }
         tempBuffer[i] = entry;
     }
-    SuccessOrExit(err);
 
-    err =
-        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount)));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount))));
 
-    err = mgmtObj.UpdateBegin(nullptr);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mgmtObj.UpdateBegin(nullptr));
 
-    if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
+    if (mgmtObj.UpdateFinish(true)) // Success path
     {
         aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 } // namespace Utils
 
@@ -976,13 +962,24 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
-    ReturnErrorOnFailure(SetCurrentDay(currentDay));
+    auto DayIsDifferentFromCurrent = [](const auto & newDay, const auto & currDay) -> bool {
+        if (newDay.IsNull() != currDay.IsNull())
+            return true;
+        if (newDay.IsNull())
+            return false;
+        return newDay.Value().date != currDay.Value().date;
+    };
+
+    if (DayIsDifferentFromCurrent(currentDay, mCurrentDay))
+    {
+        ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
+        ReturnErrorOnFailure(SetCurrentDay(currentDay));
+    }
 
     nextDay.SetNonNull(
         Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
 
-    if (Utils::DayIsValid(&nextDay.Value()))
+    if (Utils::DayIsValid(&nextDay.Value()) && DayIsDifferentFromCurrent(nextDay, mNextDay))
     {
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
         ReturnErrorOnFailure(SetNextDay(nextDay));
@@ -998,45 +995,99 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         return CHIP_ERROR_INTERNAL;
     }
 
-    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((matterEpochNow_s % kSecondsPerDay) / 60);
-    uint16_t currentEntryMinutesRemain  = 0;
-    auto & currentDayEntryIDs           = mCurrentDay.Value().dayEntryIDs;
+    const uint16_t minutesSinceMidnight      = static_cast<uint16_t>((matterEpochNow_s % kSecondsPerDay) / 60);
+    uint16_t newCurrentDayEntryMinutesRemain = 0;
+    auto & currentDayEntryIDs                = mCurrentDay.Value().dayEntryIDs;
 
-    auto [currentEntry, nextEntry] =
-        Utils::FindDayEntry(mServerTariffAttrsCtx, currentDayEntryIDs, minutesSinceMidnight, &currentEntryMinutesRemain);
+    auto [newCurrentDayEntry, newNextDayEntry] =
+        Utils::FindDayEntry(mServerTariffAttrsCtx, currentDayEntryIDs, minutesSinceMidnight, &newCurrentDayEntryMinutesRemain);
 
-    // Handle current day entry
-    DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
-    DataModel::Nullable<uint32_t> tmpDate;
+    DataModel::Nullable<Structs::DayEntryStruct::Type> updDayEntry;
+    DataModel::Nullable<uint32_t> updDayEntryDate;
 
-    if (currentEntry != nullptr)
+    auto DayEntryIsDifferent = [](const auto * newEntry, const auto & currEntry) -> bool {
+        if (newEntry == nullptr)
+        {
+            return !currEntry.IsNull();
+        }
+        if (currEntry.IsNull())
+        {
+            return true;
+        }
+        return currEntry.Value() != *newEntry;
+    };
+
+    auto DateIsDifferent = [](const auto & newDate, const auto & currDate) -> bool {
+        if (newDate.IsNull() && currDate.IsNull())
+        {
+            return false;
+        }
+        if (newDate.IsNull() || currDate.IsNull())
+        {
+            return true;
+        }
+        return currDate.Value() != newDate.Value();
+    };
+
+    // Calculate current day entry and date
+    if (newCurrentDayEntry != nullptr)
     {
-        tmpDayEntry.SetNonNull(*currentEntry);
-        tmpDate.SetNonNull(mCurrentDay.Value().date + (currentEntry->startTime * 60));
+        updDayEntry.SetNonNull(*newCurrentDayEntry);
+        updDayEntryDate.SetNonNull(mCurrentDay.Value().date + (newCurrentDayEntry->startTime * 60));
+    }
+    // else both remain null
 
-        ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
-                                                                           mCurrentTariffComponents_MgmtObj));
-        ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
+    // Handle current day entry - check if entry OR date changed
+    if (DayEntryIsDifferent(newCurrentDayEntry, mCurrentDayEntry) || DateIsDifferent(updDayEntryDate, mCurrentDayEntryDate))
+    {
+        if (newCurrentDayEntry != nullptr)
+        {
+            ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(
+                this, mServerTariffAttrsCtx, newCurrentDayEntry->dayEntryID, mCurrentTariffComponents_MgmtObj));
+            ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", updDayEntry.Value().dayEntryID);
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "UpdateCurrentAttrs: clearing current day entry");
+        }
+
+        ReturnErrorOnFailure(SetCurrentDayEntry(updDayEntry));
+        ReturnErrorOnFailure(SetCurrentDayEntryDate(updDayEntryDate));
     }
 
-    ReturnErrorOnFailure(SetCurrentDayEntry(tmpDayEntry));
-    ReturnErrorOnFailure(SetCurrentDayEntryDate(tmpDate));
+    updDayEntry.SetNull();
+    updDayEntryDate.SetNull();
 
-    // Handle next day entry
-    tmpDayEntry.SetNull();
-    tmpDate.SetNull();
-
-    if (nextEntry != nullptr)
+    // Calculate next day entry and date
+    if (newNextDayEntry != nullptr)
     {
-        tmpDayEntry.SetNonNull(*nextEntry);
-        ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
-                                                                           mNextTariffComponents_MgmtObj));
-        ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
-        tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
+        updDayEntry.SetNonNull(*newNextDayEntry);
+        if (!mCurrentDayEntryDate.IsNull())
+        {
+            updDayEntryDate.SetNonNull(mCurrentDayEntryDate.Value() + newCurrentDayEntryMinutesRemain * 60);
+        }
+    }
+    // else both remain null
+
+    // Handle next day entry - check if entry OR date changed
+    if (DayEntryIsDifferent(newNextDayEntry, mNextDayEntry) || DateIsDifferent(updDayEntryDate, mNextDayEntryDate))
+    {
+        if (newNextDayEntry != nullptr)
+        {
+            ReturnErrorOnFailure(Utils::UpdateTariffComponentAttrsDayEntryById(
+                this, mServerTariffAttrsCtx, newNextDayEntry->dayEntryID, mNextTariffComponents_MgmtObj));
+            ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day entry: %u", updDayEntry.Value().dayEntryID);
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "UpdateCurrentAttrs: clearing next day entry");
+        }
+
+        ReturnErrorOnFailure(SetNextDayEntry(updDayEntry));
+        ReturnErrorOnFailure(SetNextDayEntryDate(updDayEntryDate));
     }
 
-    ReturnErrorOnFailure(SetNextDayEntry(tmpDayEntry));
-    return SetNextDayEntryDate(tmpDate);
+    return CHIP_NO_ERROR;
 }
 
 void Instance::DeinitCurrentAttrs()

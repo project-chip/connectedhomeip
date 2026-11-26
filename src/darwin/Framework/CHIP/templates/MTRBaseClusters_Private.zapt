@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 
 /**
  * Cluster {{name}}
@@ -79,11 +80,13 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
                                    queue:(dispatch_queue_t)queue;
 
 @end
+#endif
 {{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 
 /**
  * Cluster {{name}}
@@ -140,6 +143,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 {{/zcl_attributes_server}}
 
 @end
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

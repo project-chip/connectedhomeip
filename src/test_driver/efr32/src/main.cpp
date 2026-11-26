@@ -19,21 +19,21 @@
 #include <pw_unit_test/unit_test_service.h>
 
 #include <AppConfig.h>
-#include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
 #include <cmsis_os2.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <cstring>
-#include <headers/ProvisionManager.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTest.h>
 #include <mbedtls/platform.h>
 #include <nl_test_service/nl_test.rpc.pb.h>
 #include <pigweed/RpcService.h>
+#include <pigweed_rpc/PigweedLogger.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <provision/ProvisionStorageReader.h>
 #include <sl_cmsis_os2_common.h>
 #include <sl_system_init.h>
 #include <sl_system_kernel.h>
@@ -103,11 +103,9 @@ int main(void)
     Platform::MemoryInit();
     PlatformMgr().InitChipStack();
 
-    // Init Provision Manager and provider instanaces. Required for inits tied to the event loop
-    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
-    provision.Init();
-    SetDeviceInstanceInfoProvider(&provision.GetStorage());
-    SetCommissionableDataProvider(&provision.GetStorage());
+    auto & storageReader = Silabs::Provision::ProvisionStorageReader::GetInstance();
+    SetDeviceInstanceInfoProvider(&storageReader);
+    SetCommissionableDataProvider(&storageReader);
 
     ChipLogProgress(AppServer, "***** CHIP EFR32 device tests *****\r\n");
 

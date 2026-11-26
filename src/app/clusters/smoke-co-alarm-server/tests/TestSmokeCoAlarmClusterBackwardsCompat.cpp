@@ -40,12 +40,22 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
     ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
+// 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+constexpr uint32_t kTestExpiryDate = 3976214400;
+
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
-    SmokeCoAlarmCluster::Config cfg;
-    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    return cfg;
+    return SmokeCoAlarmCluster::Config()
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kTestExpiryDate)
+        .WithUnmounted();
 }
 
 struct TestSmokeCoAlarmBackwardsCompat : public ::testing::Test
@@ -72,8 +82,8 @@ struct TestSmokeCoAlarmBackwardsCompatNoOptionals : public TestSmokeCoAlarmBackw
     void SetUp() override
     {
         SmokeCoAlarmCluster::Config cfg;
-        cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-        // optionalAttribs left empty
+        cfg.WithSmokeAlarm({}).WithCOAlarm();
+        // optional attributes left unset
         ASSERT_EQ(SmokeCoAlarmServer::Instance().Init(kTestEndpointId, cfg), CHIP_NO_ERROR);
     }
     void TearDown() override
@@ -250,4 +260,20 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, UnmountedState_SetRejected_Ge
     bool v{};
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetUnmountedState(kTestEndpointId, v));
     EXPECT_FALSE(v);
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, ContaminationState_SetIgnored_GetReturnsDefault)
+{
+    SmokeCoAlarmServer::Instance().SetContaminationState(kTestEndpointId, ContaminationStateEnum::kCritical);
+    ContaminationStateEnum v{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetContaminationState(kTestEndpointId, v));
+    EXPECT_EQ(v, ContaminationStateEnum::kNormal);
+}
+
+TEST_F(TestSmokeCoAlarmBackwardsCompatNoOptionals, SmokeSensitivityLevel_SetIgnored_GetReturnsDefault)
+{
+    SmokeCoAlarmServer::Instance().SetSmokeSensitivityLevel(kTestEndpointId, SensitivityEnum::kLow);
+    SensitivityEnum v{};
+    EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetSmokeSensitivityLevel(kTestEndpointId, v));
+    EXPECT_EQ(v, SensitivityEnum::kStandard);
 }

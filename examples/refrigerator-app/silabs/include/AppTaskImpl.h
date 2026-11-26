@@ -59,6 +59,12 @@ public:
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, CabinetModeClusterInitImpl, endpointId);
     }
 
+    // Tears down the ModeBase::Instance for the cabinet mode cluster on the given endpoint
+    void CabinetModeClusterShutdown(chip::EndpointId endpointId)
+    {
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, CabinetModeClusterShutdownImpl, endpointId);
+    }
+
     // ModeBase::Delegate hooks. Override matching *Impl() in Derived to customize cabinet mode behavior.
     CHIP_ERROR Init() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, CabinetModeInitImpl); }
 
@@ -104,6 +110,8 @@ private:
     }
 
     void CabinetModeClusterInitImpl(chip::EndpointId endpointId) { AppTask::CabinetModeClusterInit(endpointId); }
+
+    void CabinetModeClusterShutdownImpl(chip::EndpointId endpointId) { AppTask::CabinetModeClusterShutdown(endpointId); }
 
     CHIP_ERROR CabinetModeInitImpl() { return AppTask::Init(); }
 

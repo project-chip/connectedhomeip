@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_structs}}
 {{> struct_interface_impl cluster=parent.name struct=name}}
 
@@ -126,6 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/zcl_events}}
 
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

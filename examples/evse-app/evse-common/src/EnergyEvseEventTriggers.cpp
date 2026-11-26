@@ -64,7 +64,8 @@ void SetTestEventTrigger_BasicFunctionality()
 
     dg->HwSetMaxHardwareChargeCurrentLimit(32000);
     dg->HwSetMaxHardwareDischargeCurrentLimit(32000);
-    TEMPORARY_RETURN_IGNORED instance->SetCircuitCapacity(32000);
+    // Via the delegate, so the charge and discharge current limits are recomputed
+    dg->HwSetCircuitCapacity(32000);
     TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
 }
@@ -76,7 +77,7 @@ void SetTestEventTrigger_BasicFunctionalityClear()
 
     dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
     dg->HwSetMaxHardwareDischargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit);
-    TEMPORARY_RETURN_IGNORED instance->SetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
+    dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
     TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
 }

@@ -41,10 +41,30 @@ void ZoneManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
                                                                          uint16_t & outZoneID)
 {
+    return CreateTwoDCartesianZone(zone, NullOptional, NullOptional, outZoneID);
+}
+
+Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
+                                                                         const Optional<NodeId> & nodeId,
+                                                                         const Optional<EndpointId> & endpointId,
+                                                                         uint16_t & outZoneID)
+{
+    const uint16_t candidateZoneId = GetNewZoneId();
+    if (zone.use == ZoneUseEnum::kPrivacy)
+    {
+        if (mCameraDevice == nullptr ||
+            mCameraDevice->GetCameraHALInterface().SetPrivacyZone(candidateZoneId, zone) != CameraError::SUCCESS)
+        {
+            return Status::Failure;
+        }
+    }
+
     TwoDCartZone twoDCartZone;
-    outZoneID           = GetNewZoneId();
-    twoDCartZone.zoneId = outZoneID;
-    twoDCartZone.zone   = zone;
+    outZoneID               = candidateZoneId;
+    twoDCartZone.zoneId     = outZoneID;
+    twoDCartZone.zone       = zone;
+    twoDCartZone.nodeId     = nodeId;
+    twoDCartZone.endpointId = endpointId;
 
     mTwoDCartZones.push_back(twoDCartZone);
 
@@ -53,6 +73,13 @@ Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const T
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone)
 {
+    return UpdateTwoDCartesianZone(zoneID, zone, NullOptional, NullOptional);
+}
+
+Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone,
+                                                                         const Optional<NodeId> & nodeId,
+                                                                         const Optional<EndpointId> & endpointId)
+{
     // Find an iterator to the item with the matching ID
     auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
                            [zoneID](const TwoDCartZone & zone) { return zone.zoneId == zoneID; });
@@ -60,10 +87,29 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_
     // If an item with the zoneID was found
     if (it != mTwoDCartZones.end())
     {
+        if (zone.use == ZoneUseEnum::kPrivacy)
+        {
+            if (mCameraDevice == nullptr ||
+                mCameraDevice->GetCameraHALInterface().SetPrivacyZone(zoneID, zone) != CameraError::SUCCESS)
+            {
+                return Status::Failure;
+            }
+        }
+        else if (it->zone.use == ZoneUseEnum::kPrivacy)
+        {
+            if (mCameraDevice == nullptr ||
+                mCameraDevice->GetCameraHALInterface().RemovePrivacyZone(zoneID) != CameraError::SUCCESS)
+            {
+                return Status::Failure;
+            }
+        }
+
         TwoDCartZone twoDCartZone;
-        twoDCartZone.zoneId = zoneID;
-        twoDCartZone.zone   = zone;
-        *it                 = twoDCartZone; // Replace the found item with the newItem
+        twoDCartZone.zoneId     = zoneID;
+        twoDCartZone.zone       = zone;
+        twoDCartZone.nodeId     = nodeId;
+        twoDCartZone.endpointId = endpointId;
+        *it                     = twoDCartZone; // Replace the found item with the newItem
 
         return Status::Success; // Indicate success
     }
@@ -73,9 +119,22 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_
 
 Protocols::InteractionModel::Status ZoneManager::RemoveZone(uint16_t zoneID)
 {
-    mTwoDCartZones.erase(std::remove_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
-                                        [&](const TwoDCartZone & zone) { return zone.zoneId == zoneID; }),
-                         mTwoDCartZones.end());
+    auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
+                           [zoneID](const TwoDCartZone & zone) { return zone.zoneId == zoneID; });
+    if (it == mTwoDCartZones.end())
+    {
+        return Status::NotFound;
+    }
+
+    if (it->zone.use == ZoneUseEnum::kPrivacy)
+    {
+        if (mCameraDevice == nullptr || mCameraDevice->GetCameraHALInterface().RemovePrivacyZone(zoneID) != CameraError::SUCCESS)
+        {
+            return Status::Failure;
+        }
+    }
+
+    mTwoDCartZones.erase(it);
 
     return Status::Success;
 }
@@ -86,10 +145,8 @@ Protocols::InteractionModel::Status ZoneManager::CreateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
@@ -98,10 +155,8 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
@@ -110,15 +165,51 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     {
         return Status::Success;
     }
-    else
+
+    return Status::Failure;
+}
+
+bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
+{
+    // Find an iterator to the item with the matching ID
+    auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
+                           [zoneId](const TwoDCartZone & zone) { return zone.zoneId == zoneId; });
+
+    // If an item with the zoneID was found, ensure it is not a privacy zone
+    if (it != mTwoDCartZones.end())
     {
-        return Status::Failure;
+        return (it->zone.use != ZoneUseEnum::kPrivacy);
     }
+    return false;
 }
 
 CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)
 {
+    // TODO: Persist user-defined zones in KVS so zones survive device reboots.
     aZones.clear();
+    if (mCameraDevice != nullptr)
+    {
+        if (mCameraDevice->GetCameraHALInterface().ClearPrivacyZones() != CameraError::SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    for (const auto & storedZone : mTwoDCartZones)
+    {
+        if (storedZone.zone.use == ZoneUseEnum::kPrivacy)
+        {
+            if (mCameraDevice == nullptr ||
+                mCameraDevice->GetCameraHALInterface().SetPrivacyZone(storedZone.zoneId, storedZone.zone) != CameraError::SUCCESS)
+            {
+                return CHIP_ERROR_INTERNAL;
+            }
+        }
+
+        ZoneInformationStorage zoneInfo;
+        zoneInfo.Set(storedZone.zoneId, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(storedZone.zone),
+                     storedZone.nodeId, storedZone.endpointId);
+        aZones.push_back(zoneInfo);
+    }
 
     return CHIP_NO_ERROR;
 }

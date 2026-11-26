@@ -16,7 +16,9 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ModeSelectCluster.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/SupportedModesManager.cpp"
     "${CLUSTER_DIR}/SupportedModesManager.h"
     "${CLUSTER_DIR}/supported-modes-manager.h"
 )

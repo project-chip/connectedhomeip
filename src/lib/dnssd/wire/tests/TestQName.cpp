@@ -23,7 +23,7 @@
 
 namespace {
 
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 /// Convenience method to have a  serialized QName:
 ///

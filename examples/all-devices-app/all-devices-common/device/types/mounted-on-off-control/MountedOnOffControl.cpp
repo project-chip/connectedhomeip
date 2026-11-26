@@ -14,14 +14,15 @@
  *    limitations under the License.
  */
 
-#include "MountedOnOffControl.h"
-
+#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <devices/Types.h>
 
 namespace chip::app {
 
-MountedOnOffControl::MountedOnOffControl(const Context & context) :
-    LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1), context)
+MountedOnOffControl::MountedOnOffControl(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1), onOffDelegate, effectDelegate,
+              identifyDelegate, context)
 {}
 
 } // namespace chip::app

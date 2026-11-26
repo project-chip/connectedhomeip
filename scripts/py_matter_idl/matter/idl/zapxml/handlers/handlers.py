@@ -15,8 +15,9 @@
 import logging
 from typing import Any
 
-from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
-                                         EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
+from matter.idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality, ConstantEntry,
+                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -26,7 +27,7 @@ log = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
-    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform'}
+    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform', 'disallowConform', 'obsoleteConform', 'describedConform'}
 
 
 class ClusterNameHandler(BaseHandler):
@@ -151,9 +152,18 @@ class AttributeHandler(BaseHandler):
                 else:
                     log.error("Unknown access: %r", attrs['op'])
 
+            if attrs.get('fabricSensitive', "false").lower() == 'true':
+                self._attribute.definition.qualities |= FieldQuality.FABRIC_SENSITIVE
+
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
+        if name.lower() == 'quality':
+            if attrs.get('changeOmitted', 'false').lower() == 'true':
+                self._attribute.qualities |= AttributeQuality.CHANGES_OMITTED
+            if attrs.get('persistence', '') == 'fixed':
+                self._attribute.qualities |= AttributeQuality.FIXED
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)

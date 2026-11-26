@@ -16,7 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CommodityPriceTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/commodity-price-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/commodity-price-server.h"
 )

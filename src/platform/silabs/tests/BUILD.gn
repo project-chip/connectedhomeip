@@ -19,10 +19,33 @@ import("${chip_root}/build/chip/chip_test_group.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/platform/silabs/tests/tests.gni")
 
+config("mock_sleeptimer") {
+  include_dirs = [ "mocks" ]
+}
+
+chip_test_suite("clock_tests") {
+  output_name = "libSilabsClockTests"
+  test_sources = [ "TestSystemTimeSupport.cpp" ]
+  sources = [
+    "mocks/sl_core.h",
+    "mocks/sl_sleeptimer.h",
+  ]
+  public_configs = [ ":mock_sleeptimer" ]
+  public_deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+  ]
+  cflags = [ "-Wconversion" ]
+}
+
 chip_test_group("silabs_platform_tests") {
   tests = []
 
   if (sl_build_unit_tests) {
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [ ":clock_tests" ]
+    }
     tests += [
       "${chip_root}/examples/platform/silabs/tests:examples_tests",
       "${chip_root}/src/platform/silabs/wifi/icd/tests:wifi_icd_tests",

@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -38,13 +38,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CGEN_2_1(MatterBaseTest):
+class TC_CGEN_2_1(MatterTestCommissionedDevice):
     def desc_TC_CGEN_2_1(self) -> str:
         return "[TC-CGEN-2.1] Breadcrumb, BasicCommissioningInfo, RegulatoryConfig, LocationCapability and SupportsConcurrentConnection attributes [{DUT_Server}]"
 
@@ -53,7 +53,7 @@ class TC_CGEN_2_1(MatterBaseTest):
 
     def steps_TC_CGEN_2_1(self):
         return [
-            TestStep("1", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("1", "DUT commissioned and preconditions"),
             TestStep("2", "TH reads the Breadcrumb attribute"),
             TestStep("3", "TH writes Breadcrumb = 1"),
             TestStep("4", "TH reads Breadcrumb again and verifies = 1"),

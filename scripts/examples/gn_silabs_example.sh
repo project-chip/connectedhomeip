@@ -20,7 +20,7 @@
 
 set -e
 
-if [[ -z "${MATTER_ROOT}" ]]; then
+if [[ -z "$MATTER_ROOT" ]]; then
     echo "Using default path for Matter root"
     CHIP_ROOT="$(dirname "$0")/../.."
 else
@@ -28,7 +28,7 @@ else
     CHIP_ROOT="$MATTER_ROOT"
 fi
 
-if [[ -z "${PW_ENVIRONMENT_ROOT}" ]]; then
+if [[ -z "$PW_ENVIRONMENT_ROOT" ]]; then
     echo "Using the bootstrapped pigweed ENV in Matter root"
     PW_PATH="$CHIP_ROOT/.environment/cipd/packages/pigweed"
 else
@@ -123,8 +123,10 @@ if [ "$#" == "0" ]; then
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
         si91x_alarm_periodic_time
             Periodic time at which the 917 SoC should wakeup (Default: 30sec)
-        wifi_ncp_module
-            Build SiWx917_ncp example for NCP module board (Default false)
+        wifi_ncp_module_acx
+            Enable SL_SI91X_ACX_MODULE for SiWx917 NCP ACX boards (Default false)
+        wifi_ncp_module_bypass_clk
+            Enable USE_BYPASS_CLOCK for SiWx917 NCP (Default false)
         Presets
         --icd
             enable ICD features, set thread mtd
@@ -179,7 +181,7 @@ else
                 shift
                 ;;
             --wifi)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--wifi requires SiWx917"
                     exit 1
                 fi
@@ -202,7 +204,7 @@ else
                 shift
                 ;;
             --low-power)
-                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
+                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true sl_uart_log_output=false use_external_flash=false "
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
@@ -262,7 +264,7 @@ else
                 shift
                 ;;
             --gn_path)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--gn_path requires a path to GN"
                     exit 1
                 else
@@ -283,13 +285,17 @@ else
         esac
     done
 
-    if [ -z "$SILABS_BOARD" ]; then
+    if [ "$SILABS_BOARD" = "" ]; then
         echo "SILABS_BOARD not defined"
         exit 1
     fi
 
+    if [[ "BRD2601B" == "$SILABS_BOARD" ]]; then
+        echo "BRD2601B is deprecated, please use the BRD2601D"
+    fi
+
     # 917 exception. TODO find a more generic way
-    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4342A" "BRD2708A" "BRD2911A")
+    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4343C" "BRD4342A" "BRD2708A" "BRD2911A")
     if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
@@ -391,12 +397,12 @@ EOF
         bootloaderPath=""
         commanderPath=""
         # find the matter root folder
-        if [ -z "$MATTER_ROOT" ]; then
+        if [ "$MATTER_ROOT" = "" ]; then
             MATTER_ROOT="$CHIP_ROOT"
         fi
 
         # set commander path
-        if [ -z "$COMMANDER_PATH" ]; then
+        if [ "$COMMANDER_PATH" = "" ]; then
             commanderPath="commander"
         else
             commanderPath="$COMMANDER_PATH"

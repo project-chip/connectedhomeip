@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,6 @@
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
 
-CHIP_ERROR InitBindingHandler();
-void SwitchWorkerFunction(intptr_t context);
-void BindingWorkerFunction(intptr_t context);
-
 struct BindingCommandData
 {
     chip::AttributeId attributeId;
@@ -37,3 +33,8 @@ struct BindingCommandData
     bool isReadAttribute = false;
     uint32_t args[7];
 };
+
+CHIP_ERROR InitBindingHandler();
+CHIP_ERROR ScheduleSwitchCommandWork(BindingCommandData * data);
+void SwitchWorkerFunction(intptr_t context);
+void BindingWorkerFunction(intptr_t context);

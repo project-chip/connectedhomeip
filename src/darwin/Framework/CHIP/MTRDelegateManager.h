@@ -59,6 +59,8 @@ MTR_TESTABLE
 - (void)removeDelegate:(DelegateType)delegate;
 - (void)removeAllDelegates;
 
+@property (nonatomic, readonly) NSUInteger delegateInfoCount;
+
 // Iterates the delegates, and removes delegate info if the delegate object has dealloc'ed.
 // Returns the number of delegates remaining at the end of the iteration.
 //

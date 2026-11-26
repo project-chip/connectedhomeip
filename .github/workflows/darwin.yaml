@@ -53,7 +53,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -104,7 +104,7 @@ jobs:
                       defines: ENABLE_LEAK_DETECTION=1
         steps:
             - name: Checkout
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -116,16 +116,20 @@ jobs:
               # than the 6-hour overall job timeout.  4.5 hours should be plenty.
               timeout-minutes: 270
               working-directory: src/darwin/Framework
+              shell: bash # sets pipefail, so an xcodebuild failure fails the step
               run: |
                   mkdir -p /tmp/darwin/framework-tests
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
-                  echo "Quiet work in progress - artifacts 'darwin-tests.log' and 'darwin-tests-err.log' will be output."
+                  echo "Showing filtered output only. The full output will be in darwin-tests.log in the log artifact."
+                  status=0
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
                   -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
                   -sdk macosx ${{ matrix.options.arguments }} \
                   GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
-                  > /tmp/darwin/framework-tests/darwin-tests.log 2> /tmp/darwin/framework-tests/darwin-tests-err.log
+                  2>&1 | tee /tmp/darwin/framework-tests/darwin-tests.log | ../../../scripts/helpers/darwin_log_filter.sh || status=$?
+                  ../../../scripts/helpers/darwin_test_summary.sh /tmp/darwin/framework-tests/TestResults.xcresult || true
+                  exit $status
             - name: Generate Summary
               if: always()
               working-directory: /tmp
@@ -139,7 +143,7 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: failure() && !env.ACT
               with:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}

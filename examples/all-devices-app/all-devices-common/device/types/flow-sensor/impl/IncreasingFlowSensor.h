@@ -30,7 +30,7 @@ namespace app {
 class IncreasingFlowSensor : public FlowSensor, public TimerContext
 {
 public:
-    IncreasingFlowSensor(TimerDelegate & timerDelegate);
+    IncreasingFlowSensor(TimerDelegate & timerDelegate, Clusters::FlowMeasurementCluster::Config flowConfig);
     ~IncreasingFlowSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -38,9 +38,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    uint16_t mFlowMeasuredValue = 0;
 };
 
 } // namespace app

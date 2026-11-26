@@ -16,7 +16,6 @@
  */
 
 #include "CodegenIntegration.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/static-cluster-config/LaundryWasherControls.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 

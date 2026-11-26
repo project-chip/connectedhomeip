@@ -15,6 +15,30 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_9_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_9_admin_storage.json
+#       --commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import test_plan_support
@@ -25,13 +49,13 @@ import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_non_empty_string, is_valid_bool_value
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_9(MatterBaseTest):
+class TC_CNET_4_9(MatterTestCommissionedDevice):
     """
     [TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server].
     Example Usage:
@@ -47,7 +71,7 @@ class TC_CNET_4_9(MatterBaseTest):
     def steps_TC_CNET_4_9(self):
         return [
             TestStep("Precondition", test_plan_support.commission_if_required(
-            ), "DUT is commissioned on wifi network provided in --wifi-ssid parameter; TH can communicate with the DUT", is_commissioning=True),
+            ), "DUT is commissioned on wifi network provided in --wifi-ssid parameter; TH can communicate with the DUT"),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900.",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH."),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",

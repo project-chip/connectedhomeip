@@ -28,6 +28,7 @@ import pathlib
 import re
 import select
 import shlex
+import shutil
 import sys
 import threading
 import time
@@ -39,8 +40,9 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
+from matter.testing.commissioning_types import CommissioningMethod
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.metadata import TAG_OPTION_HELP, Metadata, MetadataReader, RunArgumentsError, TagFilter, extract_runs_args
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -49,6 +51,8 @@ log = logging.getLogger(__name__)
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
+LINUX_WIFI_SSID = "MatterAP"
+LINUX_WIFI_PASSPHRASE = "MatterAPPassword"
 
 TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
@@ -105,13 +109,18 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
 
 @dataclasses.dataclass
 class TestRunConfig:
-    """Configuration for the app under test."""
+    """Configuration for the app under test.
+
+    app_command_prefix runs the app in its isolated network namespace for
+    BLE-WiFi tests. linux_ble_wifi_environment supplies it; other runs leave it empty.
+    """
     app: str
     app_args: str
     script_args: str
     app_ready_pattern: str | None
     stream_output: typing.BinaryIO
     app_stdin_pipe: str | None = None
+    app_command_prefix: tuple[str, ...] = ()
 
 
 class AppProcessManager:
@@ -127,7 +136,8 @@ class AppProcessManager:
             ready_pattern = re.compile(self.config.app_ready_pattern.encode())
         else:
             ready_pattern = self.config.app_ready_pattern
-        self.app_process = Subprocess(self.config.app, *shlex.split(self.config.app_args),
+        app_command = [*self.config.app_command_prefix, self.config.app, *shlex.split(self.config.app_args)]
+        self.app_process = Subprocess(app_command[0], *app_command[1:],
                                       output_cb=process_chip_app_output,
                                       f_stdout=self.config.stream_output,
                                       f_stderr=self.config.stream_output)
@@ -206,6 +216,44 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
+def run_commissioning_args(run: Metadata) -> tuple[str | None, str | None, str | None]:
+    """Return (commissioning_method, wifi_ssid, wifi_passphrase) from a test run's script arguments."""
+    if run.script_args is None:
+        return None, None, None
+
+    parser = matter_test_args_parser()
+    args, _ = parser.parse_known_args(shlex.split(run.script_args))
+    return args.commissioning_method or args.in_test_commissioning_method, args.wifi_ssid, args.wifi_passphrase
+
+
+@contextlib.contextmanager
+def linux_ble_wifi_environment(
+    wifi_ssid: str | None = None,
+    wifi_passphrase: str | None = None,
+) -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
+    """Provide isolated Linux app/tool networks with Bluetooth and WPA mocks."""
+    from matter.testing.linux import BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, WpaSupplicantMock
+
+    ssid = wifi_ssid if wifi_ssid is not None else LINUX_WIFI_SSID
+    passphrase = wifi_passphrase if wifi_passphrase is not None else LINUX_WIFI_PASSPHRASE
+
+    with contextlib.ExitStack() as stack:
+        network = stack.enter_context(IsolatedNetworkNamespace(
+            app_link_up=False,
+            app_link_name=CommissioningMethod.BLE_WIFI.app_link_name,
+            tool_link_name=CommissioningMethod.BLE_WIFI.tool_link_name,
+        ))
+        stack.enter_context(DBusTestSystemBus())
+        stack.enter_context(BluetoothMock())
+        stack.enter_context(WpaSupplicantMock(
+            [CommissioningMethod.BLE_WIFI.app_link_name],
+            ssid,
+            passphrase,
+            network,
+        ))
+        yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -233,20 +281,38 @@ def run_timeout(run: Metadata) -> float:
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s), whatever their tags.")
+@click.option("--tag", "tags", type=str, multiple=True,
+              help=f"{TAG_OPTION_HELP} Can't be combined with --run.")
 @click.option("--ip-packet-capture/--no-ip-packet-capture", is_flag=True, default=False, help="Enable IP packet capture.")
 @click.option("--ip-packet-capture-dir", type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
               default=pathlib.Path.cwd() / "out/ip_packet_captures", help="Storage for capture files.")
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
+@click.option("--internal-inside-unshare", hidden=True, is_flag=True, default=False,
+              help="Internal re-exec marker. ensure_namespace_availability passes it after entering a private "
+                   "mount namespace, so the re-executed runner does not create another. Local and CI runs use "
+                   "the same path.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool):
+         script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], tags: tuple[str, ...],
+         ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
+         internal_inside_unshare: bool) -> None:
+    """Run the configured Matter Python test."""
+    if run and tags:
+        raise click.BadOptionUsage("tags", "--run and --tag can't be combined: --run names the runs whatever their tags.")
+    try:
+        tag_filter = TagFilter.parse(tags)
+    except ValueError as e:
+        raise click.BadParameter(str(e), param_hint="--tag")
+
     if load_from_env:
         reader = MetadataReader(load_from_env)
-        runs = reader.parse_script(script)
+        try:
+            runs = reader.parse_script(script)
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
     else:
         runs = [
             Metadata(
@@ -270,12 +336,24 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if run:
         # Filter runs based on the command line arguments
         runs = [r for r in runs if r.run in run]
+    else:
+        for r in runs:
+            if not tag_filter.matches(r.tags):
+                log.info("Skipping run '%s' (tags: %s), it doesn't match '%s'; select it with --run %s",
+                         r.run, ", ".join(r.tags), tag_filter, r.run)
+        runs = [r for r in runs if tag_filter.matches(r.tags)]
 
     if app_filter:
         allowed_apps = [s.strip() for s in app_filter.split(',')]
-        # app name in metadata is like "${APP_NAME}"
         allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
-        runs = [r for r in runs if r.app in allowed_apps_with_format]
+        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
+        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
+        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
+
+    if not runs:
+        raise click.ClickException(
+            f"No runs left to execute in '{script}' after --run, --tag and --app-filter. "
+            "Name a run with --run to execute it whatever its tags.")
 
     # Override runs Metadata with the command line options
     for run in runs:
@@ -290,11 +368,31 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         if pre_existing_fabric:
             run.pre_existing_fabric = pre_existing_fabric
 
-    for run in runs:
+    runs_with_commissioning_args = [(run, *run_commissioning_args(run)) for run in runs]
+    uses_linux_ble_wifi = any(
+        bool(run.app) and method == CommissioningMethod.BLE_WIFI
+        for run, method, _, _ in runs_with_commissioning_args
+    )
+    if uses_linux_ble_wifi:
+        if sys.platform != "linux":
+            raise click.ClickException("BLE-WiFi commissioning is only supported on Linux")
+        from matter.testing.linux import ensure_namespace_availability, ensure_private_state
+
+        if not internal_inside_unshare:
+            ensure_namespace_availability(isolate_root=True)
+        ensure_private_state()
+
+    for run, commissioning_method, wifi_ssid, wifi_passphrase in runs_with_commissioning_args:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+        if bool(run.app) and commissioning_method == CommissioningMethod.BLE_WIFI:
+            environment = linux_ble_wifi_environment(wifi_ssid, wifi_passphrase)
+        else:
+            environment = contextlib.nullcontext(((), ()))
+        with environment as (app_command_prefix, test_command_prefix):
+            main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
+                      run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
+                      ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
+                      app_command_prefix, test_command_prefix)
 
 
 class AppRestartMonitor:
@@ -366,7 +464,8 @@ class AppRestartMonitor:
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
+              app_command_prefix: tuple[str, ...] = (), test_command_prefix: tuple[str, ...] = ()):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -400,7 +499,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe,
+                                   app_command_prefix)
         app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
@@ -455,6 +555,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         log.info(
             "Running python script to commission device on a pre-existing fabric and "
             "open commissioning window...")
+        commission_command = [*test_command_prefix, *commission_command]
         log.info("Command: %s", ' '.join(commission_command))
         commission_proc = Subprocess(commission_command[0], *commission_command[1:],
                                      output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
@@ -481,7 +582,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     else:
         script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
 
-    final_script_command = [i.replace('|', ' ') for i in script_command]
+    final_script_command = [*test_command_prefix, *(i.replace('|', ' ') for i in script_command)]
 
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
                                      output_cb=process_test_script_output,
@@ -530,7 +631,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if exit_code != 0:
             log.error("SUBPROCESS failure: ")
             log.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
-            log.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
+            log.error("  APP:         %d (%r)", app_exit_code,
+                      [*app_command_prefix, app, *shlex.split(app_args)])
             sys.exit(exit_code)
 
     finally:
@@ -556,8 +658,9 @@ class FactoryResetType(enum.Enum):
     def config_files(self, app_args: str, script_args: str) -> typing.Generator[str, None, None]:
         """Yield paths of config/storage files to remove for this reset type."""
 
-        # App config files and KVS, exclude restart flag file
-        yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith('chip_test_restart_app'))
+        # App config files and KVS. Preserve runner-owned control files and sockets.
+        runner_files = ('chip_test_restart_app', 'chip-dbus-')
+        yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith(runner_files))
         yield from glob.glob('/tmp/repl*')
 
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
@@ -569,11 +672,22 @@ class FactoryResetType(enum.Enum):
                 yield match.group("path")
 
 
+# The tv-app's media store
+TV_APP_MEDIA_DIR = "/tmp/chip-media-files"
+
+
 def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
-        pathlib.Path(path).unlink(missing_ok=True)
+
+        # Targets the specific tv-app media directory if found, which
+        # unlink can't remove, so using shutil.rmtree instead.
+        if path == TV_APP_MEDIA_DIR:
+            with contextlib.suppress(FileNotFoundError):
+                shutil.rmtree(path)
+        else:
+            pathlib.Path(path).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

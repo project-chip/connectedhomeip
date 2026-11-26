@@ -35,8 +35,8 @@ source_set("fan-load") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingFanLoad.cpp",
-    "impl/LoggingFanLoad.h",
+    "impl/LoggingFanDelegate.cpp",
+    "impl/LoggingFanDelegate.h",
   ]
 
   public_deps = [

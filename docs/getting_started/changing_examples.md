@@ -1,6 +1,11 @@
 # Changing Examples
 
-The composition of most examples in the SDK is static and code generated.
+> **Note:** This guide covers **code-generated (ZAP)** examples. For
+> **code-driven** applications based on `all-devices-app`, see
+> [Writing a Code-Driven Application](../../examples/all-devices-app/docs/writing_code_driven_app.md).
+
+The composition of code-generated examples in the SDK is static and defined via
+ZAP.
 
 The tool used to describe and change the composition of an example is called
 ZAP. More information about ZAP and a walk-through of the tool can be found in

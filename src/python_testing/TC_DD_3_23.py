@@ -20,7 +20,9 @@ import logging
 from mobly import asserts
 
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.ChipDeviceCtrl import (CHIP_ERROR_INCORRECT_STATE, CHIP_ERROR_TIMEOUT,
+                                   _DevicePairingDelegate_OnCommissioningStageStartFunct)
+from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, TestStep
@@ -32,13 +34,21 @@ log = logging.getLogger(__name__)
 class TC_DD_3_23(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
+    # This test can take a long time to run due to on-purpose timeout waits during commissioning
+    @property
+    def default_timeout(self) -> int:
+        return 300
+
     def desc_TC_DD_3_23(self) -> str:
         return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
 
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
-            TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
+            TestStep(2, "Validate the NFC bit in payload and Perform the commissioning"),
+            TestStep(3, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
+            TestStep(4, "DUT is powered OFF."),
+            TestStep(5, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
         ]
 
     def setup_test(self):
@@ -72,6 +82,23 @@ class TC_DD_3_23(MatterTestCommissioner):
             _stage_start_listener
         )
         self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
+
+    async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
+        node_id = self.matter_test_config.dut_node_ids[0]
+        # The DUT has been fully commissioned at Step 2, so the commissioning window is now closed.
+        # Any attempt to start a new commissioning or open a PASE session over NFC should fail.
+        # Depending on the DUT, one of the following errors is expected:
+        # - If the DUT has fully disabled its NFC interface, CHIP_ERROR_TIMEOUT will occur.
+        # - If the DUT keeps NFC enabled but no longer accepts NFC commissioning,
+        #    CHIP_ERROR_INCORRECT_STATE will occur.
+        with asserts.assert_raises(ChipStackError) as error:
+            await self.find_or_establish_pase_session_over_ntl(payload, node_id)
+
+        asserts.assert_in(
+            error.exception.err,
+            (CHIP_ERROR_INCORRECT_STATE, CHIP_ERROR_TIMEOUT),
+            f"Expected PASE session to fail with incorrect-state or timeout, got {error.exception.err}",
+        )
 
     @async_test_body
     async def test_TC_DD_3_23(self):
@@ -113,6 +140,19 @@ class TC_DD_3_23(MatterTestCommissioner):
 
         asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
+
+        # Step 3: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(3)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        await self._assert_ntl_pase_session_fails(payload)
+
+        self.step(4)
+        self.wait_for_user_input(prompt_msg="Power OFF the device")
+
+        # Step 5: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(5)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        await self._assert_ntl_pase_session_fails(payload)
 
 
 if __name__ == "__main__":

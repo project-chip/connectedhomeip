@@ -36,6 +36,10 @@
         {
             "name": "cluster_objects_attribute_typeinfo",
             "path": "../../zap-templates/partials/cluster-objects-attribute-typeinfo.zapt"
+        },
+        {
+            "name": "accessor_default_type",
+            "path": "../../zap-templates/partials/accessor-default-type.zapt"
         }
     ],
     "templates": [

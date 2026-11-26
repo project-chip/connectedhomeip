@@ -63,7 +63,7 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     LevelControlCluster::Config lvlConfig(mContext.timerDelegate, mLevelControlDelegate);
-    lvlConfig.WithOnOff(mOnOffCluster.Cluster());
+    lvlConfig.WithOnOffCluster(mOnOffCluster.Cluster());
 
     if (mConfig.levelControl.startUpCurrentLevel.has_value())
     {
@@ -95,7 +95,6 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     }
 
     mLevelControlCluster.Create(endpoint, lvlConfig);
-    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
     mGroupsCluster.Create(endpoint,
@@ -125,7 +124,8 @@ void DimmableLoad::Unregister(CodeDrivenDataModelProvider & provider)
     //
     // Phase 1 (Disconnection): Remove all delegates and unregister from all shared lists/tables
     // while all cluster objects are still fully constructed and valid. This prevents any
-    // use-after-free or dangling pointer access (e.g. OnOff-Level coupling delegates) during destruction.
+    // use-after-free or dangling pointer access (e.g. scene handlers) during destruction.
+    // Level Control unlinks from On/Off in its own Shutdown().
     //
     // Phase 2 (Destruction): Once fully disconnected, the cluster objects can be safely destroyed
     // in any order.
@@ -146,14 +146,10 @@ void DimmableLoad::Unregister(CodeDrivenDataModelProvider & provider)
         }
     }
 
-    // 2. Remove all delegates from OnOff cluster
+    // 2. Remove application delegate from OnOff cluster
     if (mOnOffCluster.IsConstructed())
     {
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        if (mLevelControlCluster.IsConstructed())
-        {
-            mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
-        }
     }
 
     // === PHASE 2: DESTRUCTION ===

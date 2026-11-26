@@ -59,24 +59,24 @@ public:
     }
 
     template <typename... Args>
-    mdns::Minimal::FullQName AllocateQName(Args &&... names)
+    chip::Dnssd::FullQName AllocateQName(Args &&... names)
     {
-        void * storage = AllocateQNameSpace(mdns::Minimal::FlatAllocatedQName::RequiredStorageSize(std::forward<Args>(names)...));
+        void * storage = AllocateQNameSpace(chip::Dnssd::FlatAllocatedQName::RequiredStorageSize(std::forward<Args>(names)...));
         if (storage == nullptr)
         {
-            return mdns::Minimal::FullQName();
+            return chip::Dnssd::FullQName();
         }
-        return mdns::Minimal::FlatAllocatedQName::Build(storage, std::forward<Args>(names)...);
+        return chip::Dnssd::FlatAllocatedQName::Build(storage, std::forward<Args>(names)...);
     }
 
-    mdns::Minimal::FullQName AllocateQNameFromArray(char const * const * names, size_t num)
+    chip::Dnssd::FullQName AllocateQNameFromArray(char const * const * names, size_t num)
     {
-        void * storage = AllocateQNameSpace(mdns::Minimal::FlatAllocatedQName::RequiredStorageSizeFromArray(names, num));
+        void * storage = AllocateQNameSpace(chip::Dnssd::FlatAllocatedQName::RequiredStorageSizeFromArray(names, num));
         if (storage == nullptr)
         {
-            return mdns::Minimal::FullQName();
+            return chip::Dnssd::FullQName();
         }
-        return mdns::Minimal::FlatAllocatedQName::BuildFromArray(storage, names, num);
+        return chip::Dnssd::FlatAllocatedQName::BuildFromArray(storage, names, num);
     }
 
     /// Sets the query responder to a blank state and frees up any
@@ -106,8 +106,8 @@ public:
         }
     }
     mdns::Minimal::QueryResponder<kMaxRecords + 1> * GetQueryResponder() { return &mQueryResponder; }
-    const mdns::Minimal::RecordResponder * GetResponder(const mdns::Minimal::QType & qtype,
-                                                        const mdns::Minimal::FullQName & qname) const
+    const mdns::Minimal::RecordResponder * GetResponder(const chip::Dnssd::QType & qtype,
+                                                        const chip::Dnssd::FullQName & qname) const
     {
         for (auto & responder : mAllocatedResponders)
         {

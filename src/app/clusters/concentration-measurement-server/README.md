@@ -1,6 +1,6 @@
 # Concentration Measurement Cluster
 
-A single `ConcentrationMeasurementCluster` class handles all 10 aliased
+A single `ConcentrationMeasurementCluster` class handles all 11 aliased
 concentration measurement clusters. They share an identical attribute structure;
 the only difference is the cluster ID passed at construction:
 
@@ -16,6 +16,7 @@ the only difference is the cluster ID passed at construction:
 | RadonConcentrationMeasurement                         | `RadonConcentrationMeasurement::Id`                         |
 | TotalVolatileOrganicCompoundsConcentrationMeasurement | `TotalVolatileOrganicCompoundsConcentrationMeasurement::Id` |
 | FormaldehydeConcentrationMeasurement                  | `FormaldehydeConcentrationMeasurement::Id`                  |
+| SmokeConcentrationMeasurement                         | `SmokeConcentrationMeasurement::Id`                         |
 
 ## Overview
 

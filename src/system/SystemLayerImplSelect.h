@@ -263,6 +263,11 @@ protected:
 #else
     WakeEvent mWakeEvent;
 #endif
+
+private:
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    CHIP_ERROR RequestCallback(SocketWatchToken token, SocketEventFlags flag);
+#endif
 };
 
 using LayerImpl = LayerImplSelect;
