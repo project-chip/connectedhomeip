@@ -68,7 +68,6 @@ constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH"
 constexpr char kIdentityJointFabric[]           = "jf-fabric-a";
 constexpr chip::FabricId kIdentityJointFabricId = 0xA;
 
-
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore                 = nullptr;
 chip::Credentials::DeviceAttestationRevocationDelegate * CHIPCommand::sRevocationDelegate = nullptr;
 
@@ -612,8 +611,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         chip::ByteSpan ipk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
         if (fabricId == kIdentityJointFabricId && JointFabricMaterialsPresent(mCredIssuerCmds))
         {
-            chip::ByteSpan jfIpk =
-                static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds)->GetJFMaterialsIPK();
+            chip::ByteSpan jfIpk = static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds)->GetJFMaterialsIPK();
             if (jfIpk.size() == ipk.size())
             {
                 ipk = jfIpk;
@@ -622,7 +620,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         }
         ReturnLogErrorOnFailure(
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, ipk, compressed_fabric_id_span));
-
     }
 
     ReturnLogErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(deviceCommissioner->GetFabricIndex()));

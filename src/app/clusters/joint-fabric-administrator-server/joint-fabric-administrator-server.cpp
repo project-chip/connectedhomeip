@@ -259,7 +259,6 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
 
     auto onComplete = [this, cachedPath, accessingFabricIndex, peerJFANodeId](const CHIP_ERROR & err) {
-
         if (mActiveCommandHandle.has_value())
         {
             auto * commandHandler = mActiveCommandHandle.value().Get();
@@ -284,8 +283,6 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
                                     " on fabric index %u",
                                     ChipLogValueX64(peerJFANodeId), static_cast<unsigned>(accessingFabricIndex));
                 }
-
-
 
                 commandHandler->AddStatus(cachedPath, Status::Success);
             }
@@ -526,17 +523,16 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
         }
     }
 
-exit:
+exit : {
+    Commands::ICACResponse::Type response;
+    response.statusCode = status.ValueOr(ICACResponseStatusEnum::kOk);
+    if (nonDefaultStatus != Status::Success && !status.HasValue())
     {
-        Commands::ICACResponse::Type response;
-        response.statusCode = status.ValueOr(ICACResponseStatusEnum::kOk);
-        if (nonDefaultStatus != Status::Success && !status.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
-            return;
-        }
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+        return;
     }
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
 }
 
 CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const FabricIndex accessFabric,
@@ -557,8 +553,7 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const Fabr
                      static_cast<unsigned>(accessFabric), err.Format());
         return err;
     }
-    ChipLogProgress(Zcl, "VerifyAddICACStep1: RCAC fetched, size=%u, ICAC size=%u",
-                    static_cast<unsigned>(rcacSpan.size()),
+    ChipLogProgress(Zcl, "VerifyAddICACStep1: RCAC fetched, size=%u, ICAC size=%u", static_cast<unsigned>(rcacSpan.size()),
                     static_cast<unsigned>(commandData.ICACValue.size()));
 
     err = certificates.Init(kMaxCertsInChain);
@@ -585,7 +580,7 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const Fabr
     validContext.Reset();
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kKeyCertSign);
     validContext.mRequiredCertType = CertType::kICA;
-    err = certificates.ValidateCert(certificates.GetLastCert(), validContext);
+    err                            = certificates.ValidateCert(certificates.GetLastCert(), validContext);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "VerifyAddICACStep1: ValidateCert failed: %" CHIP_ERROR_FORMAT, err.Format());

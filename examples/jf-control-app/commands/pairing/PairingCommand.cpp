@@ -566,7 +566,8 @@ struct RequestOptionsContext
 
     RequestOptionsContext(uint64_t fabricId, TransactionType transactionType, const uint8_t * csrData, size_t csrLen,
                           uint64_t nodeId = chip::kUndefinedNodeId) :
-        mAnchorFabricId(fabricId), mTransactionType(transactionType), mNodeId(nodeId), mCsrLen(csrLen)
+        mAnchorFabricId(fabricId),
+        mTransactionType(transactionType), mNodeId(nodeId), mCsrLen(csrLen)
     {
         memset(mCsrBytes, 0, sizeof(mCsrBytes));
         if (csrData && csrLen > 0 && csrLen <= sizeof(mCsrBytes))
@@ -581,7 +582,6 @@ struct RequestOptionsContext
     uint8_t mCsrBytes[chip::Crypto::kMIN_CSR_Buffer_Size];
     size_t mCsrLen;
 };
-
 
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 
@@ -647,7 +647,6 @@ static void GenerateReplyWork(intptr_t arg)
     // this inactive object via a clean MoveFrom instead of destroying it mid-callback.
     static ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
 
-
     RequestOptionsContext * request = reinterpret_cast<RequestOptionsContext *>(arg);
     VerifyOrExit(request, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
     VerifyOrExit(pkiProviderCredentialIssuer, ChipLogError(JointFabric, "GenerateReplyWork: no PKI provider"));
@@ -694,7 +693,7 @@ static void GenerateReplyWork(intptr_t arg)
     }
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
 
-    rsp.transaction_type    = request->mTransactionType;
+    rsp.transaction_type = request->mTransactionType;
     memcpy(rsp.response_bytes.bytes, generatedCertificate.data(), generatedCertificate.size());
     rsp.response_bytes.size = (short unsigned int) generatedCertificate.size();
 
@@ -702,8 +701,7 @@ static void GenerateReplyWork(intptr_t arg)
     // saved when the JF materials were pushed. JFA-B uses these to populate AddNOC/AddTrustedRoot.
     if (request->mTransactionType == TransactionType::TransactionType_DEVICE_NOC)
     {
-        ExampleCredentialIssuerCommands * issuer =
-            static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer);
+        ExampleCredentialIssuerCommands * issuer = static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer);
         if (issuer->HasJFMaterials())
         {
             chip::ByteSpan icac = issuer->GetJFMaterialsICAC();
@@ -725,8 +723,7 @@ static void GenerateReplyWork(intptr_t arg)
                 memcpy(rsp.ipk_bytes.bytes, ipk.data(), ipk.size());
                 rsp.ipk_bytes.size = (short unsigned int) ipk.size();
             }
-            ChipLogProgress(JointFabric,
-                            "GenerateReplyWork: DEVICE_NOC returning ICAC=%u, RCAC=%u, IPK=%u bytes",
+            ChipLogProgress(JointFabric, "GenerateReplyWork: DEVICE_NOC returning ICAC=%u, RCAC=%u, IPK=%u bytes",
                             static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()),
                             static_cast<unsigned>(ipk.size()));
         }
@@ -756,7 +753,6 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
 
     RequestOptionsContext * options = nullptr;
 
-
     if (requestOptions.transaction_type == TransactionType_JF_MATERIALS)
     {
 
@@ -767,7 +763,8 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
             chip::ByteSpan icacSpan(requestOptions.icac_bytes.bytes, requestOptions.icac_bytes.size);
             chip::ByteSpan rcacSpan(requestOptions.rcac_bytes.bytes, requestOptions.rcac_bytes.size);
             chip::ByteSpan ipkSpan(requestOptions.ipk_bytes.bytes, requestOptions.ipk_bytes.size);
-            (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))->SetJFMaterials(icacSpan, rcacSpan, ipkSpan);
+            (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                ->SetJFMaterials(icacSpan, rcacSpan, ipkSpan);
         }
         return;
     }
@@ -786,19 +783,18 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
     if (requestOptions.transaction_type == TransactionType_CROSS_SIGNED_ICAC && requestOptions.csr_bytes.size > 0)
     {
         options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type,
-                                                      requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size);
+                                                       requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size);
     }
     else if (requestOptions.transaction_type == TransactionType_DEVICE_NOC && requestOptions.csr_bytes.size > 0)
     {
         options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type,
-                                                      requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size,
-                                                      requestOptions.node_id);
+                                                       requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size,
+                                                       requestOptions.node_id);
     }
     else
     {
         options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
     }
-
 
     if (options)
     {

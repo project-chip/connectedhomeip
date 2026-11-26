@@ -47,8 +47,7 @@ public:
     // JFA-B uses icac/rcac/ipk to populate the AddTrustedRootCertificate and AddNOC commands.
     virtual CHIP_ERROR GetNOCForDevice(NodeId deviceNodeId, ByteSpan csr, MutableByteSpan & noc, MutableByteSpan & icac,
                                        MutableByteSpan & rcac, MutableByteSpan & ipk) = 0;
-    virtual void CloseStreams()            = 0;
-
+    virtual void CloseStreams()                                                       = 0;
 };
 
 } // namespace chip

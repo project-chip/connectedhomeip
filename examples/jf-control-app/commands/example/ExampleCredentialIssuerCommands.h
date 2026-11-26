@@ -63,7 +63,10 @@ public:
     CHIP_ERROR GenerateIcacCsr(chip::MutableByteSpan & generatedIcacCsr) { return mOpCredsIssuer.ObtainICACSR(generatedIcacCsr); }
 
     // Store the cross-signed anchor ICAC, Fabric-A RCAC, and Fabric-A IPK so the next commissioning uses them.
-    void SetJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk) { mOpCredsIssuer.SetJFMaterials(icac, rcac, ipk); }
+    void SetJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk)
+    {
+        mOpCredsIssuer.SetJFMaterials(icac, rcac, ipk);
+    }
     // Discard any previously stored JF materials (e.g. on fail-safe expiry or commissioning abort).
     void ClearJFMaterials() { mOpCredsIssuer.ClearJFMaterials(); }
 
@@ -85,7 +88,6 @@ public:
     {
         return mOpCredsIssuer.SignDeviceNOC(nocCsr, anchorFabricId, deviceNodeId, noc);
     }
-
 
     CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) override
     {

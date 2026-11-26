@@ -42,10 +42,7 @@ public:
         // Called after AddICAC succeeds so the device can forward the JF materials
         // (cross-signed ICAC, anchor RCAC, anchor IPK) to its paired commissioner
         // via the local RPC channel.
-        virtual CHIP_ERROR PushJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk)
-        {
-            return CHIP_NO_ERROR;
-        }
+        virtual CHIP_ERROR PushJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk) { return CHIP_NO_ERROR; }
         // Called on fail-safe expiry or commissioning abort so the device can
         // tell its paired commissioner (JFC-B) to discard any JF materials it
         // received earlier in this attempt.
@@ -63,7 +60,6 @@ public:
             (void) fabricIndex;
         }
         virtual void ClearPeerJFANodeId() {}
-
     };
 
     static JointFabricAdministrator & GetInstance()

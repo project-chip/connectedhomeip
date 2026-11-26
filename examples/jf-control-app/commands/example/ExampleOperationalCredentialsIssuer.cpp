@@ -200,8 +200,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
                             kOperationalCredentialsIssuerKeypairStorage);
             ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
         else
         {
@@ -210,8 +210,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
             ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
     }
     else
@@ -219,7 +219,6 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         // Use the keypair from the storage
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
-
 
     {
         // Scope for keySize, because we use it as an in/out param.
@@ -243,8 +242,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
                             kOperationalCredentialsIntermediateIssuerKeypairStorage);
             ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
         else
         {
@@ -253,8 +252,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
             ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
     }
     else
@@ -262,7 +261,6 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         // Use the keypair from the storage
         ReturnErrorOnFailure(mIntermediateIssuer.Deserialize(serializedKey));
     }
-
 
     {
         // Scope for keySize, because we use it as an in/out param.
@@ -288,8 +286,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
                             kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage);
             ReturnErrorOnFailure(mAnchorIntermediateIssuer.Serialize(serializedKey));
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
         else
         {
@@ -298,8 +296,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
             ReturnErrorOnFailure(mAnchorIntermediateIssuer.Serialize(serializedKey));
 
             PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
-                              ReturnErrorOnFailure(storage.SyncSetKeyValue(
-                                  key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                              ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(),
+                                                                           static_cast<uint16_t>(serializedKey.Length()))));
         }
     }
     else
@@ -316,7 +314,6 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     mStorage     = &storage;
     mInitialized = true;
 
-
     // Restore persisted JF materials if present.
     {
         uint16_t icacLen = static_cast<uint16_t>(sizeof(mJFMaterialsICAC));
@@ -325,7 +322,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         CHIP_ERROR icacErr = storage.SyncGetKeyValue(kJFMaterialsICACStorage, mJFMaterialsICAC, icacLen);
         CHIP_ERROR rcacErr = storage.SyncGetKeyValue(kJFMaterialsRCACStorage, mJFMaterialsRCAC, rcacLen);
-        CHIP_ERROR ipkErr  = storage.SyncGetKeyValue(kJFMaterialsIPKStorage,  mJFMaterialsIPK,  ipkLen);
+        CHIP_ERROR ipkErr  = storage.SyncGetKeyValue(kJFMaterialsIPKStorage, mJFMaterialsIPK, ipkLen);
 
         if (icacErr == CHIP_NO_ERROR && rcacErr == CHIP_NO_ERROR && ipkErr == CHIP_NO_ERROR)
         {
@@ -357,8 +354,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     // the anchor ICAC, and sign a NOC that carries the caller-provided CATs (Admin CAT) under that fabric.
     if (mHasJFMaterials)
     {
-        ChipLogProgress(Controller,
-                        "GenerateNOCChainAfterValidation: using JF materials from JFA-A (ICAC=%u, RCAC=%u bytes)",
+        ChipLogProgress(Controller, "GenerateNOCChainAfterValidation: using JF materials from JFA-A (ICAC=%u, RCAC=%u bytes)",
                         static_cast<unsigned>(mJFMaterialsICACLen), static_cast<unsigned>(mJFMaterialsRCACLen));
 
         {
@@ -384,12 +380,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         ReturnErrorOnFailure(jf_noc_dn.AddAttribute_MatterNodeId(nodeId));
         ReturnErrorOnFailure(jf_noc_dn.AddCATs(cats));
 
-        ChipLogProgress(Controller, "GenerateNOCChainAfterValidation: generating Fabric-A controller NOC (fabricId=0x" ChipLogFormatX64 ")",
+        ChipLogProgress(Controller,
+                        "GenerateNOCChainAfterValidation: generating Fabric-A controller NOC (fabricId=0x" ChipLogFormatX64 ")",
                         ChipLogValueX64(anchorFabricId));
         return IssueX509Cert(mNow, mValidity, anchor_icac_dn, jf_noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey,
                              mAnchorIntermediateIssuer, noc);
     }
-
 
     ChipDN rcac_dn;
 
@@ -647,8 +643,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignICAC(const ByteSpan & icaCsr
     ChipDN rcac_dn;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "SignICAC: anchorFabricId=0x%016" PRIx64 " csrSize=%u",
-                    anchorFabricId, static_cast<unsigned>(icaCsr.size()));
+    ChipLogProgress(Controller, "SignICAC: anchorFabricId=0x%016" PRIx64 " csrSize=%u", anchorFabricId,
+                    static_cast<unsigned>(icaCsr.size()));
 
     P256PublicKey pubkey;
     err = VerifyCertificateSigningRequest(icaCsr.data(), icaCsr.size(), pubkey);
@@ -746,8 +742,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOC(const ByteSpan & icac, c
                          noc);
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::SignDeviceNOC(const ByteSpan & nocCsr, FabricId anchorFabricId,
-                                                              NodeId deviceNodeId, MutableByteSpan & noc)
+CHIP_ERROR ExampleOperationalCredentialsIssuer::SignDeviceNOC(const ByteSpan & nocCsr, FabricId anchorFabricId, NodeId deviceNodeId,
+                                                              MutableByteSpan & noc)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(mHasJFMaterials, CHIP_ERROR_INCORRECT_STATE);
@@ -810,8 +806,8 @@ void ExampleOperationalCredentialsIssuer::SetJFMaterials(chip::ByteSpan icac, ch
     memcpy(mJFMaterialsRCAC, rcac.data(), rcac.size());
     mJFMaterialsRCACLen = rcac.size();
     memcpy(mJFMaterialsIPK, ipk.data(), ipk.size());
-    mJFMaterialsIPKLen  = ipk.size();
-    mHasJFMaterials     = true;
+    mJFMaterialsIPKLen = ipk.size();
+    mHasJFMaterials    = true;
 
     // Persist JF materials to storage so they survive a reboot.
     if (mStorage != nullptr)
@@ -835,8 +831,7 @@ void ExampleOperationalCredentialsIssuer::SetJFMaterials(chip::ByteSpan icac, ch
     }
 
     ChipLogProgress(Controller, "SetJFMaterials: stored ICAC=%u bytes, RCAC=%u bytes, IPK=%u bytes",
-                    static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()),
-                    static_cast<unsigned>(ipk.size()));
+                    static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()), static_cast<unsigned>(ipk.size()));
 }
 
 void ExampleOperationalCredentialsIssuer::ClearJFMaterials()

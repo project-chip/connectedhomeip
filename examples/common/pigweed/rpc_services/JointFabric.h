@@ -25,10 +25,8 @@ public:
     // Ask JFC-B to issue a Fabric-A NOC from a Fabric-B device CSR (device migration).
     // JFC-B also returns the cross-signed ICAC, Fabric-A RCAC and IPK it holds.
     CHIP_ERROR GetNOCForDevice(chip::NodeId deviceNodeId, chip::ByteSpan csr, chip::MutableByteSpan & noc,
-                               chip::MutableByteSpan & icac, chip::MutableByteSpan & rcac,
-                               chip::MutableByteSpan & ipk) override;
+                               chip::MutableByteSpan & icac, chip::MutableByteSpan & rcac, chip::MutableByteSpan & ipk) override;
     void CloseStreams() override;
-
 
 private:
     struct OwnershipTransferContext

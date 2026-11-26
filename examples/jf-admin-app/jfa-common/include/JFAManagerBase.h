@@ -37,9 +37,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <app/data-model/DecodableList.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
-#include <app/data-model/DecodableList.h>
 
 #include "JFARpc.h"
 
@@ -54,10 +54,10 @@ namespace chip {
 // 0xFFFF Administrator CAT identifier can be recovered.
 struct JFAGroupInfoRaw
 {
-    uint16_t groupCAT             = 0;
-    bool groupCATIsNull           = true;
-    uint16_t groupCATVersion      = 0;
-    bool groupCATVersionIsNull    = true;
+    uint16_t groupCAT          = 0;
+    bool groupCATIsNull        = true;
+    uint16_t groupCATVersion   = 0;
+    bool groupCATVersionIsNull = true;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -110,7 +110,6 @@ struct JFAGroupInfoRaw
     }
 };
 
-
 class JFAManagerBase : public app::JointFabricAdministrator::Delegate
 {
 public:
@@ -141,7 +140,6 @@ public:
     void SetPeerJFANodeId(NodeId nodeId, FabricIndex fabricIndex) override;
     void ClearPeerJFANodeId() override;
 
-
     // Returns the NodeId of the peer JFA-A that is currently running JCM against
     // this device, or kUndefinedNodeId when no JCM is in progress.
     NodeId GetPeerJFANodeId() const { return mPeerJFANodeId; }
@@ -164,19 +162,19 @@ protected:
         kDeviceMigration               = 2,
         // Connected to the peer JFA-A to register the device as pending in JFA-A's datastore
         // (JointFabricDatastore::AddPendingNode) before migrating it.
-        kDatastoreAddPendingNode       = 3,
+        kDatastoreAddPendingNode = 3,
         // Reconnected to the migrated device over a CASE session on the newly installed Fabric A
         // (after AddNOC) to send GeneralCommissioning::CommissioningComplete on that fabric.
         kMigrationCommissioningComplete = 4,
         // Connected to the peer JFA-A once at the start of migration to read the fabric-wide
         // Administrator CAT from JFA-A's JointFabricDatastore GroupList, before any device is
         // added as pending or migrated.
-        kReadAdminCAT                   = 5,
+        kReadAdminCAT = 5,
         // Post-migration standard commissioning: after a new device has been commissioned into
         // Fabric A (the joint fabric) by this JFA-B and CommissioningComplete succeeded, connect to
         // the peer JFA-A (the anchor) and register the new node in JFA-A's authoritative
         // JointFabricDatastore NodeList (AddPendingNode followed by RefreshNode).
-        kRegisterNewNodeInJFADatastore  = 6,
+        kRegisterNewNodeInJFADatastore = 6,
 
         // First numeric value available for subclass-defined actions. Values
         // below this are reserved by the base.
@@ -237,14 +235,13 @@ protected:
     // index, not on this device's own locally-commissioned fabric index.
     FabricIndex mPeerJFAFabricIndex = kUndefinedFabricIndex;
 
-
     // --- Device migration (Fabric B -> Fabric A via AddNOC) state ---
     // After JCM succeeds, this JFA (acting as JFA-B commissioner) iterates all the Fabric-B
     // devices from the local datastore NodeList and onboards each of them into Fabric A.
     std::vector<NodeId> mMigrationNodeList;
-    size_t mMigrationIndex           = 0;
-    FabricId mAnchorFabricId         = kUndefinedFabricId;
-    NodeId mMigratingNodeId          = kUndefinedNodeId;
+    size_t mMigrationIndex   = 0;
+    FabricId mAnchorFabricId = kUndefinedFabricId;
+    NodeId mMigratingNodeId  = kUndefinedNodeId;
 
     // Fabric-A NOC obtained for the current device from JFC-B (DER); sent via AddNOC.
     uint8_t mDeviceNOCBuf[Credentials::kMaxDERCertLength];
@@ -266,9 +263,6 @@ protected:
     // JFA-B, which must be registered in the anchor JFA-A's authoritative JointFabricDatastore
     // NodeList. Set in FinalizeCommissioning and used by the register-in-JFA-A flow.
     NodeId mNewNodeId = kUndefinedNodeId;
-
-
-
 
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();
@@ -299,7 +293,6 @@ protected:
     CHIP_ERROR SendMigrationCommissioningComplete();
     void FinishCurrentMigration(CHIP_ERROR err);
 
-
     static void OnDatastoreAddPendingNodeResponse(void * context, const chip::app::DataModel::NullObjectType &);
     static void OnDatastoreAddPendingNodeFailure(void * context, CHIP_ERROR error);
 
@@ -319,9 +312,9 @@ protected:
     // Continue the migration once the Admin CAT lookup finished (success or fallback): release the
     // JFA-A session and connect to the migrating device to run the AddNOC flow.
     void ContinueMigrationAfterGroupList();
-    static void OnArmFailSafeResponse(
-        void * context,
-        const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void
+    OnArmFailSafeResponse(void * context,
+                          const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
 
     static void OnArmFailSafeFailure(void * context, CHIP_ERROR error);
     static void OnCSRResponse(void * context,
@@ -333,10 +326,8 @@ protected:
                                  const app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
     static void OnAddNOCFailure(void * context, CHIP_ERROR error);
     static void OnMigrationCommissioningCompleteResponse(
-        void * context,
-        const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+        void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
     static void OnMigrationCommissioningCompleteFailure(void * context, CHIP_ERROR error);
-
 
     static void OnCommissioningCompleteResponse(
         void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);

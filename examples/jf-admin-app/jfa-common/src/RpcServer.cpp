@@ -13,19 +13,19 @@ constexpr uint32_t kCrossSignedICACRpcTimeoutMs = 10000;
 
 std::mutex icacCSRMutex;
 std::condition_variable icacCSRCv;
-bool icacCSRReceived = false;
+bool icacCSRReceived                             = false;
 uint8_t icacCSRBuf[Crypto::kMIN_CSR_Buffer_Size] = { 0 };
 MutableByteSpan icacCSRSpan{ icacCSRBuf };
 
 std::mutex crossSignedICACMutex;
 std::condition_variable crossSignedICACCv;
-bool crossSignedICACReceived                              = false;
+bool crossSignedICACReceived                               = false;
 uint8_t crossSignedICACBuf[Credentials::kMaxDERCertLength] = { 0 };
 MutableByteSpan crossSignedICACSpan{ crossSignedICACBuf };
 
 std::mutex deviceNOCMutex;
 std::condition_variable deviceNOCCv;
-bool deviceNOCReceived                              = false;
+bool deviceNOCReceived                               = false;
 uint8_t deviceNOCBuf[Credentials::kMaxDERCertLength] = { 0 };
 MutableByteSpan deviceNOCSpan{ deviceNOCBuf };
 // JF materials returned by JFC-B alongside the device NOC (DEVICE_NOC transaction).
@@ -35,7 +35,6 @@ uint8_t deviceRCACBuf[Credentials::kMaxDERCertLength] = { 0 };
 MutableByteSpan deviceRCACSpan{ deviceRCACBuf };
 uint8_t deviceIPKBuf[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
 MutableByteSpan deviceIPKSpan{ deviceIPKBuf };
-
 
 ::pw::Status JointFabric::TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response)
 {
@@ -96,14 +95,14 @@ void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::
         // JFC-B also returns the JF materials it holds (cross-signed ICAC, Fabric-A RCAC, IPK)
         // so JFA-B can populate the AddTrustedRootCertificate / AddNOC commands.
         deviceICACSpan = MutableByteSpan(deviceICACBuf, sizeof(deviceICACBuf));
-        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(
-            ByteSpan(responseBytes.icac_bytes.bytes, responseBytes.icac_bytes.size), deviceICACSpan);
+        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(responseBytes.icac_bytes.bytes, responseBytes.icac_bytes.size),
+                                                       deviceICACSpan);
         deviceRCACSpan = MutableByteSpan(deviceRCACBuf, sizeof(deviceRCACBuf));
-        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(
-            ByteSpan(responseBytes.rcac_bytes.bytes, responseBytes.rcac_bytes.size), deviceRCACSpan);
+        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(responseBytes.rcac_bytes.bytes, responseBytes.rcac_bytes.size),
+                                                       deviceRCACSpan);
         deviceIPKSpan = MutableByteSpan(deviceIPKBuf, sizeof(deviceIPKBuf));
-        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(
-            ByteSpan(responseBytes.ipk_bytes.bytes, responseBytes.ipk_bytes.size), deviceIPKSpan);
+        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(responseBytes.ipk_bytes.bytes, responseBytes.ipk_bytes.size),
+                                                       deviceIPKSpan);
         deviceNOCReceived = true;
         deviceNOCCv.notify_one();
         break;
@@ -162,9 +161,9 @@ CHIP_ERROR JointFabric::GetCrossSignedICAC(chip::FabricId anchorFabricId, chip::
 
     // Send the commissionee CSR to the JFC for cross-signing.
     RequestOptions requestOptions{};
-    requestOptions.transaction_type    = TransactionType::TransactionType_CROSS_SIGNED_ICAC;
-    requestOptions.anchor_fabric_id    = anchorFabricId;
-    requestOptions.csr_bytes.size      = static_cast<uint16_t>(csr.size());
+    requestOptions.transaction_type = TransactionType::TransactionType_CROSS_SIGNED_ICAC;
+    requestOptions.anchor_fabric_id = anchorFabricId;
+    requestOptions.csr_bytes.size   = static_cast<uint16_t>(csr.size());
     memcpy(requestOptions.csr_bytes.bytes, csr.data(), csr.size());
     status = rpcGetStream.Write(requestOptions);
 
@@ -175,10 +174,10 @@ CHIP_ERROR JointFabric::GetCrossSignedICAC(chip::FabricId anchorFabricId, chip::
     }
 
     // Wait for the cross-signed ICAC from JFC.
-    if (crossSignedICACCv.wait_for(lock, std::chrono::milliseconds(kCrossSignedICACRpcTimeoutMs), [&] { return crossSignedICACReceived; }))
+    if (crossSignedICACCv.wait_for(lock, std::chrono::milliseconds(kCrossSignedICACRpcTimeoutMs),
+                                   [&] { return crossSignedICACReceived; }))
     {
-        ReturnErrorOnFailure(
-            CopySpanToMutableSpan(ByteSpan(crossSignedICACSpan.data(), crossSignedICACSpan.size()), icac));
+        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(crossSignedICACSpan.data(), crossSignedICACSpan.size()), icac));
         crossSignedICACReceived = false;
         return CHIP_NO_ERROR;
     }
@@ -193,12 +192,12 @@ CHIP_ERROR JointFabric::PushJFMaterials(chip::ByteSpan crossSignedICAC, chip::By
     VerifyOrReturnError(anchorIPK.size() <= sizeof(RequestOptions{}.ipk_bytes.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     RequestOptions requestOptions{};
-    requestOptions.transaction_type   = TransactionType::TransactionType_JF_MATERIALS;
-    requestOptions.icac_bytes.size    = static_cast<uint16_t>(crossSignedICAC.size());
+    requestOptions.transaction_type = TransactionType::TransactionType_JF_MATERIALS;
+    requestOptions.icac_bytes.size  = static_cast<uint16_t>(crossSignedICAC.size());
     memcpy(requestOptions.icac_bytes.bytes, crossSignedICAC.data(), crossSignedICAC.size());
-    requestOptions.rcac_bytes.size    = static_cast<uint16_t>(anchorRCAC.size());
+    requestOptions.rcac_bytes.size = static_cast<uint16_t>(anchorRCAC.size());
     memcpy(requestOptions.rcac_bytes.bytes, anchorRCAC.data(), anchorRCAC.size());
-    requestOptions.ipk_bytes.size     = static_cast<uint16_t>(anchorIPK.size());
+    requestOptions.ipk_bytes.size = static_cast<uint16_t>(anchorIPK.size());
     memcpy(requestOptions.ipk_bytes.bytes, anchorIPK.data(), anchorIPK.size());
 
     ::pw::Status status = rpcGetStream.Write(requestOptions);
@@ -269,6 +268,5 @@ void JointFabric::CloseStreams()
 {
     rpcGetStream.Finish();
 }
-
 
 } // namespace joint_fabric_service

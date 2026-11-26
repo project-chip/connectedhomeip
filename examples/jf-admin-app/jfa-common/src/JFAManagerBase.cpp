@@ -27,13 +27,11 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/GroupDataProvider.h>
 
-
 #include "JFAPlatform.h"
 
 #include <controller/CHIPCluster.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 
 using namespace chip;
 using namespace chip::app;
@@ -112,8 +110,7 @@ CHIP_ERROR JFAManagerBase::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256
         // Add the node as pending in the datastore before connecting.
         char friendlyNameBuf[32];
 
-        int written =
-            snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "node-0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        int written = snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "node-0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         CharSpan friendlyName(friendlyNameBuf, static_cast<size_t>(written));
         CHIP_ERROR addErr = Server::GetInstance().GetJointFabricDatastore().AddPendingNode(nodeId, friendlyName);
         if (addErr == CHIP_NO_ERROR)
@@ -255,12 +252,11 @@ void JFAManagerBase::HandleCommissioningCompleteEvent()
                             mIPKLen = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
                             // Populate epochKey0 in the datastore entry.
-                            defaultGroupKeySetEntry.epochKey0.SetNonNull(
-                                ByteSpan(mIPKBuf, mIPKLen));
-                            defaultGroupKeySetEntry.epochStartTime0.SetNonNull(
-                                ipkKeyset.epoch_keys[0].start_time);
+                            defaultGroupKeySetEntry.epochKey0.SetNonNull(ByteSpan(mIPKBuf, mIPKLen));
+                            defaultGroupKeySetEntry.epochStartTime0.SetNonNull(ipkKeyset.epoch_keys[0].start_time);
 
-                            ChipLogProgress(JointFabric, "HandleCommissioningCompleteEvent: fetched IPK (%u bytes) for GroupKeySet 0",
+                            ChipLogProgress(JointFabric,
+                                            "HandleCommissioningCompleteEvent: fetched IPK (%u bytes) for GroupKeySet 0",
                                             static_cast<unsigned>(mIPKLen));
                         }
                         else
@@ -285,9 +281,9 @@ void JFAManagerBase::HandleCommissioningCompleteEvent()
                 addGroupCommandData.groupPermission =
                     Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kAdminister;
                 LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
-                addGroupCommandData.friendlyName  = "Default JFA Group Anchor"_span;
-                addGroupCommandData.groupID  = 1;
-                addGroupCommandData.groupCAT = kAnchorCATIdentifier; // Use Anchor CAT for second default group
+                addGroupCommandData.friendlyName = "Default JFA Group Anchor"_span;
+                addGroupCommandData.groupID      = 1;
+                addGroupCommandData.groupCAT     = kAnchorCATIdentifier; // Use Anchor CAT for second default group
                 LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
 
                 Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
@@ -610,15 +606,13 @@ CHIP_ERROR JFAManagerBase::SendAddICAC()
 
     request.ICACValue = ByteSpan(mCrossSignedICACBuf, mCrossSignedICACLen);
 
-    ChipLogProgress(JointFabric, "SendAddICAC: invoke cluster command (%u bytes)",
-                    static_cast<unsigned>(mCrossSignedICACLen));
+    ChipLogProgress(JointFabric, "SendAddICAC: invoke cluster command (%u bytes)", static_cast<unsigned>(mCrossSignedICACLen));
 
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
     return cluster.InvokeCommand(request, this, OnSendAddICACResponse, OnSendAddICACFailure);
 }
 
-void JFAManagerBase::OnSendAddICACResponse(void * context,
-                                       const Commands::ICACResponse::DecodableType & response)
+void JFAManagerBase::OnSendAddICACResponse(void * context, const Commands::ICACResponse::DecodableType & response)
 {
     JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
@@ -690,12 +684,11 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
         case kStandardCommissioningComplete: {
             ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
             {
-                CHIP_ERROR refreshErr =
-                    Server::GetInstance().GetJointFabricDatastore().RefreshNode(jfaManager->mNodeId);
+                CHIP_ERROR refreshErr = Server::GetInstance().GetJointFabricDatastore().RefreshNode(jfaManager->mNodeId);
                 if (refreshErr == CHIP_NO_ERROR)
                 {
-                    ChipLogProgress(JointFabric, "OnCommissioningCompleteResponse: node 0x" ChipLogFormatX64
-                                    " committed in NodeList",
+                    ChipLogProgress(JointFabric,
+                                    "OnCommissioningCompleteResponse: node 0x" ChipLogFormatX64 " committed in NodeList",
                                     ChipLogValueX64(jfaManager->mNodeId));
                 }
                 else
@@ -713,8 +706,7 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
             // the device session and connect to the peer JFA-A to run the AddPendingNode/RefreshNode
             // registration flow. Return early so the trailing generic ReleaseSession() below does
             // not tear down the session we are about to establish.
-            if (jfaManager->mPeerJFAFabricIndex != kUndefinedFabricIndex &&
-                jfaManager->mPeerJFANodeId != kUndefinedNodeId)
+            if (jfaManager->mPeerJFAFabricIndex != kUndefinedFabricIndex && jfaManager->mPeerJFANodeId != kUndefinedNodeId)
             {
                 ChipLogProgress(JointFabric,
                                 "OnCommissioningCompleteResponse: registering new node 0x" ChipLogFormatX64
@@ -739,15 +731,16 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
                 newAdmin.icac     = ByteSpan(jfaManager->mCrossSignedICACBuf, jfaManager->mCrossSignedICACLen);
 
                 char friendlyNameBuf[32];
-                int written = snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "JFA-B-0x" ChipLogFormatX64,
-                                       ChipLogValueX64(jfaManager->mNodeId));
+                int written           = snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "JFA-B-0x" ChipLogFormatX64,
+                                                 ChipLogValueX64(jfaManager->mNodeId));
                 newAdmin.friendlyName = CharSpan(friendlyNameBuf, static_cast<size_t>(written));
 
                 CHIP_ERROR addErr = Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin);
                 if (addErr == CHIP_NO_ERROR)
                 {
-                    ChipLogProgress(JointFabric, "OnCommissioningCompleteResponse: added commissionee 0x" ChipLogFormatX64
-                                    " to AdminList", ChipLogValueX64(jfaManager->mNodeId));
+                    ChipLogProgress(JointFabric,
+                                    "OnCommissioningCompleteResponse: added commissionee 0x" ChipLogFormatX64 " to AdminList",
+                                    ChipLogValueX64(jfaManager->mNodeId));
                 }
                 else
                 {
@@ -786,10 +779,6 @@ void JFAManagerBase::OnCommissioningCompleteResponse(
         default:
             break;
         }
-
-
-
-
     }
 
     jfaManager->ReleaseSession();
@@ -869,7 +858,6 @@ void JFAManagerBase::ClearPeerJFANodeId()
     mPeerJFAFabricIndex = kUndefinedFabricIndex;
 }
 
-
 CHIP_ERROR JFAManagerBase::PushJFMaterials(ByteSpan icac, ByteSpan rcac, ByteSpan ipk)
 {
     // Forward the Fabric-A JF materials to the local commissioner (JFC-B) so it
@@ -884,9 +872,9 @@ CHIP_ERROR JFAManagerBase::PushJFMaterials(ByteSpan icac, ByteSpan rcac, ByteSpa
     CHIP_ERROR err = jfaRpc->PushJFMaterials(icac, rcac, ipk);
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(JointFabric, "PushJFMaterials: JF materials forwarded to local commissioner (%u ICAC, %u RCAC, %u IPK bytes)",
-                        static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()),
-                        static_cast<unsigned>(ipk.size()));
+        ChipLogProgress(JointFabric,
+                        "PushJFMaterials: JF materials forwarded to local commissioner (%u ICAC, %u RCAC, %u IPK bytes)",
+                        static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()), static_cast<unsigned>(ipk.size()));
     }
     else
     {
@@ -924,7 +912,8 @@ void JFAManagerBase::StartDeviceMigration()
         }
     }
 
-    ChipLogProgress(JointFabric, "StartDeviceMigration: %u Fabric-B device(s) to migrate into Fabric A (anchorFabricId=0x" ChipLogFormatX64 ")",
+    ChipLogProgress(JointFabric,
+                    "StartDeviceMigration: %u Fabric-B device(s) to migrate into Fabric A (anchorFabricId=0x" ChipLogFormatX64 ")",
                     static_cast<unsigned>(mMigrationNodeList.size()), ChipLogValueX64(mAnchorFabricId));
 
     if (mAnchorFabricId == kUndefinedFabricId)
@@ -952,7 +941,6 @@ void JFAManagerBase::StartDeviceMigration()
     ScopedNodeId peerJFA(mPeerJFANodeId, mPeerJFAFabricIndex);
     ConnectToNode(peerJFA, kReadAdminCAT);
 }
-
 
 void JFAManagerBase::MigrateNextNode()
 {
@@ -993,7 +981,6 @@ void JFAManagerBase::MigrateNextNode()
 
     ScopedNodeId peerJFA(mPeerJFANodeId, mPeerJFAFabricIndex);
     ConnectToNode(peerJFA, kDatastoreAddPendingNode);
-
 }
 
 CHIP_ERROR JFAManagerBase::SendDatastoreAddPendingNode()
@@ -1008,11 +995,13 @@ CHIP_ERROR JFAManagerBase::SendDatastoreAddPendingNode()
     request.nodeID = mMigratingNodeId;
 
     char friendlyNameBuf[32];
-    int written = snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "Migrated-0x" ChipLogFormatX64, ChipLogValueX64(mMigratingNodeId));
+    int written =
+        snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "Migrated-0x" ChipLogFormatX64, ChipLogValueX64(mMigratingNodeId));
     request.friendlyName = CharSpan(friendlyNameBuf, static_cast<size_t>(written));
 
     ChipLogProgress(JointFabric,
-                    "SendDatastoreAddPendingNode: add node 0x" ChipLogFormatX64 " as pending in JFA-A datastore (peer 0x" ChipLogFormatX64 ")",
+                    "SendDatastoreAddPendingNode: add node 0x" ChipLogFormatX64
+                    " as pending in JFA-A datastore (peer 0x" ChipLogFormatX64 ")",
                     ChipLogValueX64(mMigratingNodeId), ChipLogValueX64(mPeerJFANodeId));
 
     // The JointFabricDatastore cluster lives on the JFA admin endpoint of the peer JFA-A.
@@ -1025,7 +1014,8 @@ void JFAManagerBase::OnDatastoreAddPendingNodeResponse(void * context, const chi
     JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManager != nullptr);
 
-    ChipLogProgress(JointFabric, "OnDatastoreAddPendingNodeResponse: node 0x" ChipLogFormatX64 " added as pending in JFA-A datastore",
+    ChipLogProgress(JointFabric,
+                    "OnDatastoreAddPendingNodeResponse: node 0x" ChipLogFormatX64 " added as pending in JFA-A datastore",
                     ChipLogValueX64(jfaManager->mMigratingNodeId));
 
     // The fabric-wide Administrator CAT was already resolved once up front (kReadAdminCAT) before
@@ -1033,8 +1023,6 @@ void JFAManagerBase::OnDatastoreAddPendingNodeResponse(void * context, const chi
     // migration: release the JFA-A session and connect to the device to run the AddNOC flow.
     jfaManager->ContinueMigrationAfterGroupList();
 }
-
-
 
 void JFAManagerBase::OnDatastoreAddPendingNodeFailure(void * context, CHIP_ERROR error)
 {
@@ -1059,13 +1047,11 @@ CHIP_ERROR JFAManagerBase::SendRegisterNewNodeAddPendingNode()
     request.nodeID = mNewNodeId;
 
     char friendlyNameBuf[32];
-    int written =
-        snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "node-0x" ChipLogFormatX64, ChipLogValueX64(mNewNodeId));
+    int written = snprintf(friendlyNameBuf, sizeof(friendlyNameBuf), "node-0x" ChipLogFormatX64, ChipLogValueX64(mNewNodeId));
     request.friendlyName = CharSpan(friendlyNameBuf, static_cast<size_t>(written));
 
     ChipLogProgress(JointFabric,
-                    "SendRegisterNewNodeAddPendingNode: add node 0x" ChipLogFormatX64
-                    " as pending in anchor JFA-A datastore",
+                    "SendRegisterNewNodeAddPendingNode: add node 0x" ChipLogFormatX64 " as pending in anchor JFA-A datastore",
                     ChipLogValueX64(mNewNodeId));
 
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kJointFabricAdminEndpointId);
@@ -1108,8 +1094,7 @@ CHIP_ERROR JFAManagerBase::SendRegisterNewNodeRefreshNode()
     Clusters::JointFabricDatastore::Commands::RefreshNode::Type request;
     request.nodeID = mNewNodeId;
 
-    ChipLogProgress(JointFabric,
-                    "SendRegisterNewNodeRefreshNode: refresh node 0x" ChipLogFormatX64 " in anchor JFA-A datastore",
+    ChipLogProgress(JointFabric, "SendRegisterNewNodeRefreshNode: refresh node 0x" ChipLogFormatX64 " in anchor JFA-A datastore",
                     ChipLogValueX64(mNewNodeId));
 
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kJointFabricAdminEndpointId);
@@ -1121,8 +1106,7 @@ void JFAManagerBase::OnRegisterNewNodeRefreshResponse(void * context, const chip
     JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManager != nullptr);
 
-    ChipLogProgress(JointFabric,
-                    "OnRegisterNewNodeRefreshResponse: new node committed in anchor JFA-A datastore NodeList");
+    ChipLogProgress(JointFabric, "OnRegisterNewNodeRefreshResponse: new node committed in anchor JFA-A datastore NodeList");
     jfaManager->ReleaseSession();
 }
 
@@ -1149,10 +1133,10 @@ CHIP_ERROR JFAManagerBase::ReadPeerGroupList()
     // DecodableType: the generated struct declares groupCAT as Nullable<uint16_t>, which rejects
     // the Administrator CAT value 0xFFFF (reserved null sentinel) with CONSTRAINT_ERROR.
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kJointFabricAdminEndpointId);
-    return cluster.ReadAttribute<app::DataModel::DecodableList<JFAGroupInfoRaw>,
-                                 const app::DataModel::DecodableList<JFAGroupInfoRaw> &>(
-        this, Clusters::JointFabricDatastore::Id, Clusters::JointFabricDatastore::Attributes::GroupList::Id,
-        OnReadPeerGroupListSuccess, OnReadPeerGroupListFailure, true);
+    return cluster
+        .ReadAttribute<app::DataModel::DecodableList<JFAGroupInfoRaw>, const app::DataModel::DecodableList<JFAGroupInfoRaw> &>(
+            this, Clusters::JointFabricDatastore::Id, Clusters::JointFabricDatastore::Attributes::GroupList::Id,
+            OnReadPeerGroupListSuccess, OnReadPeerGroupListFailure, true);
 }
 
 void JFAManagerBase::OnReadPeerGroupListSuccess(void * context, const app::DataModel::DecodableList<JFAGroupInfoRaw> & groupList)
@@ -1179,9 +1163,8 @@ void JFAManagerBase::OnReadPeerGroupListSuccess(void * context, const app::DataM
             continue;
         }
 
-        uint16_t version = entry.groupCATVersionIsNull ? 0 : entry.groupCATVersion;
-        jfaManager->mAdminCAT =
-            (static_cast<CASEAuthTag>(kAdminCATIdentifier) << 16) | static_cast<CASEAuthTag>(version);
+        uint16_t version      = entry.groupCATVersionIsNull ? 0 : entry.groupCATVersion;
+        jfaManager->mAdminCAT = (static_cast<CASEAuthTag>(kAdminCATIdentifier) << 16) | static_cast<CASEAuthTag>(version);
 
         ChipLogProgress(JointFabric,
                         "OnReadPeerGroupListSuccess: resolved Admin CAT 0x%08" PRIX32 " (version %u) from JFA-A GroupList",
@@ -1194,8 +1177,8 @@ void JFAManagerBase::OnReadPeerGroupListSuccess(void * context, const app::DataM
     // success the JFA-A session is released and the per-device migration loop begins.
     if (it.GetStatus() != CHIP_NO_ERROR)
     {
-        ChipLogError(JointFabric, "OnReadPeerGroupListSuccess: GroupList decode error: %" CHIP_ERROR_FORMAT
-                     "; aborting migration", it.GetStatus().Format());
+        ChipLogError(JointFabric, "OnReadPeerGroupListSuccess: GroupList decode error: %" CHIP_ERROR_FORMAT "; aborting migration",
+                     it.GetStatus().Format());
         jfaManager->ReleaseSession();
         return;
     }
@@ -1230,8 +1213,6 @@ void JFAManagerBase::OnReadPeerGroupListFailure(void * context, CHIP_ERROR error
     jfaManager->ReleaseSession();
 }
 
-
-
 void JFAManagerBase::ContinueMigrationAfterGroupList()
 {
     // Done with the JFA-A session; now connect to the device itself and run the AddNOC flow.
@@ -1240,8 +1221,6 @@ void JFAManagerBase::ContinueMigrationAfterGroupList()
     ScopedNodeId scopedNodeId(mMigratingNodeId, jfFabricIndex);
     ConnectToNode(scopedNodeId, kDeviceMigration);
 }
-
-
 
 CHIP_ERROR JFAManagerBase::SendArmFailSafe()
 {
@@ -1263,7 +1242,7 @@ CHIP_ERROR JFAManagerBase::SendArmFailSafe()
 }
 
 void JFAManagerBase::OnArmFailSafeResponse(void * context,
-                                       const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+                                           const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
     JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManager != nullptr);
@@ -1326,8 +1305,8 @@ void JFAManagerBase::OnCSRResponse(void * context, const OperationalCredentials:
     ByteSpan vendorReserved1;
     ByteSpan vendorReserved2;
     ByteSpan vendorReserved3;
-    CHIP_ERROR err = Credentials::DeconstructNOCSRElements(nocsrElements, csr, csrNonce, vendorReserved1, vendorReserved2,
-                                                           vendorReserved3);
+    CHIP_ERROR err =
+        Credentials::DeconstructNOCSRElements(nocsrElements, csr, csrNonce, vendorReserved1, vendorReserved2, vendorReserved3);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(JointFabric, "OnCSRResponse: DeconstructNOCSRElements failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1359,16 +1338,15 @@ void JFAManagerBase::OnCSRResponse(void * context, const OperationalCredentials:
         return;
     }
 
-    jfaManager->mDeviceNOCLen      = nocSpan.size();
+    jfaManager->mDeviceNOCLen       = nocSpan.size();
     jfaManager->mCrossSignedICACLen = icacSpan.size();
-    jfaManager->mDeviceRCACLen     = rcacSpan.size();
-    jfaManager->mIPKLen            = ipkSpan.size();
+    jfaManager->mDeviceRCACLen      = rcacSpan.size();
+    jfaManager->mIPKLen             = ipkSpan.size();
     ChipLogProgress(JointFabric,
                     "OnCSRResponse: obtained Fabric-A NOC (%u bytes), ICAC (%u bytes), RCAC (%u bytes), IPK (%u bytes), "
                     "proceeding to AddTrustedRootCertificate",
                     static_cast<unsigned>(jfaManager->mDeviceNOCLen), static_cast<unsigned>(jfaManager->mCrossSignedICACLen),
                     static_cast<unsigned>(jfaManager->mDeviceRCACLen), static_cast<unsigned>(jfaManager->mIPKLen));
-
 
     TEMPORARY_RETURN_IGNORED jfaManager->SendAddTrustedRootCertificate();
 }
@@ -1436,9 +1414,8 @@ CHIP_ERROR JFAManagerBase::SendAddNOC()
 
     // Log the state of each required input up front so a silent early-return (the return value
     // is swallowed by TEMPORARY_RETURN_IGNORED at the call site) is visible in the trace.
-    ChipLogProgress(JointFabric, "SendAddNOC: entry (NOC %u, ICAC %u, IPK %u bytes)",
-                    static_cast<unsigned>(mDeviceNOCLen), static_cast<unsigned>(mCrossSignedICACLen),
-                    static_cast<unsigned>(mIPKLen));
+    ChipLogProgress(JointFabric, "SendAddNOC: entry (NOC %u, ICAC %u, IPK %u bytes)", static_cast<unsigned>(mDeviceNOCLen),
+                    static_cast<unsigned>(mCrossSignedICACLen), static_cast<unsigned>(mIPKLen));
 
     if (mDeviceNOCLen == 0)
     {
@@ -1459,8 +1436,7 @@ CHIP_ERROR JFAManagerBase::SendAddNOC()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-
-    request.NOCValue  = ByteSpan(mDeviceNOCBuf, mDeviceNOCLen);
+    request.NOCValue = ByteSpan(mDeviceNOCBuf, mDeviceNOCLen);
     request.ICACValue.SetValue(ByteSpan(mCrossSignedICACBuf, mCrossSignedICACLen));
     request.IPKValue = ByteSpan(mIPKBuf, mIPKLen);
 
@@ -1478,7 +1454,8 @@ CHIP_ERROR JFAManagerBase::SendAddNOC()
     }
     request.adminVendorId = adminVendorId;
 
-    ChipLogProgress(JointFabric, "SendAddNOC: invoke cluster command for nodeId=0x" ChipLogFormatX64 " (NOC %u, ICAC %u, IPK %u bytes)",
+    ChipLogProgress(JointFabric,
+                    "SendAddNOC: invoke cluster command for nodeId=0x" ChipLogFormatX64 " (NOC %u, ICAC %u, IPK %u bytes)",
                     ChipLogValueX64(mMigratingNodeId), static_cast<unsigned>(mDeviceNOCLen),
                     static_cast<unsigned>(mCrossSignedICACLen), static_cast<unsigned>(mIPKLen));
 
@@ -1536,10 +1513,8 @@ CHIP_ERROR JFAManagerBase::SendMigrationCommissioningComplete()
 
     GeneralCommissioning::Commands::CommissioningComplete::Type request;
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), kRootEndpointId);
-    return cluster.InvokeCommand(request, this, OnMigrationCommissioningCompleteResponse,
-                                 OnMigrationCommissioningCompleteFailure);
+    return cluster.InvokeCommand(request, this, OnMigrationCommissioningCompleteResponse, OnMigrationCommissioningCompleteFailure);
 }
-
 
 void JFAManagerBase::OnAddNOCFailure(void * context, CHIP_ERROR error)
 {
@@ -1569,8 +1544,9 @@ void JFAManagerBase::OnMigrationCommissioningCompleteResponse(
         }
         else
         {
-            ChipLogProgress(JointFabric, "OnMigrationCommissioningCompleteResponse: node 0x" ChipLogFormatX64
-                            " committed in Fabric-A NodeList", ChipLogValueX64(jfaManager->mMigratingNodeId));
+            ChipLogProgress(JointFabric,
+                            "OnMigrationCommissioningCompleteResponse: node 0x" ChipLogFormatX64 " committed in Fabric-A NodeList",
+                            ChipLogValueX64(jfaManager->mMigratingNodeId));
         }
         jfaManager->FinishCurrentMigration(CHIP_NO_ERROR);
     }

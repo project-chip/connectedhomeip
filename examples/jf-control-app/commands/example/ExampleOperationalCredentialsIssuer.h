@@ -69,7 +69,6 @@ public:
     // Administrator CAT, and is returned in CHIP TLV form.
     CHIP_ERROR SignDeviceNOC(const ByteSpan & nocCsr, FabricId anchorFabricId, NodeId deviceNodeId, MutableByteSpan & noc);
 
-
     CHIP_ERROR ObtainICACSR(MutableByteSpan & icaCsr);
 
     // Store the cross-signed anchor ICAC and Fabric-A RCAC received from JFA-A.
@@ -141,15 +140,15 @@ private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     Crypto::P256Keypair mAnchorIntermediateIssuer;
-    bool mInitialized                    = false;
+    bool mInitialized = false;
     // Set once the three issuer keypairs (mIssuer / mIntermediateIssuer / mAnchorIntermediateIssuer)
     // have been loaded or generated at least once in this process. Used so that a subsequent
     // Initialize() under a different per-identity storage namespace reuses the already-loaded keys
     // (and writes them through to that storage) instead of regenerating fresh keys. This keeps the
     // anchor intermediate key stable across identities, which is required post-JCM because the
     // cross-signed ICAC embeds that key and the Fabric-A controller NOC must be signed with it.
-    bool mKeypairsInitialized            = false;
-    uint32_t mIssuerId                   = 1;
+    bool mKeypairsInitialized = false;
+    uint32_t mIssuerId        = 1;
 
     uint32_t mIntermediateIssuerId       = 2;
     uint32_t mAnchorIntermediateIssuerId = 3;
