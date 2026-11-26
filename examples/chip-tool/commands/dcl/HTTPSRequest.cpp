@@ -31,6 +31,7 @@
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
 #if (CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -100,6 +101,7 @@ constexpr const char * kErrorSSLObjectCreate     = "Failed to create SSL object"
 constexpr const char * kErrorSSLHandshake        = "SSL handshake failed";
 constexpr const char * kErrorSSLTrustStore       = "Failed to load the system trusted certificates";
 constexpr const char * kErrorSSLHostName         = "Failed to set the expected server name";
+constexpr const char * kErrorSSLIPAddress        = "Failed to set the expected server IP address";
 constexpr const char * kErrorSSLCertificateHint =
     "To trust a server with a private or self-signed certificate, set SSL_CERT_FILE to its CA certificate. The certificate "
     "must be issued for the requested hostname. Certificate validation can also be disabled from the command line.";
@@ -220,6 +222,12 @@ private:
         return CHIP_ERROR_NOT_CONNECTED;
     }
 
+    static bool IsIPAddress(const std::string & hostname)
+    {
+        in6_addr address;
+        return inet_pton(AF_INET, hostname.c_str(), &address) == 1 || inet_pton(AF_INET6, hostname.c_str(), &address) == 1;
+    }
+
     CHIP_ERROR InitSSL(const std::string & hostname, bool validateCertificate)
     {
         mContext = SSL_CTX_new(TLS_client_method());
@@ -240,11 +248,23 @@ private:
         VerifyOrReturnError(nullptr != mSSL, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLObjectCreate));
 
         SSL_set_fd(mSSL, mSock);
-        SSL_set_tlsext_host_name(mSSL, hostname.c_str());
-        if (validateCertificate)
+        if (IsIPAddress(hostname))
         {
-            VerifyOrReturnError(SSL_set1_host(mSSL, hostname.c_str()) == 1, CHIP_ERROR_NOT_CONNECTED,
-                                ChipLogError(chipTool, "%s", kErrorSSLHostName));
+            // An IP address is matched against the certificate IP addresses and is not sent as SNI (RFC 6066 section 3).
+            if (validateCertificate)
+            {
+                VerifyOrReturnError(X509_VERIFY_PARAM_set1_ip_asc(SSL_get0_param(mSSL), hostname.c_str()) == 1,
+                                    CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLIPAddress));
+            }
+        }
+        else
+        {
+            SSL_set_tlsext_host_name(mSSL, hostname.c_str());
+            if (validateCertificate)
+            {
+                VerifyOrReturnError(SSL_set1_host(mSSL, hostname.c_str()) == 1, CHIP_ERROR_NOT_CONNECTED,
+                                    ChipLogError(chipTool, "%s", kErrorSSLHostName));
+            }
         }
 
         ERR_clear_error();
