@@ -18,7 +18,6 @@ limitations under the License.
 import logging
 import shlex
 import sys
-import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_STR, CONTROLLER_TEST_SCRIPTS_DIR_PATH,
@@ -108,11 +107,13 @@ class TestSubscriptionResumptionTimeout(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        # Wait for some time so that the sever will try to resume the subscription for several times
-        time.sleep(120)
+        # Wait (up to 120 s) until the server has tried to resume the subscription twice
+        self.logger.info("checking device log for %s", self.get_device_pretty_id(server_device_id))
+        self.assertTrue(self.wait_for_device_output(
+            server_device_id, "Schedule subscription resumption when failing to establish session, Retries: 2", 120),
+            f"SubscriptionResumption test failed: second resumption retry not seen on device {server_device_id}")
 
         # Check the device can resume subscriptions
-        self.logger.info("checking device log for %s", self.get_device_pretty_id(server_device_id))
         self.assertTrue(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Schedule subscription resumption when failing to establish session, Retries: 1",
             "Schedule subscription resumption when failing to establish session, Retries: 2"]),

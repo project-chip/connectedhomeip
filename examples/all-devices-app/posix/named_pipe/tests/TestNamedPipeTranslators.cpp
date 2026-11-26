@@ -24,11 +24,14 @@
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
 #include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
+#include <posix/named_pipe/translators/ClosureControllerTranslator.h>
 #include <posix/named_pipe/translators/DoorbellTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
+#include <posix/named_pipe/translators/HeatPumpTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffLightSwitchTranslator.h>
+#include <posix/named_pipe/translators/OnOffSensorTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/ProximityRangingTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
@@ -541,6 +544,237 @@ TEST_F(TestNamedPipeTranslators, OnOffLightSwitchTranslator)
               CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(translator.TranslateAndExecute(
                   1, ParseJson(R"({"Name": "SwitchTriggerEffect", "EffectIdentifier": 1, "EffectVariant": 256})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Unknown action
+    Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, OnOffSensorTranslator)
+{
+    OnOffSensorTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 4U);
+
+    auto decode = [this](std::optional<uint64_t>(&fields)[4]) {
+        TLV::TLVReader reader;
+        reader.Init(mMockAccessor->mLastData.data(), mMockAccessor->mLastData.size());
+        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        TLV::TLVType outerType;
+        ASSERT_EQ(reader.EnterContainer(outerType), CHIP_NO_ERROR);
+        while (reader.Next() == CHIP_NO_ERROR)
+        {
+            uint64_t value;
+            ASSERT_EQ(reader.Get(value), CHIP_NO_ERROR);
+            uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+            ASSERT_LT(tagNum, 4U);
+            fields[tagNum] = value;
+        }
+        ASSERT_EQ(reader.ExitContainer(outerType), CHIP_NO_ERROR);
+    };
+
+    for (const char * action : { "SensorOn", "SensorOff", "SensorToggle" })
+    {
+        Json::Value json = ParseJson(std::string(R"({"Name": ")") + action + R"("})");
+        EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+        std::optional<uint64_t> fields[4];
+        decode(fields);
+        EXPECT_EQ(fields[1], std::make_optional<uint64_t>(1));
+        EXPECT_FALSE(fields[2].has_value());
+    }
+
+    Json::Value identify = ParseJson(R"({"Name": "SensorIdentify", "IdentifyTime": 10})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, identify, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SensorIdentify");
+    {
+        std::optional<uint64_t> fields[4];
+        decode(fields);
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(10));
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorIdentify"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorIdentify", "IdentifyTime": 70000})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorIdentify", "IdentifyTime": -1})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorIdentify", "IdentifyTime": "10"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    mMockAccessor->mResultToReturn = CHIP_ERROR_INCORRECT_STATE;
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "SensorOn"})"), mRegistry), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestNamedPipeTranslators, HeatPumpTranslator)
+{
+    HeatPumpTranslator translator;
+    EXPECT_EQ(translator.GetActionNames().size(), 1U);
+
+    Json::Value json = ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 2, "Amount": -15})");
+    EXPECT_EQ(translator.TranslateAndExecute(3, json, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "HeatPumpSetpointRaiseLower");
+
+    TLV::TLVReader reader;
+    reader.Init(mMockAccessor->mLastData.data(), mMockAccessor->mLastData.size());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    TLV::TLVType outerType;
+    ASSERT_EQ(reader.EnterContainer(outerType), CHIP_NO_ERROR);
+    EndpointId endpointId = kInvalidEndpointId;
+    uint8_t mode          = 0;
+    int8_t amount         = 0;
+    ASSERT_EQ(reader.Next(TLV::ContextTag(1)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(endpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Next(TLV::ContextTag(2)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(mode), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Next(TLV::ContextTag(3)), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Get(amount), CHIP_NO_ERROR);
+    EXPECT_EQ(endpointId, 3);
+    EXPECT_EQ(mode, 2);
+    EXPECT_EQ(amount, -15);
+
+    // Amount is an int8 step and Mode a uint8 enum: out-of-range or missing values are rejected.
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 200})"),
+                                             mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(
+                  3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 18446744073709551615})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": -1, "Amount": 5})"),
+                                             mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "UnknownAction"})"), mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, ClosureControllerTranslator)
+{
+    ClosureControllerTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 10U);
+
+    // Reads the anonymous structure written by the translator and returns its context-tagged fields, booleans as 0/1.
+    auto decode = [this](std::optional<uint64_t>(&fields)[6]) {
+        TLV::TLVReader reader;
+        reader.Init(mMockAccessor->mLastData.data(), mMockAccessor->mLastData.size());
+        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        TLV::TLVType outerType;
+        ASSERT_EQ(reader.EnterContainer(outerType), CHIP_NO_ERROR);
+        while (reader.Next() == CHIP_NO_ERROR)
+        {
+            uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+            ASSERT_LT(tagNum, 6U);
+            if (reader.GetType() == TLV::kTLVType_Boolean)
+            {
+                bool value;
+                ASSERT_EQ(reader.Get(value), CHIP_NO_ERROR);
+                fields[tagNum] = static_cast<uint64_t>(value);
+            }
+            else
+            {
+                uint64_t value;
+                ASSERT_EQ(reader.Get(value), CHIP_NO_ERROR);
+                fields[tagNum] = value;
+            }
+        }
+        ASSERT_EQ(reader.ExitContainer(outerType), CHIP_NO_ERROR);
+    };
+
+    // MoveTo: Position -> tag 2, Speed -> tag 3, Latch -> tag 5
+    for (const char * action : { "ClosureMoveTo", "ClosureGroupedMoveTo" })
+    {
+        Json::Value json = ParseJson(std::string(R"({"Name": ")") + action + R"(", "Position": 3, "Latch": true, "Speed": 2})");
+        EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_EQ(fields[1], std::make_optional<uint64_t>(1));
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(3));
+        EXPECT_EQ(fields[3], std::make_optional<uint64_t>(2));
+        EXPECT_FALSE(fields[4].has_value());
+        EXPECT_EQ(fields[5], std::make_optional<uint64_t>(1));
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureMoveTo"})"), mRegistry), CHIP_NO_ERROR);
+    {
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_FALSE(fields[2].has_value());
+        EXPECT_FALSE(fields[3].has_value());
+        EXPECT_FALSE(fields[5].has_value());
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureMoveTo", "Position": 256})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureMoveTo", "Latch": "yes"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // SetTarget: Position -> tag 4, Speed -> tag 3, Latch -> tag 5
+    for (const char * action : { "ClosureSetTarget", "ClosureGroupedSetTarget" })
+    {
+        Json::Value json = ParseJson(std::string(R"({"Name": ")") + action + R"(", "Position": 5000, "Latch": false, "Speed": 1})");
+        EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_FALSE(fields[2].has_value());
+        EXPECT_EQ(fields[3], std::make_optional<uint64_t>(1));
+        EXPECT_EQ(fields[4], std::make_optional<uint64_t>(5000));
+        EXPECT_EQ(fields[5], std::make_optional<uint64_t>(0));
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureSetTarget", "Position": 70000})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Step: Direction -> tag 2, Speed -> tag 3, NumberOfSteps -> tag 4
+    for (const char * action : { "ClosureStep", "ClosureGroupedStep" })
+    {
+        Json::Value json =
+            ParseJson(std::string(R"({"Name": ")") + action + R"(", "Direction": 1, "NumberOfSteps": 2, "Speed": 3})");
+        EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(1));
+        EXPECT_EQ(fields[3], std::make_optional<uint64_t>(3));
+        EXPECT_EQ(fields[4], std::make_optional<uint64_t>(2));
+        EXPECT_FALSE(fields[5].has_value());
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureStep", "Direction": 1})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Parameterless actions
+    for (const char * action : { "ClosureStop", "ClosureCalibrate" })
+    {
+        Json::Value json = ParseJson(std::string(R"({"Name": ")") + action + R"("})");
+        EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+    }
+
+    // Identify: IdentifyTime -> tag 4
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureIdentify", "IdentifyTime": 10})"), mRegistry),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ClosureIdentify");
+    {
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_EQ(fields[4], std::make_optional<uint64_t>(10));
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureIdentify"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TriggerEffect: EffectIdentifier -> tag 2, EffectVariant -> tag 3 (defaults to 0)
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureTriggerEffect", "EffectIdentifier": 1})"), mRegistry),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ClosureTriggerEffect");
+    {
+        std::optional<uint64_t> fields[6];
+        decode(fields);
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(1));
+        EXPECT_EQ(fields[3], std::make_optional<uint64_t>(0));
+    }
+    EXPECT_EQ(translator.TranslateAndExecute(1, ParseJson(R"({"Name": "ClosureTriggerEffect"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(
+                  1, ParseJson(R"({"Name": "ClosureTriggerEffect", "EffectIdentifier": 1, "EffectVariant": 256})"), mRegistry),
               CHIP_ERROR_INVALID_ARGUMENT);
 
     // Unknown action

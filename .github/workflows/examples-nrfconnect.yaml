@@ -169,7 +169,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "source $ZEPHYR_BASE/zephyr-env.sh && pip3 install -r scripts/setup/requirements.build.txt && ./scripts/build/build_examples.py --target nrf-native-sim-tests build"
             - name: Uploading Failed Test Logs
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: test-log

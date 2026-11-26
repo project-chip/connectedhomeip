@@ -55,9 +55,24 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate) :
-    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
+WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId,
+                                                                 WebRTCTransportRequestor::Delegate & delegate,
+                                                                 FabricTable & fabricTable) :
+    DefaultServerCluster({ endpointId, Id }),
+    mDelegate(delegate), mFabricTable(fabricTable)
 {}
+
+CHIP_ERROR WebRTCTransportRequestorCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    return mFabricTable.AddFabricDelegate(this);
+}
+
+void WebRTCTransportRequestorCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mFabricTable.RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
 
 DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
@@ -66,7 +81,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(con
     {
     case CurrentSessions::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            for (auto & session : mCurrentSessions)
+            for (const WebRTCSessionStruct & session : mCurrentSessions)
             {
                 ReturnErrorOnFailure(listEncoder.Encode(session));
             }
@@ -153,7 +168,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleOffer(const
     VerifyOrReturnValue(session != nullptr, Status::NotFound);
 
     // Create arguments for Delegate.
-    Delegate::OfferArgs args;
+    WebRTCTransportRequestor::Delegate::OfferArgs args;
     args.sdp = std::string(req.sdp.data(), req.sdp.size());
 
     // Convert ICE servers list from DecodableList to vector.
@@ -281,6 +296,34 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleEnd(const C
     return delegateResult;
 }
 
+void WebRTCSessionStorage::Assign(const WebRTCSessionStruct & session)
+{
+    // Copy the lists first: session may be this object, whose lists point into the vectors being replaced.
+    std::vector<uint16_t> videoStreamsCopy;
+    std::vector<uint16_t> audioStreamsCopy;
+    if (session.videoStreams.HasValue())
+    {
+        videoStreamsCopy.assign(session.videoStreams.Value().begin(), session.videoStreams.Value().end());
+    }
+    if (session.audioStreams.HasValue())
+    {
+        audioStreamsCopy.assign(session.audioStreams.Value().begin(), session.audioStreams.Value().end());
+    }
+
+    static_cast<WebRTCSessionStruct &>(*this) = session;
+    mVideoStreams                             = std::move(videoStreamsCopy);
+    mAudioStreams                             = std::move(audioStreamsCopy);
+
+    if (videoStreams.HasValue())
+    {
+        videoStreams.SetValue(DataModel::List<const uint16_t>(mVideoStreams.data(), mVideoStreams.size()));
+    }
+    if (audioStreams.HasValue())
+    {
+        audioStreams.SetValue(DataModel::List<const uint16_t>(mAudioStreams.data(), mAudioStreams.size()));
+    }
+}
+
 // Helper functions
 WebRTCSessionStruct * WebRTCTransportRequestorCluster::FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
@@ -313,13 +356,63 @@ WebRTCTransportRequestorCluster::UpsertSession(const WebRTCSessionStruct & sessi
     }
     else
     {
-        mCurrentSessions.push_back(session);
+        mCurrentSessions.emplace_back(session);
         result = UpsertResultEnum::kInserted;
     }
 
     NotifyAttributeChanged(CurrentSessions::Id);
 
     return result;
+}
+
+namespace {
+
+void SetOfferedStreams(const Optional<DataModel::List<const uint16_t>> & requestedStreams,
+                       const Optional<DataModel::Nullable<uint16_t>> & reportedStreamID, uint16_t & singleStreamStorage,
+                       Optional<DataModel::List<const uint16_t>> & sessionStreams, DataModel::Nullable<uint16_t> & sessionStreamID)
+{
+    if (requestedStreams.HasValue() && !requestedStreams.Value().empty())
+    {
+        sessionStreams = requestedStreams;
+        sessionStreamID.SetNonNull(requestedStreams.Value()[0]);
+    }
+    else if (reportedStreamID.HasValue() && !reportedStreamID.Value().IsNull())
+    {
+        singleStreamStorage = reportedStreamID.Value().Value();
+        sessionStreams.SetValue(DataModel::List<const uint16_t>(&singleStreamStorage, 1));
+        sessionStreamID.SetNonNull(singleStreamStorage);
+    }
+}
+
+} // namespace
+
+WebRTCSessionStorage WebRTCTransportRequestorCluster::MakeOfferedSession(const OfferedSession & offer)
+{
+    WebRTCSessionStruct session;
+    session.id              = offer.sessionId;
+    session.peerNodeID      = offer.peerNodeId;
+    session.fabricIndex     = offer.fabricIndex;
+    session.peerEndpointID  = offer.peerEndpointId;
+    session.streamUsage     = offer.streamUsage;
+    session.metadataEnabled = offer.requestedMetadataEnabled.ValueOr(false);
+
+    // The storage below backs a single-entry list until WebRTCSessionStorage copies it.
+    uint16_t videoStream = 0;
+    uint16_t audioStream = 0;
+    SetOfferedStreams(offer.requestedVideoStreams, offer.reportedVideoStreamID, videoStream, session.videoStreams,
+                      session.videoStreamID);
+    SetOfferedStreams(offer.requestedAudioStreams, offer.reportedAudioStreamID, audioStream, session.audioStreams,
+                      session.audioStreamID);
+    return WebRTCSessionStorage(session);
+}
+
+void WebRTCTransportRequestorCluster::RecordOfferedSession(const OfferedSession & offer)
+{
+    if (offer.isReOffer && FindSession(offer.sessionId, offer.peerNodeId, offer.fabricIndex) != nullptr)
+    {
+        return;
+    }
+    UpsertSession(MakeOfferedSession(offer));
 }
 
 void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
@@ -339,6 +432,29 @@ void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId p
     {
         // Notify the stack that the CurrentSessions attribute has changed.
         NotifyAttributeChanged(CurrentSessions::Id);
+    }
+}
+
+void WebRTCTransportRequestorCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    std::vector<WebRTCSessionStruct> removedSessions;
+    for (const WebRTCSessionStruct & session : mCurrentSessions)
+    {
+        if (session.GetFabricIndex() == fabricIndex)
+        {
+            removedSessions.push_back(session);
+        }
+    }
+
+    for (const WebRTCSessionStruct & session : removedSessions)
+    {
+        CHIP_ERROR err = mDelegate.HandleEnd(session, WebRTCEndReasonEnum::kUnknownReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved: Failed to end WebRTC session %u: %" CHIP_ERROR_FORMAT, session.id, err.Format());
+        }
+        // The fabric is gone, so the session entry is removed regardless of the delegate result.
+        RemoveSession(session.id, session.peerNodeID, fabricIndex);
     }
 }
 

@@ -39,6 +39,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemStats.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
@@ -1672,6 +1673,48 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRightSize)
 
 #endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
 }
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && (CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL)
+TEST_F(TestSystemPacketBuffer, CheckNumPacketBufsStatistic)
+{
+    using chip::System::Stats::kSystemLayer_NumPacketBufs;
+    const chip::System::Stats::count_t * const inUse = chip::System::Stats::GetResourcesInUse();
+    const int baseline                               = inUse[kSystemLayer_NumPacketBufs];
+
+    {
+        PacketBufferHandle handle = PacketBufferHandle::New(PacketBuffer::kMaxSizeWithoutReserve, 0);
+        ASSERT_FALSE(handle.IsNull());
+        EXPECT_EQ(static_cast<int>(inUse[kSystemLayer_NumPacketBufs]), baseline + 1);
+
+        handle->SetDataLength(1);
+        handle.RightSize();
+        EXPECT_EQ(static_cast<int>(inUse[kSystemLayer_NumPacketBufs]), baseline + 1);
+    }
+
+    EXPECT_EQ(static_cast<int>(inUse[kSystemLayer_NumPacketBufs]), baseline);
+}
+
+TEST_F(TestSystemPacketBuffer, CheckNumPacketBufsHighWatermark)
+{
+    using chip::System::Stats::kSystemLayer_NumPacketBufs;
+    const chip::System::Stats::count_t * const watermarks = chip::System::Stats::GetHighWatermarks();
+    const int baseline                                    = chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs];
+    SYSTEM_STATS_RESET_HIGH_WATER_MARK_FOR_TESTING(kSystemLayer_NumPacketBufs);
+
+    {
+        PacketBufferHandle first = PacketBufferHandle::New(0, 0);
+        ASSERT_FALSE(first.IsNull());
+        {
+            PacketBufferHandle second = PacketBufferHandle::New(0, 0);
+            ASSERT_FALSE(second.IsNull());
+            EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+        }
+        EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+    }
+
+    EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+}
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && CHIP heap or pool PacketBuffers
 
 TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
 {

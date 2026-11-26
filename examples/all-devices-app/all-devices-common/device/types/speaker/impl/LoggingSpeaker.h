@@ -25,7 +25,7 @@ namespace app {
  * Concrete implementation of Speaker that logs volume and mute state transitions,
  * handling the interaction between the OnOff and LevelControl clusters.
  */
-class LoggingSpeaker : public Speaker, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
+class LoggingSpeaker : public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate, public Speaker
 {
 public:
     struct Context

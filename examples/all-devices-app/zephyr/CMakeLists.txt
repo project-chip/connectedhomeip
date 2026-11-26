@@ -87,6 +87,7 @@ endforeach()
 foreach(_variant_key
         FAN
         FLOW_SENSOR
+        HEAT_PUMP
         HUMIDITY_SENSOR
         LIGHT_SENSOR
         OVEN
@@ -112,6 +113,11 @@ endif()
 
 # window-covering registers one creator per entry of kVariants in WindowCoveringVariants.cpp (5 in total).
 if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
+
+# solar-power registers one creator per entry in SolarPowerVariants.cpp (5 in total).
+if(ALL_DEVICES_ENABLE_SOLAR_POWER)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
 
@@ -177,6 +183,7 @@ target_sources(app PRIVATE
     src/delegates/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
+    ${ALL_DEVICES_COMMON_DIR}/providers/AllDevicesExampleDeviceInfoProviderImpl.cpp
     ${ALL_DEVICES_DEVICE_SOURCES}
     ${ALL_DEVICES_CLUSTER_SOURCES}
 )

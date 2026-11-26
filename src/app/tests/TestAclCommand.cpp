@@ -169,7 +169,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedEndpoint)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestUnsupportedEndpointId, 0, kTestDeniedClusterId2, kTestCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));
@@ -190,7 +190,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedEndpoint)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestUnsupportedEndpointId, 0, kTestClusterId, kTestCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));
@@ -217,7 +217,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedCluster)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestDeniedEndpointId, 0, kTestUnsupportedClusterId, kTestCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));
@@ -238,7 +238,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedCluster)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestEndpointId, 0, kTestUnsupportedClusterId, kTestCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));
@@ -264,7 +264,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedCommand)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestDeniedEndpointId, 0, kTestClusterId, kTestUnsupportedCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));
@@ -285,7 +285,7 @@ TEST_F(TestAclCommand, AccessDeniedPrecedenceOverUnsupportedCommand)
 
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         auto commandPathParams = CommandPathParams(kTestEndpointId, 0, kTestClusterId, kTestUnsupportedCommandId,
                                                    (chip::app::CommandPathFlags::kEndpointIdValid));

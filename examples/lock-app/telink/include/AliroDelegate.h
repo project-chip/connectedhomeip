@@ -48,9 +48,9 @@ public:
 
     // Aliro credential storage — called from LockManager
     static bool IsAliroCredentialType(CredentialTypeEnum type);
-    bool GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out);
-    bool SetCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
-                       CredentialTypeEnum type, const chip::ByteSpan & data);
+    bool GetAliroCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out);
+    bool SetAliroCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
+                            CredentialTypeEnum type, const chip::ByteSpan & data);
 
 private:
     AliroDelegate();

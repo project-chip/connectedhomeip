@@ -224,11 +224,13 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                         memberValue.targets = array_3;
                     }
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.latestValue.Value().auxiliaryType.HasValue()) {
                     memberValue.auxiliaryType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().auxiliaryType.Value())];
                 } else {
                     memberValue.auxiliaryType = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
             value.latestValue = memberValue;
@@ -2860,16 +2862,20 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
                     memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
                 } else {
                     memberValue.apparentEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
                     memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
                 } else {
                     memberValue.reactiveEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue = nil;
             }
@@ -2900,16 +2906,20 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
                     memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
                 } else {
                     memberValue.apparentEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
                     memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
                 } else {
                     memberValue.reactiveEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue = nil;
             }
@@ -2952,16 +2962,20 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
                     memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
                 } else {
                     memberValue.apparentEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
                     memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
                 } else {
                     memberValue.reactiveEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue = nil;
             }
@@ -2992,16 +3006,20 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
                     memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
                 } else {
                     memberValue.apparentEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
                     memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
                 } else {
                     memberValue.reactiveEnergy = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue = nil;
             }
@@ -3105,22 +3123,31 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                 memberValue = nil;
             } else {
                 memberValue = [MTRCommodityPriceClusterCommodityPriceStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.periodStart = [NSNumber numberWithUnsignedInt:cppValue.currentPrice.Value().periodStart];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentPrice.Value().periodEnd.IsNull()) {
                     memberValue.periodEnd = nil;
                 } else {
                     memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentPrice.Value().periodEnd.Value()];
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentPrice.Value().price.HasValue()) {
                     memberValue.price = [NSNumber numberWithLongLong:cppValue.currentPrice.Value().price.Value()];
                 } else {
                     memberValue.price = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentPrice.Value().priceLevel.HasValue()) {
                     memberValue.priceLevel = [NSNumber numberWithShort:cppValue.currentPrice.Value().priceLevel.Value()];
                 } else {
                     memberValue.priceLevel = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentPrice.Value().description.HasValue()) {
                     memberValue.descriptionString = AsString(cppValue.currentPrice.Value().description.Value());
                     if (memberValue.descriptionString == nil) {
@@ -3131,6 +3158,8 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                 } else {
                     memberValue.descriptionString = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentPrice.Value().components.HasValue()) {
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -3139,8 +3168,13 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
+#if MTR_ENABLE_PROVISIONAL
                             newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
                                 if (newElement_3.descriptionString == nil) {
@@ -3151,11 +3185,14 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                             } else {
                                 newElement_3.descriptionString = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.tariffComponentID.HasValue()) {
                                 newElement_3.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_3.tariffComponentID.Value()];
                             } else {
                                 newElement_3.tariffComponentID = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -3168,6 +3205,7 @@ static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId,
                 } else {
                     memberValue.components = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             }
             value.currentPrice = memberValue;
         } while (0);
@@ -3396,18 +3434,26 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
         do {
             MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct * _Nonnull memberValue;
             memberValue = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct new];
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.adjustment.minPower.IsNull()) {
                 memberValue.minPower = nil;
             } else {
                 memberValue.minPower = [NSNumber numberWithLongLong:cppValue.adjustment.minPower.Value()];
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.adjustment.maxPower.IsNull()) {
                 memberValue.maxPower = nil;
             } else {
                 memberValue.maxPower = [NSNumber numberWithLongLong:cppValue.adjustment.maxPower.Value()];
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             memberValue.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.adjustment.cause)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             memberValue.endTime = [NSNumber numberWithUnsignedInt:cppValue.adjustment.endTime];
+#endif // MTR_ENABLE_PROVISIONAL
             value.adjustment = memberValue;
         } while (0);
         do {
@@ -3739,16 +3785,28 @@ static id _Nullable DecodeEventPayloadForElectricalGridConditionsCluster(EventId
                 memberValue = nil;
             } else {
                 memberValue = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.periodStart = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodStart];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.currentConditions.Value().periodEnd.IsNull()) {
                     memberValue.periodEnd = nil;
                 } else {
                     memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodEnd.Value()];
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.gridCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().gridCarbonIntensity];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().gridCarbonLevel)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.localCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().localCarbonIntensity];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().localCarbonLevel)];
+#endif // MTR_ENABLE_PROVISIONAL
             }
             value.currentConditions = memberValue;
         } while (0);
@@ -5048,6 +5106,7 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
             MTRAmbientContextSensingClusterAmbientContextTypeStruct * _Nullable memberValue;
             if (cppValue.ambientContextDetected.HasValue()) {
                 memberValue = [MTRAmbientContextSensingClusterAmbientContextTypeStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
                     auto iter_2 = cppValue.ambientContextDetected.Value().ambientContextSensed.begin();
@@ -5055,13 +5114,20 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
                         auto & entry_2 = iter_2.GetValue();
                         MTRDataTypeSemanticTagStruct * newElement_2;
                         newElement_2 = [MTRDataTypeSemanticTagStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_2.mfgCode.IsNull()) {
                             newElement_2.mfgCode = nil;
                         } else {
                             newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_2.namespaceID = [NSNumber numberWithUnsignedChar:entry_2.namespaceID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_2.tag = [NSNumber numberWithUnsignedChar:entry_2.tag];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_2.label.HasValue()) {
                             if (entry_2.label.Value().IsNull()) {
                                 newElement_2.label = nil;
@@ -5076,6 +5142,7 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
                         } else {
                             newElement_2.label = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_2 addObject:newElement_2];
                     }
                     CHIP_ERROR err = iter_2.GetStatus();
@@ -5085,6 +5152,8 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
                     }
                     memberValue.ambientContextSensed = array_2;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (cppValue.ambientContextDetected.Value().detectionConfidence.HasValue()) {
                     if (cppValue.ambientContextDetected.Value().detectionConfidence.Value().IsNull()) {
                         memberValue.detectionConfidence = nil;
@@ -5094,6 +5163,7 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
                 } else {
                     memberValue.detectionConfidence = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue = nil;
             }
@@ -5181,16 +5251,21 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     auto & entry_0 = iter_0.GetValue();
                     MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
                     newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorNodeID.IsNull()) {
                         newElement_0.contributorNodeID = nil;
                     } else {
                         newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorEndpointID.IsNull()) {
                         newElement_0.contributorEndpointID = nil;
                     } else {
                         newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorName.IsNull()) {
                         newElement_0.contributorName = nil;
                     } else {
@@ -5201,8 +5276,13 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                             return nil;
                         }
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5240,16 +5320,21 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     auto & entry_0 = iter_0.GetValue();
                     MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
                     newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorNodeID.IsNull()) {
                         newElement_0.contributorNodeID = nil;
                     } else {
                         newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorEndpointID.IsNull()) {
                         newElement_0.contributorEndpointID = nil;
                     } else {
                         newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorName.IsNull()) {
                         newElement_0.contributorName = nil;
                     } else {
@@ -5260,8 +5345,13 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                             return nil;
                         }
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5299,16 +5389,21 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     auto & entry_0 = iter_0.GetValue();
                     MTRAmbientSensingUnionClusterContributorStatusChangeStruct * newElement_0;
                     newElement_0 = [MTRAmbientSensingUnionClusterContributorStatusChangeStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorNodeID.IsNull()) {
                         newElement_0.contributorNodeID = nil;
                     } else {
                         newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorEndpointID.IsNull()) {
                         newElement_0.contributorEndpointID = nil;
                     } else {
                         newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.contributorName.IsNull()) {
                         newElement_0.contributorName = nil;
                     } else {
@@ -5319,9 +5414,16 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                             return nil;
                         }
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.previousContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.previousContributorStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.currentContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.currentContributorStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5371,56 +5473,85 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
         do {
             MTRProximityRangingClusterRangingMeasurementDataStruct * _Nonnull memberValue;
             memberValue = [MTRProximityRangingClusterRangingMeasurementDataStruct new];
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.wiFiDevIK.HasValue()) {
                 memberValue.wiFiDevIK = AsData(cppValue.rangingResultData.wiFiDevIK.Value());
             } else {
                 memberValue.wiFiDevIK = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.BLEDeviceID.HasValue()) {
                 memberValue.bleDeviceID = [NSNumber numberWithUnsignedLongLong:cppValue.rangingResultData.BLEDeviceID.Value()];
             } else {
                 memberValue.bleDeviceID = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.BLTDevIK.HasValue()) {
                 memberValue.bltDevIK = AsData(cppValue.rangingResultData.BLTDevIK.Value());
             } else {
                 memberValue.bltDevIK = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.timeOfMeasurement.HasValue()) {
                 memberValue.timeOfMeasurement = [NSNumber numberWithUnsignedInt:cppValue.rangingResultData.timeOfMeasurement.Value()];
             } else {
                 memberValue.timeOfMeasurement = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.timeOfMeasurementOffset.HasValue()) {
                 memberValue.timeOfMeasurementOffset = [NSNumber numberWithUnsignedInt:cppValue.rangingResultData.timeOfMeasurementOffset.Value()];
             } else {
                 memberValue.timeOfMeasurementOffset = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.distance.IsNull()) {
                 memberValue.distance = nil;
             } else {
                 memberValue.distance = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.distance.Value()];
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.errorMargin.HasValue()) {
                 memberValue.errorMargin = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.errorMargin.Value()];
             } else {
                 memberValue.errorMargin = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.rdr.HasValue()) {
                 memberValue.rdr = [MTRProximityRangingClusterRDRStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.rdr.azimuth = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.rdr.Value().azimuth];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.rdr.elevation = [NSNumber numberWithShort:cppValue.rangingResultData.rdr.Value().elevation];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.rdr.azimuthAccuracy = [NSNumber numberWithUnsignedChar:cppValue.rangingResultData.rdr.Value().azimuthAccuracy];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.rdr.elevationAccuracy = [NSNumber numberWithUnsignedChar:cppValue.rangingResultData.rdr.Value().elevationAccuracy];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 memberValue.rdr.reference = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.rangingResultData.rdr.Value().reference)];
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 memberValue.rdr = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.detectedAttackLevel.HasValue()) {
                 memberValue.detectedAttackLevel = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.rangingResultData.detectedAttackLevel.Value())];
             } else {
                 memberValue.detectedAttackLevel = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.rssi.HasValue()) {
                 if (cppValue.rangingResultData.rssi.Value().IsNull()) {
                     memberValue.rssi = nil;
@@ -5430,6 +5561,8 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
             } else {
                 memberValue.rssi = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.rangingResultData.txPower.HasValue()) {
                 if (cppValue.rangingResultData.txPower.Value().IsNull()) {
                     memberValue.txPower = nil;
@@ -5439,6 +5572,7 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
             } else {
                 memberValue.txPower = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
             value.rangingResultData = memberValue;
         } while (0);
 
@@ -6358,15 +6492,25 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         auto & entry_1 = iter_1.GetValue();
                         MTRAVAnalysisClusterTrackedContext * newElement_1;
                         newElement_1 = [MTRAVAnalysisClusterTrackedContext new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContextID = [NSNumber numberWithUnsignedShort:entry_1.identifiedContextID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext = [MTRDataTypeSemanticTagStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.mfgCode.IsNull()) {
                             newElement_1.identifiedContext.mfgCode = nil;
                         } else {
                             newElement_1.identifiedContext.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_1.identifiedContext.mfgCode.Value())];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.namespaceID = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.namespaceID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.tag = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.tag];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.label.HasValue()) {
                             if (entry_1.identifiedContext.label.Value().IsNull()) {
                                 newElement_1.identifiedContext.label = nil;
@@ -6381,6 +6525,9 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.identifiedContext.label = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.previousZone.HasValue()) {
                             if (entry_1.previousZone.Value().IsNull()) {
                                 newElement_1.previousZone = nil;
@@ -6390,6 +6537,8 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.previousZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.currentZone.HasValue()) {
                             if (entry_1.currentZone.Value().IsNull()) {
                                 newElement_1.currentZone = nil;
@@ -6399,12 +6548,17 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.currentZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.startTime = [NSNumber numberWithUnsignedInt:entry_1.startTime];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.endTime.IsNull()) {
                             newElement_1.endTime = nil;
                         } else {
                             newElement_1.endTime = [NSNumber numberWithUnsignedInt:entry_1.endTime.Value()];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_1 addObject:newElement_1];
                     }
                     CHIP_ERROR err = iter_1.GetStatus();
@@ -6429,15 +6583,25 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         auto & entry_1 = iter_1.GetValue();
                         MTRAVAnalysisClusterTrackedContext * newElement_1;
                         newElement_1 = [MTRAVAnalysisClusterTrackedContext new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContextID = [NSNumber numberWithUnsignedShort:entry_1.identifiedContextID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext = [MTRDataTypeSemanticTagStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.mfgCode.IsNull()) {
                             newElement_1.identifiedContext.mfgCode = nil;
                         } else {
                             newElement_1.identifiedContext.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_1.identifiedContext.mfgCode.Value())];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.namespaceID = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.namespaceID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.tag = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.tag];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.label.HasValue()) {
                             if (entry_1.identifiedContext.label.Value().IsNull()) {
                                 newElement_1.identifiedContext.label = nil;
@@ -6452,6 +6616,9 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.identifiedContext.label = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.previousZone.HasValue()) {
                             if (entry_1.previousZone.Value().IsNull()) {
                                 newElement_1.previousZone = nil;
@@ -6461,6 +6628,8 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.previousZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.currentZone.HasValue()) {
                             if (entry_1.currentZone.Value().IsNull()) {
                                 newElement_1.currentZone = nil;
@@ -6470,12 +6639,17 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.currentZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.startTime = [NSNumber numberWithUnsignedInt:entry_1.startTime];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.endTime.IsNull()) {
                             newElement_1.endTime = nil;
                         } else {
                             newElement_1.endTime = [NSNumber numberWithUnsignedInt:entry_1.endTime.Value()];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_1 addObject:newElement_1];
                     }
                     CHIP_ERROR err = iter_1.GetStatus();
@@ -6500,15 +6674,25 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         auto & entry_1 = iter_1.GetValue();
                         MTRAVAnalysisClusterTrackedContext * newElement_1;
                         newElement_1 = [MTRAVAnalysisClusterTrackedContext new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContextID = [NSNumber numberWithUnsignedShort:entry_1.identifiedContextID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext = [MTRDataTypeSemanticTagStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.mfgCode.IsNull()) {
                             newElement_1.identifiedContext.mfgCode = nil;
                         } else {
                             newElement_1.identifiedContext.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_1.identifiedContext.mfgCode.Value())];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.namespaceID = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.namespaceID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.identifiedContext.tag = [NSNumber numberWithUnsignedChar:entry_1.identifiedContext.tag];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.identifiedContext.label.HasValue()) {
                             if (entry_1.identifiedContext.label.Value().IsNull()) {
                                 newElement_1.identifiedContext.label = nil;
@@ -6523,6 +6707,9 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.identifiedContext.label = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.previousZone.HasValue()) {
                             if (entry_1.previousZone.Value().IsNull()) {
                                 newElement_1.previousZone = nil;
@@ -6532,6 +6719,8 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.previousZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.currentZone.HasValue()) {
                             if (entry_1.currentZone.Value().IsNull()) {
                                 newElement_1.currentZone = nil;
@@ -6541,12 +6730,17 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
                         } else {
                             newElement_1.currentZone = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_1.startTime = [NSNumber numberWithUnsignedInt:entry_1.startTime];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_1.endTime.IsNull()) {
                             newElement_1.endTime = nil;
                         } else {
                             newElement_1.endTime = [NSNumber numberWithUnsignedInt:entry_1.endTime.Value()];
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_1 addObject:newElement_1];
                     }
                     CHIP_ERROR err = iter_1.GetStatus();
@@ -6766,11 +6960,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
             memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
             memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
             memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
+#if MTR_ENABLE_PROVISIONAL
             if (cppValue.arg4.i.HasValue()) {
                 memberValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.i.Value())];
             } else {
                 memberValue.i = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
             value.arg4 = memberValue;
         } while (0);
         do {
@@ -6795,11 +6991,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
                     newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                     newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                     newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.i.HasValue()) {
                         newElement_0.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.i.Value())];
                     } else {
                         newElement_0.i = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

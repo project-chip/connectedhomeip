@@ -109,12 +109,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 }
                 [humanFlags appendString:@"ON NETWORK"];
             }
+#if MTR_ENABLE_PROVISIONAL
             if (value & MTRDiscoveryCapabilitiesNFC) {
                 if ([humanFlags length]) {
                     [humanFlags appendString:@", "];
                 }
                 [humanFlags appendString:@"NFC"];
             }
+#endif
 
             NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);
         }

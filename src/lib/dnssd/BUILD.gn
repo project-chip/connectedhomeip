@@ -54,9 +54,22 @@ source_set("platform_header") {
   ]
 }
 
+source_set("ip_address_sorter") {
+  sources = [
+    "IPAddressSorter.cpp",
+    "IPAddressSorter.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 static_library("dnssd") {
   public_deps = [
     ":constants",
+    ":ip_address_sorter",
     ":platform_header",
     ":types",
     "${chip_root}/src/app/icd/server:icd-server-config",
@@ -69,8 +82,6 @@ static_library("dnssd") {
   sources = [
     "Advertiser.cpp",
     "Advertiser.h",
-    "IPAddressSorter.cpp",
-    "IPAddressSorter.h",
     "Resolver.cpp",
     "Resolver.h",
     "ResolverProxy.cpp",

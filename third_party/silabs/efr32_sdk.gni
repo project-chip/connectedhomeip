@@ -676,6 +676,7 @@ template("efr32_sdk") {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
+          "SL_NET_NETWORK_MANAGER_THREAD_STACK_SIZE=1024",
           "SL_MATTER_SIWX_WIFI_ENABLE",
           "EXP_BOARD=1",
           "SLI_SI917=1",

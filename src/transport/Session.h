@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <functional>
+#include <optional>
+
 #include <access/SubjectDescriptor.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
@@ -107,6 +110,12 @@ private:
     friend class SessionHolder;
     ReferenceCountedHandle<Transport::Session> mSession;
 };
+
+/**
+ * A non-owning reference to a SessionHandle that may be absent.
+ * It only binds to an existing SessionHandle, so it must not be stored beyond the lifetime of that handle.
+ */
+using OptionalSessionHandleRef = std::optional<std::reference_wrapper<const SessionHandle>>;
 
 /** @brief
  *    Managed session reference. The object is used to store a session, the stored session will be automatically
@@ -295,6 +304,17 @@ public:
                                                                    bool isFirstMessageOnExchange) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
+
+    // Returns the InteractionModelRevision the peer reported during session establishment.
+    // Returns std::nullopt if the peer did not report one, or for group sessions, which have no single peer.
+    std::optional<uint16_t> GetPeerInteractionModelRevision() const
+    {
+        if (IsGroupSession())
+        {
+            return std::nullopt;
+        }
+        return GetRemoteSessionParameters().GetInteractionModelRevision().std_optional();
+    }
 
     // Returns a suggested timeout value based on the round-trip time it takes for the peer at the other end of the session to
     // receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy

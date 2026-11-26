@@ -19,6 +19,9 @@ log = logging.getLogger(__name__)
 TEST_NODE_ID = '0x12344321'
 TEST_VID = '0xFFF1'
 TEST_PID = '0x8001'
+# The requestor asks for this BDX block size in the skip test.  Matter.framework allows up to 1024 bytes per block for a
+# peer that is not known to use Thread, so this is the block size of the transfer.
+TEST_BDX_BLOCK_SIZE = 1024
 
 
 class DarwinToolRunner:
@@ -105,8 +108,15 @@ def main(context):
     '--ota-candidate-file',
     required=True,
     help='The file to use for our OTA candidate JSON.  This file does not need to exist.')
+@click.option(
+    '--bdx-skip-after-first-block',
+    type=int,
+    default=None,
+    help='If set, the requestor sends a BDX BlockQueryWithSkip that skips this many bytes after the first block, '
+    'and the test checks that the download is missing exactly those bytes.')
 @click.pass_context
-def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ota_image_file, ota_destination_file, ota_candidate_file):
+def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ota_image_file, ota_destination_file,
+            ota_candidate_file, bdx_skip_after_first_block):
     paths_finder = PathsFinder()
 
     if darwin_framework_tool is None:
@@ -117,9 +127,20 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     if darwin_framework_tool is not None:
         darwin_framework_tool = SubprocessInfo(kind=SubprocessKind.TOOL, path=Path(darwin_framework_tool))
 
+    if bdx_skip_after_first_block is None:
+        ota_data = "This is some test OTA data"
+        ota_requestor_args = ('--otaDownloadPath', ota_destination_file)
+    else:
+        # Several blocks long, so that blocks follow the skip, and with no repeating pattern, so that data read from the
+        # wrong position does not match.
+        ota_data = "".join(f"{i:08d}" for i in range(800))
+        ota_requestor_args = ('--otaDownloadPath', ota_destination_file,
+                              '--maxBDXBlockSize', str(TEST_BDX_BLOCK_SIZE),
+                              '--bdxSkipAfterFirstBlock', str(bdx_skip_after_first_block))
+
     if ota_requestor_app is not None:
         ota_requestor_app = SubprocessInfo(kind=SubprocessKind.APP, path=Path(ota_requestor_app),
-                                           args=('--otaDownloadPath', ota_destination_file))
+                                           args=ota_requestor_args)
 
     runner = Runner(executor=DarwinExecutor())
     runner.capture_delegate = ExecutionCapture()
@@ -130,7 +151,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     darwin_tool = None
 
     try:
-        apps_register.create_ota_image(ota_image_file, ota_data_file, "This is some test OTA data", vid=TEST_VID, pid=TEST_PID)
+        apps_register.create_ota_image(ota_image_file, ota_data_file, ota_data, vid=TEST_VID, pid=TEST_PID)
         json_data = {
             "deviceSoftwareVersionModel": [{
                 "vendorId": int(TEST_VID, 16),
@@ -180,7 +201,17 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         requestor_app.waitForMessage(f"OTA image downloaded to {ota_destination_file}")
 
         # Make sure the right thing was downloaded.
-        apps_register.compare_files(ota_data_file, ota_destination_file)
+        if bdx_skip_after_first_block is None:
+            apps_register.compare_files(ota_data_file, ota_destination_file)
+        else:
+            # The requestor removes the image header from the start of the first block, then writes everything it
+            # receives, so the skipped bytes are missing from the download.
+            raw_data = Path(ota_data_file).read_bytes()
+            header_size = len(Path(ota_image_file).read_bytes()) - len(raw_data)
+            skip_start = TEST_BDX_BLOCK_SIZE - header_size
+            expected_data = raw_data[:skip_start] + raw_data[skip_start + bdx_skip_after_first_block:]
+            if Path(ota_destination_file).read_bytes() != expected_data:
+                raise RuntimeError(f'{ota_destination_file} does not match {ota_data_file} with the skipped bytes removed')
 
     except Exception:
         log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
