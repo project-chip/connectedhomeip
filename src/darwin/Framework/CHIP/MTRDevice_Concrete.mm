@@ -3991,8 +3991,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
-                // A write that has sent nothing can be cancelled by its queue bound up to here: if it was, send
-                // nothing.  Its cancel handler has already removed its expected values.
+                // A write that has sent nothing can be cancelled up to here (the device is going away): if it was,
+                // send nothing.  Its cancel handler has already removed its expected values.
                 if (weakWorkItem && ![workQueue workItem:weakWorkItem readyToSend:^ {}]) {
                     MTR_LOG("Write attribute work item [%llu] was cancelled before it was sent", workItemID);
                     return NO;
@@ -4041,9 +4041,9 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                    completion(MTRAsyncWorkComplete);
                                }];
     }];
-    // The work queue cancels its work items when the device is invalidated, and the queue bound below cancels a write
-    // that has sent nothing.  A write dropped either way before it was sent still has a pending expected value, which
-    // would never expire, so remove it, and that of a write merged into this one, even if this write did not set one.
+    // The work queue cancels its work items when the device is invalidated.  A write dropped before it was sent still
+    // has a pending expected value, which would never expire, so remove it, and that of a write merged into this one,
+    // even if this write did not set one.
     // Removal only touches expected values that still carry these IDs; a write already in flight loses its expected
     // value too only when the device is going away.
     mtr_weakify(self);
@@ -4061,14 +4061,14 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         [self _removeMergedOutWriteExpectedValues:request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex]];
     }];
     if (useValueAsExpectedValue) {
-        // As for an invoke with expected values, the write's wait in the queue is bounded: if it has sent nothing by
-        // then, it is cancelled, its expected value is removed, and it is never sent.  A later write merged into this
-        // work item is cancelled with it.
-        MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+        // How long the write's expected value is shown while the write waits to be sent is bounded: if it has not been
+        // sent by then, its expected value is removed.  The write stays queued and is still sent.  Each write bounds
+        // its own expected value, whether or not its work item was merged into another.
+        mtr_weakify(self);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kMTRUntokenedInvokeQueueTimeoutMs * NSEC_PER_MSEC)), self.queue, ^{
-            MTRAsyncWorkItem * item = weakWorkItem;
-            if (item && [workQueue cancelWorkItemIfUnsent:item]) {
-                MTR_LOG("Write attribute work item [%llu] timed out after %u ms in the queue before it was sent", workItemID, kMTRUntokenedInvokeQueueTimeoutMs);
+            mtr_strongify(self);
+            if (self && [self _removePendingExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID]) {
+                MTR_LOG("Write attribute work item [%llu] not sent after %u ms in the queue: its expected value is removed", workItemID, kMTRUntokenedInvokeQueueTimeoutMs);
             }
         });
     }
@@ -5662,6 +5662,20 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
     }
+}
+
+// Removes the expected value with this ID for this path only while its request has not been sent.  Returns whether it
+// removed one.
+- (BOOL)_removePendingExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
+{
+    std::lock_guard lock(_lock);
+    NSArray * expectedValue = _expectedValueCache[attributePath];
+    if (!expectedValue || !MTRExpectedValueIsPending(expectedValue)
+        || [expectedValue[MTRDeviceExpectedValueFieldIDIndex] unsignedLongLongValue] != expectedValueID) {
+        return NO;
+    }
+    [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+    return YES;
 }
 
 // Removes the expected values of writes a later write replaced while merging; each entry is [ path, expectedValueID ].

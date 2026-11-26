@@ -8900,6 +8900,18 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertTrue(ran);
 }
 
+// Returns once the device's work queue is empty and everything already dispatched to the device queue has run.
+- (void)_waitForEmptyWorkQueueOfDevice:(MTRDevice *)device timeout:(NSTimeInterval)timeout
+{
+    XCTNSPredicateExpectation * drained = [[XCTNSPredicateExpectation alloc]
+        initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary<NSString *, id> * _Nullable bindings) {
+            return device.asyncWorkQueue.itemCount == 0;
+        }]
+                   object:nil];
+    [self waitForExpectations:@[ drained ] timeout:timeout];
+    [self _waitForDeviceQueue:device];
+}
+
 // Waits until a hold from HoldDeviceWorkQueue has ended, and returns the time it ended.
 - (NSDate *)_waitForHoldRelease:(NSMutableArray<NSDate *> *)releaseTimes
 {
@@ -9950,11 +9962,11 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
 }
 
-- (void)test080_WriteWaitingForSessionIsDroppedAtQueueBound
+- (void)test080_WriteWaitingForSessionLosesExpectedValueAtQueueBound
 {
     // A write with an expected value whose session is not ready does not keep its expected value for the whole wait:
-    // once it has waited the default bound (10 s) unsent, its expected value is removed, and when the session does
-    // become ready the write is not sent.
+    // once it has waited the default bound (10 s) unsent, its expected value is removed.  The write itself is not
+    // dropped: when the session becomes ready it is sent, and the expected value does not come back.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
     __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
     MTRAttributePath * path = [self _expectedValueTestPath];
@@ -9998,9 +10010,9 @@ static const unsigned kExpectedValueTestCachedValue = 3;
         @"expected value still shown %.1f s after the write", [[NSDate now] timeIntervalSinceDate:writtenAt]);
 
     releaseSession();
-    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Session ready; the write is not sent"];
-    settle.inverted = YES;
-    [self waitForExpectations:@[ settle ] timeout:kTimeoutInSeconds];
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
+        @"the expected value came back when the write was sent");
 
     XCTestExpectation * readBack = [[XCTestExpectation alloc] initWithDescription:@"Accessory value read back"];
     __block id readValue;
@@ -10015,7 +10027,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
                                       [readBack fulfill];
                                   }];
     [self waitForExpectations:@[ readBack ] timeout:kTimeoutInSeconds];
-    XCTAssertEqualObjects(readValue, @(accessoryValue), @"the dropped write reached the accessory");
+    XCTAssertEqualObjects(readValue, @(expectedValue), @"the write did not reach the accessory");
 }
 
 // Writes three values to the test path so that their work items merge into one, with the middle one's expected
@@ -10091,17 +10103,6 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     return thirdValue;
 }
 
-- (void)_waitForEmptyWorkQueueOfDevice:(MTRDevice *)device timeout:(NSTimeInterval)timeout
-{
-    XCTNSPredicateExpectation * drained = [[XCTNSPredicateExpectation alloc]
-        initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary<NSString *, id> * _Nullable bindings) {
-            return device.asyncWorkQueue.itemCount == 0;
-        }]
-                   object:nil];
-    [self waitForExpectations:@[ drained ] timeout:timeout];
-    [self _waitForDeviceQueue:device];
-}
-
 - (void)test081_MergedWritesLeaveNoExpectedValueAfterTheyAreSent
 {
     // When writes to one path merge into one work item, the expected value of a write merged out in the middle does
@@ -10122,22 +10123,90 @@ static const unsigned kExpectedValueTestCachedValue = 3;
 
 - (void)test082_MergedWritesLeaveNoExpectedValueWhenCancelled
 {
-    // As test081, but the merged write waits for its session past the queue bound (10 s) and is cancelled unsent:
-    // none of the three writes' expected values remains.
+    // As test081, but the merged write is cancelled unsent while it waits for its session, well before the queue
+    // bound (10 s), as when the device goes away: none of the three writes' expected values remains.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
     __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
     MTRAttributePath * path = [self _expectedValueTestPath];
-    const NSTimeInterval bound = 10;
 
     dispatch_block_t releaseSession = [self _holdMatterQueue];
     dispatch_block_t releaseDeviceQueue;
     [self _writeThreeMergedValuesToDevice:device delegate:delegate releaseDeviceQueue:&releaseDeviceQueue];
     releaseDeviceQueue();
-    [self _waitForEmptyWorkQueueOfDevice:device timeout:(bound + 2)];
+    // The three writes merge into one work item, which starts and waits for its session.
+    XCTNSPredicateExpectation * merged = [[XCTNSPredicateExpectation alloc]
+        initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary<NSString *, id> * _Nullable bindings) {
+            return device.asyncWorkQueue.itemCount == 1;
+        }]
+                   object:nil];
+    [self waitForExpectations:@[ merged ] timeout:kTimeoutInSeconds];
+    [self _waitForDeviceQueue:device];
+    // The device going away cancels every work item; the cancel handler runs on the device queue.
+    [device.asyncWorkQueue invalidate];
+    [self _waitForDeviceQueue:device];
 
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
         @"a merged-out write's expected value is still shown after the merged write was cancelled");
     releaseSession();
+}
+
+- (void)test083_MergedWriteLosesEveryExpectedValueAtQueueBound
+{
+    // A write waiting for its session absorbs a later write to the same path.  At the default bound (10 s) neither
+    // write's expected value is still shown, although the later write's work item is gone; once the session is ready
+    // the merged write is sent with the later value.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const NSTimeInterval bound = 10;
+    const unsigned firstValue = 8;
+    const unsigned secondValue = 9;
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    __auto_type writeValue = ^(unsigned value) {
+        [device writeAttributeWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                       value:[self _expectedValueTestDataValue:value]
+                       expectedValueInterval:@(60000)
+                           timedWriteTimeout:nil];
+    };
+    // Hold the device work queue so that both writes are queued before the first starts and absorbs the second.
+    NSMutableArray<NSDate *> * releaseTimes = HoldDeviceWorkQueue(device, 1);
+    writeValue(firstValue);
+    writeValue(secondValue);
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, 3u);
+    [self _waitForHoldRelease:releaseTimes];
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, 1u, @"the two writes did not merge");
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(secondValue));
+
+    XCTestExpectation * sessionPending = [[XCTestExpectation alloc] initWithDescription:@"Session still not ready"];
+    sessionPending.inverted = YES;
+    [self waitForExpectations:@[ sessionPending ] timeout:(bound + 2)];
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
+        @"a merged write's expected value is still shown after the bound");
+
+    releaseSession();
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue));
+
+    XCTestExpectation * readBack = [[XCTestExpectation alloc] initWithDescription:@"Accessory value read back"];
+    __block id readValue;
+    [baseDevice readAttributesWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                      params:nil
+                                       queue:dispatch_get_main_queue()
+                                  completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                      XCTAssertNil(error);
+                                      readValue = values.firstObject[MTRDataKey][MTRValueKey];
+                                      [readBack fulfill];
+                                  }];
+    [self waitForExpectations:@[ readBack ] timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects(readValue, @(secondValue), @"the merged write did not reach the accessory");
 }
 
 @end
