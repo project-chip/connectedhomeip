@@ -418,7 +418,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
         # DUT must be in kIdle after reboot
         logger.info("%s - DUT UpdateStae is : %d", step_number_s1, current_update_state)
-        asserts.assert_equal(current_update_state,Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        asserts.assert_equal(current_update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
 
         # DUT is running the expected version.
         await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, self.expected_software_version)
