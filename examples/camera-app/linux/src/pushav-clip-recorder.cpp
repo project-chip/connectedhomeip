@@ -718,10 +718,41 @@ RecorderStatus PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
 #endif
 
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
-        mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
         mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-        AVDictionary * opts                         = NULL;
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+        const AVSampleFormat * sampleFmts = nullptr;
+        int numSampleFmts                 = 0;
+        if (avcodec_get_supported_config(mAudioEncoderContext, audioCodec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0,
+                                         reinterpret_cast<const void **>(&sampleFmts), &numSampleFmts) < 0)
+        {
+            ChipLogError(Camera, "Error: Failed to query supported audio sample formats");
+            return RecorderStatus::kFail;
+        }
+        if (sampleFmts == nullptr)
+        {
+            // FFmpeg sets out_configs to nullptr when all sample formats are supported.
+            mAudioEncoderContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
+        }
+        else if (numSampleFmts > 0)
+        {
+            mAudioEncoderContext->sample_fmt = sampleFmts[0];
+        }
+        else
+        {
+            ChipLogError(Camera, "Error: Audio encoder reports no supported sample formats");
+            return RecorderStatus::kFail;
+        }
+#else
+        if (audioCodec->sample_fmts == nullptr || audioCodec->sample_fmts[0] == AV_SAMPLE_FMT_NONE)
+        {
+            ChipLogError(Camera, "Error: Audio encoder reports no supported sample formats");
+            return RecorderStatus::kFail;
+        }
+        mAudioEncoderContext->sample_fmt = audioCodec->sample_fmts[0];
+#endif
+        AVDictionary * opts = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);
         if (avcodec_open2(mAudioEncoderContext, audioCodec, &opts) < 0)
         {
