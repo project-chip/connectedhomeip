@@ -1031,9 +1031,8 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
     // Wait until every reliable send, including the responder's Sigma2, has
     // run out of retransmissions.
     auto * rm = GetExchangeManager().GetReliableMessageMgr();
-    GetIOContext().DriveIOUntil(System::Clock::Seconds16(10), [&] {
-        return loopback.mDroppedMessageCount >= 2 && rm->TestGetCountRetransTable() == 0;
-    });
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(10),
+                                [&] { return loopback.mDroppedMessageCount >= 2 && rm->TestGetCountRetransTable() == 0; });
     ASSERT_EQ(rm->TestGetCountRetransTable(), 0);
     ASSERT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
 

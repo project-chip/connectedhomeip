@@ -2667,8 +2667,8 @@ System::Clock::Milliseconds32 CASESession::RemainingSigma2ResponseTime()
     VerifyOrReturnValue(mState == State::kSentSigma2, System::Clock::kZero);
 
     auto timeout = std::chrono::duration_cast<System::Clock::Milliseconds32>(ComputeSigma2ResponseTimeout(GetRemoteMRPConfig()));
-    auto elapsed = std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp() -
-                                                                              mSigma2SentTime);
+    auto elapsed =
+        std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp() - mSigma2SentTime);
     return elapsed < timeout ? timeout - elapsed : System::Clock::kZero;
 }
 
