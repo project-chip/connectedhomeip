@@ -4,6 +4,14 @@
 		zephyr,code-partition = &app_partition_0;
 	};
 
+	aliases {
+		/*
+		 * The board dts only aliases led0, so expose the remaining two here.
+		 */
+		led1 = &led1;
+		led2 = &led2;
+	};
+
 	tcm {
 		/delete-node/ memory@133c00;
 

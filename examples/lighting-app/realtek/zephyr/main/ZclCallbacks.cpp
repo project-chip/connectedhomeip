@@ -37,7 +37,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        AppTask::Instance().GetLightingDevice().Set(*value);
+        AppTask::Instance().GetLightLED().Set(*value);
     }
 }
 
@@ -60,7 +60,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     if (status == Protocols::InteractionModel::Status::Success)
     {
         // Set actual state to the cluster state that was last persisted
-        AppTask::Instance().GetLightingDevice().Set(storedValue);
+        AppTask::Instance().GetLightLED().Set(storedValue);
     }
 
     AppTask::Instance().UpdateClusterState();

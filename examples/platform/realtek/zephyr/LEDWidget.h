@@ -24,14 +24,12 @@
 class LEDWidget
 {
 public:
-    typedef void (*LEDWidgetStateUpdateHandler)(LEDWidget * ledWidget);
-
-    static void SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb);
     void Init(gpio_dt_spec gpio);
     void Set(bool state);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
+    void BlinkStop();
     void UpdateState();
     bool IsTurnedOn() { return mState; }
 

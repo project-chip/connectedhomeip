@@ -50,6 +50,7 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/reboot.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -60,10 +61,12 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout      = 3000;
-constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr int kAppEventQueueSize               = 10;
-constexpr EndpointId kLightEndpointId          = 1;
+constexpr int kAppEventQueueSize      = 10;
+constexpr EndpointId kLightEndpointId = 1;
+
+constexpr uint32_t kResetTriggerTimeout      = 1500;
+constexpr uint32_t kBleAdvTriggerTimeout     = 1500;
+constexpr uint32_t kFactoryResetCancelWindow = 3500;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -71,12 +74,17 @@ k_timer sFunctionTimer;
 Identify sIdentify = { kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                        Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
-LEDWidget sStatusLED;
-LEDWidget sIdentifyLED;
+LEDWidget lightStatusLED;
+LEDWidget identifyLED;
+LEDWidget systemStatusLED;
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
+
+// Set once the app event loop is about to run. Button events produced while
+// the stack is still starting up are dropped.
+bool sIsInitialized = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::app::DefaultAttributePersistenceProvider gSimpleAttributePersistence;
@@ -131,9 +139,9 @@ constexpr uint32_t kOff_ms{ 950 };
 CHIP_ERROR AppTask::Init()
 {
     // Initialize LEDs
-    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios, {}));
-    sIdentifyLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(led1), gpios, {}));
-    sIdentifyLED.Set(false);
+    lightStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios, {}));
+    identifyLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(led1), gpios, {}));
+    systemStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(led2), gpios, {}));
 
     UpdateStatusLED();
 
@@ -262,6 +270,10 @@ CHIP_ERROR AppTask::StartApp()
 {
     ReturnErrorOnFailure(Init());
 
+    // The stack is up, so from here on button events are meaningful. Anything
+    // pressed during init was dropped by ButtonEventHandler.
+    sIsInitialized = true;
+
     AppEvent event = {};
 
     while (true)
@@ -277,7 +289,7 @@ void AppTask::IdentifyStartHandler(Identify *)
 {
     AppEvent event;
     event.Type    = AppEventType::IdentifyStart;
-    event.Handler = [](const AppEvent &) { sIdentifyLED.Blink(LedConsts::kIdentifyBlinkRate_ms); };
+    event.Handler = [](const AppEvent &) { identifyLED.Blink(LedConsts::kIdentifyBlinkRate_ms); };
     PostEvent(event);
 }
 
@@ -285,17 +297,28 @@ void AppTask::IdentifyStopHandler(Identify *)
 {
     AppEvent event;
     event.Type    = AppEventType::IdentifyStop;
-    event.Handler = [](const AppEvent &) { sIdentifyLED.Set(false); };
+    event.Handler = [](const AppEvent &) { identifyLED.BlinkStop(); };
     PostEvent(event);
 }
 
-LEDWidget & AppTask::GetLightingDevice(void)
+LEDWidget & AppTask::GetLightLED(void)
 {
-    return sIdentifyLED;
+    return lightStatusLED;
 }
 
 void AppTask::ButtonEventHandler(uint8_t buttonIdx, uint8_t state)
 {
+    if (buttonIdx != APP_TOGGLE_BUTTON && buttonIdx != APP_FUNCTION_BUTTON && buttonIdx != APP_LEVEL_BUTTON &&
+        buttonIdx != APP_BLE_ADV_BUTTON)
+    {
+        return;
+    }
+
+    if (!sIsInitialized)
+    {
+        return;
+    }
+
     AppEvent button_event;
 
     button_event.Type                  = AppEventType::Button;
@@ -327,22 +350,34 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
         return;
     }
 
-    // If we reached here, the button was held past kFactoryResetTriggerTimeout, initiate factory reset
-    if (Instance().mFunction == FunctionEvent::SoftwareUpdate)
+    // Three stage state machine, matching the FreeRTOS variant:
+    //   hold < 1.5s        : reset (applied on release)
+    //   1.5s .. 3.0s       : toggle BLE advertising (applied on release)
+    //   3.0s and beyond    : factory reset, cancelable for another 3.5s
+    if (Instance().mFunction == FunctionEvent::Reset)
     {
-        LOG_INF("Factory Reset Triggered. Release button within %ums to cancel.", kFactoryResetTriggerTimeout);
+        LOG_INF("[BTN] Start/Stop BLE advertising selected. Release to apply.");
 
-        // Start timer for kFactoryResetCancelWindowTimeout to allow user to cancel, if required.
-        Instance().StartTimer(kFactoryResetCancelWindowTimeout);
+        Instance().StartTimer(kBleAdvTriggerTimeout);
+        Instance().mFunction = FunctionEvent::AdvertisingStart;
+
+        // Turn the LED off before starting the blink so the pattern is visible
+        // from its first cycle.
+        systemStatusLED.Set(false);
+        systemStatusLED.Blink(LedConsts::StatusLed::Provisioned::kOn_ms, LedConsts::StatusLed::Provisioned::kOff_ms);
+    }
+    else if (Instance().mFunction == FunctionEvent::AdvertisingStart)
+    {
+        LOG_INF("[BTN] Factory Reset selected. Release within %ums to cancel.", kFactoryResetCancelWindow);
+
+        Instance().StartTimer(kFactoryResetCancelWindow);
         Instance().mFunction = FunctionEvent::FactoryReset;
 
-        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
-        sStatusLED.Set(false);
-        sStatusLED.Blink(LedConsts::kBlinkRate_ms);
+        systemStatusLED.Set(false);
+        systemStatusLED.Blink(LedConsts::kBlinkRate_ms);
     }
     else if (Instance().mFunction == FunctionEvent::FactoryReset)
     {
-        // Actually trigger Factory Reset
         Instance().mFunction = FunctionEvent::NoneSelected;
         chip::Server::GetInstance().ScheduleFactoryReset();
     }
@@ -352,70 +387,110 @@ void AppTask::FunctionHandler(const AppEvent & event)
 {
     LOG_INF("Button state changed: index %d, action %d", event.ButtonEvent.ButtonIdx, event.ButtonEvent.Action);
 
+    const bool pushed = event.ButtonEvent.Action == static_cast<uint8_t>(AppEventType::ButtonPushed);
+
     switch (event.ButtonEvent.ButtonIdx)
     {
-    case 0: {
-        // To trigger software update: press the FUNCTION_BUTTON button briefly (< kFactoryResetTriggerTimeout)
-        // To initiate factory reset: press the FUNCTION_BUTTON for kFactoryResetTriggerTimeout + kFactoryResetCancelWindowTimeout
-        // All LEDs start blinking after kFactoryResetTriggerTimeout to signal factory reset has been initiated.
-        // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
-        // kFactoryResetCancelWindowTimeout
-        if (event.ButtonEvent.Action == static_cast<uint8_t>(AppEventType::ButtonPushed))
+    case APP_TOGGLE_BUTTON:
+        if (pushed)
+        {
+            bool on = false;
+            if (Clusters::OnOff::Attributes::OnOff::Get(kLightEndpointId, &on) != Protocols::InteractionModel::Status::Success)
+            {
+                LOG_ERR("[BTN] Failed to read the OnOff attribute");
+                break;
+            }
+
+            lightStatusLED.Set(!on);
+            Instance().UpdateClusterState();
+        }
+        break;
+
+    case APP_LEVEL_BUTTON:
+        // Dimming is not implemented: PWM output for the LEDs is disabled, so
+        // there is nothing to drive. Left as a no-op rather than repurposed, so
+        // the button map keeps matching the FreeRTOS variant.
+        break;
+
+    case APP_BLE_ADV_BUTTON:
+        if (pushed)
+        {
+            RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(BLEStartAdvertising, 0);
+        }
+        break;
+
+    case APP_FUNCTION_BUTTON:
+        if (pushed)
         {
             if (!Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::NoneSelected)
             {
-                Instance().StartTimer(kFactoryResetTriggerTimeout);
-                Instance().mFunction = FunctionEvent::SoftwareUpdate;
+                LOG_INF("[BTN] Hold to select function:");
+                LOG_INF("[BTN] - Reset (release within %ums)", kResetTriggerTimeout);
+                LOG_INF("[BTN] - Start/Stop BLE advertising (release within %ums)",
+                        kResetTriggerTimeout + kBleAdvTriggerTimeout);
+                LOG_INF("[BTN] - Factory Reset (release within a further %ums to cancel)", kFactoryResetCancelWindow);
+
+                Instance().StartTimer(kResetTriggerTimeout);
+                Instance().mFunction = FunctionEvent::Reset;
             }
         }
-        else
+        else if (Instance().mFunctionTimerActive)
         {
-            // If the button was released before factory reset got initiated, trigger a software update.
-            if (Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::SoftwareUpdate)
+            switch (Instance().mFunction)
             {
+            case FunctionEvent::Reset:
                 Instance().CancelTimer();
                 Instance().mFunction = FunctionEvent::NoneSelected;
 
-                LOG_INF("Software update is disabled");
-            }
-            else if (Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::FactoryReset)
-            {
+                LOG_INF("[BTN] Reset selected");
+                sys_reboot(SYS_REBOOT_COLD);
+                break;
+
+            case FunctionEvent::AdvertisingStart:
+                Instance().CancelTimer();
+                Instance().mFunction = FunctionEvent::NoneSelected;
+
+                RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(BLEStartAdvertising, 0);
+                break;
+
+            case FunctionEvent::FactoryReset:
                 UpdateStatusLED();
                 Instance().CancelTimer();
                 Instance().mFunction = FunctionEvent::NoneSelected;
-                LOG_INF("Factory Reset has been Canceled");
+
+                LOG_INF("[BTN] Factory Reset has been Canceled");
+                break;
+
+            default:
+                break;
             }
         }
-    }
-    break;
+        break;
 
     default:
         break;
     }
 }
 
-void AppTask::UpdateLedStateEventHandler(const AppEvent & event)
+void AppTask::BLEStartAdvertising(intptr_t /* arg */)
 {
-    if (event.Type == AppEventType::UpdateLedState)
-    {
-        event.UpdateLedStateEvent.LedWidget->UpdateState();
-    }
-}
+    const bool enable = !ConnectivityMgr().IsBLEAdvertisingEnabled();
 
-void AppTask::LEDStateUpdateHandler(LEDWidget & ledWidget)
-{
-    AppEvent event;
-    event.Type                          = AppEventType::UpdateLedState;
-    event.Handler                       = UpdateLedStateEventHandler;
-    event.UpdateLedStateEvent.LedWidget = &ledWidget;
-    PostEvent(event);
+    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(enable);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("SetBLEAdvertisingEnabled failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    LOG_INF("[BTN] BLE advertising %s", enable ? "enabled" : "disabled");
 }
 
 void AppTask::UpdateStatusLED()
 {
     // Update the status LED.
     //
-    // If IPv6 network and service provisioned, keep the LED On constantly.
+    // If IPv6 network and service provisioned, keep the LED Off constantly.
     //
     // If the system has ble connection(s) uptill the stage above, THEN blink the LED at an even
     // rate of 100ms.
@@ -423,15 +498,15 @@ void AppTask::UpdateStatusLED()
     // Otherwise, blink the LED for a very short time.
     if (sIsNetworkProvisioned && sIsNetworkEnabled)
     {
-        sStatusLED.Set(true);
+        systemStatusLED.Set(false);
     }
     else if (sHaveBLEConnections)
     {
-        sStatusLED.Blink(LedConsts::StatusLed::Unprovisioned::kOn_ms, LedConsts::StatusLed::Unprovisioned::kOff_ms);
+        systemStatusLED.Blink(LedConsts::StatusLed::Unprovisioned::kOn_ms, LedConsts::StatusLed::Unprovisioned::kOff_ms);
     }
     else
     {
-        sStatusLED.Blink(LedConsts::StatusLed::Provisioned::kOn_ms, LedConsts::StatusLed::Provisioned::kOff_ms);
+        systemStatusLED.Blink(LedConsts::StatusLed::Provisioned::kOn_ms, LedConsts::StatusLed::Provisioned::kOff_ms);
     }
 }
 
@@ -507,7 +582,7 @@ void AppTask::UpdateClusterState()
     SystemLayer().ScheduleLambda([this] {
         // write the new on/off value
         Protocols::InteractionModel::Status status =
-            Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, sIdentifyLED.IsTurnedOn());
+            Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, lightStatusLED.IsTurnedOn());
 
         if (status != Protocols::InteractionModel::Status::Success)
         {
