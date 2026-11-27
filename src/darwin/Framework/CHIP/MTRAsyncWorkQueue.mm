@@ -558,8 +558,11 @@ struct ContextSnapshot {
 
     NSUInteger nextWorkItemToRunIndex = [self _runningCount];
     MTRAsyncWorkItem * workItem = _items[nextWorkItemToRunIndex];
-    if (workItem.jumpsUnsentWork && [self _runningJumperHasNotSentWithContext]) {
-        return; // it starts when the earlier user command completes
+    if ([self _runningJumperHasNotSentWithContext]) {
+        // A running user command has not sent yet: nothing queued after it starts until it sends, completes or is
+        // cancelled, so nothing queued after a user command can act before it.  A user command is not held back by
+        // other work that has sent nothing; see the above-width start above.
+        return;
     }
     _runningWorkItemCount++;
 
@@ -628,11 +631,14 @@ struct ContextSnapshot {
     BOOL isJumper = workItem.jumpsUnsentWork;
     if (isJumper) {
         {
+            ContextSnapshot context(self); // outside of lock
             std::lock_guard lock(_lock);
             if (workItem.isComplete) {
                 return NO; // cancelled before it could send
             }
             workItem.sent = YES;
+            // Work held back behind this user command while it had sent nothing may start now.
+            [self _callNextReadyWorkItemWithContext:context];
         }
         [_jumperSendDone lock];
         _jumpersSending++;

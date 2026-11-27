@@ -974,6 +974,85 @@
     }
 }
 
+// Starts an unsent read in the normal slot (width 1), then a user command above the width beside it, then a second
+// read queued behind the command, and frees the normal slot.  Returns the command, whose readyHandler keeps its
+// completion in `jumperCompletion`, and signals `secondReadStarted` when the second read starts.
+- (MTRAsyncWorkItem *)_queueReadBehindUnsentJumperOnQueue:(MTRAsyncWorkQueue *)workQueue
+                                         jumperCompletion:(MTRAsyncWorkCompletionBlock __strong *)jumperCompletionOut
+                                        secondReadStarted:(dispatch_semaphore_t)secondReadStarted
+{
+    dispatch_semaphore_t firstReadRunning = dispatch_semaphore_create(0);
+    dispatch_semaphore_t releaseFirstRead = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * firstRead = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    firstRead.tracksSend = YES; // it never calls workItem:readyToSend:, so it stays unsent until it completes
+    firstRead.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(firstReadRunning);
+        dispatch_semaphore_wait(releaseFirstRead, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:firstRead description:@"first read"];
+    XCTAssertEqual(dispatch_semaphore_wait(firstReadRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock jumperCompletion;
+    MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    jumper.jumpsUnsentWork = YES;
+    jumper.tracksSend = YES;
+    jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        jumperCompletion = completion;
+        dispatch_semaphore_signal(jumperStarted);
+    };
+    [workQueue enqueueWorkItem:jumper description:@"user command"];
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the user command runs above width beside the unsent read");
+
+    MTRAsyncWorkItem * secondRead = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    secondRead.tracksSend = YES;
+    secondRead.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(secondReadStarted);
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:secondRead description:@"second read"];
+
+    // The first read completes and frees the normal slot.
+    dispatch_semaphore_signal(releaseFirstRead);
+    *jumperCompletionOut = jumperCompletion;
+    return jumper;
+}
+
+- (void)testReadBehindUnsentJumperWaitsUntilItSends
+{
+    // A read queued behind a user command that is running above the width and has not sent does not start when the
+    // normal slot frees: it would read before the command takes effect.  It starts once the command sends.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t secondReadStarted = dispatch_semaphore_create(0);
+    MTRAsyncWorkCompletionBlock jumperCompletion;
+    MTRAsyncWorkItem * jumper = [self _queueReadBehindUnsentJumperOnQueue:workQueue jumperCompletion:&jumperCompletion secondReadStarted:secondReadStarted];
+    XCTAssertNotEqual(dispatch_semaphore_wait(secondReadStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0,
+        @"the read queued behind the unsent user command started before it sent");
+
+    XCTAssertTrue([workQueue workItem:jumper readyToSend:^ {}]);
+    XCTAssertEqual(dispatch_semaphore_wait(secondReadStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0,
+        @"the read did not start once the user command sent");
+    if (jumperCompletion) {
+        jumperCompletion(MTRAsyncWorkComplete);
+    }
+}
+
+- (void)testReadBehindUnsentJumperRunsWhenItIsCancelledUnsent
+{
+    // The same read is not held forever behind a user command that never sends: when the command is cancelled
+    // unsent (as its queue timeout does), the read starts.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t secondReadStarted = dispatch_semaphore_create(0);
+    MTRAsyncWorkCompletionBlock jumperCompletion;
+    MTRAsyncWorkItem * jumper = [self _queueReadBehindUnsentJumperOnQueue:workQueue jumperCompletion:&jumperCompletion secondReadStarted:secondReadStarted];
+    XCTAssertNotEqual(dispatch_semaphore_wait(secondReadStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0);
+
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:jumper]);
+    XCTAssertEqual(dispatch_semaphore_wait(secondReadStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0,
+        @"the read stayed held after the user command was cancelled unsent");
+}
+
 - (void)testReadSendAfterJumperSendReturns
 {
     MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
