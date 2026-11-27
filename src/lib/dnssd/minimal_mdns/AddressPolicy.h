@@ -16,9 +16,12 @@
  */
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <lib/dnssd/minimal_mdns/ListenIterator.h>
 #include <lib/dnssd/minimal_mdns/ServerIPAddresses.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 
 namespace mdns {
 namespace Minimal {
@@ -50,6 +53,38 @@ AddressPolicy * GetAddressPolicy();
 /// MUST be called before any minmdns functionality is used (e.g. server
 /// startup)
 void SetAddressPolicy(AddressPolicy * policy);
+
+class InterfaceFilter
+{
+public:
+    virtual ~InterfaceFilter() = default;
+
+    virtual bool IsInterfaceAllowed(const char * name) const = 0;
+};
+
+InterfaceFilter & GetInterfaceFilter();
+void SetInterfaceFilter(InterfaceFilter * filter);
+
+inline constexpr char kMinimalMdnsInterfaceEnvVar[] = "CHIP_MDNS_INTERFACE";
+
+class InterfaceNameListFilter : public InterfaceFilter
+{
+public:
+    CHIP_ERROR SetAllowedInterfaces(chip::Span<const chip::CharSpan> allowed);
+    CHIP_ERROR SetAllowedInterfacesFromCommaSeparatedList(const char * commaSeparatedNames);
+    void Reset();
+    size_t Count() const { return mCount; }
+
+    bool IsInterfaceAllowed(const char * name) const override;
+
+    chip::Platform::ScopedMemoryBuffer<char> mNamesStorage;
+    chip::Platform::ScopedMemoryBuffer<char *> mAcceptedNames;
+    size_t mCount = 0;
+};
+
+CHIP_ERROR ConfigureInterfaceFilter(chip::Span<const chip::CharSpan> allowedInterfaces);
+CHIP_ERROR ConfigureInterfaceFilterFromCommaSeparatedList(const char * commaSeparatedNames);
+CHIP_ERROR ConfigureInterfaceFilterFromEnvironmentVariable(const char * envVarName = kMinimalMdnsInterfaceEnvVar);
 
 } // namespace Minimal
 } // namespace mdns
