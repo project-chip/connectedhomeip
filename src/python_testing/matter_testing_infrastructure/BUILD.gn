@@ -96,6 +96,14 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_matter_asserts.py",
     "matter/testing/test_data_model_errata.py",
   ]
+
+  # These unit tests require Linux sdbus, but no root privileges or mock services.
+  if (host_os == "linux") {
+    tests += [
+      "matter/testing/test_linux_namespace.py",
+      "matter/testing/test_linux_wifi.py",
+    ]
+  }
 }
 
 pw_zip("data_model_zip_1_1") {

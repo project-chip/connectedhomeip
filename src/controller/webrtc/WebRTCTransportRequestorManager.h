@@ -58,8 +58,9 @@ public:
         return instance;
     }
 
-    // methods to be called by python
-    void Init();
+    // `fabricTable` must be the controller stack's fabric table, which lives in the
+    // DeviceControllerFactory system state; Server is never initialized in this process.
+    void Init(chip::FabricTable & fabricTable);
 
     void Shutdown();
 

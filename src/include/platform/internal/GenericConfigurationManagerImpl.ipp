@@ -324,10 +324,18 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpo
     }
 #endif
     // Else, attempt to read the hard-coded values.
-    VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
+#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE
     const char * date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
+#else
+    const char * date = __DATE__;
+#endif
+#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
     const char * time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+#else
+    const char * time = __TIME__;
+#endif
+    VerifyOrReturnError(!BUILD_DATE_IS_BAD(date), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!BUILD_TIME_IS_BAD(time), CHIP_ERROR_INTERNAL);
     uint32_t seconds;
     auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date),
                                         COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);

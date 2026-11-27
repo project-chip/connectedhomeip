@@ -37,7 +37,9 @@ jobs:
     zephyr:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
         runs-on: ubuntu-24.04
-        if: github.actor != 'restyled-io[bot]'
+# if: github.actor != 'restyled-io[bot]'
+# Silabs artifactory issues are causing this job to fail, disabling until the blobs can be fetched reliably
+        if: false
 
         permissions:
             contents: read

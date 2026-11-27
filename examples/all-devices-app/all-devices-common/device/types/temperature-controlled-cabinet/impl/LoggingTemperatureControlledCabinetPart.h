@@ -22,10 +22,10 @@
 
 namespace chip::app {
 
-class LoggingTemperatureControlledCabinetPart : public TemperatureControlledCabinetPart,
-                                                public Clusters::OperationalState::Delegate,
+class LoggingTemperatureControlledCabinetPart : public Clusters::OperationalState::Delegate,
                                                 public Clusters::IdentifyDelegate,
-                                                public TimerContext
+                                                public TimerContext,
+                                                public TemperatureControlledCabinetPart
 {
 public:
     LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name);
@@ -38,7 +38,7 @@ public:
     void TimerFired() override;
 
     // OperationalState::Delegate Interface
-    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
     CHIP_ERROR GetOperationalStateAtIndex(size_t index,
                                           Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
@@ -61,7 +61,6 @@ private:
 
     const char * mName;
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };
 
