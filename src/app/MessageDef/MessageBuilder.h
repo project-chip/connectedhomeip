@@ -26,10 +26,20 @@
 namespace chip {
 namespace app {
 
+/**
+ * Inputs for encoding the SuppressResponse and TimedRequest fields of an Invoke or Write Request.
+ *
+ * A field that is false is omitted only when peerRevision is at least Revision::kFirstRevisionWithOptionalRequestFlags.
+ * Otherwise (older or unknown peerRevision) both fields are always encoded. A true field is always encoded.
+ * Setting timedRequest on a group request is an error.
+ */
 struct RequestFlagsOptions
 {
     bool suppressResponse = false;
     bool timedRequest     = false;
+    // Interaction model revision of the receiver, or std::nullopt if unknown. Comes from the session when it reports
+    // one. Otherwise it is the revision the client assumes for the receiver based on its own knowledge of the peer
+    // state.
     std::optional<uint16_t> peerRevision;
     bool isGroupcast = false;
 };

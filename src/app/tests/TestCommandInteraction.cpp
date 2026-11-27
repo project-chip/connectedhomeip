@@ -1766,12 +1766,17 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
 
 TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 {
-    for (bool passSessionAtConstruction : { false, true })
-    {
+    using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
+    auto checkGroupInvoke = [this](bool passSessionAtConstruction, std::optional<uint16_t> fallbackRevision) {
         mockCommandSenderDelegate.ResetCounter();
         SessionHandle groupSession = GetSessionBobToFriends();
         app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(),
                                          passSessionAtConstruction ? OptionalSessionHandleRef(groupSession) : std::nullopt);
+        if (fallbackRevision.has_value())
+        {
+            ASSERT_SUCCESS(commandSender.SetFallbackPeerInteractionModelRevision(fallbackRevision));
+        }
 
         AddInvokeRequestData(&commandSender);
         chip::Testing::MessageCapturer messageLog(*this);
@@ -1786,7 +1791,9 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
         InvokeRequestMessage::Parser parser;
         ASSERT_SUCCESS(parser.Init(reader));
         bool flag = true;
-        if (passSessionAtConstruction)
+        // Groupcast has no peer revision, so the fields are omitted only if the caller provided a fallback revision that
+        // allows it.
+        if (fallbackRevision.has_value() && *fallbackRevision >= kFirstRevisionWithOptionalRequestFlags)
         {
             EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
             EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
@@ -1807,6 +1814,16 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 
         EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    };
+
+    for (bool passSessionAtConstruction : { false, true })
+    {
+        for (std::optional<uint16_t> fallbackRevision :
+             { std::optional<uint16_t>(), std::optional<uint16_t>(kFirstRevisionWithOptionalRequestFlags - 1),
+               std::optional<uint16_t>(kFirstRevisionWithOptionalRequestFlags) })
+        {
+            checkGroupInvoke(passSessionAtConstruction, fallbackRevision);
+        }
     }
 }
 
@@ -1881,7 +1898,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
         bool timedRequest;
     };
 
-    auto encodeUnicastInvoke = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedRequest, bool aSuppressResponse) {
+    auto encodeUnicastInvoke = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedRequest, bool aSuppressResponse,
+                                      std::optional<uint16_t> aFallbackRevision = std::nullopt) {
         SessionParameters peerParameters;
         peerParameters.SetMRPConfig(GetDefaultMRPConfig());
         if (aPeerRevision.has_value())
@@ -1893,6 +1911,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
 
         app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session, aIsTimedRequest,
                                          aSuppressResponse);
+        if (aFallbackRevision.has_value())
+        {
+            EXPECT_SUCCESS(commandSender.SetFallbackPeerInteractionModelRevision(aFallbackRevision));
+        }
         EXPECT_SUCCESS(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)));
         EXPECT_SUCCESS(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
         app::CommandSender::FinishCommandParameters finishCommandParams(aIsTimedRequest ? Optional<uint16_t>(1000)
@@ -1944,6 +1966,29 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
         EXPECT_SUCCESS(flags.timedRequestError);
         EXPECT_FALSE(flags.timedRequest);
     }
+
+    // The assumed revision is used only when the session does not report a revision.
+    flags = encodeUnicastInvoke(std::nullopt, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false,
+                                kFirstRevisionWithOptionalRequestFlags);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+    flags = encodeUnicastInvoke(std::nullopt, /* aIsTimedRequest = */ true, /* aSuppressResponse = */ false,
+                                kFirstRevisionWithOptionalRequestFlags);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_SUCCESS(flags.timedRequestError);
+    EXPECT_TRUE(flags.timedRequest);
+
+    // A revision reported by the session always wins over the assumed revision.
+    flags = encodeUnicastInvoke(kFirstRevisionWithOptionalRequestFlags - 1, /* aIsTimedRequest = */ false,
+                                /* aSuppressResponse = */ false, kFirstRevisionWithOptionalRequestFlags);
+    EXPECT_SUCCESS(flags.suppressResponseError);
+    EXPECT_SUCCESS(flags.timedRequestError);
+
+    flags = encodeUnicastInvoke(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedRequest = */ false,
+                                /* aSuppressResponse = */ false, kFirstRevisionWithOptionalRequestFlags - 1);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
 }
 
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSessionIsEnforced)
@@ -2087,6 +2132,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastOmitsSup
     SessionHandle groupSession = GetSessionBobToFriends();
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
                                      groupSession, &pendingResponseTracker);
+    EXPECT_SUCCESS(commandSender.SetFallbackPeerInteractionModelRevision(chip::Revision::kFirstRevisionWithOptionalRequestFlags));
 
     constexpr GroupId kTestGroupId = 0x0101;
     {
@@ -2099,6 +2145,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastOmitsSup
         finishCommandParams.SetEndDataStruct(true);
         EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
     }
+
+    // The assumed revision cannot change once the first command was encoded; the check below on the encoded
+    // message verifies that the rejected call did not change the encoding.
+    EXPECT_EQ(commandSender.SetFallbackPeerInteractionModelRevision(std::nullopt), CHIP_ERROR_INCORRECT_STATE);
 
     System::PacketBufferHandle commandDatabuf;
     EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));

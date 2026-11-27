@@ -2223,11 +2223,13 @@ struct RequestFlagsCase
 constexpr uint16_t kRevisionWithOptionalFlags = chip::Revision::kFirstRevisionWithOptionalRequestFlags;
 
 const RequestFlagsCase kRequestFlagsCases[] = {
-    // Groupcast cannot be timed and omits both fields, regardless of SuppressResponse or peer revision.
-    { false, false, std::nullopt, true, false, false },
-    { true, false, std::nullopt, true, false, false },
+    // Groupcast cannot be timed. Without a known revision (no peer revision is available) both fields are encoded.
+    { false, false, std::nullopt, true, true, true },
+    { true, false, std::nullopt, true, true, true },
+    { false, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), true, true, true },
+    // Groupcast with the lowest revision of the group members known: only TRUE fields are encoded.
     { false, false, kRevisionWithOptionalFlags, true, false, false },
-    { true, false, kRevisionWithOptionalFlags, true, false, false },
+    { true, false, kRevisionWithOptionalFlags, true, true, false },
     // Peer at the first revision with optional flags: only TRUE fields are encoded.
     { false, false, kRevisionWithOptionalFlags, false, false, false },
     { true, false, kRevisionWithOptionalFlags, false, true, false },
@@ -2372,6 +2374,10 @@ void CheckRequestFlagsBufferError()
         ASSERT_SUCCESS(builder.Init(&writer));
 
         RequestFlagsOptions options;
+        EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        // Nothing is encoded with these options: only the stored error can make the call fail.
+        options.peerRevision = kRevisionWithOptionalFlags;
         EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_BUFFER_TOO_SMALL);
         options.isGroupcast = true;
         EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_BUFFER_TOO_SMALL);

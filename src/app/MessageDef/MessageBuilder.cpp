@@ -32,7 +32,6 @@ CHIP_ERROR MessageBuilder::EncodeRequestFlags(const RequestFlagsOptions & option
 {
     ReturnErrorOnFailure(mError);
     VerifyOrReturnError(!(options.isGroupcast && options.timedRequest), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!options.isGroupcast, CHIP_NO_ERROR);
 
     const bool omitFalseFlags =
         options.peerRevision.has_value() && *options.peerRevision >= Revision::kFirstRevisionWithOptionalRequestFlags;

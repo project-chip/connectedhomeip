@@ -38,7 +38,20 @@ public:
     RequestSession & operator=(const RequestSession &) = delete;
 
     bool IsGroupSession() const { return mKind == Kind::kGroupcast; }
-    std::optional<uint16_t> GetPeerInteractionModelRevision() const { return mPeerInteractionModelRevision; }
+
+    /// Returns the peer interaction model revision reported by the construction session. When the session reports none
+    /// (groupcast, no construction session, or a peer that reported none), returns the revision assumed by the client, if any.
+    std::optional<uint16_t> GetPeerInteractionModelRevision() const
+    {
+        return mPeerInteractionModelRevision.has_value() ? mPeerInteractionModelRevision : mFallbackPeerInteractionModelRevision;
+    }
+
+    /// Sets the revision the client assumes for the peer. GetPeerInteractionModelRevision() uses it only when the
+    /// construction session reports none.
+    void SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision)
+    {
+        mFallbackPeerInteractionModelRevision = aFallbackRevision;
+    }
 
     /// Returns CHIP_ERROR_INCORRECT_STATE if the session was not available in the constructor or has since been released.
     CHIP_ERROR Validate() const;
@@ -68,6 +81,7 @@ private:
 
     SessionHolderWithDelegate mUnicastSession{ *this };
     std::optional<uint16_t> mPeerInteractionModelRevision;
+    std::optional<uint16_t> mFallbackPeerInteractionModelRevision;
     GroupId mGroupId         = kUndefinedGroupId;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     Kind mKind               = Kind::kUnspecified;
