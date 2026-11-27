@@ -500,7 +500,10 @@ if (chip_support_commissioning_in_controller) {
         version = chip_python_version
       }
     }
-    tests = [ "tests/test_commissioning_flow_blocks.py" ]
+    tests = [
+      "tests/test_commissioning_flow_blocks.py",
+      "tests/test_storage_ini.py",
+    ]
     python_deps = [
       ":matter-clusters-module",
       ":matter-core-module",
