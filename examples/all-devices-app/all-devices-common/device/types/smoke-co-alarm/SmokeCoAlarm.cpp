@@ -27,13 +27,15 @@ namespace app {
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
     mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
-CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                   EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+
     if (mConfig.coConcentrationConfig.has_value())
     {
         VerifyOrReturnError(mConfig.coConcentrationConfig->clusterId == CarbonMonoxideConcentrationMeasurement::Id,
@@ -45,7 +47,13 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    const EndpointId endpoint = allocator.Allocate();
+    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+    mEndpointId = endpoint;
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -66,12 +74,21 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
         ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
     }
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(RegisterPowerSource(allocator, provider, composition.parentId));
+
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void SmokeCoAlarm::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterDescriptor(provider);
+    UnregisterPowerSource(provider);
+    if (mEndpointId != kInvalidEndpointId)
+    {
+        UnregisterDescriptor(mEndpointId, provider);
+        mEndpointId = kInvalidEndpointId;
+    }
     if (mSmokeConcentrationCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mSmokeConcentrationCluster.Cluster()));

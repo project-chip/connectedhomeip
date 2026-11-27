@@ -34,7 +34,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_12(MatterTestCommissionedDevice):
+class TC_CNET_4_12_provisional(MatterTestCommissionedDevice):
     """
     This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command,
     including validation for two Thread operational datasets.
@@ -199,16 +199,16 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
     def default_timeout(self) -> int:
         return 900
 
-    def desc_TC_CNET_4_12(self):
+    def desc_TC_CNET_4_12_provisional(self):
         return '[TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command [DUT-Server]'
 
-    def pics_TC_CNET_4_12(self):
+    def pics_TC_CNET_4_12_provisional(self):
         """Return the PICS definitions associated with this test."""
         return [
             "CNET.S.F01"
         ]
 
-    def steps_TC_CNET_4_12(self) -> list[TestStep]:
+    def steps_TC_CNET_4_12_provisional(self) -> list[TestStep]:
         return [
             TestStep("precondition", "TH is commissioned"),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
@@ -273,7 +273,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         ]
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
-    async def test_TC_CNET_4_12(self):
+    async def test_TC_CNET_4_12_provisional(self):
 
         # Pre-Conditions
         # Commissioning is already done

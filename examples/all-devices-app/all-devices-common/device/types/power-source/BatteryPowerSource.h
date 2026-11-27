@@ -37,6 +37,8 @@ class BatteryPowerSource : public SingleEndpoint
     constexpr static auto BatVoltageId            = Clusters::PowerSource::Attributes::BatVoltage::Id;
 
 public:
+    using SingleEndpoint::Register;
+
     enum class ChargingCapability : uint8_t
     {
         kNotRechargeable,
