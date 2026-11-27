@@ -1697,17 +1697,10 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     // One delegate only: it skips subscription setup and reports the node as Thread, so the read is a read-through
     // on the existing session.  The test hooks ask only the first delegate, so a second one would decide them.
     MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
-    MTRDeviceTestDelegate * reportDelegate = _deviceDelegates.lastObject;
     MTRAttributeRequestPath * readPath = [self descriptorPartsListPath];
-    __block BOOL readReported = NO;
-    reportDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * value in data) {
-            MTRAttributePath * path = value[MTRAttributePathKey];
-            if ([path.cluster isEqual:readPath.cluster] && [path.attribute isEqual:readPath.attribute]) {
-                readReported = YES;
-            }
-        }
-    };
+    // The claim is that the read is sent while the command waits, so wait for the send itself, not for the
+    // read's response, whose round trip is what sanitizer builds slow down.
+    [MTRBaseDevice unitTestResetReadSendCount];
 
     // Both get to the Matter queue in one turn: the read first, then the command beside it.
     dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
@@ -1727,7 +1720,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
                                   queue:dispatch_get_main_queue()
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {}];
     dispatch_semaphore_signal(matterQueueBlocker);
-    XCTAssertTrue([self waitUntil:^{ return readReported; } timeout:kPromptSeconds description:@"the read sent on its session while the command waits on DNS-SD"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRBaseDevice unitTestReadSendCount] > 0); } timeout:kPromptSeconds description:@"the read sent on its session while the command waits on DNS-SD"]);
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
 #else
     XCTSkip(@"Requires DEBUG test hooks");
