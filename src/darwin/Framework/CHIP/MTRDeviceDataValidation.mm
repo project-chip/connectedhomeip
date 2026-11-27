@@ -20,6 +20,7 @@
 #import "MTRDevice.h"
 
 #import "MTRLogging_Internal.h"
+#import "MTRXPCServerProtocol.h"
 
 // MTRDataValueDictionaryIsWellFormed lives in MTRBaseDevice.mm, because it uses
 // static functions defined in that file.
@@ -269,4 +270,50 @@ BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> *
     }
 
     return YES;
+}
+
+#pragma mark - Flow ID key
+
+id _Nullable MTRFlowIDFromResponseValues(id _Nullable values)
+{
+    for (id entry in MTR_SAFE_CAST(values, NSArray)) {
+        id flowID = MTR_SAFE_CAST(entry, NSDictionary)[MTRDeviceResponseFlowIDKey];
+        if (flowID != nil) {
+            return flowID;
+        }
+    }
+    return nil;
+}
+
+id _Nullable MTRResponseValuesByRemovingFlowID(id _Nullable values)
+{
+    NSArray * array = MTR_SAFE_CAST(values, NSArray);
+    if (MTRFlowIDFromResponseValues(array) == nil) {
+        return values;
+    }
+
+    NSMutableArray * stripped = [NSMutableArray arrayWithCapacity:array.count];
+    for (id entry in array) {
+        NSDictionary * dictionary = MTR_SAFE_CAST(entry, NSDictionary);
+        if (dictionary[MTRDeviceResponseFlowIDKey] == nil) {
+            [stripped addObject:entry];
+            continue;
+        }
+        NSMutableDictionary * copy = [dictionary mutableCopy];
+        [copy removeObjectForKey:MTRDeviceResponseFlowIDKey];
+        [stripped addObject:[copy copy]];
+    }
+    return stripped;
+}
+
+id _Nullable MTRErrorByRemovingFlowID(id _Nullable error)
+{
+    NSError * nsError = MTR_SAFE_CAST(error, NSError);
+    if (nsError.userInfo[MTRErrorFlowIDKey] == nil) {
+        return error;
+    }
+
+    NSMutableDictionary * userInfo = [nsError.userInfo mutableCopy];
+    [userInfo removeObjectForKey:MTRErrorFlowIDKey];
+    return [NSError errorWithDomain:nsError.domain code:nsError.code userInfo:userInfo];
 }

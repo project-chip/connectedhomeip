@@ -32,6 +32,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
@@ -356,6 +357,7 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
+    MTRMetricsScope metricsScope(block ? [MTRMetrics _currentOrNewFlowID] : MTRMetrics.currentFlowID);
 
     NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
     NSUInteger remainingCount = [_delegateManager iterateDelegatesWithBlock:block];
@@ -366,6 +368,7 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
+    MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
 
     NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
     BOOL delegatesCalled = [_delegateManager callDelegatesWithBlock:block];

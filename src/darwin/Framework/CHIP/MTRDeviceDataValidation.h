@@ -52,4 +52,17 @@ MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResp
 // only one response.
 MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * responses);
 
+// Returns the MTRDeviceResponseFlowIDKey value of the first dictionary in values that has one, or nil.
+// values can be any object, or nil; the value returned is not validated.
+MTR_EXTERN id _Nullable MTRFlowIDFromResponseValues(id _Nullable values);
+
+// Returns values with MTRDeviceResponseFlowIDKey removed from each dictionary.  Anything else is
+// returned unchanged, for the validators to judge.  A receiver of values from the other side of
+// XPC runs their handling in the flow MTRFlowIDFromResponseValues returns, and removes the key
+// with this before passing the values to delegates or completions.
+MTR_EXTERN id _Nullable MTRResponseValuesByRemovingFlowID(id _Nullable values);
+
+// Returns error with MTRErrorFlowIDKey removed from its userInfo.  Anything else is returned unchanged.
+MTR_EXTERN id _Nullable MTRErrorByRemovingFlowID(id _Nullable error);
+
 NS_ASSUME_NONNULL_END
