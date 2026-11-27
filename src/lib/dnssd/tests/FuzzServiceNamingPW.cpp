@@ -37,9 +37,9 @@
  *          it with MakeInstanceName and extracting again yields the same PeerId.
  */
 
-#include <array>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -69,8 +69,6 @@ void EnsureInitialized()
     (void) sInitialized;
 }
 
-// Buffers are deliberately larger than the documented maxima so an overrun would
-// land in the guard area rather than in an adjacent object.
 constexpr size_t kNameBufferSize = 128;
 
 // Instance labels. The accepted form is <compressedFabricId>-<nodeId>, both as
@@ -173,17 +171,18 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
 
     const size_t bufferLen = bufferLenSel % (kNameBufferSize + 1);
 
-    std::array<char, kNameBufferSize> buffer;
+    // Exactly bufferLen bytes, so ASan reports any write past the length the builder was given.
+    const std::unique_ptr<char[]> buffer(new char[bufferLen]);
 
     {
-        buffer.fill('\xAB');
+        memset(buffer.get(), 0xAB, bufferLen);
         const PeerId peerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
-        CheckBuilderResult(MakeInstanceName(buffer.data(), bufferLen, peerId), buffer.data(), bufferLen);
+        CheckBuilderResult(MakeInstanceName(buffer.get(), bufferLen, peerId), buffer.get(), bufferLen);
     }
 
     {
-        buffer.fill('\xAB');
-        CheckBuilderResult(MakeHostName(buffer.data(), bufferLen, ByteSpan(mac.data(), mac.size())), buffer.data(), bufferLen);
+        memset(buffer.get(), 0xAB, bufferLen);
+        CheckBuilderResult(MakeHostName(buffer.get(), bufferLen, ByteSpan(mac.data(), mac.size())), buffer.get(), bufferLen);
     }
 
     // kCompressedFabricId is the last enumerator, so the count is one past it.
@@ -197,14 +196,14 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
     filter.instanceName = (filter.type == DiscoveryFilterType::kInstanceName) ? filterInstanceName.c_str() : nullptr;
 
     {
-        buffer.fill('\xAB');
-        CheckBuilderResult(MakeServiceSubtype(buffer.data(), bufferLen, filter), buffer.data(), bufferLen);
+        memset(buffer.get(), 0xAB, bufferLen);
+        CheckBuilderResult(MakeServiceSubtype(buffer.get(), bufferLen, filter), buffer.get(), bufferLen);
     }
 
     {
-        buffer.fill('\xAB');
+        memset(buffer.get(), 0xAB, bufferLen);
         const DiscoveryType type = static_cast<DiscoveryType>(discoveryTypeSel % kDiscoveryTypeCount);
-        CheckBuilderResult(MakeServiceTypeName(buffer.data(), bufferLen, filter, type), buffer.data(), bufferLen);
+        CheckBuilderResult(MakeServiceTypeName(buffer.get(), bufferLen, filter, type), buffer.get(), bufferLen);
     }
 }
 
