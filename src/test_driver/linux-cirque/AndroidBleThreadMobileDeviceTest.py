@@ -74,6 +74,7 @@ TBR_DIAG_CMDS = (
     'ot-ctl srp server service',
 )
 ANDROID_FULL_LOGCAT_CMD = 'adb logcat -d -v threadtime'
+DATASET_TLVS_HEX_RE = re.compile(r'^(?:[0-9a-fA-F]{2}){5,}$')
 
 EXPECTED_BLE_THREAD_DEVICE_MARKERS = [
     'Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003',
@@ -291,6 +292,17 @@ class _ThreadTopology:
         return list(self.tbr_ids) + self.server_ids
 
 
+def _joiner_helper_launch_cmd(b64_joiner: str) -> str:
+    """Returns the sh command that decodes the joiner helper synchronously, then backgrounds only python3."""
+    decode_step = 'echo %s | tr "_-" "/+" | base64 -d > /tmp/joiner_helper.py || exit 1' % b64_joiner
+    return (
+        'sh -c "kill -9 $(cat /tmp/joiner_helper.pid 2>/dev/null) 2>/dev/null || true; '
+        + decode_step
+        + '; nohup python3 -u /tmp/joiner_helper.py >/tmp/joiner_helper.log 2>&1 &'
+        ' echo $! > /tmp/joiner_helper.pid"'
+    )
+
+
 def _check_android_preconditions() -> bool:
     return check_android_preconditions(ANDROID_RUNNER_IMAGE)
 
@@ -473,22 +485,25 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
     def _get_tbr_active_dataset(self, tbr_id) -> dict:
         out_txt = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl dataset active'))
         out_hex = self._cmd_output_str(self.execute_device_cmd(tbr_id, 'ot-ctl dataset active -x'))
-        dataset_tlvs_hex = ''
-        for line in out_hex.splitlines():
-            stripped = line.strip()
-            if re.match(r'^[0-9a-fA-F]{10,}$', stripped):
-                dataset_tlvs_hex = stripped
-                break
+        dataset_tlvs_hex = next(
+            (line.strip() for line in out_hex.splitlines() if DATASET_TLVS_HEX_RE.match(line.strip())), ''
+        )
+        self.assertTrue(
+            bool(dataset_tlvs_hex), f'ot-ctl dataset active -x on {tbr_id} returned no even-length hex TLVs: {out_hex!r}'
+        )
 
         chan_m = re.search(r'Channel:\s*(\d+)', out_txt)
         pan_m = re.search(r'(?<!Ext )PAN ID:\s*(?:0x)?([0-9a-fA-F]+)', out_txt)
         xpan_m = re.search(r'Ext PAN ID:\s*([0-9a-fA-F]+)', out_txt)
         key_m = re.search(r'Network Key:\s*([0-9a-fA-F]+)', out_txt)
+        self.assertTrue(
+            all((chan_m, pan_m, xpan_m, key_m)), f'ot-ctl dataset active on {tbr_id} is missing fields: {out_txt!r}'
+        )
         return {
-            'channel': int(chan_m.group(1)) if chan_m else int(TEST_CHANNEL),
-            'pan_id': pan_m.group(1) if pan_m else TEST_PANID.replace('0x', ''),
-            'xpan_id': xpan_m.group(1) if xpan_m else TEST_EXTPANID,
-            'master_key': key_m.group(1) if key_m else '00112233445566778899aabbccddeeff',
+            'channel': int(chan_m.group(1)),
+            'pan_id': pan_m.group(1),
+            'xpan_id': xpan_m.group(1),
+            'master_key': key_m.group(1),
             'dataset_tlvs_hex': dataset_tlvs_hex,
         }
 
@@ -569,7 +584,8 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         self._ensure_host_runtime_libs()
         if host_libs_dir is None:
             host_libs_dir = shlex.quote(f'{CHIP_REPO_STR}/out/host_libs')
-        b64_joiner = base64.b64encode(THREAD_END_DEVICE_JOINER_HELPER.encode('utf-8')).decode('ascii')
+        # URL-safe base64 avoids '/' runs that the Cirque /device_cmd/<path:cmd> route would collapse.
+        b64_joiner = base64.urlsafe_b64encode(THREAD_END_DEVICE_JOINER_HELPER.encode('utf-8')).decode('ascii')
         gdb_wrapper = (
             "gdb -batch -return-child-result -q -ex 'set pagination off' -ex"
             " run -ex 'thread apply all bt' --args"
@@ -584,13 +600,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
                 ' ot-ctl dataset clear 2>/dev/null || true;'
                 ' ot-ctl factoryreset 2>/dev/null || true"',
             )
-            self.execute_device_cmd(
-                server_id,
-                'sh -c "kill -9 $(cat /tmp/joiner_helper.pid 2>/dev/null) 2>/dev/null || true;'
-                f' echo \\"{b64_joiner}\\" | base64 -d > /tmp/joiner_helper.py &&'
-                ' nohup python3 -u /tmp/joiner_helper.py >/tmp/joiner_helper.log 2>&1 &'
-                ' echo $! > /tmp/joiner_helper.pid"',
-            )
+            self.run_checked_device_cmd(server_id, _joiner_helper_launch_cmd(b64_joiner), 'Start Thread joiner helper')
             self.logger.info(
                 'Starting chip-all-clusters-app on CHIPEndDevice %s with --thread --ble-controller %d --discriminator %d',
                 self.get_device_pretty_id(server_id),
@@ -609,28 +619,23 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
     _start_thread_end_devices = _start_ble_thread_end_devices
 
     def _stage_chiptool_apk_if_needed(self, req_device_id: str) -> None:
+        # Cirque device ids are Docker container ids, which docker cp accepts directly.
         try:
-            ps_res = subprocess.run(
-                ['docker', 'ps', '--format', '{{.Names}}'],
+            cp_target = '%s:/tmp/CHIPTool.apk' % req_device_id
+            cp_res = subprocess.run(
+                ['docker', 'cp', str(CHIP_TOOL_APK_PATH), cp_target],
                 capture_output=True,
                 text=True,
-                timeout=15,
+                timeout=30,
                 check=False,
             )
-            container_name = next(
-                (line.strip() for line in ps_res.stdout.splitlines() if req_device_id in line),
-                '',
-            )
-            if container_name:
-                host_apk_path = f'{CHIP_REPO_STR}/out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk'
-                subprocess.run(
-                    ['docker', 'cp', host_apk_path, f'{container_name}:/tmp/CHIPTool.apk'],
-                    timeout=30,
-                    check=False,
-                )
-                self.logger.info('Copied APK to %s:/tmp/CHIPTool.apk', container_name)
         except (subprocess.SubprocessError, OSError) as exc:
             self.logger.warning('Failed to copy APK: %s', exc)
+            return
+        if cp_res.returncode == 0:
+            self.logger.info('Copied APK to %s:/tmp/CHIPTool.apk', req_device_id)
+        else:
+            self.logger.warning('docker cp of CHIPTool APK failed (rc=%s): %s', cp_res.returncode, cp_res.stderr.strip())
 
     def _configure_post_boot_guest_routes(self, req_device_id: str) -> None:
         self.execute_device_cmd(
@@ -653,7 +658,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         if not tbr_dataset:
             return params
         for key in ('channel', 'pan_id', 'xpan_id', 'master_key', 'dataset_tlvs_hex'):
-            if key in tbr_dataset:
+            if tbr_dataset.get(key) not in (None, ''):
                 params[key] = tbr_dataset[key]
         return params
 
@@ -729,7 +734,10 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
             self.execute_device_cmd(req_device_id, 'adb logcat -c')
             self.execute_device_cmd(req_device_id, 'adb shell am force-stop com.google.chip.chiptool')
             time.sleep(0.5)
-            self.execute_device_cmd(req_device_id, 'adb shell am start -n com.google.chip.chiptool/.CHIPToolActivity')
+            self.execute_device_cmd(
+                req_device_id,
+                'adb shell am start -n com.google.chip.chiptool/.CHIPToolActivity --ez show_post_commissioning_dialog false',
+            )
             time.sleep(6.0)
             self.execute_device_cmd(req_device_id, 'adb shell input tap 357 650')
             time.sleep(2.0)
@@ -772,7 +780,7 @@ class TestAndroidBleThreadMobileDevice(AndroidCirqueTestBase):
         rlocs.update(int(v, 16) for v in re.findall(r'\|\s*0x([0-9a-fA-F]{1,4})\s*\|', neighbor_out))
         self.assertTrue(
             snapshot.rloc_int() in rlocs,
-            f'TBR RLOC16 {snapshot.rloc16} not found in EndDevice parent or neighbor table',
+            'TBR RLOC16 %s not found in EndDevice parent or neighbor table' % snapshot.rloc16,
         )
 
     def _assert_end_device_matches_mesh(self, server_id: str, snapshot: ThreadMeshSnapshot) -> None:

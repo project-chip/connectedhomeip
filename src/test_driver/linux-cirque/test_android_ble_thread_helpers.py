@@ -14,10 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import ast
 import importlib.util
 import logging
 import os
+import shlex
+import subprocess
 import sys
+import tempfile
 import types
 import unittest
 from unittest import mock
@@ -82,6 +86,23 @@ def _load_android_ble_thread_module():
 MODULE = _load_android_ble_thread_module()
 
 
+def _fake_tbr_cmd(_dev_id, cmd):
+    if cmd == 'ot-ctl state':
+        return {'output': 'leader\nDone\n'}
+    if cmd == 'ot-ctl dataset active':
+        return {
+            'output': (
+                'Channel: 15\n'
+                'PAN ID: 0x1234\n'
+                'Ext PAN ID: 1111111122222222\n'
+                'Network Key: 00112233445566778899aabbccddeeff\n'
+            )
+        }
+    if cmd == 'ot-ctl dataset active -x':
+        return {'output': '0e080000000000010000\nDone\n'}
+    return {'output': 'Done\n', 'return_code': '0'}
+
+
 class _FakeAndroidBleThreadTest(MODULE.TestAndroidBleThreadMobileDevice):
     """Minimal harness exposing helper methods without a live Cirque server."""
 
@@ -96,14 +117,20 @@ class _FakeAndroidBleThreadTest(MODULE.TestAndroidBleThreadMobileDevice):
         self.commands.append((dev_id, cmd))
         if self._cmd_handler is not None:
             return self._cmd_handler(dev_id, cmd)
-        return {'output': ''}
+        return {'output': '', 'return_code': '0'}
+
+    def run_checked_device_cmd(self, dev_id, cmd, description):
+        ret = self.execute_device_cmd(dev_id, cmd)
+        self.assertEqual(str(ret.get('return_code')), '0', f'{description} failed')
+        return ret
 
     def get_device_pretty_id(self, dev_id):
         return str(dev_id)
 
     def assertTrue(self, expr, msg=None):
-        if not expr:
-            raise AssertionError(msg or 'Expected truthy expression')
+        # Mirrors CHIPVirtualHome.assertTrue, which requires `expr is True`.
+        if expr is not True:
+            raise AssertionError(msg or 'Expected True')
 
     def assertEqual(self, a, b, msg=None):
         if a != b:
@@ -111,19 +138,23 @@ class _FakeAndroidBleThreadTest(MODULE.TestAndroidBleThreadMobileDevice):
 
 
 class AndroidBleThreadHelpersTest(unittest.TestCase):
-    def test_no_srp_bridger_or_killall_in_source_or_diag_cmds(self):
-        with open(TEST_MODULE_PATH, encoding='utf-8') as f:
-            source = f.read()
-
-        self.assertNotIn('srp_bridger', source)
-        self.assertNotIn('killall', source)
-        self.assertNotIn('kill -HUP', source)
-        self.assertIn('cat /tmp/otbr-agent.log', MODULE.TBR_DIAG_CMDS)
-        self.assertTrue(
-            all('srp_bridger' not in cmd for cmd in MODULE.TBR_DIAG_CMDS)
+    def test_thread_setup_commands_never_use_srp_bridger_or_killall(self):
+        harness = _FakeAndroidBleThreadTest(
+            {'tbr1': {'type': 'ThreadBorderRouter'}, 'end1': {'type': 'CHIPEndDevice'}},
+            cmd_handler=_fake_tbr_cmd,
         )
-        self.assertIn('otbr-agent -I wpan0 -B wlan0', source)
-        self.assertIn('native SRP Advertising Proxy', source)
+        with mock.patch.object(MODULE, 'wait_for_device_wlan0_ipv4', return_value='10.0.1.2'), \
+                mock.patch.object(harness, '_ensure_host_runtime_libs'), \
+                mock.patch.dict(os.environ, {'CIRQUE_PCAP_DIR': '', 'DEVICE_LOG_DIR': ''}):
+            harness._isolate_eth0_and_start_avahi(['tbr1', 'end1'])
+            harness._setup_thread_border_routers(['tbr1'])
+            harness._start_ble_thread_end_devices([{'id': 'end1', 'type': 'CHIPEndDevice'}])
+
+        issued = [cmd for _, cmd in harness.commands] + list(MODULE.TBR_DIAG_CMDS) + list(MODULE.END_DEVICE_DIAG_CMDS)
+        for forbidden in ('srp_bridger', 'killall', 'kill -HUP'):
+            self.assertFalse([cmd for cmd in issued if forbidden in cmd], forbidden)
+        self.assertTrue(any('otbr-agent -I wpan0 -B wlan0' in cmd for _, cmd in harness.commands if _ == 'tbr1'))
+        self.assertIn('cat /tmp/otbr-agent.log', MODULE.TBR_DIAG_CMDS)
 
     def test_tbr_and_end_device_configure_avahi_before_daemon_and_escape_uart(self):
         harness = _FakeAndroidBleThreadTest({
@@ -171,25 +202,9 @@ class AndroidBleThreadHelpersTest(unittest.TestCase):
         )
 
     def test_setup_tbr_enables_srp_server_without_srp_bridger(self):
-        def _fake_cmd(_dev_id, cmd):
-            if cmd == 'ot-ctl state':
-                return {'output': 'leader\nDone\n'}
-            if cmd == 'ot-ctl dataset active':
-                return {
-                    'output': (
-                        'Channel: 15\n'
-                        'PAN ID: 0x1234\n'
-                        'Ext PAN ID: 1111111122222222\n'
-                        'Network Key: 00112233445566778899aabbccddeeff\n'
-                    )
-                }
-            if cmd == 'ot-ctl dataset active -x':
-                return {'output': '0e080000000000010000\nDone\n'}
-            return {'output': 'Done\n'}
-
         harness = _FakeAndroidBleThreadTest(
             {'tbr1': {'type': 'ThreadBorderRouter'}},
-            cmd_handler=_fake_cmd,
+            cmd_handler=_fake_tbr_cmd,
         )
         with mock.patch.dict(os.environ, {'CIRQUE_PCAP_DIR': '', 'DEVICE_LOG_DIR': ''}):
             dataset = harness._setup_thread_border_routers(['tbr1'])
@@ -201,18 +216,89 @@ class AndroidBleThreadHelpersTest(unittest.TestCase):
         )
         self.assertFalse(any('srp_bridger' in cmd for cmd in tbr_cmds))
 
-    def test_joiner_helper_guards_external_route_fallback_with_timeout(self):
+    def test_joiner_helper_is_valid_python_and_sh_retries_with_timeout(self):
+        tree = ast.parse(MODULE.THREAD_END_DEVICE_JOINER_HELPER)
+        sh_def = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'sh')
+        calls = []
+
+        def _fake_check_output(cmd, **kwargs):
+            calls.append((cmd, kwargs))
+            if len(calls) == 1:
+                raise subprocess.TimeoutExpired(cmd, kwargs.get('timeout'))
+            if len(calls) == 2:
+                return b'Connection reset by peer'
+            return b' fd11:22::/64 dev wpan0 \n'
+
+        fake_subprocess = types.SimpleNamespace(
+            check_output=_fake_check_output,
+            SubprocessError=subprocess.SubprocessError,
+            STDOUT=subprocess.STDOUT,
+        )
+        namespace = {'subprocess': fake_subprocess, 'sys': types.SimpleNamespace(stderr=mock.Mock()),
+                     'time': types.SimpleNamespace(sleep=lambda _sec: None)}
+        exec(compile(ast.Module(body=[sh_def], type_ignores=[]), '<joiner_helper>', 'exec'), namespace)
+
+        self.assertEqual(namespace['sh']('ip -6 route show dev wpan0'), 'fd11:22::/64 dev wpan0')
+        self.assertEqual(len(calls), 3)
+        self.assertTrue(all(kwargs.get('timeout') == 10 for _, kwargs in calls))
+
+    def test_joiner_helper_launch_decodes_synchronously_and_records_python_pid(self):
         helper_src = MODULE.THREAD_END_DEVICE_JOINER_HELPER
-        self.assertIn('OT_POSIX_INSTALL_EXTERNAL_ROUTES=ON', helper_src)
-        self.assertIn('timeout=10', helper_src)
-        self.assertIn(
-            'if "fd11:22::/64" not in sh("ip -6 route show dev wpan0"):',
-            helper_src,
+        harness = _FakeAndroidBleThreadTest({'end1': {'id': 'end1', 'type': 'CHIPEndDevice'}})
+        with mock.patch.object(harness, '_ensure_host_runtime_libs'):
+            harness._start_ble_thread_end_devices([{'id': 'end1', 'type': 'CHIPEndDevice'}])
+        launch_cmd = next(cmd for _, cmd in harness.commands if 'joiner_helper.py' in cmd)
+        # No '/' runs that the Cirque /device_cmd/<path:cmd> route would collapse.
+        self.assertNotIn('//', launch_cmd)
+        argv = shlex.split(launch_cmd)
+        self.assertEqual(argv[:2], ['sh', '-c'])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            script = argv[2].replace('/tmp/', f'{tmp}/').replace('python3 -u', 'cat')
+            res = subprocess.run(['sh', '-c', script], capture_output=True, text=True, timeout=30, check=False)
+            self.assertEqual(res.returncode, 0, res.stderr)
+            with open(os.path.join(tmp, 'joiner_helper.py'), encoding='utf-8') as f:
+                self.assertEqual(f.read(), helper_src)
+            with open(os.path.join(tmp, 'joiner_helper.pid'), encoding='utf-8') as f:
+                self.assertTrue(f.read().strip().isdigit())
+
+            os.remove(os.path.join(tmp, 'joiner_helper.pid'))
+            bad = MODULE._joiner_helper_launch_cmd('!!not-base64!!')
+            bad_script = shlex.split(bad)[2].replace('/tmp/', f'{tmp}/').replace('python3 -u', 'cat')
+            res = subprocess.run(['sh', '-c', bad_script], capture_output=True, text=True, timeout=30, check=False)
+            self.assertNotEqual(res.returncode, 0)
+            self.assertFalse(os.path.exists(os.path.join(tmp, 'joiner_helper.pid')))
+
+    def test_tbr_active_dataset_requires_hex_tlvs_and_omits_empty_intent_extra(self):
+        harness = _FakeAndroidBleThreadTest({'tbr1': {'type': 'ThreadBorderRouter'}}, cmd_handler=_fake_tbr_cmd)
+        dataset = harness._get_tbr_active_dataset('tbr1')
+        self.assertEqual(dataset['dataset_tlvs_hex'], '0e080000000000010000')
+        self.assertEqual(dataset['pan_id'], '1234')
+
+        for bad_hex in ('Done\n', '0e0800000000000100f\nDone\n'):
+            def _no_hex(dev_id, cmd, bad_hex=bad_hex):
+                return {'output': bad_hex} if cmd == 'ot-ctl dataset active -x' else _fake_tbr_cmd(dev_id, cmd)
+
+            with self.assertRaises(AssertionError):
+                _FakeAndroidBleThreadTest({'tbr1': {}}, cmd_handler=_no_hex)._get_tbr_active_dataset('tbr1')
+
+        params = MODULE.TestAndroidBleThreadMobileDevice._build_thread_commission_params(
+            'intent', {'channel': 15, 'pan_id': '1234', 'dataset_tlvs_hex': ''}
         )
-        self.assertIn(
-            'sh("ip -6 route replace fd11:22::/64 dev wpan0")',
-            helper_src,
-        )
+        self.assertNotIn('dataset_tlvs_hex', params)
+        self.assertEqual(params['channel'], 15)
+
+    def test_stage_chiptool_apk_copies_to_container_id_and_checks_return_code(self):
+        harness = _FakeAndroidBleThreadTest({'emu1': {'type': 'android_emulator'}})
+        container_id = 'a' * 64
+        for returncode, expected_log in ((0, 'Copied APK'), (1, 'docker cp of CHIPTool APK failed')):
+            completed = subprocess.CompletedProcess([], returncode, stdout='', stderr='no such container')
+            with mock.patch.object(MODULE.subprocess, 'run', return_value=completed) as run_mock, \
+                    self.assertLogs(harness.logger, level='INFO') as logs:
+                harness._stage_chiptool_apk_if_needed(container_id)
+            argv = run_mock.call_args.args[0]
+            self.assertEqual(argv, ['docker', 'cp', str(MODULE.CHIP_TOOL_APK_PATH), '%s:/tmp/CHIPTool.apk' % container_id])
+            self.assertTrue(any(expected_log in line for line in logs.output), logs.output)
 
     def test_android_ipv6_routes_include_omr_and_mesh_local_prefixes(self):
         harness = _FakeAndroidBleThreadTest({'emu1': {'type': 'android_emulator'}})
@@ -261,6 +347,17 @@ class AndroidBleThreadHelpersTest(unittest.TestCase):
         )
         with self.assertRaises(AssertionError):
             harness._assert_end_device_matches_mesh('end1', empty_snap)
+
+    def test_ui_fallback_launch_disables_post_commissioning_dialog(self):
+        harness = _FakeAndroidBleThreadTest({'emu1': {'type': 'android_emulator'}})
+        with mock.patch.object(MODULE.time, 'sleep'), \
+                mock.patch.object(harness, '_start_ui_video'), \
+                mock.patch.object(harness, '_stop_ui_video'), \
+                mock.patch.object(harness, '_poll_commissioning_logcat', return_value=True):
+            self.assertTrue(harness._provision_thread_network_via_adb_and_otctl('emu1'))
+        starts = [cmd for _, cmd in harness.commands if 'am start' in cmd]
+        self.assertEqual(len(starts), 1)
+        self.assertIn('--ez show_post_commissioning_dialog false', starts[0])
 
     def test_ui_credentials_clear_edittext_and_uppercase_pan_hex(self):
         harness = _FakeAndroidBleThreadTest({'emu1': {'type': 'android_emulator'}})

@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
@@ -46,8 +47,8 @@ public class MatterServantService extends Service {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .build();
-    if (android.os.Build.VERSION.SDK_INT >= 29) {
-      startForeground(1, notification, 16); // FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
     } else {
       startForeground(1, notification);
     }

@@ -37,7 +37,6 @@
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <controller/CHIPCluster.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -107,7 +106,11 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app)
 {
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    {
+        // Server::Init() binds the provider to persistent storage; SetDeviceInfoProvider requires the stack lock.
+        chip::DeviceLayer::StackLock lock;
+        chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
     TvAppJNIMgr().InitializeWithObjects(app);
 }
 
@@ -180,7 +183,6 @@ JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpoi
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::postServerInit");
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
 }
 
 JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)

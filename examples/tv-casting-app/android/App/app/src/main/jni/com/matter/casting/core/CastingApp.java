@@ -38,8 +38,6 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
-  private static final long BROWSE_SERVICE_TIMEOUT = 5000;
-  private static final long RESOLVE_SERVICE_TIMEOUT = 15000;
 
   private static CastingApp sInstance;
 
@@ -81,8 +79,11 @@ public final class CastingApp {
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
             new NsdManagerServiceResolver(
-                applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
-            new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
+                applicationContext,
+                nsdManagerResolverAvailState,
+                appParameters.getResolveServiceTimeoutMs()),
+            new NsdManagerServiceBrowser(
+                applicationContext, appParameters.getBrowseServiceTimeoutMs()),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 

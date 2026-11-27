@@ -318,13 +318,29 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     }
 }
 
+namespace {
+
+// jsoncpp asserts when operator[] is applied to non-object values or asInt() to non-numeric values,
+// so validate the content app's JSON shape before reading response fields.
+bool HasIntField(const Json::Value & value, const std::string & fieldId)
+{
+    return value.isObject() && value[fieldId].isInt();
+}
+
+bool HasNonEmptyStringField(const Json::Value & value, const std::string & fieldId)
+{
+    return value.isObject() && value[fieldId].isString() && value[fieldId].asCString()[0] != '\0';
+}
+
+} // namespace
+
 LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(const Json::Value & value, Status & status)
 {
     status = chip::Protocols::InteractionModel::Status::Success;
     LaunchResponseType launchResponse;
     std::string statusFieldId =
         std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kStatus));
-    if (value[statusFieldId].empty())
+    if (!HasIntField(value, statusFieldId))
     {
         status = chip::Protocols::InteractionModel::Status::Failure;
         return launchResponse;
@@ -334,7 +350,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(cons
         launchResponse.status = static_cast<app::Clusters::ContentLauncher::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
-        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
+        if (value[dataFieldId].isString())
         {
             launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -348,7 +364,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
     NavigateTargetResponseType navigateTargetResponse;
     std::string statusFieldId =
         std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kStatus));
-    if (value[statusFieldId].empty())
+    if (!HasIntField(value, statusFieldId))
     {
         status = chip::Protocols::InteractionModel::Status::Failure;
         return navigateTargetResponse;
@@ -358,7 +374,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
         navigateTargetResponse.status = static_cast<app::Clusters::TargetNavigator::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kData));
-        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
+        if (value[dataFieldId].isString())
         {
             navigateTargetResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -372,7 +388,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(cons
     PlaybackResponseType playbackResponse;
     std::string statusFieldId =
         std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kStatus));
-    if (value[statusFieldId].empty())
+    if (!HasIntField(value, statusFieldId))
     {
         status = chip::Protocols::InteractionModel::Status::Failure;
         return playbackResponse;
@@ -382,7 +398,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(cons
         playbackResponse.status = static_cast<app::Clusters::MediaPlayback::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kData));
-        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
+        if (value[dataFieldId].isString())
         {
             playbackResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -396,7 +412,7 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(con
     GetSetupPINResponseType getSetupPINresponse;
     std::string setupPINFieldId =
         std::to_string(to_underlying(app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Fields::kSetupPIN));
-    if (!value[setupPINFieldId].empty() && value[setupPINFieldId].isString())
+    if (HasNonEmptyStringField(value, setupPINFieldId))
     {
         getSetupPINresponse.setupPIN = CharSpan::fromCharString(value[setupPINFieldId].asCString());
     }

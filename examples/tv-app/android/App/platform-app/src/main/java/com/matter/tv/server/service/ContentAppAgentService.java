@@ -4,7 +4,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -27,6 +29,9 @@ public class ContentAppAgentService extends Service {
       "com.matter.tv.app.api.action.MATTER_COMMAND_RESPONSE";
   public static final String EXTRA_RESPONSE_RECEIVING_PACKAGE = "EXTRA_RESPONSE_RECEIVING_PACKAGE";
   public static final String EXTRA_RESPONSE_ID = "EXTRA_RESPONSE_ID";
+  // The response id travels in the Intent data URI because a mutable PendingIntent lets the
+  // content app overwrite extras via fillIn(), but not data that is already set.
+  private static final String RESPONSE_URI_SCHEME = "matter-response";
 
   public static final String FAILURE_KEY = "PlatformError";
   public static final String FAILURE_STATUS_KEY = "Status";
@@ -211,22 +216,48 @@ public class ContentAppAgentService extends Service {
     ackBackIntent.setClass(context, ContentAppAgentService.class);
     ackBackIntent.putExtra(EXTRA_RESPONSE_RECEIVING_PACKAGE, targetPackage);
     ackBackIntent.putExtra(EXTRA_RESPONSE_ID, responseId);
-    return PendingIntent.getService(
-        context,
-        responseId,
-        ackBackIntent,
-        PendingIntent.FLAG_ONE_SHOT
-            | PendingIntent.FLAG_UPDATE_CURRENT
-            | PendingIntent.FLAG_MUTABLE);
+    ackBackIntent.setData(Uri.fromParts(RESPONSE_URI_SCHEME, Integer.toString(responseId), null));
+    int flags = PendingIntent.FLAG_ONE_SHOT;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      // The content app fills in EXTRA_RESPONSE_PAYLOAD, which requires a mutable PendingIntent.
+      flags |= PendingIntent.FLAG_MUTABLE;
+    }
+    return PendingIntent.getService(context, responseId, ackBackIntent, flags);
+  }
+
+  private static int getResponseId(final Intent intent) {
+    Uri data = intent.getData();
+    if (data == null || !RESPONSE_URI_SCHEME.equals(data.getScheme())) {
+      return Integer.MAX_VALUE;
+    }
+    try {
+      return Integer.parseInt(data.getSchemeSpecificPart());
+    } catch (NumberFormatException e) {
+      return Integer.MAX_VALUE;
+    }
   }
 
   @Override
   public int onStartCommand(final Intent intent, final int flags, final int startId) {
     if (intent != null && ACTION_MATTER_RESPONSE.equals(intent.getAction())) {
       byte[] rawBytes = intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD);
-      int messageId = intent.getIntExtra(EXTRA_RESPONSE_ID, Integer.MAX_VALUE);
+      int messageId = getResponseId(intent);
+      if (messageId == Integer.MAX_VALUE) {
+        Log.w(TAG, "Ignoring command response without a valid response id");
+        return START_NOT_STICKY;
+      }
       if (rawBytes == null) {
-        Log.w(TAG, "Ignoring empty command response for message " + messageId);
+        Log.w(TAG, "Empty command response for message " + messageId);
+        // Release the waiting caller instead of letting it block until the timeout.
+        responseRegistry.receivedMessageResponse(
+            messageId,
+            "{\""
+                + FAILURE_KEY
+                + "\":{\""
+                + FAILURE_STATUS_KEY
+                + "\":"
+                + FAILED_UNKNOWN
+                + "}}");
         return START_NOT_STICKY;
       }
       String response = new String(rawBytes, StandardCharsets.UTF_8);

@@ -93,6 +93,19 @@ public class InitializationExample {
    * @param applicationContext Given android.content.Context, initialize and start the CastingApp
    */
   public static MatterError initAndStart(Context applicationContext) {
+    return initAndStart(
+        applicationContext,
+        AppParameters.DEFAULT_BROWSE_SERVICE_TIMEOUT_MS,
+        AppParameters.DEFAULT_RESOLVE_SERVICE_TIMEOUT_MS);
+  }
+
+  /**
+   * @param applicationContext Given android.content.Context, initialize and start the CastingApp
+   * @param browseServiceTimeoutMs DNS-SD browse timeout passed to the SDK
+   * @param resolveServiceTimeoutMs DNS-SD resolve timeout passed to the SDK
+   */
+  public static MatterError initAndStart(
+      Context applicationContext, long browseServiceTimeoutMs, long resolveServiceTimeoutMs) {
     // Create an AppParameters object to pass in global casting parameters to the SDK
     AppParameters appParameters =
         new AppParameters(
@@ -107,6 +120,7 @@ public class InitializationExample {
             rotatingDeviceIdUniqueIdProvider,
             commissionableDataProvider,
             dacProvider);
+    appParameters.setServiceDiscoveryTimeouts(browseServiceTimeoutMs, resolveServiceTimeoutMs);
 
     // Initialize the SDK using the appParameters and check if it returns successfully
     MatterError err = CastingApp.getInstance().initialize(appParameters);

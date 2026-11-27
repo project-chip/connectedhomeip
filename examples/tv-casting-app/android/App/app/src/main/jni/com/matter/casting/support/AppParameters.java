@@ -22,6 +22,9 @@ import androidx.annotation.NonNull;
 import chip.platform.ConfigurationManager;
 
 public class AppParameters {
+  public static final long DEFAULT_BROWSE_SERVICE_TIMEOUT_MS = 2500;
+  public static final long DEFAULT_RESOLVE_SERVICE_TIMEOUT_MS = 3000;
+
   @NonNull private final Context applicationContext;
 
   @NonNull private final DataProvider<ConfigurationManager> configurationManagerProvider;
@@ -31,6 +34,10 @@ public class AppParameters {
   @NonNull private final DataProvider<CommissionableData> commissionableDataProvider;
 
   @NonNull private final DACProvider dacProvider;
+
+  private long browseServiceTimeoutMs = DEFAULT_BROWSE_SERVICE_TIMEOUT_MS;
+
+  private long resolveServiceTimeoutMs = DEFAULT_RESOLVE_SERVICE_TIMEOUT_MS;
 
   /**
    * @param applicationContext the Android app's android.content.Context
@@ -77,5 +84,33 @@ public class AppParameters {
   @NonNull
   public DACProvider getDacProvider() {
     return dacProvider;
+  }
+
+  /**
+   * Overrides the DNS-SD browse and resolve timeouts, for example on slow emulators.
+   *
+   * @param browseServiceTimeoutMs how long NsdManager browses before delivering discovered services
+   * @param resolveServiceTimeoutMs how long NsdManager waits to resolve a discovered service
+   */
+  public AppParameters setServiceDiscoveryTimeouts(
+      long browseServiceTimeoutMs, long resolveServiceTimeoutMs) {
+    if (browseServiceTimeoutMs <= 0 || resolveServiceTimeoutMs <= 0) {
+      throw new IllegalArgumentException(
+          "Service discovery timeouts must be positive: browse="
+              + browseServiceTimeoutMs
+              + ", resolve="
+              + resolveServiceTimeoutMs);
+    }
+    this.browseServiceTimeoutMs = browseServiceTimeoutMs;
+    this.resolveServiceTimeoutMs = resolveServiceTimeoutMs;
+    return this;
+  }
+
+  public long getBrowseServiceTimeoutMs() {
+    return browseServiceTimeoutMs;
+  }
+
+  public long getResolveServiceTimeoutMs() {
+    return resolveServiceTimeoutMs;
   }
 }

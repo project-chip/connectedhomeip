@@ -327,6 +327,16 @@ class AndroidBleWiFiFixesTest(unittest.TestCase):
             check({'return_code': '0', 'output': '2 packets transmitted, 2 received, 0% packet loss, time 1002ms'})
         )
 
+    def test_ping_requires_summary_line_and_explicit_zero_return_code(self):
+        check = WIFI_MOD._ping_has_zero_packet_loss
+        ok = '2 packets transmitted, 2 received, 0% packet loss, time 1002ms'
+        self.assertFalse(check({'output': ok}))
+        self.assertFalse(check({'return_code': None, 'output': ok}))
+        self.assertTrue(check({'return_code': 0, 'output': ok}))
+        self.assertFalse(check({'return_code': '0', 'output': '0 packets transmitted, 0 received, 0% packet loss'}))
+        self.assertFalse(check({'return_code': '0', 'output': 'ping: sendmsg: Network unreachable, 0% packet loss'}))
+        self.assertFalse(check('0% packet loss'))
+
     def test_parse_toggle_read_logcat_binds_read_after_toggle(self):
         parse = WIFI_MOD.TestAndroidBleWiFiMobileDevice._parse_toggle_read_logcat
         stale_true_log = (
@@ -617,7 +627,7 @@ class AndroidTvCastingFixesTest(unittest.TestCase):
 
         removed_after = (
             callback_first_log
-            + f'I NsdManagerServiceResolver: Remove {listener} (_matterd._udp:7FE4A1F542AC5110)\n'
+            + ('I NsdManagerServiceResolver: Remove %s (_matterd._udp:7FE4A1F542AC5110)\n' % listener)
         )
         self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(removed_after))
 
@@ -664,6 +674,129 @@ class AndroidTvCastingFixesTest(unittest.TestCase):
             + f'I NsdManagerServiceResolver: service 6FE4A1F542AC5110({matterd_listener}) onServiceRegistered\n'
         )
         self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(with_unbound_matterd_confirm))
+
+    def test_tv_mdns_untyped_registration_failure_fails_every_same_name_pending_service(self):
+        listener_c = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@d3b2e9d'
+        shared_name_log = (
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110 type=_matterc._udp subTypes=[_CM] port=5540\n'
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110 type=_matterd._udp subTypes=[_T35] port=5550\n'
+            'W NsdManagerServiceResolver: service 6FE4A1F542AC5110 onRegistrationFailed:3\n'
+            f'I NsdManagerServiceResolver: service 6FE4A1F542AC5110({listener_c}) onServiceRegistered\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(shared_name_log))
+
+        typed_failure_log = (
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110 type=_matterc._udp subTypes=[_CM] port=5540\n'
+            'I NsdManagerServiceResolver: publish serviceName=6FE4A1F542AC5110 type=_matterd._udp subTypes=[_T35] port=5550\n'
+            'W NsdManagerServiceResolver: service _matterd._udp:6FE4A1F542AC5110 onRegistrationFailed:3\n'
+            f'I NsdManagerServiceResolver: service 6FE4A1F542AC5110({listener_c}) onServiceRegistered\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(typed_failure_log))
+
+    def test_tv_mdns_unbound_remove_then_republish_does_not_deadlock(self):
+        old = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@1111111'
+        new = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@2222222'
+        publish = 'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110 type=_matterd._udp subTypes=[_T35] port=5550\n'
+        republished = (
+            publish
+            + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({old}) onServiceRegistered\n'
+            + ('I NsdManagerServiceResolver: Remove %s (_matterd._udp:7FE4A1F542AC5110)\n' % old)
+            + publish
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(republished))
+        confirmed = republished + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({new}) onServiceRegistered\n'
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(confirmed))
+        late_unregister = confirmed + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({old}) onServiceUnregistered\n'
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(late_unregister))
+        removed_new = late_unregister + ('I NsdManagerServiceResolver: Remove %s (_matterd._udp:7FE4A1F542AC5110)\n' % new)
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(removed_new))
+
+    def test_tv_mdns_unbound_replacement_needs_its_own_confirmation(self):
+        old = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@1111111'
+        new = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@2222222'
+        publish = 'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5110 type=_matterd._udp subTypes=[_T35] port=5550\n'
+        replaced = (
+            publish
+            + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({old}) onServiceRegistered\n'
+            + 'I NsdManagerServiceResolver: publish: replacing changed registration for _matterd._udp:7FE4A1F542AC5110\n'
+            + publish
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(replaced))
+        confirmed = replaced + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5110({new}) onServiceRegistered\n'
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(confirmed))
+
+    def test_tv_mdns_accepts_standalone_nsd_rename_log(self):
+        listener = 'chip.platform.NsdManagerServiceResolver$ActiveRegistration$1@9ab12cd'
+        renamed_log = (
+            'I NsdManagerServiceResolver: publish: renamed 7FE4A1F542AC5110 to 7FE4A1F542AC5111'
+            ' for _matterd._udp:7FE4A1F542AC5110\n'
+            'I NsdManagerServiceResolver: publish serviceName=7FE4A1F542AC5111 type=_matterd._udp subTypes=[_T35] port=5550\n'
+        )
+        self.assertFalse(CASTING_MOD.tv_mdns_has_registered_matterd(renamed_log))
+        bound_log = (
+            renamed_log
+            + f'D NsdManagerServiceResolver: publish {listener} count = 1\n'
+            + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5111({listener}) onServiceRegistered\n'
+        )
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(bound_log))
+        unbound_log = renamed_log + f'I NsdManagerServiceResolver: service 7FE4A1F542AC5111({listener}) onServiceRegistered\n'
+        self.assertTrue(CASTING_MOD.tv_mdns_has_registered_matterd(unbound_log))
+
+    def test_accept_tv_dialog_taps_tv_right_from_single_dump(self):
+        harness = CASTING_MOD.AndroidTvCastingTest({})
+        harness.logger = logging.getLogger('test_tv_dialog')
+        dialog_xml = (
+            '<?xml version="1.0"?><hierarchy><node resource-id="com.matter.tv.server:id/tv_right" text="Ok"'
+            ' bounds="[600,1200][800,1300]"/></hierarchy>'
+        )
+        cmds = []
+
+        def fake_exec(_cid, cmd):
+            cmds.append(cmd)
+            return {'return_code': '0', 'output': dialog_xml if 'uiautomator dump' in cmd else ''}
+
+        harness.execute_device_cmd = fake_exec
+        centers = []
+
+        def fake_center(_xml, resource_id=None, text=None):
+            centers.append((resource_id, text))
+            return (700, 1250) if resource_id == 'tv_right' else None
+
+        with mock.patch.object(CASTING_MOD.UiAutomatorHelper, 'get_element_center', fake_center):
+            self.assertTrue(harness._accept_tv_commissioning_dialog_if_shown('tv-1', initial_wait_sec=0.0))
+        self.assertEqual(sum('uiautomator dump' in c for c in cmds), 1)
+        self.assertEqual([c for c in cmds if 'input tap' in c], ['adb shell input tap 700 1250'])
+        self.assertEqual(centers, [('tv_right', None)])
+
+        cmds.clear()
+        harness.execute_device_cmd = lambda _cid, cmd: cmds.append(cmd) or {
+            'return_code': '0',
+            'output': '<?xml version="1.0"?><hierarchy><node text="OK, Google" bounds="[0,0][1,1]"/></hierarchy>',
+        }
+        self.assertFalse(harness._accept_tv_commissioning_dialog_if_shown('tv-1', initial_wait_sec=0.0))
+        self.assertFalse([c for c in cmds if 'input tap' in c])
+
+    def test_launch_url_oracle_requires_status_zero_and_casting_app_gets_timeout_extras(self):
+        harness = CASTING_MOD.AndroidTvCastingTest({})
+        harness.logger = logging.getLogger('test_launch_url')
+        patterns = []
+
+        def fake_wait(_cid, pattern, _timeout, since_timestamp=None):
+            patterns.append(pattern)
+            return True, ''
+
+        harness._wait_for_next_button_enabled = lambda *_args: True
+        harness._click_ui_element = lambda *_args, **_kwargs: True
+        harness._wait_for_logcat = fake_wait
+        harness.execute_device_cmd = lambda *_args: {'return_code': '0', 'output': ''}
+        with mock.patch.object(CASTING_MOD.time, 'sleep'):
+            harness._exercise_launch_url_and_read_vendor_id('tv-1', 'cast-1')
+        launch_pattern = next(p for p in patterns if 'LaunchURL success' in p)
+        self.assertRegex('D Fragment: LaunchURL success. Status: 0, Data: Optional.empty', launch_pattern)
+        self.assertNotRegex('D Fragment: LaunchURL success. Status: 1, Data: Optional.empty', launch_pattern)
+        self.assertNotRegex('D Fragment: LaunchURL success. Status: 01, Data: Optional.empty', launch_pattern)
+        self.assertIn('--el browseServiceTimeoutMs 5000', CASTING_MOD.CASTING_APP_START_CMD)
+        self.assertIn('--el resolveServiceTimeoutMs 15000', CASTING_MOD.CASTING_APP_START_CMD)
 
     def test_wait_for_tv_mdns_ready_rechecks_registration_after_settle(self):
         harness = CASTING_MOD.AndroidTvCastingTest({})
@@ -774,7 +907,58 @@ class AndroidCirqueSharedBaseTest(unittest.TestCase):
         self.assertIsNone(BASE_MOD.latest_onoff_value('no attributes logged'))
         self.assertTrue(BASE_MOD.latest_onoff_value('On/Off attribute value: 1'))
         self.assertFalse(BASE_MOD.latest_onoff_value('On/Off attribute value: true\nOn/Off attribute value: 0'))
-        self.assertTrue(BASE_MOD.has_commissioning_complete_marker('I ChipTool: Device commissioning completed'))
+        self.assertTrue(BASE_MOD.has_commissioning_complete_marker('I ChipTool: Device commissioning completed with success'))
+
+    def test_commissioning_complete_requires_explicit_zero_code_or_success(self):
+        has_done = BASE_MOD.has_commissioning_complete_marker
+        for line in (
+            'D OnOffClientFragment: onCommissioningComplete for nodeId 1: 0',
+            'D Fragment: onCommissioningComplete errorCode=0',
+            'I Toast: Commissioning completed with result: 0',
+            'I chipTool: Device commissioning completed with success',
+            'I chipTool: Commissioning completed successfully',
+            'I CTL : Commissioning complete for node ID 0x0000000000000001: success',
+        ):
+            self.assertTrue(has_done(line), line)
+        for line in (
+            'D Fragment: onCommissioningComplete: timeout',
+            'D Fragment: Calling onCommissioningComplete',
+            'E Fragment: Commissioning completed with error: FAILED',
+            'I chipTool: Device commissioning completed',
+            'I Toast: Commissioning completed with result: 50',
+            'D OnOffClientFragment: onCommissioningComplete for nodeId 1: 0x32',
+            'I CTL : Commissioning complete',
+        ):
+            self.assertFalse(has_done(line), line)
+
+    def test_post_commissioning_dialog_is_dismissed_before_onoff_interaction(self):
+        dialog_xml = (
+            '<?xml version="1.0"?><hierarchy>'
+            '<node text="Device Commissioned Successfully" bounds="[100,500][980,560]"/>'
+            '<node text="Skip (Save as Unassigned)" bounds="[100,1500][500,1600]"/>'
+            '</hierarchy>'
+        )
+        self.assertEqual(BASE_MOD.find_post_commissioning_skip_center(dialog_xml), (300, 1550))
+        self.assertIsNone(BASE_MOD.find_post_commissioning_skip_center('<hierarchy/>'))
+        self.assertIsNone(BASE_MOD.find_post_commissioning_skip_center('Device Commissioned Successfully <broken'))
+
+        harness = BASE_MOD.AndroidCirqueTestBase('http://localhost:5000', {})
+        harness.logger = logging.getLogger('test_dismiss_dialog')
+        cmds = []
+
+        def fake_exec(_dev, cmd):
+            cmds.append(cmd)
+            return {'return_code': '0', 'output': dialog_xml if 'uiautomator dump' in cmd else ''}
+
+        harness.execute_device_cmd = fake_exec
+        harness._start_ui_video = lambda *_args: False
+        harness._stop_ui_video = lambda *_args: None
+        harness._try_rest_onoff_toggle = lambda _dev: (cmds.append('REST toggle'), (True, False))[1]
+        harness._try_rest_onoff_read = lambda _dev: True
+        with mock.patch.object(BASE_MOD.time, 'sleep'):
+            result = harness._interact_onoff_with_ui_fallback('emu1')
+        self.assertEqual(tuple(result), (True, True))
+        self.assertLess(cmds.index('adb shell input tap 300 1550'), cmds.index('REST toggle'))
 
     def test_cpp_commissioning_complete_and_pairing_error_oracles(self):
         has_done = BASE_MOD.has_commissioning_complete_marker

@@ -19,6 +19,7 @@ import shutil
 import subprocess
 import sys
 import time
+import xml.etree.ElementTree as ET
 from collections.abc import Iterator
 from dataclasses import dataclass
 
@@ -81,13 +82,18 @@ CHIP_ERROR_CODE_RE = re.compile(r'\bCHIP Error\s+(-?(?:0x[0-9a-fA-F]+|\d+))\b', 
 PING_SUMMARY_RE = re.compile(
     r'(\d+)\s+packets\s+transmitted,\s+(\d+)\s+(?:packets\s+)?received[^\r\n]*?(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b'
 )
-PING_LOSS_ONLY_RE = re.compile(r'(?<!\d)(\d+(?:\.\d+)?)%\s+packet\s+loss\b')
 IPV4_TOKEN_RE = re.compile(r'^\d+\.\d+\.\d+\.\d+$')
-COMMISSION_COMPLETE_MARKERS = (
-    'onCommissioningComplete',
-    'Device commissioning completed',
-    'Commissioning completed',
+# Completion lines count only with an explicit zero code or success word; bare markers such as
+# 'onCommissioningComplete: timeout' or 'Calling onCommissioningComplete' must not pass.
+COMMISSION_SUCCESS_RE = re.compile(
+    r'\bonCommissioningComplete\b(?:[^\r\n]*?\berrorCode\s*[:=]\s*|\s+for\s+nodeId\s+\S+\s*:\s*)0\b'
+    r'|\bCommissioning\s+completed\s+with\s+(?:code|result)\s*[:=]?\s*0\b'
+    r'|\bcommissioning\s+completed\s+(?:with\s+success|successfully)\b',
+    re.IGNORECASE,
 )
+POST_COMMISSIONING_DIALOG_TITLE = 'Device Commissioned Successfully'
+POST_COMMISSIONING_SKIP_TEXT = 'Skip (Save as Unassigned)'
+UI_BOUNDS_RE = re.compile(r'^\[(\d+),(\d+)\]\[(\d+),(\d+)\]$')
 CHIPTOOL_PERMISSIONS = (
     'android.permission.ACCESS_FINE_LOCATION',
     'android.permission.ACCESS_COARSE_LOCATION',
@@ -100,6 +106,10 @@ EMULATOR_DIAG_CMDS = (
     'sh -c "ls -l /dev/kvm; nproc; free -m"',
     'sh -c "cat /proc/loadavg; uptime"',
     'sh -c "tail -n 200 /tmp/emulator.log 2>/dev/null"',
+)
+UI_DUMP_CMD = (
+    'adb shell "uiautomator dump /data/local/tmp/ui.xml >/dev/null 2>&1'
+    ' && cat /data/local/tmp/ui.xml 2>/dev/null || true"'
 )
 BOUNDED_EMULATOR_DIAG_SPECS = (
     ('adb logcat -d -t 2000', 'logcat-tail.log'),
@@ -180,19 +190,17 @@ def check_android_preconditions(runner_image: str = DEFAULT_ANDROID_RUNNER_IMAGE
 def ping_has_zero_packet_loss(ping_res: object) -> bool:
     """Returns True iff ping exited cleanly with >0 replies and 0% packet loss."""
     if isinstance(ping_res, dict):
-        rc = ping_res.get('return_code')
-        if rc is not None and str(rc) != '0':
+        if str(ping_res.get('return_code')) != '0':
             return False
         ping_out = str(ping_res.get('output', ''))
     else:
         ping_out = str(ping_res)
 
     summary = PING_SUMMARY_RE.search(ping_out)
-    if summary:
-        tx, rx, loss = int(summary.group(1)), int(summary.group(2)), float(summary.group(3))
-        return tx > 0 and rx == tx and loss == 0.0
-    loss_match = PING_LOSS_ONLY_RE.search(ping_out)
-    return bool(loss_match and float(loss_match.group(1)) == 0.0)
+    if not summary:
+        return False
+    tx, rx, loss = int(summary.group(1)), int(summary.group(2)), float(summary.group(3))
+    return tx > 0 and rx == tx and loss == 0.0
 
 
 def _is_nonzero_code_token(token: str) -> bool:
@@ -242,17 +250,28 @@ def _line_is_commissioning_complete(line: str) -> bool:
     cpp_match = CPP_COMMISSION_COMPLETE_RE.search(line)
     if cpp_match:
         return cpp_match.group(1).strip().lower() == 'success'
-    if any(marker in line for marker in COMMISSION_COMPLETE_MARKERS):
-        return True
-    if 'Commissioning complete' in line:
-        tail = line.split('Commissioning complete', 1)[1].strip()
-        return not tail or tail.lstrip(':').strip().lower() == 'success'
-    return False
+    return bool(COMMISSION_SUCCESS_RE.search(line))
 
 
 def has_commissioning_complete_marker(logcat_out: str) -> bool:
     """Returns True if logcat contains a successful CHIPTool commissioning completion line."""
     return any(_line_is_commissioning_complete(line) for line in logcat_out.splitlines())
+
+
+def find_post_commissioning_skip_center(ui_xml: str) -> tuple[int, int] | None:
+    """Returns the tap center of CHIPTool's post-commissioning 'Skip' button, or None if not shown."""
+    if POST_COMMISSIONING_DIALOG_TITLE not in ui_xml:
+        return None
+    try:
+        root = ET.fromstring(ui_xml)
+    except ET.ParseError:
+        return None
+    for node in root.iter('node'):
+        bounds = UI_BOUNDS_RE.match(node.attrib.get('bounds', ''))
+        if node.attrib.get('text') == POST_COMMISSIONING_SKIP_TEXT and bounds:
+            x1, y1, x2, y2 = (int(v) for v in bounds.groups())
+            return (x1 + x2) // 2, (y1 + y2) // 2
+    return None
 
 
 def latest_onoff_value(logcat_slice: str) -> bool | None:
@@ -548,10 +567,11 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         relay_chk = self.execute_device_cmd(
             req_device_id, 'test -S /dev/virtual_bt/shared_hci.sock -a -f /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py'
         )
-        if isinstance(relay_chk, dict) and relay_chk.get('return_code') == '0':
+        if isinstance(relay_chk, dict) and str(relay_chk.get('return_code')) == '0':
             relay_cmd = (
-                'sh -c "pkill -9 -f \\"[b]t_tcp_to_unix_relay.py\\" || true;'
-                f' python3 /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py {hci_port} /dev/virtual_bt/shared_hci.sock >/dev/null 2>&1 &"'
+                'sh -c "pkill -9 -f \\"[b]t_tcp_to_unix_relay.py\\" || true; '
+                f'python3 /dev/virtual_bt/bin/bt_tcp_to_unix_relay.py {hci_port} '
+                '/dev/virtual_bt/shared_hci.sock >/dev/null 2>&1 &"'
             )
             self.execute_device_cmd(req_device_id, relay_cmd)
             time.sleep(0.2)
@@ -562,21 +582,27 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         cirque_pty = f'{CHIP_REPO_STR}/third_party/cirque/repo/cirque/virtual_bt/android/pty_bridge'
         self.execute_device_cmd(
             req_device_id,
-            f'sh -c "adb push /opt/virtual_bt_android/pty_bridge /data/local/tmp/pty_bridge || adb push {cirque_pty} /data/local/tmp/pty_bridge"',
+            (
+                'sh -c "adb push /opt/virtual_bt_android/pty_bridge /data/local/tmp/pty_bridge '
+                f'|| adb push {cirque_pty} /data/local/tmp/pty_bridge"'
+            ),
         )
         self.execute_device_cmd(req_device_id, 'adb shell chmod 755 /data/local/tmp/pty_bridge')
         bt_info = self.query_api('virtual_bt_info')
         hci_port = bt_info.get('hci_port', 23458) if isinstance(bt_info, dict) else 23458
         gw_ip = self._resolve_virtual_bt_gateway(req_device_id, hci_port)
         pin_cmd = (
-            f'ip route replace {gw_ip}/32 via 10.0.2.2 dev eth0 2>/dev/null || true;'
-            f' ip rule add to {gw_ip}/32 lookup main pref 100 2>/dev/null || true'
-        )
+            'ip route replace %s/32 via 10.0.2.2 dev eth0 2>/dev/null || true; '
+            'ip rule add to %s/32 lookup main pref 100 2>/dev/null || true'
+        ) % (gw_ip, gw_ip)
         self.execute_device_cmd(req_device_id, f'adb shell "{pin_cmd}"')
         self.execute_device_cmd(req_device_id, 'adb shell killall pty_bridge 2>/dev/null || true')
         self.execute_device_cmd(
             req_device_id,
-            f'adb shell "/data/local/tmp/pty_bridge /dev/bluetooth0 {gw_ip} {hci_port} android_hci0 > /data/local/tmp/pty_bridge.log 2>&1 &"',
+            (
+                f'adb shell "/data/local/tmp/pty_bridge /dev/bluetooth0 {gw_ip} {hci_port} '
+                'android_hci0 > /data/local/tmp/pty_bridge.log 2>&1 &"'
+            ),
         )
         time.sleep(2.0)
         self.execute_device_cmd(req_device_id, 'adb shell chmod 666 /dev/bluetooth0 /dev/pts/* 2>/dev/null || true')
@@ -625,13 +651,22 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
             time.sleep(1.0)
         return False
 
+    def _dump_ui_xml(self, req_device_id: str) -> str:
+        return self._cmd_output_str(self.execute_device_cmd(req_device_id, UI_DUMP_CMD))
+
+    def _dismiss_post_commissioning_dialog_if_shown(self, req_device_id: str) -> None:
+        # UI-driven commissioning launched without show_post_commissioning_dialog=false leaves a
+        # non-cancelable dialog that would swallow the OnOff cluster taps.
+        center = find_post_commissioning_skip_center(self._dump_ui_xml(req_device_id))
+        if center is None:
+            return
+        self.logger.info('Dismissing CHIPTool post-commissioning dialog')
+        self.execute_device_cmd(req_device_id, f'adb shell input tap {center[0]} {center[1]}')
+        time.sleep(1.0)
+
     def _open_chiptool_onoff_cluster(self, req_device_id: str) -> None:
         time.sleep(2.0)
-        dump_cmd = (
-            'adb shell "uiautomator dump /data/local/tmp/ui.xml >/dev/null 2>&1'
-            ' && cat /data/local/tmp/ui.xml 2>/dev/null || true"'
-        )
-        dump_out = self._cmd_output_str(self.execute_device_cmd(req_device_id, dump_cmd))
+        dump_out = self._dump_ui_xml(req_device_id)
         if 'onOffClusterBtn' not in dump_out and 'LIGHT ON/OFF' not in dump_out:
             start_cmd = (
                 'adb shell am start --activity-clear-top --activity-single-top'
@@ -716,6 +751,7 @@ class AndroidCirqueTestBase(CHIPVirtualHome):
         self._start_ui_video(req_device_id, '3_onoff_cluster_toggle_read.mp4')
         require_toggle_marker = False
         try:
+            self._dismiss_post_commissioning_dialog_if_shown(req_device_id)
             toggle_ok, toggle_ambiguous = self._try_rest_onoff_toggle(req_device_id)
             read_ok = self._try_rest_onoff_read(req_device_id) if toggle_ok else False
             if not (toggle_ok and read_ok):

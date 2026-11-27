@@ -110,6 +110,12 @@ TV_MDNS_LOGCAT_PATTERN = (
     r'onServiceRegistered|onServiceUnregistered|'
     r'onRegistrationFailed|_matterd\._udp'
 )
+# Emulator DNS-SD is slower than real devices, so lengthen the casting app's browse/resolve
+# timeouts (defaults 2.5 s / 3 s) through its launch extras.
+CASTING_APP_START_CMD = (
+    'adb shell am start -n com.chip.casting/com.matter.casting.MainActivity'
+    ' --el browseServiceTimeoutMs 5000 --el resolveServiceTimeoutMs 15000'
+)
 NSD_PUBLISH_SERVICE_RE = re.compile(
     r'\bpublish\s+serviceName=(\S+)\s+type=([^\s,]+)'
 )
@@ -117,7 +123,7 @@ NSD_PUBLISH_LISTENER_RE = re.compile(r'\bpublish\s+(\S+@\w+)\s+count\s*=')
 NSD_REPLACING_REG_RE = re.compile(
     r'\bpublish:\s+replacing\s+changed\s+registration\s+for\s+([^:\s]+):(\S+)'
 )
-NSD_REMOVE_LISTENER_RE = re.compile(r'\bRemove\s+(\S+@\w+)\b')
+NSD_REMOVE_LISTENER_RE = re.compile(r'\bRemove\s+(\S+@\w+)(?:\s+\(([^)\s]+)\))?')
 NSD_SERVICE_REGISTERED_RE = re.compile(
     r'\bservice\s+(.+?)\(([^()\s]+@[0-9a-f]+)\)\s+onServiceRegistered\b'
 )
@@ -353,6 +359,7 @@ class _NsdPublishedService:
 
     service_type: str
     requested_name: str
+    seq: int = 0
     listener: str | None = None
     active: bool = True
     confirmed: bool = False
@@ -365,35 +372,44 @@ class _NsdPublishedService:
     def matches_failure(self, fail_key: str) -> bool:
         if not self.active or self.confirmed:
             return False
-        map_key = f'{self.service_type}:{self.requested_name}'
+        map_key = '%s:%s' % (self.service_type, self.requested_name)
         return fail_key in (self.requested_name, map_key)
 
 
 def _deactivate_matching_listener(
     entries: list[_NsdPublishedService],
-    confirmed_by_name: dict[str, set[str]],
+    confirmations: dict[str, tuple[str, int]],
     listener: str,
+    map_key: str | None = None,
 ) -> None:
+    matched = False
     for entry in entries:
         if entry.listener == listener:
             entry.active = False
             entry.confirmed = False
-    for listeners in confirmed_by_name.values():
-        listeners.discard(listener)
+            matched = True
+    if not matched and map_key:
+        # Without Log.d listener bindings, bind the earliest active registration for this
+        # type:name to the listener so its later onServiceUnregistered stays idempotent.
+        svc_type, _, name = map_key.partition(':')
+        for entry in entries:
+            if entry.active and entry.listener is None and (entry.service_type, entry.requested_name) == (svc_type, name):
+                entry.listener = listener
+                entry.active = False
+                break
+    confirmations.pop(listener, None)
 
 
 def _apply_nsd_publish_line(
-    line: str, entries: list[_NsdPublishedService]
+    line: str,
+    entries: list[_NsdPublishedService],
+    confirmations: dict[str, tuple[str, int]],
+    seq: int,
 ) -> bool:
     pub = NSD_PUBLISH_SERVICE_RE.search(line)
     if pub:
         name, svc_type = pub.group(1), pub.group(2)
-        entries.append(
-            _NsdPublishedService(
-                service_type=svc_type,
-                requested_name=name,
-            )
-        )
+        entries.append(_NsdPublishedService(service_type=svc_type, requested_name=name, seq=seq))
         return True
     lst = NSD_PUBLISH_LISTENER_RE.search(line)
     if lst:
@@ -407,6 +423,8 @@ def _apply_nsd_publish_line(
             if entry.matches_replacement(rep_type, rep_name):
                 entry.active = False
                 entry.confirmed = False
+                if entry.listener is not None:
+                    confirmations.pop(entry.listener, None)
                 break
         return True
     return False
@@ -415,64 +433,73 @@ def _apply_nsd_publish_line(
 def _apply_nsd_callback_line(
     line: str,
     entries: list[_NsdPublishedService],
-    confirmed_by_name: dict[str, set[str]],
+    confirmations: dict[str, tuple[str, int]],
+    seq: int,
 ) -> None:
     rem = NSD_REMOVE_LISTENER_RE.search(line)
     if rem:
-        _deactivate_matching_listener(entries, confirmed_by_name, rem.group(1))
+        _deactivate_matching_listener(entries, confirmations, rem.group(1), rem.group(2))
         return
     unreg = NSD_SERVICE_UNREGISTERED_RE.search(line)
     if unreg:
-        unreg_name, listener = unreg.group(1).strip(), unreg.group(2)
-        _deactivate_matching_listener(entries, confirmed_by_name, listener)
-        listeners = confirmed_by_name.get(unreg_name)
-        if listeners is not None:
-            listeners.discard(listener)
+        _deactivate_matching_listener(entries, confirmations, unreg.group(2))
         return
     fail = NSD_REGISTRATION_FAILED_RE.search(line)
     if fail:
+        # The failure log names the service but not its type or listener, so every pending
+        # registration it could refer to is treated as failed.
         fail_key = fail.group(1).strip()
         for entry in entries:
             if entry.matches_failure(fail_key):
                 entry.active = False
-                break
         return
     reg = NSD_SERVICE_REGISTERED_RE.search(line)
     if reg:
         reg_name, listener = reg.group(1).strip(), reg.group(2)
-        confirmed_by_name.setdefault(reg_name, set()).add(listener)
+        confirmations[listener] = (reg_name, seq)
         for entry in entries:
             if entry.active and entry.listener == listener:
                 entry.confirmed = True
 
 
+def _unbound_registrations_confirmed(
+    entries: list[_NsdPublishedService],
+    confirmations: dict[str, tuple[str, int]],
+    name: str,
+) -> bool:
+    """Returns True iff each active unbound `name` registration has its own later confirmation."""
+    bound_listeners = {e.listener for e in entries if e.listener is not None}
+    confirm_seqs = sorted(
+        conf_seq
+        for listener, (conf_name, conf_seq) in confirmations.items()
+        if conf_name == name and listener not in bound_listeners
+    )
+    pending_seqs = sorted(e.seq for e in entries if e.active and e.listener is None and e.requested_name == name)
+    idx = 0
+    for pending_seq in pending_seqs:
+        while idx < len(confirm_seqs) and confirm_seqs[idx] <= pending_seq:
+            idx += 1
+        if idx == len(confirm_seqs):
+            return False
+        idx += 1
+    return True
+
+
 def tv_mdns_has_registered_matterd(log_output: str) -> bool:
     """Returns True iff an active _matterd._udp service is registered."""
     entries: list[_NsdPublishedService] = []
-    confirmed_by_name: dict[str, set[str]] = {}
-    for line in log_output.splitlines():
-        if not _apply_nsd_publish_line(line, entries):
-            _apply_nsd_callback_line(line, entries, confirmed_by_name)
+    confirmations: dict[str, tuple[str, int]] = {}
+    for seq, line in enumerate(log_output.splitlines()):
+        if not _apply_nsd_publish_line(line, entries, confirmations, seq):
+            _apply_nsd_callback_line(line, entries, confirmations, seq)
 
-    confirmed_listeners = set().union(*confirmed_by_name.values())
-    active_matterd = [
-        e for e in entries if e.active and e.service_type == '_matterd._udp'
-    ]
+    active_matterd = [e for e in entries if e.active and e.service_type == '_matterd._udp']
     if not active_matterd:
         return False
     latest = active_matterd[-1]
     if latest.listener is not None:
-        return latest.confirmed or latest.listener in confirmed_listeners
-    target_name = latest.requested_name
-    same_name_active = [
-        e
-        for e in entries
-        if e.active and e.listener is None and e.requested_name == target_name
-    ]
-    bound_listeners = {e.listener for e in entries if e.listener is not None}
-    unbound_confirmed = confirmed_by_name.get(target_name, set()) - bound_listeners
-    confirmed_count = len(unbound_confirmed)
-    return confirmed_count > 0 and confirmed_count >= len(same_name_active)
+        return latest.confirmed or latest.listener in confirmations
+    return _unbound_registrations_confirmed(entries, confirmations, latest.requested_name)
 
 
 def _decode_dns_name(buf, offset):
@@ -575,8 +602,8 @@ def _extract_udp_segment(eth_frame) -> UdpSegment | None:
     """Extracts a UdpSegment from an Ethernet IPv4/IPv6 UDP frame, or returns None."""
     if len(eth_frame) < 14:
         return None
-    dst_mac = ':'.join(f'{b:02x}' for b in eth_frame[0:6])
-    src_mac = ':'.join(f'{b:02x}' for b in eth_frame[6:12])
+    dst_mac = ':'.join('%02x' % b for b in eth_frame[0:6])
+    src_mac = ':'.join('%02x' % b for b in eth_frame[6:12])
     ethertype = struct.unpack('!H', eth_frame[12:14])[0]
     l3_off = 14
     while ethertype in (0x8100, 0x88A8) and len(eth_frame) >= l3_off + 4:
@@ -1024,10 +1051,21 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
             tv_id, 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
         )
         dump_out = str(tv_dump.get('output', '')) if isinstance(tv_dump, dict) else ''
-        if 'dialog_title' not in dump_out and 'ALLOW' not in dump_out.upper() and 'OK' not in dump_out.upper():
+        xml_start = dump_out.find('<?xml')
+        xml_content = dump_out[xml_start:] if xml_start >= 0 else ''
+        # The TV app's commissioning dialog (layout_dialog.xml) accepts via the "Ok" button @id/tv_right.
+        if ':id/tv_right' not in xml_content:
             return False
-        self.logger.info('TV App dialog found, trying to accept')
-        return any(self._click_ui_element(tv_id, text=label) for label in ('Allow', 'ALLOW', 'OK'))
+        center = UiAutomatorHelper.get_element_center(xml_content, resource_id='tv_right')
+        for label in ('Ok', 'Allow'):
+            if center:
+                break
+            center = UiAutomatorHelper.get_element_center(xml_content, text=label)
+        if not center:
+            return False
+        self.logger.info('TV App dialog found, accepting at (%d, %d)', center[0], center[1])
+        tap_res = self.execute_device_cmd(tv_id, f'adb shell input tap {center[0]} {center[1]}')
+        return isinstance(tap_res, dict) and str(tap_res.get('return_code')) == '0'
 
     def _wait_for_next_button_enabled(self, container_id: str, timeout_sec: float) -> bool:
         dump_cmd = 'adb shell "uiautomator dump /data/local/tmp/dump.xml && cat /data/local/tmp/dump.xml"'
@@ -1069,7 +1107,8 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         )
         self.assertTrue(success, 'Failed to handle LaunchUrl on TV app')
 
-        success, _ = self._wait_for_logcat(casting_id, r'LaunchURL success', ANDROID_COMMISSION_TIMEOUT_SEC)
+        # The casting app logs every LauncherResponse as "LaunchURL success"; only status 0 is a success.
+        success, _ = self._wait_for_logcat(casting_id, r'LaunchURL success\. Status: 0\b', ANDROID_COMMISSION_TIMEOUT_SEC)
         self.assertTrue(success, 'Failed to get LaunchURL success')
 
         self.logger.info('Testing ReadVendorID')
@@ -1106,7 +1145,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         self.logger.info('Starting Casting App')
         self.execute_device_cmd(casting_id, 'adb shell logcat -G 16M')
         self.execute_device_cmd(casting_id, disable_bt_cmd)
-        self.execute_device_cmd(casting_id, 'adb shell am start -n com.chip.casting/com.matter.casting.MainActivity')
+        self.execute_device_cmd(casting_id, CASTING_APP_START_CMD)
 
         discovered = self._wait_for_casting_discovery(casting_id, ANDROID_COMMISSION_TIMEOUT_SEC)
         self.assertTrue(discovered, 'Failed to discover CastingPlayer')
@@ -1155,7 +1194,7 @@ class AndroidTvCastingTest(AndroidCirqueTestBase):
         pcap_dir = os.environ.get('CIRQUE_PCAP_DIR') or os.environ.get('DEVICE_LOG_DIR')
         self.assertTrue(bool(pcap_dir and os.path.isdir(pcap_dir)), f'pcap_dir not found: {pcap_dir}')
         pcap_path = os.path.join(pcap_dir, 'wifi_medium.pcap')
-        self.assertTrue(os.path.isfile(pcap_path), f'wifi_medium.pcap not found in {pcap_dir}')
+        self.assertTrue(os.path.isfile(pcap_path), 'wifi_medium.pcap not found in %s' % pcap_dir)
 
         active_ips = self._active_ips if hasattr(self, '_active_ips') else {}
         tv_spec = self._resolve_guest_endpoint(
