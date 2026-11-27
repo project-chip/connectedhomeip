@@ -32,6 +32,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_PICS_Checker(BasicCompositionTests):
+    # This test validates the PICS file against the device, so check_pics must answer
+    # from the PICS file only, never from the PICS generated from the device.
+    use_device_pics = False
+
     @async_test_body
     async def setup_class(self):
         super().setup_class()

@@ -19,10 +19,12 @@ import logging
 import os
 import tempfile
 import zipfile
+from contextlib import contextmanager
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.global_stash as global_stash
 from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
@@ -622,6 +624,94 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
         # An endpoint with no slice at all only sees endpoint 0's codes.
         asserts.assert_true(self.check_pics('MCORE.IDM.S', endpoint=9), "unknown endpoint falls back to endpoint 0")
         asserts.assert_false(self.check_pics('SWTCH.S', endpoint=9), "endpoint 3 code must not leak into endpoint 9")
+
+    # ------------------------------------------------------------------
+    # check_pics: device-generated PICS override the PICS file
+    # ------------------------------------------------------------------
+
+    @contextmanager
+    def _pics_sources(self, file_pics: dict[int, dict[str, bool]], device_pics: dict[int, list[str]] | None,
+                      endpoint: int = 1):
+        """Run a block with the given PICS file, pseudo-PICS for the DUT and endpoint under test.
+
+        device_pics None means the runner generated no pseudo-PICS for the DUT. Everything
+        is restored afterwards so the other tests keep their own PICS.
+        """
+        config = self.matter_test_config
+        saved = (config.pics, config.endpoint, config.use_device_pics, self.user_params.get("pseudo_pics"))
+        pseudo_pics = {} if device_pics is None else {self.dut_node_id: device_pics}
+        config.pics, config.endpoint, config.use_device_pics = file_pics, endpoint, True
+        self.user_params["pseudo_pics"] = global_stash.stash_globally(pseudo_pics)
+        try:
+            yield
+        finally:
+            config.pics, config.endpoint, config.use_device_pics, self.user_params["pseudo_pics"] = saved
+            self.__dict__.pop("use_device_pics", None)
+
+    def test_check_pics_device_overrides_pics_file(self):
+        """Device-element codes come from the DUT and override the PICS file in both directions."""
+        asserts.assert_is_not_none(self.data_model, "The runner must provide a data model for the override")
+        file_pics = {
+            0: {'MCORE.ROLE.COMMISSIONEE': False},
+            1: {
+                # The PICS file says no, the DUT has them.
+                'OO.S': False, 'OO.S.A0000': False, 'OO.S.F00': False, 'OO.S.C00.Rsp': False,
+                'DRLK.S.C1c.Tx': False, 'IDM.S': False,
+                # The PICS file says yes, the DUT does not have them.
+                'OO.S.A4002': True, 'OO.S.F01': True, 'OO.S.C01.Rsp': True, 'DRLK.S.C1d.Tx': True,
+            },
+        }
+        device_pics = {
+            0: ['MCORE.ROLE.COMMISSIONEE'],
+            1: ['OO.S', 'OO.S.A0000', 'OO.S.F00', 'OO.S.C00.Rsp', 'DRLK.S.C1c.Tx', 'IDM.S'],
+        }
+        with self._pics_sources(file_pics, device_pics):
+            for code in ['OO.S', 'OO.S.A0000', 'OO.S.F00', 'OO.S.C00.Rsp', 'DRLK.S.C1c.Tx', 'IDM.S']:
+                asserts.assert_true(self.check_pics(code), f"{code}: the DUT has it, so False -> True")
+            for code in ['OO.S.A4002', 'OO.S.F01', 'OO.S.C01.Rsp', 'DRLK.S.C1d.Tx']:
+                asserts.assert_false(self.check_pics(code), f"{code}: the DUT lacks it, so True -> False")
+            asserts.assert_true(self.check_pics('oo.s.a0000'), "Codes must match regardless of case")
+            asserts.assert_true(self.check_pics('MCORE.ROLE.COMMISSIONEE'),
+                                "MCORE.ROLE.COMMISSIONEE must be read from endpoint 0 even when testing endpoint 1")
+            asserts.assert_false(self.check_pics('OO.S', endpoint=0),
+                                 "An explicit endpoint must be used: the DUT has no On/Off on endpoint 0")
+
+    def test_check_pics_non_device_element_codes_use_pics_file(self):
+        """Codes the generator does not produce keep the PICS file value, whatever the DUT has."""
+        file_pics = {
+            0: {'MCORE.IDM.S': True},
+            1: {'OO.S.E00': True, 'OO.S.E01': False, 'OO.C': True, 'OO.S.M.ManualCheck': True, 'XYZ.S': True,
+                'XYZ.S.A0000': True},
+        }
+        device_pics = {1: ['OO.S', 'OO.S.A0000', 'IDM.S']}
+        with self._pics_sources(file_pics, device_pics):
+            asserts.assert_true(self.check_pics('OO.S.E00'), "Event codes must come from the PICS file")
+            asserts.assert_false(self.check_pics('OO.S.E01'), "Event codes must come from the PICS file")
+            asserts.assert_true(self.check_pics('OO.C'), "Client codes must come from the PICS file")
+            asserts.assert_true(self.check_pics('OO.S.M.ManualCheck'), "Manual codes must come from the PICS file")
+            asserts.assert_true(self.check_pics('MCORE.IDM.S'), "MCORE codes must come from the PICS file")
+            asserts.assert_true(self.check_pics('XYZ.S'), "Clusters missing from the data model must use the PICS file")
+            asserts.assert_true(self.check_pics('XYZ.S.A0000'),
+                                "Clusters missing from the data model must use the PICS file")
+
+    def test_check_pics_override_disabled(self):
+        """With the override off, or without pseudo-PICS for the DUT, every code comes from the PICS file."""
+        file_pics = {1: {'OO.S': False, 'OO.S.A4002': True}}
+        device_pics = {1: ['OO.S']}
+
+        with self._pics_sources(file_pics, device_pics):
+            self.use_device_pics = False  # what a test class such as TC_PICS_Checker declares
+            asserts.assert_false(self.check_pics('OO.S'), "Class opt-out: the PICS file must be used")
+            asserts.assert_true(self.check_pics('OO.S.A4002'), "Class opt-out: the PICS file must be used")
+
+        with self._pics_sources(file_pics, device_pics):
+            self.matter_test_config.use_device_pics = False  # what MockTestRunner sets by default
+            asserts.assert_false(self.check_pics('OO.S'), "Config opt-out: the PICS file must be used")
+            asserts.assert_true(self.check_pics('OO.S.A4002'), "Config opt-out: the PICS file must be used")
+
+        with self._pics_sources(file_pics, device_pics=None):
+            asserts.assert_false(self.check_pics('OO.S'), "No pseudo-PICS for the DUT: the PICS file must be used")
+            asserts.assert_true(self.check_pics('OO.S.A4002'), "No pseudo-PICS for the DUT: the PICS file must be used")
 
     def test_check_pics_no_cross_endpoint_leak(self):
         """

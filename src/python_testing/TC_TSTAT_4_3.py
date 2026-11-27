@@ -166,7 +166,7 @@ class TC_TSTAT_4_3(MatterTestCommissionedDevice):
 
         has_valid_time = True
         self.step("3")
-        if self.pics_guard(self.check_pics("TIMESYNC.S.A0000")):
+        if self.pics_guard(self.check_pics("TIMESYNC.S.A0000", endpoint=0)):
             # TH checks if the Thermostat does not have a valid UTC time.
             currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
 
@@ -196,7 +196,7 @@ class TC_TSTAT_4_3(MatterTestCommissionedDevice):
                 log.info("Couldn't run test step 4a since all preset handles are also the ActivePresetHandle on this Thermostat")
 
             self.step("4b")
-            if self.pics_guard(self.check_pics("TIMESYNC.S.C00.Rsp")):
+            if self.pics_guard(self.check_pics("TIMESYNC.S.C00.Rsp", endpoint=0)):
                 # If has_valid_time is False, TH sends Time Synchronization command to DUT using a time source.
                 try:
                     code = 0
