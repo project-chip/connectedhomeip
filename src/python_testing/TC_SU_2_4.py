@@ -94,7 +94,6 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-        self.cleanup = True
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
         self.requestor_node_id = self.dut_node_id
@@ -131,8 +130,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.expected_software_version = await self.check_ota_image_version(
             controller=self.controller, requestor_node_id=self.requestor_node_id, ota_image_path=self.ota_image)
 
-        # Start the provider normally (no --queryImageStatus busy, no --userConsentNeeded, no
-        # --applyUpdateAction override) so the full flow Query -> Download -> Apply proceeds.
+        # Start the provider normally (no --queryImageStatus busy, no --userConsentNeeded override) so the full flow Query -> Download -> Apply proceeds.
         # The --app-pipe / --app-pipe-out extra args are required for the pipe reads later.
         # Adds a delay to allow terminate the provider but read the ApplyUpdateRequest before reading the named pipe
         self.start_provider(
@@ -157,12 +155,43 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
-    async def _wait_for_idle_after_software_update(self, update_state_handler):
-        # Wait for the DUT to return to Idle after the Provider is canceled.
-        update_state_match = AttributeMatcher.from_callable(
-            "UpdateState is Idle",
-            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+    async def _wait_for_idle_after_software_update(self, controller:ChipDeviceCtrl.ChipDeviceController, requestor_node_id:int, step_number:str):
+        """Waits for DUT update state reach kIdle after the DUT is on kApplying state.
+        Fails if is not able to reach the state in the exected timeout.
+
+        Args:
+            controller (ChipDeviceCtrl.ChipDeviceController): _description_
+            requestor_node_id (int): _description_
+        """
+        kidle_timeout_sec = self.remaining_test_budget_sec(reserve_sec=60)
+        poll_interval_sec = 5
+        is_kidle = False
+        t_kidle_wait_start = time.time()
+        attempt = 0
+        logger.info("%s - Waiting DUT go back to kIdle", step_number)
+        while time.time() - t_kidle_wait_start < kidle_timeout_sec:
+            attempt += 1
+            try:
+                update_state = await self.read_single_attribute(
+                    controller,
+                    requestor_node_id,
+                    self.get_endpoint(),
+                    Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,    
+                )
+                if update_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
+                    logger.info("%s - kIdle value found for UpdteState.")
+                    is_kidle = True
+                    break
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError):
+                logger.info('%s - Waiting for DUT to come back online (attempt %s, elapsed %.0fs / %.0fs)...',
+                            step_number, attempt, time.time() - t_kidle_wait_start, kidle_timeout_sec)
+            logger.info("%s UpdateState is not kIdle yet, waiting DUT to change UpdateState", step_number)
+            await asyncio.sleep(poll_interval_sec)
+
+        asserts.assert_true(
+            is_kidle,
+            f'{step_number}: DUT did not change UpdateState to kIdle after finding kApplying on {kidle_timeout_sec:.0f}s after OTA reboot '
+            '(remaining test budget exhausted).')
 
     @async_test_body
     async def teardown_test(self):
@@ -305,7 +334,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             liveness_matcher=progress_liveness_s1,
         )
         logger.info("%s - DUT reached kDelayedOnApply to allow read the named pipe for GetApplyUpdateRequestStatus", step_number_s1)
-        # Pool for a max of 30 seconds the read the last ApplyUpdateRequest that the OTA-P received from the DUT to avoid a race condition.
+        # Poll for a max of 30 seconds the read the last ApplyUpdateRequest that the OTA-P received from the DUT to avoid a race condition.
         # A delayedApplyActionTimeSec of 60 secs to cover the poll time.
         # The provider exposes this snapshot via the "GetApplyUpdateRequestStatus" pipe command,
         # which returns UpdateToken and NewVersion under Payload alongside the existing fields.
@@ -345,7 +374,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             if remaining <= 0:
                 # Time exhausted, warn and exit the loop. Asserts will fail as received_update_token and expected_update_token initialized as None
                 logger.warning(
-                    "%s ApplyUpdateRequest has not been reached after %.0fs. Retrying", step_number_s1, poll_command_interval_sec)
+                    "%s ApplyUpdateRequest was not received after %.0fs. Retrying", step_number_s1, poll_command_timeout_sec)
                 break
             if wait_poll:
                 await asyncio.sleep(min(poll_command_interval_sec, remaining))
@@ -360,7 +389,6 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(
             received_new_version, self.expected_software_version,
             f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
-        # Clean up and terminate if this is completed dont perform this action on teardown
 
         # Wait DUT for kApplying and start updating the DUT after the delay
         subscription_attr_s1.await_first_value_asserting_no_forbidden(
@@ -369,56 +397,12 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=60),
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
         )
-        logger.info("%s - DUT Applying the software udpate", step_number_s1)
+        logger.info("%s - DUT Applying the software update", step_number_s1)
         # Cancel subscription as is not needed anymore.
         subscription_attr_s1.cancel()
-        # DUT is applying the software update
-        # GetConnectedDevice succeeds (DUT is back online). Applying firmware on a real DUT
-        # (signature check, flash bank copy, reboot, mDNS re-advertisement) has no known
-        # upper bound and offers no observable liveness signal, so the polling loop itself
-        # is the liveness mechanism and runs until the remaining test budget is exhausted.
-        # ------------------------------------------------------------------------------------
-        logger.info('%s - Expiring stale session and waiting for DUT to reboot.', step_number_s1)
-        controller.ExpireSessions(self.requestor_node_id)
 
-        reboot_timeout_sec = self.remaining_test_budget_sec(reserve_sec=60)
-        poll_interval_sec = 5
-        reconnect_timeout_ms = 5000
-        reconnected = False
-        t_reboot_start = time.time()
-        attempt = 0
-        while time.time() - t_reboot_start < reboot_timeout_sec:
-            attempt += 1
-            await asyncio.sleep(poll_interval_sec)
-            try:
-                await controller.GetConnectedDevice(
-                    self.requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
-                reconnected = True
-                logger.info('%s- DUT reconnected after OTA reboot (attempt %s).', step_number_s1, attempt)
-                break
-            except (TimeoutError, ChipDeviceCtrl.ChipStackError):
-                logger.info('%s - Waiting for DUT to come back online (attempt %s, elapsed %.0fs / %.0fs)...',
-                            step_number_s1, attempt, time.time() - t_reboot_start, reboot_timeout_sec)
-
-        asserts.assert_true(
-            reconnected,
-            f'{step_number_s1}: DUT did not come back online within {reboot_timeout_sec:.0f}s after OTA reboot '
-            '(remaining test budget exhausted).')
-
-        logger.info("%s - Wait some time for the DUT to stabilize after reboot", step_number_s1)
-        await asyncio.sleep(15)
-
-        # Wait DUT go back to kIdle
-        current_update_state = await self.read_single_attribute_check_success(
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-            dev_ctrl=self.controller,
-            node_id=self.requestor_node_id,
-            endpoint=self.get_endpoint(),
-        )
-        # DUT must be in kIdle after reboot
-        logger.info("%s - DUT UpdateStae is : %d", step_number_s1, current_update_state)
-        asserts.assert_equal(current_update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        # Wait DUT go back to kIdle after applying the SoftwareUpdate and reboot.
+        await self._wait_for_idle_after_software_update(self.controller, self.requestor_node_id, step_number_s1)
 
         # DUT is running the expected version.
         await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, self.expected_software_version)

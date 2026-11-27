@@ -555,14 +555,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             resp = await controller.WriteAttribute(
                 attributes=[(0, attr_clear)],
                 nodeId=requestor_node_id,
-                timedRequestTimeoutMs=10000,
+                interactionTimeoutMs=10000
             )
             if resp[0].Status == Status.Success:
                 log.info('Cleanup - DefaultOTAProviders cleared')
             else:
                 log.warning('Cleanup - Failed to clear DefaultOTAProviders ')
-        except InteractionModelError:
-            log.warning("Cleanup - Unable to clear DefaultOTAProviders due to InteractionModelError")
+        except (InteractionModelError, TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+            log.warning("Cleanup - Unable to clear DefaultOTAProviders %s", e)
 
     def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
         """
