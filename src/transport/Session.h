@@ -169,6 +169,7 @@ public:
 
     // There is no delegate, nothing to do here
     virtual void OnSessionHang() {}
+    virtual void OnSessionRecovered() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -205,6 +206,7 @@ public:
     }
 
     void OnSessionHang() override { mDelegate.OnSessionHang(); }
+    void OnSessionRecovered() override { mDelegate.OnSessionRecovered(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -353,6 +355,12 @@ public:
     {
         SessionHandle session(*this); // A holder may evict this session; keep it alive until the walk is done.
         ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionHang(); });
+    }
+
+    void NotifySessionRecovered()
+    {
+        SessionHandle session(*this); // A holder may evict this session; keep it alive until the walk is done.
+        ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionRecovered(); });
     }
 
     // Return a session id that is usable for logging. This is the local session
