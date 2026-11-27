@@ -210,6 +210,26 @@ public:
     ~WriteClient() { assertChipStackLockedByCurrentThread(); }
 
     /**
+     * Tells WriteClient which interaction model revision to assume, as fallback, for the peer, based on what the caller knows
+     * about the peer state (for example, collected when the group was set up).
+     *
+     * The fallback revision is used only when the session passed to the constructor reports none: groupcast,
+     * no session at construction, or a peer that reported none. A revision reported by the session always wins.
+     * The default, std::nullopt, keeps an encoding that every receiver accepts.
+     *
+     * The caller is responsible for the fallback revision being correct. For groupcast, pass the lowest interaction model
+     * revision among the group members. See RequestFlagsOptions for the encoding choices that depend on the revision.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if called after the first attribute was encoded.
+     */
+    CHIP_ERROR SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mRequestSession.SetFallbackPeerInteractionModelRevision(aFallbackRevision);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.
      */
     template <class T>
