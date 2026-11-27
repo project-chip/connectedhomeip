@@ -25,7 +25,7 @@ from matter.tlv import uint
 
 class ChoiceConformanceProblemNotice(ProblemNotice):
     def __init__(self, location: AttributePathLocation, choice: Choice, count: int):
-        problem = f'Problem with choice conformance {choice} - {count} selected'
+        problem = f'Problem with choice conformance {choice}: {count} selected'
         super().__init__(test_name='Choice conformance', location=location, severity=ProblemSeverity.ERROR, problem=problem, spec_location='')
         self.choice = choice
         self.count = count
@@ -64,7 +64,7 @@ def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]
         # do not require implementing a provisional item just because provisional elements are allowed on the test run.
         if not cluster_is_provisional and choice not in non_provisional_choices and count == 0:
             continue
-        if count == 0 or (not choice.more and count > 1):
+        if not choice.is_met(count):
             problems.append(ChoiceConformanceProblemNotice(location, choice, count))
     return problems
 

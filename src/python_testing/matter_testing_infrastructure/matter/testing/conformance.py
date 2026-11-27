@@ -85,12 +85,24 @@ class BasicConformanceException(ConformanceException):
 
 @dataclass(frozen=True)
 class Choice:
+    """Choice conformance O.<marker><count><+|->: exactly `count` elements of the choice set,
+    at least `count` if `more` ("+"), or at most `count` if `less` ("-")."""
     marker: str
     more: bool
+    less: bool = False
+    count: int = 1
 
     def __str__(self):
-        more_str = '+' if self.more else ''
-        return '.' + self.marker + more_str
+        count_str = str(self.count) if self.count != 1 else ''
+        sign_str = '+' if self.more else '-' if self.less else ''
+        return '.' + self.marker + count_str + sign_str
+
+    def is_met(self, selected: int) -> bool:
+        if self.more:
+            return selected >= self.count
+        if self.less:
+            return selected <= self.count
+        return selected == self.count
 
 
 def parse_choice(element: ElementTree.Element) -> Choice | None:
@@ -100,7 +112,11 @@ def parse_choice(element: ElementTree.Element) -> Choice | None:
     if element.tag != OPTIONAL_CONFORM:
         raise ChoiceConformanceException('Choice conformance on non-optional attribute')
     more = element.get('more', 'false') == 'true'
-    return Choice(choice, more)
+    less = 'max' in element.attrib
+    if less and (more or 'min' in element.attrib):
+        raise ChoiceConformanceException('Choice conformance with both a lower and an upper bound is not supported')
+    count = int(element.get('max' if less else 'min', '1'))
+    return Choice(choice, more, less, count)
 
 
 class ConformanceDecision(Enum):

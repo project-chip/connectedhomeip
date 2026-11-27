@@ -457,6 +457,24 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
             asserts.assert_equal(len(problems), expected_problems, "Unexpected number of problems")
             asserts.assert_false(success, "Unexpected success running test that should fail")
 
+    def test_revision_gated_cluster(self):
+        # In the 1.7 spec, Scenes Management is mandatory on a Dimmable Light from device type revision 3, and disallowed below it.
+        self._create_xmls(PrebuiltDataModelDirectory.k1_7)
+        dimmable_light_id = 0x0101
+        self.create_good_device(dimmable_light_id)
+        descriptor = self.endpoints[1][Clusters.Descriptor]
+        asserts.assert_in(Clusters.ScenesManagement.id, descriptor[Clusters.Descriptor.Attributes.ServerList],
+                          "Scenes Management is missing from a current revision Dimmable Light")
+        success, problems = self.check_device_type(fail_on_extra_clusters=True)
+        asserts.assert_true(success, f"Unexpected problems on a current revision Dimmable Light: {problems}")
+
+        descriptor[Clusters.Descriptor.Attributes.DeviceTypeList] = [
+            Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dimmable_light_id, revision=2)]
+        success, problems = self.check_device_type(fail_on_extra_clusters=True)
+        asserts.assert_false(success, "Scenes Management was accepted on a revision 2 Dimmable Light")
+        asserts.assert_equal(len(problems), 1, f"Unexpected number of problems: {problems}")
+        asserts.assert_equal(problems[0].location.cluster_id, Clusters.ScenesManagement.id, "Problem is not on Scenes Management")
+
     def test_spec_files(self):
         one_two, one_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_2)
         one_three, one_three_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
