@@ -314,14 +314,13 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     VerifyOrReturnError(!activeConnection.IsNull(), CHIP_ERROR_NO_MEMORY);
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;
+    outPeerConnState                   = activeConnection;
 
-    mUsedEndPointCount++;
+    auto cleanupOutPeerConnState = ScopeExit([&]() { outPeerConnState.Release(); });
 
     ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
 
-    // Set the return value of the peer connection state to the allocated
-    // connection.
-    outPeerConnState = activeConnection;
+    cleanupOutPeerConnState.release();
 
     return CHIP_NO_ERROR;
 #else
@@ -484,11 +483,11 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     prevState                   = connection.mConnectionState;
     connection.mConnectionState = TCPState::kClosed;
 
+    ActiveTCPConnectionHandle holder(&connection);
     if (suppressCallback == SuppressCallback::No)
     {
         if (prevState == TCPState::kConnecting)
         {
-            ActiveTCPConnectionHandle holder(&connection);
             // Call upper layer connection attempt complete handler
             HandleConnectionAttemptComplete(holder, err);
         }
@@ -500,7 +499,6 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     }
 
     connection.Free();
-    mUsedEndPointCount--;
 }
 
 CHIP_ERROR TCPBase::HandleTCPEndPointDataReceived(const Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer)
@@ -658,7 +656,6 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     // If it fails, we can still use the connection
     RETURN_SAFELY_IGNORED endPoint->EnableNoDelay();
 
-    mUsedEndPointCount++;
     activeConnection->mConnectionState = TCPState::kConnected;
 
     // Set the TCPKeepalive configurations on the received connection
@@ -691,7 +688,7 @@ CHIP_ERROR TCPBase::TCPConnect(const PeerAddress & address, Transport::AppTCPCon
     // Verify that PeerAddress AddressType is TCP
     VerifyOrReturnError(address.GetTransportType() == Transport::Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(mUsedEndPointCount < mActiveConnectionsSize, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(UsedEndPointCount() < mActiveConnectionsSize, CHIP_ERROR_NO_MEMORY);
 
     char addrStr[Transport::PeerAddress::kMaxToStringSize];
     address.ToString(addrStr);
@@ -731,6 +728,22 @@ bool TCPBase::HasActiveConnections() const
     }
 
     return false;
+}
+
+size_t TCPBase::UsedEndPointCount() const
+{
+    size_t count = 0;
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        // Count slots that still hold an endpoint or are mid-teardown in CloseConnectionInternal
+        // (where mEndPoint has been released before callbacks run, and mPeerAddr is cleared by Free()).
+        if (mActiveConnections[i].InUse() || mActiveConnections[i].mPeerAddr.IsInitialized())
+        {
+            count++;
+        }
+    }
+
+    return count;
 }
 
 void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)

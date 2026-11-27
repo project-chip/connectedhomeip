@@ -48,4 +48,12 @@ public interface ServiceResolver {
 
   /** Removes or marks all services being advertised for removal. */
   void removeServices();
+
+  /**
+   * Finalizes updating advertised services.
+   *
+   * <p>Called after {@link #removeServices()} and {@link #publish} calls to apply pending changes,
+   * such as unregistering services still marked for removal.
+   */
+  default void finalizeServiceUpdate() {}
 }

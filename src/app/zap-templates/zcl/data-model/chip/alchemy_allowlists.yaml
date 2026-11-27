@@ -15,7 +15,6 @@
 MANUAL_ALLOWLIST:
     - access-control-definitions.xml
     - ballast-configuration-cluster.xml
-    - channel-cluster.xml
     - chip-ota.xml
     - chip-types.xml
     - clusters-extensions.xml

@@ -101,6 +101,8 @@ The application supports the following device types (specified via the
 -   `flow-sensor`
 -   `flow-sensor-simulated`
 -   `generic-switch`
+-   `heat-pump`
+-   `heat-pump-thermostat-client`
 -   `humidity-conditioner`
 -   `humidity-sensor`
 -   `humidity-sensor-simulated`
@@ -119,6 +121,7 @@ The application supports the following device types (specified via the
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
 -   `on-off-plug-with-sensors`
+-   `on-off-sensor`
 -   `oven`
 -   `oven-2`
 -   `power-source`

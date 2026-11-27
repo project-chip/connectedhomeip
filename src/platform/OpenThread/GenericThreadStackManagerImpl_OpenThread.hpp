@@ -870,16 +870,18 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    MutableByteSpan mac(macBuffer);
-    char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
+    {
+        uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+        MutableByteSpan mac(macBuffer);
+        char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
 
-    err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-    SuccessOrExit(err);
-    err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
-    SuccessOrExit(err);
-    otErr = otMdnsSetLocalHostName(mOTInst, hostname);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+        err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+        SuccessOrExit(err);
+        err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
+        SuccessOrExit(err);
+        otErr = otMdnsSetLocalHostName(mOTInst, hostname);
+        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART

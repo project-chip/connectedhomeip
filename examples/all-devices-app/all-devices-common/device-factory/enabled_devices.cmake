@@ -78,6 +78,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/HeatPump.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/heat-pump/impl/SimulatedHeatPump.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
@@ -109,6 +111,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-sensor/OnOffSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"
@@ -229,6 +232,7 @@ foreach(_key
         fan
         flow-sensor
         generic-switch
+        heat-pump
         humidity-conditioner
         humidity-sensor
         irrigation-system
@@ -244,6 +248,7 @@ foreach(_key
         on-off-light
         on-off-light-switch
         on-off-plug-in-unit
+        on-off-sensor
         oven
         power-source
         pressure-sensor

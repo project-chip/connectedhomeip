@@ -98,6 +98,9 @@ config ALL_DEVICES_DEVICE_FLOW_SENSOR
 config ALL_DEVICES_DEVICE_GENERIC_SWITCH
 	bool "Generic switch"
 
+config ALL_DEVICES_DEVICE_HEAT_PUMP
+	bool "Heat pump"
+
 config ALL_DEVICES_DEVICE_HUMIDITY_CONDITIONER
 	bool "Humidity conditioner"
 
@@ -143,6 +146,9 @@ config ALL_DEVICES_DEVICE_ON_OFF_LIGHT_SWITCH
 
 config ALL_DEVICES_DEVICE_ON_OFF_PLUG_IN_UNIT
 	bool "On/off plug-in unit"
+
+config ALL_DEVICES_DEVICE_ON_OFF_SENSOR
+	bool "On/off sensor"
 
 config ALL_DEVICES_DEVICE_OVEN
 	bool "Oven"

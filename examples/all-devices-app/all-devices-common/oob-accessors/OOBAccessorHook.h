@@ -27,6 +27,7 @@
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
 #include <device/types/doorbell/OOBAccessors.h>
 #include <device/types/electrical-sensor/OOBAccessors.h>
+#include <device/types/heat-pump/impl/OOBAccessors.h>
 #include <device/types/mode-select/OOBAccessors.h>
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
 #include <device/types/mounted-on-off-control/OOBAccessors.h>
@@ -35,6 +36,7 @@
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/impl/OOBAccessors.h>
+#include <device/types/on-off-sensor/OOBAccessors.h>
 #include <device/types/power-source/OOBAccessors.h>
 #include <device/types/proximity-ranger/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>

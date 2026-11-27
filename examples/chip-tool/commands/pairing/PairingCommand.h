@@ -148,6 +148,10 @@ public:
             AddArgument("dcl-hostname", &mDCLHostName,
                         "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
             AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("dcl-disable-https-validation", 0, 1, &mDCLDisableHttpsValidation,
+                        "Disable validation of the certificates of the DCL server and of the Terms and Conditions server. "
+                        "Defaults to false. "
+                        "To trust a private CA instead, set SSL_CERT_FILE.");
             AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             FALLTHROUGH;
         case PairingMode::CodePaseOnly:
@@ -369,6 +373,7 @@ private:
     chip::Optional<uint16_t> mTCAcknowledgementVersion;
     chip::Optional<char *> mDCLHostName;
     chip::Optional<uint16_t> mDCLPort;
+    chip::Optional<bool> mDCLDisableHttpsValidation;
     chip::Optional<bool> mUseDCL;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>

@@ -151,6 +151,10 @@ _available_devices = [
     "GENERIC_SWITCH",
   ],
   [
+    "heat-pump",
+    "HEAT_PUMP",
+  ],
+  [
     "humidity-conditioner",
     "HUMIDITY_CONDITIONER",
   ],
@@ -209,6 +213,10 @@ _available_devices = [
   [
     "on-off-plug-in-unit",
     "ON_OFF_PLUG_IN_UNIT",
+  ],
+  [
+    "on-off-sensor",
+    "ON_OFF_SENSOR",
   ],
   [
     "oven",

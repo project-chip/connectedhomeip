@@ -8,7 +8,6 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
-
     - Inspect
       `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
     - Look at the `DeviceFactory` constructor. Every
@@ -25,7 +24,6 @@ To update or validate this list manually, follow these steps:
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
-
     - Locate the device type definition in the Matter Specification (e.g. under
       `device_library/` in the spec repository, or locally generated markdown
       files).
@@ -49,7 +47,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (60 total)
+## Implemented Device Types (61 total)
 
 | #   | Device Type Name               | ID            | Missing Clusters                                                                                                                                                                                            | Notes                       |
 | --- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -113,7 +111,7 @@ To update or validate this list manually, follow these steps:
 | 58  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                                                                                                             |                             |
 | 59  | Water Valve                    | 66 (0x0042)   |                                                                                                                                                                                                             |                             |
 | 60  | Window Covering                | 514 (0x0202)  |                                                                                                                                                                                                             |                             |
-| 61  | Window Covering                | 515 (0x0203)  |                                                                                                                                                                                                             |                             |
+| 61  | Window Covering Controller     | 515 (0x0203)  |                                                                                                                                                                                                             |                             |
 
 ## Unimplemented Device Types (44 total)
 

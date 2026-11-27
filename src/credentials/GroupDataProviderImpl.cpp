@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <algorithm>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/TLV.h>
@@ -1881,6 +1882,28 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 // Key Sets
 //
 
+namespace {
+
+bool HasOverlappingEncryptionKey(
+    Span<const Crypto::GroupOperationalCredentials> currentKeys,
+    Span<const Crypto::SensitiveDataFixedBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>> previousKeys)
+{
+    for (const auto & current : currentKeys)
+    {
+        for (const auto & previous : previousKeys)
+        {
+            if (Crypto::IsBufferContentEqualConstantTime(current.encryption_key, previous.ConstBytes(),
+                                                         Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+} // namespace
+
 constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
 
 CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id,
@@ -1904,6 +1927,19 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     // Search existing keyset
     bool found = keyset.Find(mStorage, fabric, in_keyset.keyset_id);
 
+    size_t previous_keys_count = 0;
+    Crypto::SensitiveDataFixedBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>
+        previous_encryption_keys[KeySet::kEpochKeysMax];
+    if (found)
+    {
+        previous_keys_count = std::min<size_t>(keyset.keys_count, KeySet::kEpochKeysMax);
+        for (size_t i = 0; i < previous_keys_count; ++i)
+        {
+            memcpy(previous_encryption_keys[i].Bytes(), keyset.operational_keys[i].encryption_key,
+                   Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+        }
+    }
+
     keyset.keyset_id  = in_keyset.keyset_id;
     keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
@@ -1921,7 +1957,13 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     if (found)
     {
         // Update existing keyset info, keep next
-        return keyset.Save(mStorage);
+        ReturnErrorOnFailure(keyset.Save(mStorage));
+        if (!HasOverlappingEncryptionKey(Span(keyset.operational_keys, keyset.keys_count),
+                                         Span(previous_encryption_keys, previous_keys_count)))
+        {
+            KeySetRemoved(fabric_index, in_keyset.keyset_id);
+        }
+        return CHIP_NO_ERROR;
     }
 
     // New keyset
@@ -1969,6 +2011,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(keyset.Find(mStorage, fabric, target_id), CHIP_ERROR_NOT_FOUND);
     ReturnErrorOnFailure(keyset.Delete(mStorage));
+    // Keyset is deleted from storage, so listeners must be notified even if later cleanup fails.
+    // Run on exit rather than inline so linked-list metadata and group mappings update before callbacks.
+    auto notifyKeySetRemoved = ScopeExit([&]() { KeySetRemoved(fabric_index, target_id); });
 
     if (keyset.first)
     {
@@ -2313,6 +2358,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
             TEMPORARY_RETURN_IGNORED mGroupKeyContext.Initialize(creds.encryption_key, mSessionId, creds.privacy_key);
             output.fabric_index    = fabric.fabric_index;
             output.group_id        = mapping.group_id;
+            output.keyset_id       = keyset.keyset_id;
             output.security_policy = keyset.policy;
             output.keyContext      = &mGroupKeyContext;
             return true;
@@ -2326,6 +2372,48 @@ void GroupDataProviderImpl::GroupSessionIteratorImpl::Release()
 {
     mGroupKeyContext.ReleaseKeys();
     mProvider.mGroupSessionsIterator.ReleaseObject(this);
+}
+
+void GroupDataProvider::SetListener(GroupListener * listener)
+{
+    if (listener == nullptr)
+    {
+        return;
+    }
+
+    GroupListener ** freeSlot = nullptr;
+    for (auto & slot : mListeners)
+    {
+        if (slot == listener)
+        {
+            return;
+        }
+        if (slot == nullptr && freeSlot == nullptr)
+        {
+            freeSlot = &slot;
+        }
+    }
+
+    if (freeSlot != nullptr)
+    {
+        *freeSlot = listener;
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "GroupDataProvider: max listeners (%u) reached", static_cast<unsigned>(kMaxListeners));
+    }
+}
+
+void GroupDataProvider::RemoveListener(GroupListener * listener)
+{
+    for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+    {
+        if (listener == mListeners[i])
+        {
+            mListeners[i] = nullptr;
+            return;
+        }
+    }
 }
 
 namespace {
