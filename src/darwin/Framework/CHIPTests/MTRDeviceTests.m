@@ -9974,6 +9974,50 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
 }
 
+- (void)test078b_InvokeWithEmptyExpectedValuesHasNoQueueBound
+{
+    // A command with no token and an empty expected-values array sets no expected values, so, like one with none,
+    // it gets no queue bound: still waiting behind a read past 10 s, it is sent once the session is ready.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    const NSTimeInterval bound = 10;
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _waitForDeviceQueue:device];
+    __block NSError * failure;
+    __block BOOL completed = NO;
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeUnitTestingID)
+                              commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:@[]
+                  expectedValueInterval:@(60000)
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 failure = error;
+                                 completed = YES;
+                             }];
+
+    XCTestExpectation * sessionPending = [[XCTestExpectation alloc] initWithDescription:@"Session still not ready"];
+    sessionPending.inverted = YES;
+    [self waitForExpectations:@[ sessionPending ] timeout:(bound + 2)];
+    [self _waitForDeviceQueue:device];
+    XCTAssertFalse(completed, @"completed with %@ while still queued", failure);
+
+    releaseSession();
+    XCTNSPredicateExpectation * done = [[XCTNSPredicateExpectation alloc]
+        initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary<NSString *, id> * _Nullable bindings) {
+            return completed;
+        }]
+                   object:nil];
+    [self waitForExpectations:@[ done ] timeout:(3 * kTimeoutInSeconds)];
+    XCTAssertNil(failure);
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 1);
+}
+
 - (void)test079_TokenCancelledAfterItIsTiedBeforeEnqueueNeverSends
 {
     // A token cancelled after it is tied to the invoke's work item, but before that item is enqueued, cancels the
