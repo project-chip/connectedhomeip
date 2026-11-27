@@ -3980,8 +3980,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // The expected value interval starts when the request is actually sent, after the session is ready, not
         // here: getting the session can take longer than the interval.  Until then the expected value stays pending
         // and cannot expire.  If a later write was merged into this work item, the request carries that write's
-        // expected value ID and interval.  This work item's own expected value is started too, in case the merged
-        // write did not set one; it is a no-op when the merged write replaced it.
+        // expected value ID and interval, and this work item's own expected value is removed, since its value is
+        // not sent.  If the merged write set no expected value, this work item's own is started instead.
         NSNumber * requestExpectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
         id requestExpectedValueInterval = request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex];
         NSArray<NSArray *> * mergedOutExpectedValues = [request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex] copy];
@@ -4000,10 +4000,18 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 if (!self) {
                     return YES;
                 }
+                BOOL sendsMergedWrite = (requestExpectedValueInterval != [NSNull null] && requestExpectedValueID.unsignedLongLongValue != expectedValueID);
                 if (useValueAsExpectedValue) {
-                    [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                    if (sendsMergedWrite) {
+                        // This work item's own value is not what is sent: a later write replaced it.  Remove its
+                        // expected value rather than start it; it would otherwise be shown for a whole interval
+                        // when it was set after the write that replaced it.
+                        [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+                    } else {
+                        [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                    }
                 }
-                if (requestExpectedValueInterval != [NSNull null] && requestExpectedValueID.unsignedLongLongValue != expectedValueID) {
+                if (sendsMergedWrite) {
                     [self _startExpectedValueIntervalForAttributePaths:@[ path ]
                                                        expectedValueID:requestExpectedValueID.unsignedLongLongValue
                                                  expectedValueInterval:requestExpectedValueInterval];
@@ -4028,8 +4036,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                    if (error) {
                                        MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
                                        if (useValueAsExpectedValue) {
-                                           NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
-                                           [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
+                                           [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
                                        }
                                        // A later write merged into this work item carries its own expected value.
                                        // Remove that too, whether or not this work item set one.

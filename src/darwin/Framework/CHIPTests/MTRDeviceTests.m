@@ -10305,6 +10305,121 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     releaseSession();
 }
 
+// Queues two writes to the test path so the one queued first sets its expected value last: the second sets its
+// own and is held, the first sets its own and is queued, then the second is queued.  The device queue is held until
+// the returned block is called, so they merge only then.  The cache shows the first's value.
+- (void)_queueTwoWritesFirstSetLastOnDevice:(MTRDevice *)device
+                                   delegate:(MTRDeviceTestDelegate *)delegate
+                           queuedFirstValue:(unsigned)queuedFirstValue
+                          queuedSecondValue:(unsigned)queuedSecondValue
+                         releaseDeviceQueue:(dispatch_block_t __autoreleasing *)releaseDeviceQueueOut
+{
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    __block BOOL deviceQueueReleased = NO;
+    dispatch_semaphore_t secondInstalled = dispatch_semaphore_create(0);
+    dispatch_semaphore_t releaseSecond = dispatch_semaphore_create(0);
+    __block BOOL secondReleased = NO;
+    [self addTeardownBlock:^{
+        if (!deviceQueueReleased) {
+            dispatch_semaphore_signal(deviceQueueBlocker);
+        }
+        if (!secondReleased) {
+            dispatch_semaphore_signal(releaseSecond);
+        }
+    }];
+    MTRAsyncWorkItem * holdItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [holdItem setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+        workCompletion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:holdItem description:@"Blocking work item"];
+
+    __auto_type writeValue = ^(unsigned value) {
+        [device writeAttributeWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                       value:[self _expectedValueTestDataValue:value]
+                       expectedValueInterval:@(60000)
+                           timedWriteTimeout:nil];
+    };
+    __block NSUInteger installs = 0;
+    delegate.onWriteDidInstallExpectedValue = ^(MTRAttributePath * attributePath) {
+        NSUInteger install;
+        @synchronized(self) {
+            install = ++installs;
+        }
+        if (install == 1) {
+            dispatch_semaphore_signal(secondInstalled);
+            dispatch_semaphore_wait(releaseSecond, DISPATCH_TIME_FOREVER);
+        }
+    };
+    dispatch_semaphore_t secondQueued = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        writeValue(queuedSecondValue);
+        dispatch_semaphore_signal(secondQueued);
+    });
+    XCTAssertEqual(dispatch_semaphore_wait(secondInstalled, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+    writeValue(queuedFirstValue);
+    secondReleased = YES;
+    dispatch_semaphore_signal(releaseSecond);
+    XCTAssertEqual(dispatch_semaphore_wait(secondQueued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+    delegate.onWriteDidInstallExpectedValue = nil;
+    // The hold and the two writes, the one set last shown.
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, 3u);
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(queuedFirstValue));
+
+    *releaseDeviceQueueOut = [^{
+        deviceQueueReleased = YES;
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    } copy];
+}
+
+- (void)test082b_MergedWriteDoesNotShowTheReplacedWritesValue
+{
+    // Two writes to one path, where the one queued first set its expected value last: it absorbs the second and
+    // sends the second's value.  Once sent, its own replaced value is not shown.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const unsigned queuedFirstValue = 5;
+
+    dispatch_block_t releaseDeviceQueue;
+    [self _queueTwoWritesFirstSetLastOnDevice:device delegate:delegate queuedFirstValue:queuedFirstValue queuedSecondValue:6 releaseDeviceQueue:&releaseDeviceQueue];
+    releaseDeviceQueue();
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:kTimeoutInSeconds * 3];
+
+    // The second write's expected value was already replaced when the first set its own, so once the first's is
+    // removed the cached value shows.  The replaced value must not.
+    XCTAssertNotEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(queuedFirstValue),
+        @"the replaced write's value is still shown after the merged write was sent");
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue));
+}
+
+- (void)test082c_MergedWriteFailingBeforeItSendsRemovesItsOwnValue
+{
+    // As test082b, but the merged write fails before it is sent (the controller is suspended, so its session
+    // fails): its own expected value is removed then, not left until the queue bound.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const unsigned queuedFirstValue = 5;
+
+    dispatch_block_t releaseDeviceQueue;
+    [self _queueTwoWritesFirstSetLastOnDevice:device delegate:delegate queuedFirstValue:queuedFirstValue queuedSecondValue:6 releaseDeviceQueue:&releaseDeviceQueue];
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+    releaseDeviceQueue();
+    [self _waitForEmptyWorkQueueOfDevice:device timeout:kTimeoutInSeconds * 3];
+
+    // Well before the 10 s queue bound.
+    XCTAssertNotEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(queuedFirstValue),
+        @"the failed write's own expected value is still shown");
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue));
+}
+
 - (void)test083_MergedWriteLosesEveryExpectedValueAtQueueBound
 {
     // A write waiting for its session absorbs a later write to the same path.  At the default bound (10 s) neither
