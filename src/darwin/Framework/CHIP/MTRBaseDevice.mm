@@ -1289,9 +1289,26 @@ private:
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
+    [self _writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value timedWriteTimeout:timeoutMs requestWillBeSent:nil queue:queue completion:completion];
+}
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
+{
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            // The session is ready and the write request goes out from here.
+            if (requestWillBeSent) {
+                requestWillBeSent();
+            }
+
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
             // failure callback, for a non-group session.
             auto onSuccessCb = [successCb, bridge](const app::ConcreteAttributePath & attribPath) {
@@ -1679,6 +1696,29 @@ private:
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeoutMs
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                               logCall:logCall
+                     requestWillBeSent:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     commandID = (commandID == nil) ? nil : [commandID copy];
@@ -1761,6 +1801,10 @@ private:
                 // int when converted to ms.
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
                 invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
+            }
+            // The session is ready and the invoke request goes out now.
+            if (requestWillBeSent) {
+                requestWillBeSent();
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
