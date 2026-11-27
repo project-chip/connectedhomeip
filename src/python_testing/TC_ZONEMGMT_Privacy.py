@@ -58,7 +58,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 from mobly import asserts
-from TC_TLS_Utils import TLSUtils
+from support_modules.tls_utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

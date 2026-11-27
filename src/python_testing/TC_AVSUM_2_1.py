@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from TC_AVSUMTestBase import AVSUMTestBase
+from support_modules.avsum_testbase import AVSUMTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

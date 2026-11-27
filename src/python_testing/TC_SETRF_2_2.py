@@ -43,7 +43,7 @@
 
 
 from mobly import asserts
-from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
+from support_modules.setrf_testbase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

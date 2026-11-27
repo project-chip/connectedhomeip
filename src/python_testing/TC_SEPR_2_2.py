@@ -44,7 +44,7 @@
 
 
 from mobly import asserts
-from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+from support_modules.sepr_testbase import CommodityPriceTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

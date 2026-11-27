@@ -25,8 +25,8 @@ import socket
 import subprocess
 import time
 
-import test_plan_support
 from mobly import asserts
+from support_modules import test_plan_support
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters

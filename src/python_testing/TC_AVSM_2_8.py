@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase, wmark_osd_matcher
+from support_modules.avsm_testbase import AVSMTestBase, wmark_osd_matcher
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status

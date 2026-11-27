@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from TC_WEBRTC_Utils import WebRTCTestHelper
+from support_modules.webrtc_utils import WebRTCTestHelper
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider

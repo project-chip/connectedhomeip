@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# See TC_DA_PQC_common.py for the required arguments and fixture generation.
+# See support_modules/da_pqc_common.py for the required arguments and fixture generation.
 #
 # dut_supports_pqc_profiles selects the matrix column: when true, the PQC rows must show
 # segmented chain retrieval in the TH app log; when false (the SDK-CI default: standard
@@ -25,7 +25,7 @@
 # with a controller built with chip_crypto="openssl" against OpenSSL 3.5+.
 
 from mobly import asserts
-from TC_DA_PQC_common import PQCDACommissionerTestBase
+from support_modules.da_pqc_common import PQCDACommissionerTestBase
 
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.runner import default_matter_test_main
