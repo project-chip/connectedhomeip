@@ -39,14 +39,20 @@
     return self;
 }
 
+// Holds the delegate weakly across the dispatch: a delegate that is released
+// before the block runs is not kept alive just to receive it.
 - (BOOL)callDelegateWithBlock:(void (^)(id))block
 {
     id strongDelegate = _delegate;
     if (strongDelegate == nil) {
         return NO;
     }
+    __weak id weakDelegate = strongDelegate;
     dispatch_async(_queue, ^{
-        block(strongDelegate);
+        id delegate = weakDelegate;
+        if (delegate != nil) {
+            block(delegate);
+        }
     });
 
     return YES;
