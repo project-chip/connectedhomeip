@@ -32,6 +32,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
@@ -501,12 +502,12 @@ constexpr NodeId kOracleNodeBase    = 0x0000000200000000ull;
 // A committed counter must still read as a replay after unrelated inserts shuffle its entry.
 void PeerCounterSurvivesLruChurn(uint8_t victimSel, uint8_t churn, uint32_t counterValue)
 {
-    Transport::GroupPeerTable table;
+    auto table = std::make_unique<Transport::GroupPeerTable>();
 
     const NodeId victim = kOracleNodeBase + victimSel;
 
     Transport::PeerMessageCounter * counter = nullptr;
-    ASSERT_EQ(table.FindOrAddPeer(kOracleFabric, victim, false, counter), CHIP_NO_ERROR);
+    ASSERT_EQ(table->FindOrAddPeer(kOracleFabric, kTestKeysetId, victim, false, counter), CHIP_NO_ERROR);
     ASSERT_NE(counter, nullptr);
     ASSERT_EQ(counter->VerifyOrTrustFirstGroup(counterValue), CHIP_NO_ERROR);
     counter->CommitGroup(counterValue);
@@ -518,11 +519,11 @@ void PeerCounterSurvivesLruChurn(uint8_t victimSel, uint8_t churn, uint32_t coun
     {
         const NodeId other                      = kOracleNodeBase + static_cast<NodeId>(victimSel) + 1 + i;
         Transport::PeerMessageCounter * ignored = nullptr;
-        ASSERT_EQ(table.FindOrAddPeer(kOracleFabric, other, false, ignored), CHIP_NO_ERROR);
+        ASSERT_EQ(table->FindOrAddPeer(kOracleFabric, kTestKeysetId, other, false, ignored), CHIP_NO_ERROR);
     }
 
     Transport::PeerMessageCounter * again = nullptr;
-    ASSERT_EQ(table.FindOrAddPeer(kOracleFabric, victim, false, again), CHIP_NO_ERROR);
+    ASSERT_EQ(table->FindOrAddPeer(kOracleFabric, kTestKeysetId, victim, false, again), CHIP_NO_ERROR);
     ASSERT_NE(again, nullptr);
     EXPECT_EQ(again->VerifyOrTrustFirstGroup(counterValue), CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
 }
@@ -538,12 +539,12 @@ void PeerCounterCrowdedOutPeerKeepsNoForeignState(uint8_t victimSel, uint32_t vi
     // can only come from another peer's state.
     const uint32_t otherCounter = victimCounter + 0x10000u;
 
-    Transport::GroupPeerTable table;
+    auto table = std::make_unique<Transport::GroupPeerTable>();
 
     const NodeId victim = kOracleNodeBase + victimSel;
 
     Transport::PeerMessageCounter * counter = nullptr;
-    ASSERT_EQ(table.FindOrAddPeer(kOracleFabric, victim, false, counter), CHIP_NO_ERROR);
+    ASSERT_EQ(table->FindOrAddPeer(kOracleFabric, kTestKeysetId, victim, false, counter), CHIP_NO_ERROR);
     ASSERT_NE(counter, nullptr);
     ASSERT_EQ(counter->VerifyOrTrustFirstGroup(victimCounter), CHIP_NO_ERROR);
     counter->CommitGroup(victimCounter);
@@ -553,7 +554,7 @@ void PeerCounterCrowdedOutPeerKeepsNoForeignState(uint8_t victimSel, uint32_t vi
     {
         const NodeId other                        = kOracleNodeBase + static_cast<NodeId>(victimSel) + 1 + i;
         Transport::PeerMessageCounter * otherPeer = nullptr;
-        if (table.FindOrAddPeer(kOracleFabric, other, false, otherPeer) != CHIP_NO_ERROR)
+        if (table->FindOrAddPeer(kOracleFabric, kTestKeysetId, other, false, otherPeer) != CHIP_NO_ERROR)
         {
             break;
         }
@@ -565,7 +566,7 @@ void PeerCounterCrowdedOutPeerKeepsNoForeignState(uint8_t victimSel, uint32_t vi
     }
 
     Transport::PeerMessageCounter * again = nullptr;
-    const CHIP_ERROR err                  = table.FindOrAddPeer(kOracleFabric, victim, false, again);
+    const CHIP_ERROR err                  = table->FindOrAddPeer(kOracleFabric, kTestKeysetId, victim, false, again);
     if (err != CHIP_NO_ERROR)
     {
         return; // Refused rather than re-admitted; nothing was handed out to check.
