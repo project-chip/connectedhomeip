@@ -46,6 +46,9 @@ void ThreadFeature::UnregisterFeatureClusters(CodeDrivenDataModelProvider & prov
 {
     if (mNetworkCommissioningCluster.IsConstructed())
     {
+        // Init() registered an event handler with PlatformManager and started the driver; the
+        // destructor undoes neither.
+        mNetworkCommissioningCluster.Cluster().Deinit();
         LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
         mNetworkCommissioningCluster.Destroy();
     }

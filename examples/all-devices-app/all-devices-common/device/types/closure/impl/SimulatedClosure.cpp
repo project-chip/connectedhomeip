@@ -59,6 +59,13 @@ SimulatedClosure::~SimulatedClosure()
     CancelTimer();
 }
 
+void SimulatedClosure::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    // A pending timer would touch clusters that Unregister() destroys.
+    CancelTimer();
+    Closure::Unregister(provider);
+}
+
 Protocols::InteractionModel::Status SimulatedClosure::HandleStopCommand()
 {
     ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleStopCommand()");

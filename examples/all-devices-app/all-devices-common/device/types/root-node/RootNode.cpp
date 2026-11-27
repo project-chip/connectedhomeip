@@ -34,8 +34,13 @@ namespace app {
 
 CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterRootClusters(endpointId, provider, composition));
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
@@ -147,6 +152,8 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
 void RootNode::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+
+    UnregisterExtraClusters(provider);
 
     // De-init in reverse order as init, in case there were data dependencies.
     if (mOperationalCredentialsCluster.IsConstructed())

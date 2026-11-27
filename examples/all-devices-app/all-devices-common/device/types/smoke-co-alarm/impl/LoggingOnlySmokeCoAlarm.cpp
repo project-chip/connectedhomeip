@@ -46,6 +46,13 @@ LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
     mTimerDelegate.CancelTimer(this);
 }
 
+void LoggingOnlySmokeCoAlarm::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    // A pending self-test timer would touch clusters that Unregister() destroys.
+    mTimerDelegate.CancelTimer(this);
+    SmokeCoAlarm::Unregister(provider);
+}
+
 void LoggingOnlySmokeCoAlarm::OnSelfTestRequested()
 {
     ChipLogDetail(NotSpecified, "SmokeCoAlarm: self-test started");

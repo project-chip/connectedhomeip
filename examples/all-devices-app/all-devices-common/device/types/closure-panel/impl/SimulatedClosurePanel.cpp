@@ -31,6 +31,12 @@ SimulatedClosurePanel::~SimulatedClosurePanel()
     mTimerDelegate.CancelTimer(this);
 }
 
+void SimulatedClosurePanel::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    mTimerDelegate.CancelTimer(this);
+    ClosurePanel::Unregister(provider);
+}
+
 Protocols::InteractionModel::Status SimulatedClosurePanel::HandleSetTarget(const Optional<Percent100ths> & position,
                                                                            const Optional<bool> & latch,
                                                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
