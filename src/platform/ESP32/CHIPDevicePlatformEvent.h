@@ -33,6 +33,13 @@
 #include <esp_wifi_types.h>
 
 namespace chip {
+
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+namespace System {
+class PacketBuffer;
+} // namespace System
+#endif
+
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -70,10 +77,16 @@ struct ChipDevicePlatformEvent final
 {
     struct BleLink
     {
-#ifdef CONFIG_BT_BLUEDROID_ENABLED
-        uint8_t PeerAddress[6];
-#else
         uint16_t Connection;
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+        enum class GattRole : uint8_t
+        {
+            kClient,
+            kServer,
+        };
+
+        GattRole Role;
+        uint8_t PeerAddress[6];
 #endif
     };
 

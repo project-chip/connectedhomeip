@@ -70,10 +70,16 @@ namespace Internal {
 namespace {
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-void PostBleLinkEvent(uint16_t type, const esp_bd_addr_t & peerAddress)
+using GattRole = ChipDevicePlatformEvent::BleLink::GattRole;
+
+void PostBleLinkEvent(uint16_t type, GattRole role, uint16_t connection, const uint8_t * peerAddress = nullptr)
 {
     ChipDeviceEvent event{ .Type = type };
-    memcpy(event.Platform.BLELink.PeerAddress, peerAddress, sizeof(peerAddress));
+    event.Platform.BLELink = { .Connection = connection, .Role = role, .PeerAddress = {} };
+    if (peerAddress != nullptr)
+    {
+        memcpy(event.Platform.BLELink.PeerAddress, peerAddress, sizeof(event.Platform.BLELink.PeerAddress));
+    }
     PlatformMgr().PostEventOrDie(&event);
 }
 #endif
@@ -477,7 +483,8 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
         break;
     case ESP_GATTC_CONNECT_EVT:
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, p_data->connect.remote_bda);
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, GattRole::kClient, p_data->connect.conn_id,
+                         p_data->connect.remote_bda);
 #endif
         err = sInstance.HandleGAPConnect(*p_data);
         SuccessOrExit(err);
@@ -698,7 +705,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
         break;
     case ESP_GATTC_DISCONNECT_EVT:
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, p_data->disconnect.remote_bda);
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, GattRole::kClient, p_data->disconnect.conn_id);
 #endif
         connect    = false;
         get_server = false;
@@ -1484,10 +1491,11 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
         ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", param->connect.conn_id);
 
         // Allocate a connection state record for the new connection.
-        GetConnectionState(param->mtu.conn_id, true);
+        GetConnectionState(param->connect.conn_id, true);
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, param->connect.remote_bda);
+        PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkConnected, GattRole::kServer, param->connect.conn_id,
+                         param->connect.remote_bda);
 #endif
 
         // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
@@ -1729,7 +1737,7 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
                     param->disconnect.reason);
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, param->disconnect.remote_bda);
+    PostBleLinkEvent(DeviceEventType::kPlatformESP32BLELinkDisconnected, GattRole::kServer, param->disconnect.conn_id);
 #endif
 
     // If this was a CHIPoBLE connection, release the associated connection state record

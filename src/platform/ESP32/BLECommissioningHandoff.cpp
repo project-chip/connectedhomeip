@@ -59,31 +59,51 @@ bool BLEManagerImpl::HandleBleHandoffEvent(const ChipDeviceEvent & event)
     {
     case DeviceEventType::kPlatformESP32BLELinkConnected:
     case DeviceEventType::kPlatformESP32BLELinkDisconnected: {
-        const auto & link = event.Platform.BLELink;
-        auto existing     = std::find_if(mBleLinks.begin(), mBleLinks.end(), [&link](const auto & candidate) {
+        const auto & link    = event.Platform.BLELink;
+        const bool connected = event.Type == DeviceEventType::kPlatformESP32BLELinkConnected;
+        auto existing        = std::find_if(mBleLinks.begin(), mBleLinks.end(), [&](auto & candidate) {
             if (!candidate.has_value())
             {
                 return false;
             }
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
             // Both Bluedroid GATT roles can report the same physical link.
-            return std::memcmp(candidate->PeerAddress, link.PeerAddress, sizeof(link.PeerAddress)) == 0;
+            if (connected)
+            {
+                return std::memcmp(candidate->PeerAddress, link.PeerAddress, sizeof(link.PeerAddress)) == 0;
+            }
+            return candidate->ConnectionFor(link.Role) == link.Connection;
 #else
             return candidate->Connection == link.Connection;
 #endif
         });
-        if (event.Type == DeviceEventType::kPlatformESP32BLELinkConnected)
+        if (connected)
         {
             if (existing == mBleLinks.end())
             {
-                const auto free = std::find(mBleLinks.begin(), mBleLinks.end(), std::nullopt);
-                VerifyOrDieWithMsg(free != mBleLinks.end(), DeviceLayer, "No slot for physical BLE link");
-                *free = link;
+                existing = std::find(mBleLinks.begin(), mBleLinks.end(), std::nullopt);
+                VerifyOrDieWithMsg(existing != mBleLinks.end(), DeviceLayer, "No slot for physical BLE link");
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+                std::memcpy(existing->emplace().PeerAddress, link.PeerAddress, sizeof(link.PeerAddress));
+#else
+                *existing = link;
+#endif
             }
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+            (*existing)->ConnectionFor(link.Role) = link.Connection;
+#endif
         }
         else if (existing != mBleLinks.end())
         {
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+            (*existing)->ConnectionFor(link.Role).reset();
+            if (!(*existing)->ClientConnection.has_value() && !(*existing)->ServerConnection.has_value())
+            {
+                existing->reset();
+            }
+#else
             existing->reset();
+#endif
         }
         ScheduleNetworkHandoff();
         return true;

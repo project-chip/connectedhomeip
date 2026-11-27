@@ -306,11 +306,22 @@ private:
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
     static constexpr size_t kMaxBleLinks = CONFIG_BT_ACL_CONNECTIONS;
+    struct BleLink
+    {
+        esp_bd_addr_t PeerAddress;
+        std::optional<uint16_t> ClientConnection;
+        std::optional<uint16_t> ServerConnection;
+
+        std::optional<uint16_t> & ConnectionFor(ChipDevicePlatformEvent::BleLink::GattRole role)
+        {
+            return role == ChipDevicePlatformEvent::BleLink::GattRole::kClient ? ClientConnection : ServerConnection;
+        }
+    };
 #else
     static constexpr size_t kMaxBleLinks = CONFIG_BT_NIMBLE_MAX_CONNECTIONS;
+    using BleLink                        = ChipDevicePlatformEvent::BleLink;
 #endif
 
-    using BleLink = ChipDevicePlatformEvent::BleLink;
     enum class NetworkHandoffState : uint8_t{
         kIdle,
         kStartingNetwork,
