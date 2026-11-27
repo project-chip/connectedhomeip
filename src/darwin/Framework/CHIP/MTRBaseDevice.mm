@@ -265,6 +265,7 @@ static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable c
 #ifdef DEBUG
 static std::atomic<uint64_t> sBatchInvokeRequestMessageCount { 0 };
 static std::atomic<uint64_t> sSingleInvokeSendCount { 0 };
+static std::atomic<uint64_t> sReadSendCount { 0 };
 static std::atomic<uint16_t> sMaxPathsPerInvokeOverride { 0 };
 #endif
 
@@ -1269,6 +1270,9 @@ private:
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
+#ifdef DEBUG
+            sReadSendCount.fetch_add(1, std::memory_order_relaxed);
+#endif
 
             //
             // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
@@ -2718,6 +2722,16 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 + (NSUInteger)unitTestSingleInvokeSendCount
 {
     return static_cast<NSUInteger>(sSingleInvokeSendCount.load(std::memory_order_relaxed));
+}
+
++ (void)unitTestResetReadSendCount
+{
+    sReadSendCount.store(0, std::memory_order_relaxed);
+}
+
++ (NSUInteger)unitTestReadSendCount
+{
+    return static_cast<NSUInteger>(sReadSendCount.load(std::memory_order_relaxed));
 }
 
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke

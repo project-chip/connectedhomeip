@@ -9832,7 +9832,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
                                   queue:dispatch_get_main_queue()
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                  @synchronized(events) {
-                                     [events addObject:@"invoke"];
+                                     [events addObject:error ? [NSString stringWithFormat:@"invoke failed: %@", error] : @"invoke"];
                                  }
                              }];
     [self _waitForDeviceQueue:device];
@@ -9845,6 +9845,9 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
     XCTAssertLessThan([firstEventTime timeIntervalSinceDate:releaseTime], 1.5, @"the read did not wait for the command's 2 s response");
     [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+    @synchronized(events) {
+        XCTAssertEqualObjects(events, (@[ @"read", @"invoke" ]), @"the command did not complete successfully after the read");
+    }
 }
 
 - (void)test075_ReadThroughThatSentFinishesBeforeLaterUserInvoke
@@ -9914,6 +9917,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
     NSMutableArray<NSString *> * events = [NSMutableArray array];
     [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+    [MTRBaseDevice unitTestResetReadSendCount];
 
     dispatch_semaphore_t hold1Reached = dispatch_semaphore_create(0);
     dispatch_block_t releaseHold1 = [self _holdMatterQueueSignalling:hold1Reached];
@@ -9929,6 +9933,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     // Precondition: the read has sent and is in flight, not completed.
     XCTAssertEqual(dispatch_semaphore_wait(hold2Reached, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeoutInSeconds * NSEC_PER_SEC))), 0,
         @"the read's session and send block ran ahead of hold2");
+    XCTAssertEqual([MTRBaseDevice unitTestReadSendCount], 1u, @"the read was not sent: without a session, its block can start CASE and return");
     XCTAssertEqual(device.asyncWorkQueue.itemCount, 1u, @"the read is still in the work queue");
     @synchronized(events) {
         XCTAssertEqual(events.count, 0u, @"the read has not completed");

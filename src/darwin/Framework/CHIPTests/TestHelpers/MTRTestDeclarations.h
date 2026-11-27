@@ -113,6 +113,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 // Counts single invoke requests actually sent from MTRBaseDevice's invoke path.
 + (void)unitTestResetSingleInvokeSendCount;
 + (NSUInteger)unitTestSingleInvokeSendCount;
++ (void)unitTestResetReadSendCount;
++ (NSUInteger)unitTestReadSendCount;
 
 // Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
