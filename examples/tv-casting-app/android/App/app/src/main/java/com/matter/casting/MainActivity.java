@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity
         ActionSelectorFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
+  // Optional launch extras that let tests on slow emulators lengthen DNS-SD timeouts.
+  private static final String EXTRA_BROWSE_SERVICE_TIMEOUT_MS = "browseServiceTimeoutMs";
+  private static final String EXTRA_RESOLVE_SERVICE_TIMEOUT_MS = "resolveServiceTimeoutMs";
 
   private TvCastingApp tvCastingApp;
 
@@ -37,9 +40,29 @@ public class MainActivity extends AppCompatActivity
     setContentView(R.layout.activity_main);
 
     Log.i(TAG, "ChipCastingSimplified = " + GlobalCastingConstants.ChipCastingSimplified);
+    long browseServiceTimeoutMs =
+        getIntent()
+            .getLongExtra(
+                EXTRA_BROWSE_SERVICE_TIMEOUT_MS,
+                com.matter.casting.support.AppParameters.DEFAULT_BROWSE_SERVICE_TIMEOUT_MS);
+    if (browseServiceTimeoutMs <= 0) {
+      browseServiceTimeoutMs =
+          com.matter.casting.support.AppParameters.DEFAULT_BROWSE_SERVICE_TIMEOUT_MS;
+    }
+    long resolveServiceTimeoutMs =
+        getIntent()
+            .getLongExtra(
+                EXTRA_RESOLVE_SERVICE_TIMEOUT_MS,
+                com.matter.casting.support.AppParameters.DEFAULT_RESOLVE_SERVICE_TIMEOUT_MS);
+    if (resolveServiceTimeoutMs <= 0) {
+      resolveServiceTimeoutMs =
+          com.matter.casting.support.AppParameters.DEFAULT_RESOLVE_SERVICE_TIMEOUT_MS;
+    }
     boolean ret =
         GlobalCastingConstants.ChipCastingSimplified
-            ? InitializationExample.initAndStart(this.getApplicationContext()).hasNoError()
+            ? InitializationExample.initAndStart(
+                    this.getApplicationContext(), browseServiceTimeoutMs, resolveServiceTimeoutMs)
+                .hasNoError()
             : initJni();
     if (!ret) {
       Log.e(TAG, "Failed to initialize Matter TV casting library");

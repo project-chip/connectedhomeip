@@ -178,7 +178,7 @@ class CHIPVirtualHome:
                 return CHIPVirtualHome._read_response_chunk_fallback(raw)
         return CHIPVirtualHome._read_response_chunk_fallback(raw)
 
-    def query_api(self, end_point, args=[], binary=False, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
+    def query_api(self, end_point, args=[], binary=False, timeout=REQUEST_TIMEOUT_SEC, deadline=None, params=None):
         url = self._build_request_url(end_point, args)
         now = time.monotonic()
         effective_deadline = now + timeout
@@ -190,7 +190,7 @@ class CHIPVirtualHome:
 
         chunks = []
         try:
-            with requests.get(url, timeout=remaining, stream=True) as ret:
+            with requests.get(url, params=params, timeout=remaining, stream=True) as ret:
                 while True:
                     left = effective_deadline - time.monotonic()
                     if left <= 0:

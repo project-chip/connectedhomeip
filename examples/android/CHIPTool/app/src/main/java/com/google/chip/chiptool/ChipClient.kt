@@ -139,7 +139,8 @@ object ChipClient {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
     } else {
-      ensureDnssdStarted(chipDeviceController)
+      chipDeviceController.startDnssd()
+      dnssdStarted = true
     }
   }
 

@@ -72,11 +72,11 @@ public:
     Status InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload, bool & commandHandled,
                          Json::Value & value);
 
-    GetSetupPINResponseType FormatGetSetupPINResponse(Json::Value value, Status & status);
-    LaunchResponseType FormatContentLauncherResponse(Json::Value value, Status & status);
-    NavigateTargetResponseType FormatNavigateTargetResponse(Json::Value value, Status & status);
-    PlaybackResponseType FormatMediaPlaybackResponse(Json::Value value, Status & status);
-    Status FormatStatusResponse(Json::Value value);
+    GetSetupPINResponseType FormatGetSetupPINResponse(const Json::Value & value, Status & status);
+    LaunchResponseType FormatContentLauncherResponse(const Json::Value & value, Status & status);
+    NavigateTargetResponseType FormatNavigateTargetResponse(const Json::Value & value, Status & status);
+    PlaybackResponseType FormatMediaPlaybackResponse(const Json::Value & value, Status & status);
+    Status FormatStatusResponse(const Json::Value & value);
 
 private:
     void InitializeJNIObjects(jobject manager)

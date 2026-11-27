@@ -38,6 +38,9 @@ CHIP_TV_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/tv-app/chip-tv-app
 CHIP_TV_CASTING_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/tv-casting-app/chip-tv-casting-app"))
 LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/lit_icd/lit-icd-app"))
 
+# Built by scripts/build/build_examples.py --target android-x64-chip-tool.
+CHIP_TOOL_APK_PATH = CHIP_REPO_PATH / "out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk"
+
 MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/controller/python/matter-controller-wheels"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
 MATTER_CONTROLLER_INSTALL_WHEELS = (

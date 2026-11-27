@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,16 @@ public class ContentAppFragment extends Fragment {
   }
 
   @Override
+  public void onPause() {
+    Context context = getContext();
+    if (context != null && broadcastReceiver != null) {
+      context.unregisterReceiver(broadcastReceiver);
+      broadcastReceiver = null;
+    }
+    super.onPause();
+  }
+
+  @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     // Inflate the layout for this fragment
@@ -105,16 +116,20 @@ public class ContentAppFragment extends Fragment {
   }
 
   private void registerReceiver(ArrayAdapter adapter) {
+    Context regContext = getContext();
+    if (regContext == null) {
+      return;
+    }
+    if (broadcastReceiver != null) {
+      regContext.unregisterReceiver(broadcastReceiver);
+    }
     broadcastReceiver =
         new BroadcastReceiver() {
           @Override
           public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            String packageName =
-                intent.getStringExtra(
-                    ContentAppDiscoveryService.DISCOVERY_APPAGENT_EXTRA_PACKAGENAME);
-            if (action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD)
-                || action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE)) {
+            if (ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD.equals(action)
+                || ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE.equals(action)) {
               adapter.clear();
               adapter.addAll(
                   ContentAppDiscoveryService.getReceiverInstance()
@@ -124,14 +139,14 @@ public class ContentAppFragment extends Fragment {
             }
           }
         };
-    getContext()
-        .registerReceiver(
-            broadcastReceiver,
-            new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD));
-    getContext()
-        .registerReceiver(
-            broadcastReceiver,
-            new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE));
+    IntentFilter filter =
+        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD);
+    filter.addAction(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      regContext.registerReceiver(broadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+    } else {
+      regContext.registerReceiver(broadcastReceiver, filter);
+    }
   }
 
   public class ViewHolder {

@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
@@ -37,7 +38,8 @@ public class MatterServantService extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     createNotificationChannel();
     Intent notificationIntent = new Intent(this, MainActivity.class);
-    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    PendingIntent pendingIntent =
+        PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
     Notification notification =
         new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MatterServant Service")
@@ -45,7 +47,11 @@ public class MatterServantService extends Service {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .build();
-    startForeground(1, notification);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+    } else {
+      startForeground(1, notification);
+    }
     return super.onStartCommand(intent, flags, startId);
   }
 

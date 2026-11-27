@@ -1,11 +1,20 @@
 name: Maximize runner disk
 description: Free up disk space on the github runner
+inputs:
+  prune-android:
+    description: >-
+      Delete the preinstalled Android SDK/NDK (/usr/local/lib/android). Set to
+      'false' for jobs that use the runner's ANDROID_HOME directly.
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
     - name: Free up disk space on the github runner
       if: runner.os == 'Linux' && !env.ACT
       shell: bash
+      env:
+        PRUNE_ANDROID: ${{ inputs.prune-android }}
       run: |
         # maximize-runner-disk
         # Directories to prune to free up space. Candidates:
@@ -18,9 +27,13 @@ runs:
         # We prune:
         #   - /usr/share/dotnet: Not used by any workflow in this repository.
         #   - /usr/local/lib/android: Android builds run in docker containers containing their own SDK.
+        #     Skipped when prune-android is 'false' (e.g. the Cirque Android emulator tests).
         #   - /opt/ghc: Haskell (GHC) is not used.
         #   - /usr/share/swift: Swift compiles only run on macOS runners.
-        prune=(/usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift)
+        prune=(/usr/share/dotnet /opt/ghc /usr/share/swift)
+        if [[ "$PRUNE_ANDROID" != "false" ]]; then
+          prune+=(/usr/local/lib/android)
+        fi
 
         if [[ "$UID" -eq 0 && -d /__w ]]; then
           root=/runner-root-volume

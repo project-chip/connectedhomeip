@@ -18,6 +18,7 @@
 package com.google.chip.chiptool
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
@@ -30,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.chip.chiptool.devicemanagement.CenterConnectionManager
+import com.google.chip.chiptool.devicemanagement.CommissionedNodeRegistry
 import com.google.chip.chiptool.devicemanagement.DeviceCenterFragment
 import com.google.chip.chiptool.devicemanagement.PostCommissioningDialogHelper
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
@@ -57,27 +59,32 @@ class CHIPToolActivity :
 
   private var networkType: ProvisionNetworkType? = null
   private var deviceInfo: CHIPDeviceInfo? = null
+  private var isAutomatedCommissioningIntent: Boolean = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
 
     if (savedInstanceState == null) {
-      val fragment =
-        if (intent?.getBooleanExtra("open_scan", false) == true) {
-          BarcodeFragment.newInstance()
-        } else {
-          SelectActionFragment.newInstance()
-        }
-      supportFragmentManager
-        .beginTransaction()
-        .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
-        .commit()
+      if (!handleAutomatedCommissioningIntent(intent)) {
+        val fragment =
+          if (intent?.getBooleanExtra("open_scan", false) == true) {
+            BarcodeFragment.newInstance()
+          } else {
+            SelectActionFragment.newInstance()
+          }
+        supportFragmentManager
+          .beginTransaction()
+          .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
+          .commit()
+      }
     } else {
       networkType =
         ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
       @Suppress("DEPRECATION")
       deviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO)
+      isAutomatedCommissioningIntent =
+        savedInstanceState.getBoolean(ARG_IS_AUTOMATED_COMMISSIONING_INTENT, false)
     }
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED) onNfcIntent(intent)
@@ -89,76 +96,293 @@ class CHIPToolActivity :
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    setIntent(intent)
-    if (intent.getBooleanExtra("open_scan", false)) {
-      supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-      showFragment(BarcodeFragment.newInstance(), false)
+    if (isAutomatedCommissioningAction(intent.action)) {
+      // Validate before touching activity state so a rejected intent cannot disturb an
+      // in-progress interactive session.
+      if (handleAutomatedCommissioningIntent(intent)) {
+        setIntent(intent)
+      }
+      return
     }
+    setIntent(intent)
+    isAutomatedCommissioningIntent = false
+    if (intent.getBooleanExtra("open_scan", false)) {
+      clearBackStackIfSafe()
+      showFragment(BarcodeFragment.newInstance(), false)
+    } else if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+      onNfcIntent(intent)
+    } else if (intent.action == Intent.ACTION_VIEW) {
+      onReturnIntent(intent)
+    } else {
+      clearBackStackIfSafe()
+      showFragment(SelectActionFragment.newInstance(), false)
+    }
+  }
+
+  private fun isAutomatedCommissioningAction(action: String?): Boolean =
+    action == ACTION_COMMISSION_BLE_WIFI || action == ACTION_COMMISSION_BLE_THREAD
+
+  private fun isDebuggableBuild(): Boolean =
+    (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+
+  /**
+   * Starts commissioning for a validated automated commissioning intent.
+   *
+   * Returns false without changing activity state when [candidate] is not an automated
+   * commissioning intent, the build is not debuggable, or validation fails.
+   */
+  private fun handleAutomatedCommissioningIntent(candidate: Intent?): Boolean {
+    if (candidate == null || !isAutomatedCommissioningAction(candidate.action)) return false
+    val action = candidate.action
+    // CHIPToolActivity is exported, so only debuggable (test) builds accept credentials and
+    // setup codes from other apps.
+    if (!isDebuggableBuild()) {
+      rejectCommissioningIntent(
+        "Ignoring $action: automated commissioning requires a debuggable build",
+        "Automated commissioning is only available in debuggable builds",
+      )
+      return false
+    }
+    val request =
+      if (action == ACTION_COMMISSION_BLE_WIFI) {
+        buildBleWifiCommissioningRequest(candidate)
+      } else {
+        buildBleThreadCommissioningRequest(candidate)
+      }
+    if (request == null) return false
+    isAutomatedCommissioningIntent = true
+    deviceInfo = request.first
+    clearBackStackIfSafe()
+    showFragment(DeviceProvisioningFragment.newInstance(request.first, request.second), false)
+    return true
+  }
+
+  private fun canCommitFragments(): Boolean =
+    !isFinishing && !isDestroyed && !supportFragmentManager.isStateSaved
+
+  private fun clearBackStackIfSafe() {
+    if (canCommitFragments()) {
+      supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+  }
+
+  private fun popBackStackOnceIfSafe() {
+    if (canCommitFragments()) {
+      supportFragmentManager.popBackStack()
+    }
+  }
+
+  private fun hasValidCommissioningParams(discriminator: Int, setupPinCode: Long): Boolean =
+    discriminator in 0..MAX_DISCRIMINATOR && setupPinCode in MIN_SETUP_PIN_CODE..MAX_SETUP_PIN_CODE
+
+  private fun rejectCommissioningIntent(logMessage: String, toastMessage: String) {
+    Log.e(TAG, logMessage)
+    Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
+  }
+
+  private fun buildBleWifiCommissioningRequest(
+    intent: Intent
+  ): Pair<CHIPDeviceInfo, NetworkCredentialsParcelable>? {
+    val ssid = intent.getStringExtra(EXTRA_WIFI_SSID)
+    if (ssid.isNullOrEmpty() || ssid.toByteArray(Charsets.UTF_8).size !in 1..MAX_WIFI_SSID_BYTES) {
+      rejectCommissioningIntent(
+        "Invalid or missing Wi-Fi SSID in commissioning intent",
+        "Valid Wi-Fi SSID (1..32 UTF-8 bytes) required",
+      )
+      return null
+    }
+    val psk = intent.getStringExtra(EXTRA_WIFI_PASSWORD) ?: ""
+    if (psk.toByteArray(Charsets.UTF_8).size !in 0..MAX_WIFI_PSK_BYTES) {
+      rejectCommissioningIntent(
+        "Invalid Wi-Fi password length in commissioning intent",
+        "Wi-Fi password must be 0..64 UTF-8 bytes",
+      )
+      return null
+    }
+    val discriminator = intent.getIntExtra(EXTRA_DISCRIMINATOR, DEFAULT_DISCRIMINATOR)
+    val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, DEFAULT_SETUP_PIN_CODE)
+    if (!hasValidCommissioningParams(discriminator, setupPinCode)) {
+      rejectCommissioningIntent(
+        "Out-of-range discriminator=$discriminator or setupPinCode",
+        "Invalid commissioning discriminator or setup PIN code",
+      )
+      return null
+    }
+
+    val devInfo = CHIPDeviceInfo(discriminator = discriminator, setupPinCode = setupPinCode)
+    val networkCreds =
+      NetworkCredentialsParcelable.forWiFi(NetworkCredentialsParcelable.WiFiCredentials(ssid, psk))
+    return devInfo to networkCreds
+  }
+
+  private fun decodeHexBytes(hex: String, expectedByteLength: Int? = null): ByteArray? {
+    val normalized = hex.filterNot { it == ':' || it == ' ' }
+    if (normalized.isEmpty() || normalized.length % 2 != 0) {
+      return null
+    }
+    if (expectedByteLength != null && normalized.length != expectedByteLength * 2) {
+      return null
+    }
+    return try {
+      ByteArray(normalized.length / 2) { idx ->
+        normalized.substring(idx * 2, idx * 2 + 2).toUByte(16).toByte()
+      }
+    } catch (_: NumberFormatException) {
+      null
+    }
+  }
+
+  private fun resolveThreadDatasetBytes(intent: Intent): ByteArray? {
+    if (intent.hasExtra(EXTRA_THREAD_OPERATIONAL_DATASET)) {
+      val rawDatasetHex = intent.getStringExtra(EXTRA_THREAD_OPERATIONAL_DATASET) ?: return null
+      val decoded = decodeHexBytes(rawDatasetHex) ?: return null
+      return decoded.takeIf { it.size in 1..MAX_THREAD_DATASET_BYTES }
+    }
+    val channel = intent.getIntExtra(EXTRA_THREAD_CHANNEL, DEFAULT_THREAD_CHANNEL)
+    val panId = intent.getIntExtra(EXTRA_THREAD_PAN_ID, DEFAULT_THREAD_PAN_ID)
+    if (channel !in MIN_THREAD_CHANNEL..MAX_THREAD_CHANNEL || panId !in 0..MAX_THREAD_PAN_ID) {
+      return null
+    }
+    val xpanIdStr = intent.getStringExtra(EXTRA_THREAD_XPAN_ID) ?: "11:11:11:11:22:22:22:22"
+    val masterKeyStr =
+      intent.getStringExtra(EXTRA_THREAD_MASTER_KEY)
+        ?: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
+    val xpanIdBytes = decodeHexBytes(xpanIdStr, expectedByteLength = 8) ?: return null
+    val masterKeyBytes = decodeHexBytes(masterKeyStr, expectedByteLength = 16) ?: return null
+    var dataset =
+      byteArrayOf(
+        0.toByte(),
+        3.toByte(),
+        0.toByte(),
+        (channel.shr(8) and 0xFF).toByte(),
+        (channel and 0xFF).toByte(),
+      )
+    dataset +=
+      byteArrayOf(
+        1.toByte(),
+        2.toByte(),
+        (panId.shr(8) and 0xFF).toByte(),
+        (panId and 0xFF).toByte(),
+      )
+    dataset += byteArrayOf(2.toByte(), 8.toByte()) + xpanIdBytes
+    dataset += byteArrayOf(5.toByte(), 16.toByte()) + masterKeyBytes
+    return dataset.takeIf { it.size in 1..MAX_THREAD_DATASET_BYTES }
+  }
+
+  private fun buildBleThreadCommissioningRequest(
+    intent: Intent
+  ): Pair<CHIPDeviceInfo, NetworkCredentialsParcelable>? {
+    val discriminator = intent.getIntExtra(EXTRA_DISCRIMINATOR, DEFAULT_DISCRIMINATOR)
+    val setupPinCode = intent.getLongExtra(EXTRA_SETUP_PIN_CODE, DEFAULT_SETUP_PIN_CODE)
+    if (!hasValidCommissioningParams(discriminator, setupPinCode)) {
+      rejectCommissioningIntent(
+        "Out-of-range discriminator=$discriminator or setupPinCode",
+        "Invalid commissioning discriminator or setup PIN code",
+      )
+      return null
+    }
+    // LIT ICD registration (ICD Management RegisterClient during commissioning).
+    // Defaults to true like CHIPDeviceInfo; tests pass false as a negative control.
+    val isLIT = intent.getBooleanExtra(EXTRA_IS_LIT, true)
+
+    val datasetBytes = resolveThreadDatasetBytes(intent)
+    if (datasetBytes == null) {
+      rejectCommissioningIntent(
+        "Invalid Thread operational dataset parameters in commissioning intent",
+        "Invalid Thread operational dataset",
+      )
+      return null
+    }
+
+    val devInfo =
+      CHIPDeviceInfo(discriminator = discriminator, setupPinCode = setupPinCode, isLIT = isLIT)
+    val networkCreds =
+      NetworkCredentialsParcelable.forThread(
+        NetworkCredentialsParcelable.ThreadCredentials(datasetBytes)
+      )
+    return devInfo to networkCreds
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     outState.putString(ARG_PROVISION_NETWORK_TYPE, networkType?.name)
     outState.putParcelable(ARG_DEVICE_INFO, deviceInfo)
+    outState.putBoolean(ARG_IS_AUTOMATED_COMMISSIONING_INTENT, isAutomatedCommissioningIntent)
 
     super.onSaveInstanceState(outState)
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
     this.deviceInfo = deviceInfo
-    supportFragmentManager.popBackStack()
+    popBackStackOnceIfSafe()
     val targetNetworkType = networkType
     if (targetNetworkType == null) {
       showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
+    } else if (deviceInfo.ipAddress != null) {
+      showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, null))
     } else {
-      if (deviceInfo.ipAddress != null) {
-        showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, null))
-      } else {
-        showFragment(EnterNetworkFragment.newInstance(targetNetworkType))
-      }
+      showFragment(EnterNetworkFragment.newInstance(targetNetworkType))
     }
   }
 
-  override fun onCommissioningComplete(code: Long, nodeId: Long) {
-    ChipClient.getDeviceController(this).close()
+  private fun showCompletionToastIfActive(code: Long) {
+    if (!isFinishing && !isDestroyed) {
+      Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
+        .show()
+    }
+  }
 
-    if (code == 0L && nodeId > 0L) {
-      DeviceIdUtil.setCommissionedNodeId(this, nodeId)
-      val registry =
-        CenterConnectionManager.registry(this).also { reg ->
-          PostCommissioningDialogHelper.autoRegisterNode(reg, nodeId, deviceInfo, this)
-        }
-      runOnUiThread {
-        Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
-          .show()
-        if (!isFinishing && !isDestroyed) {
-          PostCommissioningDialogHelper.showPostCommissioningDialog(
-            activity = this,
-            nodeId = nodeId,
-            registry = registry,
-            deviceInfo = deviceInfo,
-            onComplete = {
-              if (!isFinishing && !isDestroyed) {
-                supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                showFragment(DeviceCenterFragment.newInstance())
-              }
-            },
-          )
+  private fun openDeviceCenterIfActive() {
+    if (!canCommitFragments()) return
+    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    showFragment(DeviceCenterFragment.newInstance())
+  }
+
+  private fun presentPostCommissioningDialog(
+    code: Long,
+    nodeId: Long,
+    registry: CommissionedNodeRegistry,
+  ) {
+    showCompletionToastIfActive(code)
+    if (!canCommitFragments()) return
+    PostCommissioningDialogHelper.showPostCommissioningDialog(
+      activity = this,
+      nodeId = nodeId,
+      registry = registry,
+      deviceInfo = deviceInfo,
+      onComplete = { openDeviceCenterIfActive() },
+    )
+  }
+
+  override fun onCommissioningComplete(code: Long, nodeId: Long) {
+    runOnUiThread {
+      ChipClient.getDeviceController(this).close()
+      val wasAutomatedIntent = isAutomatedCommissioningIntent
+      isAutomatedCommissioningIntent = false
+
+      if (code == 0L && nodeId > 0L) {
+        DeviceIdUtil.setCommissionedNodeId(this, nodeId)
+        val registry = CenterConnectionManager.registry(this)
+        PostCommissioningDialogHelper.autoRegisterNode(registry, nodeId, deviceInfo, this)
+        // UI automation that drives interactive commissioning can opt out of the dialog.
+        val shouldShowDialog =
+          !wasAutomatedIntent &&
+            intent?.getBooleanExtra(EXTRA_SHOW_POST_COMMISSIONING_DIALOG, true) != false
+        if (shouldShowDialog) {
+          presentPostCommissioningDialog(code, nodeId, registry)
+          return@runOnUiThread
         }
       }
-    } else {
-      runOnUiThread {
-        Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
-          .show()
-        if (!isFinishing && !isDestroyed) {
-          supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-          showFragment(SelectActionFragment.newInstance(), false)
-        }
+
+      showCompletionToastIfActive(code)
+      if (canCommitFragments()) {
+        clearBackStackIfSafe()
+        showFragment(SelectActionFragment.newInstance(), false)
       }
     }
   }
 
   override fun onShowDeviceAddressInput() {
-    supportFragmentManager.popBackStack()
+    popBackStackOnceIfSafe()
     showFragment(AddressCommissioningFragment.newInstance())
   }
 
@@ -168,7 +392,7 @@ class CHIPToolActivity :
       Log.e(TAG, "onNetworkCredentialsEntered called with null deviceInfo; returning to scanner")
       Toast.makeText(this, "Device info lost; please scan the device again.", Toast.LENGTH_SHORT)
         .show()
-      supportFragmentManager.popBackStack()
+      popBackStackOnceIfSafe()
       showFragment(BarcodeFragment.newInstance())
       return
     }
@@ -189,6 +413,7 @@ class CHIPToolActivity :
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
+    if (!canCommitFragments()) return
     val fragmentTransaction =
       supportFragmentManager
         .beginTransaction()
@@ -315,5 +540,34 @@ class CHIPToolActivity :
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
     private const val ARG_DEVICE_INFO = "device_info"
+    private const val ARG_IS_AUTOMATED_COMMISSIONING_INTENT = "is_automated_commissioning_intent"
+    private const val EXTRA_SHOW_POST_COMMISSIONING_DIALOG = "show_post_commissioning_dialog"
+
+    private const val DEFAULT_DISCRIMINATOR = 3840
+    private const val MAX_DISCRIMINATOR = 0xFFF
+    private const val DEFAULT_SETUP_PIN_CODE = 20202021L
+    private const val MIN_SETUP_PIN_CODE = 1L
+    private const val MAX_SETUP_PIN_CODE = 99_999_998L
+    private const val MAX_WIFI_SSID_BYTES = 32
+    private const val MAX_WIFI_PSK_BYTES = 64
+    private const val MAX_THREAD_DATASET_BYTES = 254
+    private const val DEFAULT_THREAD_CHANNEL = 15
+    private const val MIN_THREAD_CHANNEL = 11
+    private const val MAX_THREAD_CHANNEL = 26
+    private const val DEFAULT_THREAD_PAN_ID = 0x1234
+    private const val MAX_THREAD_PAN_ID = 0xFFFE
+
+    const val ACTION_COMMISSION_BLE_WIFI = "com.google.chip.chiptool.action.COMMISSION_BLE_WIFI"
+    const val EXTRA_DISCRIMINATOR = "discriminator"
+    const val EXTRA_SETUP_PIN_CODE = "setupPinCode"
+    const val EXTRA_WIFI_SSID = "wifiSsid"
+    const val EXTRA_WIFI_PASSWORD = "wifiPassword"
+    const val ACTION_COMMISSION_BLE_THREAD = "com.google.chip.chiptool.action.COMMISSION_BLE_THREAD"
+    const val EXTRA_THREAD_OPERATIONAL_DATASET = "threadOperationalDataset"
+    const val EXTRA_THREAD_CHANNEL = "threadChannel"
+    const val EXTRA_THREAD_PAN_ID = "threadPanId"
+    const val EXTRA_THREAD_XPAN_ID = "threadXpanId"
+    const val EXTRA_THREAD_MASTER_KEY = "threadMasterKey"
+    const val EXTRA_IS_LIT = "isLIT"
   }
 }

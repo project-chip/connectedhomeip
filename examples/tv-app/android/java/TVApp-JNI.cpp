@@ -17,6 +17,8 @@
  */
 
 #include "TvApp-JNI.h"
+#include <DeviceInfoProviderImpl.h>
+
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentLauncherManager.h"
@@ -100,8 +102,15 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app)
 {
+    {
+        // Server::Init() binds the provider to persistent storage; SetDeviceInfoProvider requires the stack lock.
+        chip::DeviceLayer::StackLock lock;
+        chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    }
     TvAppJNIMgr().InitializeWithObjects(app);
 }
 

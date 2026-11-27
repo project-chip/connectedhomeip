@@ -38,8 +38,6 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
-  private static final long BROWSE_SERVICE_TIMEOUT = 2500;
-  private static final long RESOLVE_SERVICE_TIMEOUT = 3000;
 
   private static CastingApp sInstance;
 
@@ -81,8 +79,11 @@ public final class CastingApp {
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
             new NsdManagerServiceResolver(
-                applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
-            new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
+                applicationContext,
+                nsdManagerResolverAvailState,
+                appParameters.getResolveServiceTimeoutMs()),
+            new NsdManagerServiceBrowser(
+                applicationContext, appParameters.getBrowseServiceTimeoutMs()),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
@@ -90,7 +91,8 @@ public final class CastingApp {
     if (err.hasError()) {
       Log.e(
           TAG,
-          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on"
+              + " AndroidChipPlatform");
       return err;
     }
 
@@ -125,7 +127,8 @@ public final class CastingApp {
     if (!updated) {
       Log.e(
           TAG,
-          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to"
+              + " updateCommissionableDataProviderData() on AndroidChipPlatform");
       return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
     }
     return MatterError.NO_ERROR;
