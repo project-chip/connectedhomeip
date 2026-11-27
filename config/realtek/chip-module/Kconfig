@@ -135,8 +135,7 @@ endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
-	bool
-	default y
+	depends on SETTINGS_NVS || SETTINGS_ZMS
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
@@ -192,30 +191,5 @@ config REALTEK_OTA_BANK1
 	bool "OTA BANK1 APP"
 	default n
 	depends on CHIP_OTA_REQUESTOR
-
-# ==============================================================================
-# PSA crypto: HKDF dependency
-#
-# config/realtek/chip-gn/args.gni sets chip_crypto = "psa", so Matter is built
-# against CHIPCryptoPALPSA.cpp. config/zephyr/Kconfig only *implies*
-# PSA_WANT_ALG_HKDF, which is not enough when MBEDTLS_PROMPTLESS hides the
-# prompt of every PSA_WANT_* symbol: a weak imply loses against Kconfig's
-# default precedence. The other algorithms Matter needs (SHA-256, HMAC, ECDH)
-# happen to be pulled in by hard selects from OpenThread and the Bee PSA
-# accelerator, which is why HKDF was the only gap.
-#
-# SPAKE2+'s KDF() goes through HKDF_sha -> PsaKdf -> psa_key_derivation_setup.
-# Without the HKDF implementation compiled in, that call returns
-# PSA_ERROR_NOT_SUPPORTED (-134) and PASE fails with CHIP_ERROR_INTERNAL right
-# after a successful ComputeRoundTwo.
-#
-# The application enables CONFIG_CHIP_CRYPTO_PSA=y in prj.conf (same approach
-# as the NXP Zephyr samples), this default then supplies HKDF.
-if CHIP_CRYPTO_PSA
-
-config PSA_WANT_ALG_HKDF
-	default y
-
-endif # CHIP_CRYPTO_PSA
 
 endif # CONFIG_CHIP

@@ -201,6 +201,9 @@ config NVS_LOOKUP_CACHE
 config NVS_LOOKUP_CACHE_SIZE
     default 512
 
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+    default y
+
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD
@@ -246,6 +249,10 @@ config NET_MAX_CONTEXTS
 
 config NET_CONFIG_INIT_TIMEOUT
     default 0
+
+choice CHIP_CRYPTO
+	default CHIP_CRYPTO_PSA
+endchoice
 
 # Configure MBEDTLS lib
 config MBEDTLS_ENABLE_HEAP
