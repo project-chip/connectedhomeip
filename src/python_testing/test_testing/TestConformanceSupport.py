@@ -1142,6 +1142,11 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
             xml = (f'<deprecateConform {xml_attrs}/>')
             check_bad_choice(xml)
 
+        # Ranges (O.a2-4) are allowed by the spec but Choice holds only one bound
+        for xml_attrs in ['choice="a" min="2" max="4"', 'choice="a" more="true" max="1"']:
+            with asserts.assert_raises(ConformanceException):
+                parse_callable_from_xml(ElementTree.fromstring(f'<optionalConform {xml_attrs} />'), self.params)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

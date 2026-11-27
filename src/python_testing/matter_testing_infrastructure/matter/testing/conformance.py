@@ -113,6 +113,8 @@ def parse_choice(element: ElementTree.Element) -> Choice | None:
         raise ChoiceConformanceException('Choice conformance on non-optional attribute')
     more = element.get('more', 'false') == 'true'
     less = 'max' in element.attrib
+    if less and (more or 'min' in element.attrib):
+        raise ChoiceConformanceException('Choice conformance with both a lower and an upper bound is not supported')
     count = int(element.get('max' if less else 'min', '1'))
     return Choice(choice, more, less, count)
 
