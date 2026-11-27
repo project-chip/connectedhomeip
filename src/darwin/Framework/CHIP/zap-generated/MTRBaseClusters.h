@@ -14942,25 +14942,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ChangeChannel
  *
- * Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument.
+ * Change the channel to the channel case-insensitive exact matching the value passed as an argument.
  */
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ChangeChannelByNumber
  *
- * Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.
+ * Change the channel to the channel with the given Number in the ChannelList attribute.
  */
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command SkipChannel
  *
- * This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.
+ * This command provides channel up and channel down functionality, but allows channel index jumps of size Count.
  */
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command GetProgramGuide
  *
- * This command retrieves the program guide. It accepts several filter parameters to return specific schedule and program information from a content app. The command shall receive in response a ProgramGuideResponse.
+ * This command retrieves the program guide.
  */
 - (void)getProgramGuideWithParams:(MTRChannelClusterGetProgramGuideParams * _Nullable)params completion:(void (^)(MTRChannelClusterProgramGuideResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)getProgramGuideWithCompletion:(void (^)(MTRChannelClusterProgramGuideResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14968,7 +14968,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command RecordProgram
  *
- * Record a specific program or series when it goes live. This functionality enables DVR recording features.
+ * Record a specific program or series when it goes live.
  */
 - (void)recordProgramWithParams:(MTRChannelClusterRecordProgramParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**

@@ -34,6 +34,8 @@ CHIP_IM_INITIATOR_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/linux_x64_gc
 CHIP_IM_RESPONDER_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/linux_x64_gcc/chip-im-responder"))
 CHIP_LIGHTING_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/chip-lighting-app"))
 CHIP_TOOL_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/chip-tool"))
+CHIP_TV_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/tv-app/chip-tv-app"))
+CHIP_TV_CASTING_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/tv-casting-app/chip-tv-casting-app"))
 LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/lit_icd/lit-icd-app"))
 
 MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/controller/python/matter-controller-wheels"

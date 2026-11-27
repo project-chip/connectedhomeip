@@ -15,7 +15,6 @@
 MANUAL_ALLOWLIST:
     - access-control-definitions.xml
     - ballast-configuration-cluster.xml
-    - channel-cluster.xml
     - chip-ota.xml
     - chip-types.xml
     - clusters-extensions.xml
@@ -24,7 +23,6 @@ MANUAL_ALLOWLIST:
     - global-bitmaps.xml
     - measurement-and-sensing.xml
 
-    - mode-base-cluster.xml
     - proxy-configuration-cluster.xml
     - proxy-discovery-cluster.xml
     - proxy-valid-cluster.xml

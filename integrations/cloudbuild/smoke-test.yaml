@@ -92,6 +92,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              unset JAVA_HOME &&
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-arm-all-devices-clang

@@ -24,6 +24,12 @@ from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
+# ESP-IDF Component Manager unpacks components into a shared user cache across
+# apps, so parallel `idf.py reconfigure` calls race on that cache even for
+# distinct example directories. Serialize ESP32 generation on this constant key;
+# compilation in _build() still locks per example directory.
+ESP32_GENERATE_LOCK_KEY = 'esp32:idf-component-manager'
+
 
 class Esp32Board(Enum):
     DevKitC = auto()
@@ -225,9 +231,9 @@ class Esp32Builder(Builder):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        example_lock = self.output_dir_lock.lock_dir(
-            os.path.join(self.root, self.ExamplePath)) if self.output_dir_lock else contextlib.nullcontext()
-        with example_lock:
+        generate_lock = self.output_dir_lock.lock_dir(
+            ESP32_GENERATE_LOCK_KEY) if self.output_dir_lock else contextlib.nullcontext()
+        with generate_lock:
             defaults = os.path.join(self.ExamplePath, DefaultsFileName(
                 self.board, self.app, self.enable_rpcs))
 

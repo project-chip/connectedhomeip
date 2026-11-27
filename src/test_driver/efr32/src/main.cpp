@@ -19,7 +19,6 @@
 #include <pw_unit_test/unit_test_service.h>
 
 #include <AppConfig.h>
-#include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
 #include <cmsis_os2.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -30,6 +29,7 @@
 #include <mbedtls/platform.h>
 #include <nl_test_service/nl_test.rpc.pb.h>
 #include <pigweed/RpcService.h>
+#include <pigweed_rpc/PigweedLogger.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>

@@ -51,7 +51,7 @@ ALARM_BIT = int(AlarmBitmap.kOverFrequency)
 class TC_ESALM_3_3(ElectricalAlarmTestBaseHelper):
 
     def pics_TC_ESALM_3_3(self) -> list[str]:
-        return ["ESALM.S", "ESALM.S.F23", "ESALM.S.E0000"]
+        return ["ESALM.S", "ESALM.S.F17", "ESALM.S.E00"]
 
     def steps_TC_ESALM_3_3(self) -> list[TestStep]:
         return self.alarm_lifecycle_steps(ALARM_NAME, ALARM_BIT)
