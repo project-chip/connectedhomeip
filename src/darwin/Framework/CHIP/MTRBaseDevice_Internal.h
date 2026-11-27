@@ -134,6 +134,22 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           completion:(MTRDeviceResponseHandler)completion;
 
 /**
+ * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
+ * before the invoke request is sent.  It is not called if the invoke never gets to that point (e.g.
+ * can't establish a session).
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
  * Invoke commands as one batched Invoke Request Message; commands.count must be in [1, peer
  * MaxPathsPerInvoke]. On success the completion gets one response per command in request order, on overall
  * failure nil values and an error. A batch shares one message, so also its timed-invoke flag and buffer.
@@ -227,6 +243,20 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           attributeID:(NSNumber *)attributeID
                                 value:(id)value
                     timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
+ * before the write request is sent.  It is not called if the write never gets to that point (e.g.
+ * can't establish a session).
+ */
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion;
 
