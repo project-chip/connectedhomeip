@@ -87,6 +87,8 @@ protected:
     CommissioningParameters mParams = CommissioningParameters();
 
 private:
+    bool IsCommissioningWithoutPower() const { return mDeviceCommissioningInfo.general.isCommissioningWithoutPower; }
+
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
 
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set

@@ -23,7 +23,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnInitialPhaseCompleteFunct
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
@@ -58,24 +58,17 @@ class TC_DD_3_26(MatterTestCommissioner):
     def setup_test(self):
         super().setup_test()
 
-        # Boolean to detect the unpowered-phase commissioning stage
-        self.unpowered_phase_complete_seen: bool = False
+        # Boolean to detect the end of the initial commissioning stage
+        self.unpowered_initial_phase_complete_seen: bool = False
 
-        def _stage_start_listener(node_id: int, stage):
-            # Normalize stage to string
-            if isinstance(stage, bytes):
-                stage = stage.decode("utf-8", errors="replace")
+        def _initial_phase_complete_listener(node_id: int, transport_type: bytes, unpowered: bool):
+            log.info("Detected 'InitialPhaseComplete' commissioning stage")
+            self.unpowered_initial_phase_complete_seen = unpowered
 
-            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
-
-            if stage == "UnpoweredPhaseComplete":
-                log.info("Detected 'UnpoweredPhaseComplete' commissioning stage")
-                self.unpowered_phase_complete_seen = True
-
-        self._commissioning_stage_start_callback = _DevicePairingDelegate_OnCommissioningStageStartFunct(
-            _stage_start_listener
+        self._commissioning_initial_phase_complete_callback = _DevicePairingDelegate_OnInitialPhaseCompleteFunct(
+            _initial_phase_complete_listener
         )
-        self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
+        self.default_controller.setInitialPhaseCompleteCallback(self._commissioning_initial_phase_complete_callback)
 
     @async_test_body
     async def test_TC_DD_3_26(self):
@@ -203,7 +196,7 @@ class TC_DD_3_26(MatterTestCommissioner):
         # Step 5: Restart NFC commissioning from scratch. Success here means the unpowered NFC phase completes
         self.step(5)
 
-        self.unpowered_phase_complete_seen = False
+        self.unpowered_initial_phase_complete_seen = False
 
         self.wait_for_user_input(prompt_msg="Move the DUT's NFC interface away from the NFC reader, then place it back"
                                  " on the NFC reader to restart commissioning (keep the DUT unpowered)")
@@ -220,7 +213,7 @@ class TC_DD_3_26(MatterTestCommissioner):
 
         commissioning_success = await self.commission_ntl_device(payload_2)
         asserts.assert_true(commissioning_success, "Device Commissioning restart using nfc transport has failed")
-        asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen on restart!")
+        asserts.assert_true(self.unpowered_initial_phase_complete_seen, "Stage 'InitialPhaseComplete' was not seen on restart!")
 
 
 if __name__ == "__main__":
