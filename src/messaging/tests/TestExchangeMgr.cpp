@@ -21,7 +21,9 @@
  *      This file implements unit tests for the ExchangeManager implementation.
  */
 #include <errno.h>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include <pw_unit_test/framework.h>
 
@@ -29,6 +31,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -351,5 +354,57 @@ TEST_F(TestExchangeMgr, CheckUmhEncryptionMismatchCleanup)
         EXPECT_EQ(removedHandler, &mockUH);
     }
 }
+
+#if CHIP_DETAIL_LOGGING && !CHIP_PW_TOKENIZER_LOGGING
+std::vector<std::pair<uint8_t, std::string>> gMessageLogLines;
+
+ENFORCE_FORMAT(3, 0) void RecordMessageLogLine(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    (void) module;
+    (void) args;
+    std::string format(msg);
+    if (format.find("Msg RX") != std::string::npos || format.find("Msg TX") != std::string::npos)
+    {
+        gMessageLogLines.emplace_back(category, format);
+    }
+}
+
+// The per-message RX and TX lines fire for every message on every session, so they log at Detail, not Progress.
+TEST_F(TestExchangeMgr, PerMessageLogLinesAreDetail)
+{
+    MockAppDelegate mockUnsolicitedAppDelegate;
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1,
+                                                                                 &mockUnsolicitedAppDelegate));
+
+    auto filterLevel = Logging::GetLogFilter();
+    Logging::SetLogFilter(Logging::kLogCategory_Max);
+    gMessageLogLines.clear();
+    Logging::SetLogRedirectCallback(&RecordMessageLogLine);
+
+    MockAppDelegate mockSolicitedAppDelegate;
+    ExchangeContext * ec = NewExchangeToAlice(&mockSolicitedAppDelegate);
+    EXPECT_SUCCESS(ec->SendMessage(Protocols::BDX::Id, kMsgType_TEST1,
+                                   System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                   SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck)));
+    DrainAndServiceIO();
+
+    Logging::SetLogRedirectCallback(nullptr);
+    Logging::SetLogFilter(filterLevel);
+    EXPECT_TRUE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    bool sawRX = false;
+    bool sawTX = false;
+    for (const auto & line : gMessageLogLines)
+    {
+        sawRX = sawRX || line.second.find("Msg RX") != std::string::npos;
+        sawTX = sawTX || line.second.find("Msg TX") != std::string::npos;
+        EXPECT_EQ(line.first, Logging::kLogCategory_Detail) << line.second;
+    }
+    EXPECT_TRUE(sawRX);
+    EXPECT_TRUE(sawTX);
+
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1));
+}
+#endif // CHIP_DETAIL_LOGGING && !CHIP_PW_TOKENIZER_LOGGING
 
 } // namespace

@@ -208,10 +208,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     VerifyOrReturnError(message->TotalLength() <= sessionHandle->GetMaxAppMessageLen(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
     NodeId destination;
     FabricIndex fabricIndex;
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DETAIL_LOGGING
 
     NodeId sourceNodeId = kUndefinedNodeId;
     PeerAddress destination_address;
@@ -322,10 +322,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         VerifyOrReturnError(headerEnd < messageEnd, CHIP_ERROR_INTERNAL);
         ReturnErrorOnFailure(cryptoContext.PrivacyEncrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
         destination = NodeIdFromGroupId(groupSession->GetGroupId());
         fabricIndex = groupSession->GetFabricIndex();
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DETAIL_LOGGING
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -370,10 +370,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message));
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
         destination = session->GetPeerNodeId();
         fabricIndex = session->GetFabricIndex();
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DETAIL_LOGGING
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
@@ -404,7 +404,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
         destination = kUndefinedNodeId;
         fabricIndex = kUndefinedFabricIndex;
         if (session->GetSessionRole() == Transport::UnauthenticatedSession::SessionRole::kResponder)
@@ -415,7 +415,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         {
             sourceNodeId = session->GetEphemeralInitiatorNodeID();
         }
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DETAIL_LOGGING
     }
     break;
     default:
@@ -427,7 +427,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     }
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
 
     if (fabricIndex != kUndefinedFabricIndex && mFabricTable != nullptr)
@@ -479,11 +479,11 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
-    ChipLogProgress(ExchangeManager,
-                    "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)",
-                    exchangeStr, sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
-                    Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
-                    msgTypeName, static_cast<unsigned>(message->TotalLength()));
+    ChipLogDetail(ExchangeManager,
+                  "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)", exchangeStr,
+                  sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
+                  Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
+                  msgTypeName, static_cast<unsigned>(message->TotalLength()));
 #endif
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));

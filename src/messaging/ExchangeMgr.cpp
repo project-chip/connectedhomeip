@@ -213,7 +213,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
     auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
@@ -264,7 +264,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
-    ChipLogProgress(
+    ChipLogDetail(
         ExchangeManager,
         ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX %s --- Type %s (%s:%s) (B:%u)",
         ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(), packetHeader.GetMessageCounter(),
