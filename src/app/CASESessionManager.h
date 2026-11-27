@@ -174,6 +174,9 @@ public:
 
     void ReleaseAllSessions();
 
+    // The phase of the session setup for peerId, if there is one.
+    Optional<OperationalSessionSetup::SetupPhase> GetSessionSetupPhase(const ScopedNodeId & peerId) const;
+
     /**
      * This API returns the address for the given node ID.
      * If the CASESessionManager is configured with a DNS-SD cache, the cache is looked up

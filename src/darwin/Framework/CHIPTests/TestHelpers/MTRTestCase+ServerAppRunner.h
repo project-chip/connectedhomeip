@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
  * after the app has already exited, is harmless.
  */
 - (void)terminate;
+
+- (void)suspend;
+- (void)resume;
 @end
 
 @interface MTRTestCase (ServerAppRunner)
