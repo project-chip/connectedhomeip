@@ -244,7 +244,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
 
     // Test buffer just under the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
-    EXPECT_EQ(MakeServiceTypeName(buffer, 8, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 8, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
@@ -302,7 +302,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
 
     // "_CM" (3) + "._sub._matterc" (14) + terminator = 18.
     constexpr size_t kRequired = 18;
-    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired - 1, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired - 1, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     EXPECT_SUCCESS(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode));
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
@@ -319,12 +319,12 @@ TEST(TestServiceNaming, TestZeroLengthDestination)
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     filter.type = DiscoveryFilterType::kLongDiscriminator;
     filter.code = 0xFFF;
-    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
     EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     EXPECT_EQ(MakeHostName(buffer, 0, ByteSpan()), CHIP_ERROR_BUFFER_TOO_SMALL);
