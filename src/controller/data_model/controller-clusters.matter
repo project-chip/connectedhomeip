@@ -10261,18 +10261,18 @@ cluster Channel = 1284 {
   }
 
   struct ProgramCastStruct {
-    char_string name = 0;
-    char_string role = 1;
+    long_char_string<256> name = 0;
+    long_char_string<256> role = 1;
   }
 
   struct ProgramCategoryStruct {
-    char_string category = 0;
-    optional char_string subCategory = 1;
+    long_char_string<256> category = 0;
+    optional long_char_string<256> subCategory = 1;
   }
 
   struct SeriesInfoStruct {
-    char_string season = 0;
-    char_string episode = 1;
+    long_char_string<256> season = 0;
+    long_char_string<256> episode = 1;
   }
 
   struct ChannelInfoStruct {
@@ -10286,20 +10286,20 @@ cluster Channel = 1284 {
   }
 
   struct ProgramStruct {
-    char_string identifier = 0;
+    char_string<255> identifier = 0;
     ChannelInfoStruct channel = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
-    char_string title = 4;
-    optional char_string subtitle = 5;
-    optional char_string description = 6;
+    char_string<255> title = 4;
+    optional char_string<255> subtitle = 5;
+    optional long_char_string<8192> description = 6;
     optional char_string audioLanguages[] = 7;
     optional char_string ratings[] = 8;
-    optional char_string thumbnailUrl = 9;
-    optional char_string posterArtUrl = 10;
-    optional char_string dvbiUrl = 11;
-    optional char_string releaseDate = 12;
-    optional char_string parentalGuidanceText = 13;
+    optional long_char_string<8192> thumbnailUrl = 9;
+    optional long_char_string<8192> posterArtUrl = 10;
+    optional long_char_string<8192> dvbiUrl = 11;
+    optional char_string<30> releaseDate = 12;
+    optional char_string<255> parentalGuidanceText = 13;
     optional RecordingFlagBitmap recordingFlag = 14;
     optional nullable SeriesInfoStruct seriesInfo = 15;
     optional ProgramCategoryStruct categoryList[] = 16;
@@ -10309,8 +10309,8 @@ cluster Channel = 1284 {
 
   struct PageTokenStruct {
     optional int16u limit = 0;
-    optional char_string after = 1;
-    optional char_string before = 2;
+    optional long_char_string<8192> after = 1;
+    optional long_char_string<8192> before = 2;
   }
 
   struct ChannelPagingStruct {
@@ -10364,7 +10364,7 @@ cluster Channel = 1284 {
     optional PageTokenStruct pageToken = 3;
     optional RecordingFlagBitmap recordingFlag = 4;
     optional AdditionalInfoStruct externalIDList[] = 5;
-    optional octet_string data = 6;
+    optional long_octet_string<8092> data = 6;
   }
 
   response struct ProgramGuideResponse = 5 {
@@ -10373,28 +10373,28 @@ cluster Channel = 1284 {
   }
 
   request struct RecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
     AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    long_octet_string<8092> data = 3;
   }
 
   request struct CancelRecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
     AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    long_octet_string<8092> data = 3;
   }
 
-  /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
+  /** Change the channel to the channel case-insensitive exact matching the value passed as an argument. */
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
-  /** Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute. */
+  /** Change the channel to the channel with the given Number in the ChannelList attribute. */
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
-  /** This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel. */
+  /** This command provides channel up and channel down functionality, but allows channel index jumps of size Count. */
   command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
-  /** This command retrieves the program guide. It accepts several filter parameters to return specific schedule and program information from a content app. The command shall receive in response a ProgramGuideResponse. */
+  /** This command retrieves the program guide. */
   command GetProgramGuide(GetProgramGuideRequest): ProgramGuideResponse = 4;
-  /** Record a specific program or series when it goes live. This functionality enables DVR recording features. */
+  /** Record a specific program or series when it goes live. */
   command RecordProgram(RecordProgramRequest): DefaultSuccess = 6;
   /** Cancel recording for a specific program or series. */
   command CancelRecordProgram(CancelRecordProgramRequest): DefaultSuccess = 7;

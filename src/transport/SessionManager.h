@@ -548,9 +548,10 @@ private:
         kPayloadIsUnencrypted,
     };
 
-    System::Layer * mSystemLayer               = nullptr;
-    FabricTable * mFabricTable                 = nullptr;
-    Crypto::SessionKeystore * mSessionKeystore = nullptr;
+    System::Layer * mSystemLayer                                    = nullptr;
+    FabricTable * mFabricTable                                      = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore                      = nullptr;
+    const Credentials::GroupDataProvider * mRegisteredGroupProvider = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
@@ -627,6 +628,7 @@ private:
 
     void CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
     void CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void EnsureGroupPeerTableListenerRegistered(Credentials::GroupDataProvider * groups);
 };
 
 namespace MessagePacketBuffer {
