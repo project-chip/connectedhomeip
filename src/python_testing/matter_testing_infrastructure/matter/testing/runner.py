@@ -845,13 +845,13 @@ class MockTestRunner:
         from matter.testing.matter_test_config import MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
+        self.use_device_pics = use_device_pics
 
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
                                        pics=pics or {}, storage_path=Path(self.kvs_storage))
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
-        self.config.use_device_pics = use_device_pics
 
         # Honor the test class's server-interactions opt-out before the stack
         # starts advertising, mirroring run_tests_no_exit.
@@ -885,6 +885,8 @@ class MockTestRunner:
         self.config = test_config
         self.config.tests = [self.test]
         self.config.storage_path = Path(self.kvs_storage)
+        # A new MatterTestConfig defaults use_device_pics to True; keep this runner's choice.
+        self.config.use_device_pics = self.use_device_pics
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
 
