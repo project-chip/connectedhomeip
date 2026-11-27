@@ -259,7 +259,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
+        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(mDataMaxLen, sizeof(uint8_t)));
         VerifyOrReturnError(mData != nullptr, CHIP_ERROR_NO_MEMORY);
 
         chip::TLV::TLVWriter writer;
