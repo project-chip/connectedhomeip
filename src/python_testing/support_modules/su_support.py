@@ -31,7 +31,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, write_restart_flag_file
 from matter.tlv import TLVReader
 
 # Type aliases for AccessControl cluster types
@@ -526,8 +526,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         else:
             try:
                 # Create the restart flag file to signal the test runner
-                with open(restart_flag_file, "w") as f:
-                    f.write("restart")
+                write_restart_flag_file(restart_flag_file, "restart")
                 log.info("Created restart flag file to signal app restart")
                 # This sleep allows the app start while waiting for app ready pattern. If not in some cases connections will Drop.
                 sleep(1)

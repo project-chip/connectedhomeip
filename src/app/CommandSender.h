@@ -378,6 +378,21 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
+    /**
+     * Tells CommandSender which interaction model revision to assume, as fallback, for the peer, based on what the caller knows
+     * about the peer state (for example, collected when the group was set up).
+     *
+     * The fallback revision is used only when the session passed to the constructor reports none: groupcast,
+     * no session at construction, or a peer that reported none. A revision reported by the session always wins.
+     * The default, std::nullopt, keeps an encoding that every receiver accepts.
+     *
+     * The caller is responsible for the fallback revision being correct. For groupcast, pass the lowest interaction model
+     * revision among the group members. See RequestFlagsOptions for the encoding choices that depend on the revision.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if called after PrepareCommand or AddRequestData.
+     */
+    CHIP_ERROR SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision);
+
     void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
     {
         mDelayReportData = aDelayReportData;

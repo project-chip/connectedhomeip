@@ -297,7 +297,7 @@ TEST_F(TestHeatPump, RegisterFailsWithoutThermostatEndpointOrClient)
 {
     // The spec requires one or more Thermostat endpoints or a Thermostat client; this heat pump has neither.
     WiredPowerSource powerSource("grid"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc);
-    EnergyManagement energyManagement(mTimerDelegate);
+    EnergyManagement energyManagement({ .timerDelegate = mTimerDelegate, .testEventTriggerDelegate = mTestEventTriggerDelegate });
     SimulatedElectricalSensor electricalSensor(mTimerDelegate, mTestEventTriggerDelegate);
     HeatPump heatPump(HeatPump::Parts{
         .powerSource      = powerSource,

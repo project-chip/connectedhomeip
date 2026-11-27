@@ -23,9 +23,10 @@ namespace chip::app {
 
 SimulatedBatteryStorage::SimulatedBatteryStorage(const Context & context) :
     SimulatedBatteryStorageDelegates(context.timerDelegate, context.testEventTriggerDelegate),
-    BatteryStorage({ .timerDelegate           = context.timerDelegate,
-                     .gridElectricalSensor    = mGridSensorDelegate.GetConfig(context.timerDelegate),
-                     .batteryElectricalSensor = mBatterySensorDelegate.GetConfig(context.timerDelegate) }),
+    BatteryStorage({ .timerDelegate            = context.timerDelegate,
+                     .testEventTriggerDelegate = context.testEventTriggerDelegate,
+                     .gridElectricalSensor     = mGridSensorDelegate.GetConfig(context.timerDelegate),
+                     .batteryElectricalSensor  = mBatterySensorDelegate.GetConfig(context.timerDelegate) }),
     mTimerDelegate(context.timerDelegate)
 {}
 

@@ -397,8 +397,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
     ExpectSingleDeviceType(mProvider, inverterEndpoint, Device::Type::kTemperatureSensor);
 
     ExpectServerClusters(mProvider, parentEndpoint, { Clusters::Descriptor::Id, Clusters::Identify::Id });
-    ExpectServerClusters(mProvider, energyEndpoint,
-                         { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::DeviceEnergyManagement::Id });
+    ExpectServerClusters(mProvider, energyEndpoint, { Clusters::Descriptor::Id, Clusters::DeviceEnergyManagement::Id });
     ExpectElectricalSensorClusters(mProvider, outputEndpoint);
     ExpectServerClusters(mProvider, gridSourceEndpoint, { Clusters::Descriptor::Id, Clusters::PowerSource::Id });
     ExpectServerClusters(mProvider, inverterEndpoint,

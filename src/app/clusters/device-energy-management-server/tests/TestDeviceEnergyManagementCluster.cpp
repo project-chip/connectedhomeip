@@ -26,7 +26,9 @@
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/DeviceEnergyManagement/Attributes.h>
 #include <clusters/DeviceEnergyManagement/Commands.h>
+#include <clusters/DeviceEnergyManagement/Events.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/SystemClock.h>
 
 using namespace chip;
@@ -418,6 +420,51 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustRequest)
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kPowerAdjustActive);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestDeviceEnergyManagementCluster, TestGeneratePowerAdjustEvents)
+{
+    TestServerClusterContext context;
+    DeviceEnergyManagementMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kPowerAdjustment);
+
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+
+    Events::PowerAdjustEnd::Type endEvent;
+    endEvent.cause     = CauseEnum::kUserOptOut;
+    endEvent.duration  = 42;
+    endEvent.energyUse = 1234;
+
+    // No event is generated before Startup.
+    cluster.GenerateEvent(Events::PowerAdjustStart::Type{});
+    cluster.GenerateEvent(endEvent);
+    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    cluster.GenerateEvent(Events::PowerAdjustStart::Type{});
+    auto startInfo = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(startInfo.has_value());
+    EXPECT_EQ(startInfo->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, DeviceEnergyManagement::Id, Events::PowerAdjustStart::Id));
+
+    cluster.GenerateEvent(endEvent);
+    auto endInfo = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(endInfo.has_value());
+    EXPECT_EQ(endInfo->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, DeviceEnergyManagement::Id, Events::PowerAdjustEnd::Id));
+    Events::PowerAdjustEnd::DecodableType decoded;
+    ASSERT_EQ(endInfo->GetEventData(decoded), CHIP_NO_ERROR);
+    EXPECT_EQ(decoded.cause, CauseEnum::kUserOptOut);
+    EXPECT_EQ(decoded.duration, 42u);
+    EXPECT_EQ(decoded.energyUse, 1234);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // No event is generated after Shutdown.
+    cluster.GenerateEvent(Events::PowerAdjustStart::Type{});
+    cluster.GenerateEvent(endEvent);
+    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
 }
 
 // =============================================================================
