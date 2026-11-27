@@ -39,7 +39,7 @@ jobs:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
         runs-on: ubuntu-24.04
         # Enable after publishing the image and validating all board configurations.
-        if: false
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: ghcr.io/malbert-silabs/chip-build-zephyr:223
