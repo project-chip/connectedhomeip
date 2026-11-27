@@ -168,6 +168,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     String mapKey = type + ":" + serviceName;
 
     synchronized (mRegistrationLock) {
+      String preservedServiceName = null;
       ActiveRegistration existing = mActiveRegistrations.get(mapKey);
       if (existing != null) {
         if (existing.matches(port, txtAttributes, subTypeSet)) {
@@ -176,11 +177,15 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           return;
         }
         Log.i(TAG, "publish: replacing changed registration for " + mapKey);
+        preservedServiceName = existing.nsdServiceName;
         unregisterServiceSafely(existing.listener, mapKey);
         mActiveRegistrations.remove(mapKey);
       }
 
-      String nsdServiceName = uniqueServiceNameLocked(serviceName, mapKey);
+      String nsdServiceName =
+          preservedServiceName != null && !isServiceNameInUseLocked(preservedServiceName)
+              ? preservedServiceName
+              : uniqueServiceNameLocked(serviceName, mapKey);
       ActiveRegistration reg = null;
       try {
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
@@ -203,8 +208,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           Log.i(TAG, "     " + entry.getKey() + "=" + entry.getValue());
         }
 
-        reg = new ActiveRegistration(mapKey, port, txtAttributes, subTypeSet);
-        reg.nsdServiceName = nsdServiceName;
+        reg = new ActiveRegistration(mapKey, nsdServiceName, port, txtAttributes, subTypeSet);
         if (!publishMulticastLock.isHeld()) {
           publishMulticastLock.acquire();
         }
@@ -340,14 +344,20 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     String candidate = null;
     if (serviceName.matches("[0-9A-F]{16}")) {
       int nibble = Character.digit(serviceName.charAt(0), 16);
-      for (int mask = 1; mask <= 15 && candidate == null; mask++) {
+      for (int mask = 1; mask <= 15; mask++) {
         char first = Character.toUpperCase(Character.forDigit(nibble ^ mask, 16));
         String name = first + serviceName.substring(1);
-        candidate = isServiceNameInUseLocked(name) ? null : name;
+        if (!isServiceNameInUseLocked(name)) {
+          candidate = name;
+          break;
+        }
       }
     }
-    for (int i = 2; candidate == null || isServiceNameInUseLocked(candidate); i++) {
-      candidate = serviceName + "-" + i;
+    if (candidate == null) {
+      int i = 2;
+      do {
+        candidate = serviceName + "-" + i++;
+      } while (isServiceNameInUseLocked(candidate));
     }
     Log.i(TAG, "publish: renamed " + serviceName + " to " + candidate + " for " + mapKey);
     return candidate;
@@ -387,16 +397,21 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
   private class ActiveRegistration {
     final String mapKey;
+    final String nsdServiceName;
     final int port;
     final Map<String, String> txtAttributes;
     final Set<String> subTypes;
     final NsdManager.RegistrationListener listener;
     boolean pendingRemoval = false;
-    String nsdServiceName;
 
     ActiveRegistration(
-        String mapKey, int port, Map<String, String> txtAttributes, Set<String> subTypes) {
+        String mapKey,
+        String nsdServiceName,
+        int port,
+        Map<String, String> txtAttributes,
+        Set<String> subTypes) {
       this.mapKey = mapKey;
+      this.nsdServiceName = nsdServiceName;
       this.port = port;
       this.txtAttributes = txtAttributes;
       this.subTypes = subTypes;
