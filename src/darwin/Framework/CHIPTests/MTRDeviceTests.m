@@ -9732,6 +9732,28 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual(failure.code, MTRErrorCodeInvalidArgument);
 }
 
+- (void)test070b_UnusableTimeoutRefused
+{
+    // A caller timeout that is not a finite number of milliseconds that fits a dispatch time is refused up front,
+    // like one that is too short, instead of being queued with a deadline it cannot have.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    for (NSNumber * timeoutMs in @[ @(NAN), @(INFINITY), @(1e13) ]) {
+        NSUInteger itemsBefore = device.asyncWorkQueue.itemCount;
+        __block NSError * failure;
+        XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:[NSString stringWithFormat:@"Invoke with timeout %@ done", timeoutMs]];
+        [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:timeoutMs] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            failure = error;
+            [invokeDone fulfill];
+        }];
+        XCTAssertEqual(device.asyncWorkQueue.itemCount, itemsBefore, @"a command with timeout %@ was queued", timeoutMs);
+        [self waitForExpectations:@[ invokeDone ] timeout:kTimeoutInSeconds];
+        XCTAssertEqual(failure.code, MTRErrorCodeInvalidArgument, @"timeout %@ gave %@", timeoutMs, failure);
+    }
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+}
+
 - (void)test071_CopiedParamsShareToken
 {
     // A command made with a copy of its params object is cancelled through the original's token: copies share it.

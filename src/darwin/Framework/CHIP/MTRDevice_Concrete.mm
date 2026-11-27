@@ -18,6 +18,8 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#include <cmath>
+
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeChangesOmittedCheck.h"
 #import "MTRAttributeSpecifiedCheck.h"
@@ -4213,6 +4215,14 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // A user command whose caller allows it less than one session attempt would only be queued to fail, so
         // refuse it now.  The bound is the one used for a single CASE attempt; no separate constant.
         NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
+        // The timeout becomes a dispatch_time in nanoseconds, so it must be a finite number that fits.
+        if (userTimeoutMs != nil && !(std::isfinite(userTimeoutMs.doubleValue) && userTimeoutMs.doubleValue <= static_cast<double>(INT64_MAX / NSEC_PER_MSEC))) {
+            MTR_LOG_ERROR("%@ user command timeout %@ ms is not a usable time; not queued", self, userTimeoutMs);
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            });
+            return;
+        }
         if (userTimeoutMs != nil && userTimeoutMs.doubleValue < MTRUserInvokeMinimumTimeoutMs()) {
             MTR_LOG_ERROR("%@ user command timeout %@ ms is shorter than one session attempt (%u ms); not queued", self, userTimeoutMs, MTRUserInvokeMinimumTimeoutMs());
             dispatch_async(queue, ^{
