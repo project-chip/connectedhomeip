@@ -56,8 +56,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -100,8 +102,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -144,8 +148,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -232,8 +238,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -322,8 +330,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -400,8 +410,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -486,8 +498,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -530,8 +544,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -575,8 +591,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -615,8 +633,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -655,8 +675,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -699,8 +721,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -744,8 +768,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -790,8 +816,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -838,8 +866,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -886,8 +916,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -936,8 +968,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -980,8 +1014,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1028,8 +1064,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1076,8 +1114,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1126,8 +1166,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1170,8 +1212,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1212,8 +1256,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1254,8 +1300,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1317,8 +1365,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1363,8 +1413,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1407,8 +1459,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1453,8 +1507,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1497,8 +1553,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1541,8 +1599,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1587,8 +1647,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1631,8 +1693,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1675,8 +1739,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1721,8 +1787,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1765,8 +1833,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1811,8 +1881,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1851,8 +1923,10 @@ MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1907,8 +1981,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1959,8 +2035,10 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams",
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2093,8 +2171,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2137,8 +2217,10 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequest
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2240,8 +2322,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2284,8 +2368,10 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateApplie
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2334,8 +2420,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2380,8 +2468,10 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProvid
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2431,8 +2521,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2513,8 +2605,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2589,8 +2683,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2669,8 +2765,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2732,8 +2830,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2824,8 +2924,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2868,8 +2970,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2912,8 +3016,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2998,8 +3104,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3082,8 +3190,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3126,8 +3236,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3193,8 +3305,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3284,8 +3398,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3324,8 +3440,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3391,8 +3509,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3450,8 +3570,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3490,8 +3612,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3530,8 +3654,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3570,8 +3696,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3616,8 +3744,10 @@ MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3662,8 +3792,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3704,8 +3836,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3746,8 +3880,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3807,8 +3943,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3849,8 +3987,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3893,8 +4033,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3943,8 +4085,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3990,8 +4134,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4030,8 +4176,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4072,8 +4220,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4161,8 +4311,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4243,8 +4395,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4329,8 +4483,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4373,8 +4529,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4453,8 +4611,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4495,8 +4655,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4537,8 +4699,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4588,8 +4752,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4632,8 +4798,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4697,8 +4865,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4739,8 +4909,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4815,8 +4987,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4855,8 +5029,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4939,8 +5115,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5002,8 +5180,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5044,8 +5224,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5103,8 +5285,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5143,8 +5327,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5204,8 +5390,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5267,8 +5455,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5309,8 +5499,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5351,8 +5543,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5414,8 +5608,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5456,8 +5652,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5519,8 +5717,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5561,8 +5761,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5624,8 +5826,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5666,8 +5870,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5729,8 +5935,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5773,8 +5981,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5815,8 +6025,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5878,8 +6090,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5918,8 +6132,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5960,8 +6176,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6002,8 +6220,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6052,8 +6272,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6094,8 +6316,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6134,8 +6358,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6174,8 +6400,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6214,8 +6442,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6254,8 +6484,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6313,8 +6545,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6353,8 +6587,10 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6412,8 +6648,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6462,8 +6700,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6529,8 +6769,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6602,8 +6844,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6667,8 +6911,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6732,8 +6978,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6801,8 +7049,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6843,8 +7093,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6918,8 +7170,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6983,8 +7237,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7046,8 +7302,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7100,8 +7358,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7144,8 +7404,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7211,8 +7473,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7255,8 +7519,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7299,8 +7565,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7339,8 +7607,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7379,8 +7649,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7419,8 +7691,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7461,8 +7735,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7503,8 +7779,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7547,8 +7825,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7587,8 +7867,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7629,8 +7911,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7669,8 +7953,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7711,8 +7997,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7772,8 +8060,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7849,8 +8139,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7891,8 +8183,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7937,8 +8231,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7977,8 +8273,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8021,8 +8319,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8065,8 +8365,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8105,8 +8407,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8151,8 +8455,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8195,8 +8501,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8235,8 +8543,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8283,8 +8593,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8323,8 +8635,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8382,8 +8696,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8428,8 +8744,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8472,8 +8790,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8512,8 +8832,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8554,8 +8876,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8594,8 +8918,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8634,8 +8960,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8676,8 +9004,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8739,8 +9069,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8781,8 +9113,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8844,8 +9178,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8886,8 +9222,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8949,8 +9287,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8991,8 +9331,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9033,8 +9375,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9093,8 +9437,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9135,8 +9481,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9177,8 +9525,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9219,8 +9569,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9263,8 +9615,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9317,8 +9671,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9361,8 +9717,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9453,8 +9811,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9501,8 +9861,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9545,8 +9907,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9631,8 +9995,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9679,8 +10045,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9721,8 +10089,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9805,8 +10175,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9859,8 +10231,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9906,8 +10280,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10005,8 +10381,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10057,8 +10435,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10137,8 +10517,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10223,8 +10605,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10265,8 +10649,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10313,8 +10699,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10353,8 +10741,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10393,8 +10783,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10433,8 +10825,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10473,8 +10867,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10515,8 +10911,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10557,8 +10955,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10599,8 +10999,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10641,8 +11043,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10681,8 +11085,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10727,8 +11133,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10767,8 +11175,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10813,8 +11223,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10859,8 +11271,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10905,8 +11319,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10951,8 +11367,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10997,8 +11415,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11039,8 +11459,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11102,8 +11524,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11167,8 +11591,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11255,8 +11681,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11299,8 +11727,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11358,8 +11788,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11400,8 +11832,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11442,8 +11876,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11488,8 +11924,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11530,8 +11968,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11599,8 +12039,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11645,8 +12087,10 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11697,8 +12141,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11747,8 +12193,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11795,8 +12243,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11845,8 +12295,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11893,8 +12345,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11941,8 +12395,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11991,8 +12447,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12041,8 +12499,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12091,8 +12551,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12139,8 +12601,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12189,8 +12653,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12237,8 +12703,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12292,8 +12760,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12340,8 +12810,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12390,8 +12862,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12440,8 +12914,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12494,8 +12970,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12538,8 +13016,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12590,8 +13070,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12644,8 +13126,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12692,8 +13176,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12732,8 +13218,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12788,8 +13276,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12849,8 +13339,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12891,8 +13383,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12954,8 +13448,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13002,8 +13498,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13063,8 +13561,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13103,8 +13603,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13162,8 +13664,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13221,8 +13725,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13261,8 +13767,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13324,8 +13832,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13366,8 +13876,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13408,8 +13920,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13450,8 +13964,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13492,8 +14008,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13565,8 +14083,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13626,8 +14146,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13670,8 +14192,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13737,8 +14261,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13781,8 +14307,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13827,8 +14355,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13890,8 +14420,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13970,8 +14502,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14012,8 +14546,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14066,8 +14602,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14135,8 +14673,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14183,8 +14723,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14227,8 +14769,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14303,8 +14847,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14343,8 +14889,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14383,8 +14931,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14423,8 +14973,10 @@ MTR_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), 
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14463,8 +15015,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14503,8 +15057,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14543,8 +15099,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14585,8 +15143,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14627,8 +15187,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14669,8 +15231,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14711,8 +15275,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14789,8 +15355,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14833,8 +15401,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14875,8 +15445,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14915,8 +15487,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14957,8 +15531,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14997,8 +15573,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15037,8 +15615,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15081,8 +15661,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15121,8 +15703,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15163,8 +15747,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15251,8 +15837,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15309,8 +15897,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15408,8 +15998,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15471,8 +16063,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15513,8 +16107,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15557,8 +16153,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15601,8 +16199,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15643,8 +16243,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15685,8 +16287,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15763,8 +16367,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15843,8 +16449,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15885,8 +16493,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15925,8 +16535,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15996,8 +16608,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16036,8 +16650,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16095,8 +16711,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16135,8 +16753,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16179,8 +16799,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16221,8 +16843,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16261,8 +16885,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16301,8 +16927,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16343,8 +16971,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16385,8 +17015,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16427,8 +17059,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16469,8 +17103,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16511,8 +17147,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16553,8 +17191,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16595,8 +17235,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16637,8 +17279,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16681,8 +17325,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16752,8 +17398,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16815,8 +17463,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16861,8 +17511,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16903,8 +17555,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16974,8 +17628,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17014,8 +17670,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17054,8 +17712,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17094,8 +17754,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17138,8 +17800,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17184,8 +17848,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17228,8 +17894,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17274,8 +17942,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17341,8 +18011,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17383,8 +18055,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17425,8 +18099,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17467,8 +18143,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17519,8 +18197,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17580,8 +18260,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17642,8 +18324,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17707,8 +18391,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17749,8 +18435,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17803,8 +18491,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17868,8 +18558,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17910,8 +18602,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17952,8 +18646,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17996,8 +18692,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18065,8 +18763,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18111,8 +18811,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18153,8 +18855,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18197,8 +18901,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18239,8 +18945,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18283,8 +18991,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18331,8 +19041,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18391,8 +19103,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18480,8 +19194,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18547,8 +19263,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18591,8 +19309,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18635,8 +19355,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18683,8 +19405,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18727,8 +19451,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18771,8 +19497,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18815,8 +19543,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18857,8 +19587,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18918,8 +19650,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18962,8 +19696,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19006,8 +19742,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19054,8 +19792,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19096,8 +19836,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19161,8 +19903,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19203,8 +19947,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19245,8 +19991,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19287,8 +20035,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19329,8 +20079,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19394,8 +20146,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19436,8 +20190,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19478,8 +20234,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19520,8 +20278,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19585,8 +20345,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19652,8 +20414,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19696,8 +20460,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19765,8 +20531,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19807,8 +20575,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19849,8 +20619,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19901,8 +20673,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19953,8 +20727,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19995,8 +20771,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20043,8 +20821,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20089,8 +20869,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20131,8 +20913,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20175,8 +20959,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20217,8 +21003,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20261,8 +21049,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20303,8 +21093,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20349,8 +21141,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20395,8 +21189,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20441,8 +21237,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20487,8 +21285,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20533,8 +21333,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20577,8 +21379,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20621,8 +21425,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20661,8 +21467,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20724,8 +21532,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20793,8 +21603,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20833,8 +21645,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20892,8 +21706,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20934,8 +21750,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20978,8 +21796,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21039,8 +21859,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21100,8 +21922,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21161,8 +21985,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21205,8 +22031,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21274,8 +22102,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21316,8 +22146,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21377,8 +22209,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21438,8 +22272,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21488,8 +22324,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21549,8 +22387,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21610,8 +22450,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21650,8 +22492,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21690,8 +22534,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), ma
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21785,8 +22631,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21825,8 +22673,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1,
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21920,8 +22770,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21960,8 +22812,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 1
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22055,8 +22909,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22095,8 +22951,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(1
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22214,8 +23072,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22258,8 +23118,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22355,8 +23217,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22397,8 +23261,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams"
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22508,8 +23374,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22560,8 +23428,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestPa
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22669,8 +23539,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22711,8 +23583,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams"
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22916,8 +23790,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22958,8 +23834,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestP
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23055,8 +23933,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23097,8 +23977,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestPar
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23194,8 +24076,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23236,8 +24120,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestPara
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23333,8 +24219,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23375,8 +24263,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequ
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23472,8 +24362,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23514,8 +24406,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgument
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23575,8 +24469,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23617,8 +24513,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParam
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23680,8 +24578,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23724,8 +24624,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23787,8 +24689,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23829,8 +24733,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParam
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23893,8 +24799,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23957,8 +24865,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalReque
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23999,8 +24909,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24041,8 +24953,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", 
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24081,8 +24995,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24121,8 +25037,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(1
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24163,8 +25081,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24205,8 +25125,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentReques
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24251,8 +25173,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24297,8 +25221,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams",
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24339,8 +25265,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24381,8 +25309,10 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24427,8 +25357,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24473,8 +25405,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24515,8 +25449,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24559,8 +25495,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24599,8 +25537,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24641,8 +25581,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24702,8 +25644,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24765,8 +25709,10 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * If nil (the default value), the command is queued in order with other work, as before.
  *
- * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
- * object share the token rather than copying it, since cancelling is shared state.
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
+ * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
+ * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
+ * state.
  *
  * @see MTRUserInvokeToken
  */
