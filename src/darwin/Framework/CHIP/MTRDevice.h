@@ -276,8 +276,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *                               is counted from when the invoke is passed to the XPC service.
  *                               While the invoke is still waiting to be sent (for example
  *                               behind other work for the device, or for a session), reads
- *                               also return the expected values.  If the invoke fails, the
- *                               expected values are removed.  If the value is negative, both
+ *                               also return the expected values.  That wait is bounded: an
+ *                               invoke that sets expected values and has no user command
+ *                               token, still unsent after 10 seconds, fails with
+ *                               MTRErrorCodeTimeout, its expected values are removed, and it
+ *                               is never sent.  If the invoke fails, the expected values are
+ *                               removed.  If the value is negative, both
  *                               this value and expectedValues will be ignored.  A value less
  *                               than 1 that is not negative is treated as 1.  If this value is
  *                               greater than UINT32_MAX, it will be clamped to UINT32_MAX.

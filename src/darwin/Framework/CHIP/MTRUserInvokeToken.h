@@ -35,8 +35,10 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * @param timeoutMs  how long, in milliseconds, the invoke may wait in the queue before it is sent.  An invoke still
  *                   unsent when it elapses completes with MTRErrorCodeTimeout and is never sent.  If nil, the wait
- *                   is not bounded.  A value shorter than one session attempt is refused when the invoke is made,
- *                   with MTRErrorCodeInvalidArgument.
+ *                   is not bounded.  A value shorter than one session attempt, or one that is not a finite
+ *                   number of milliseconds, is refused when the invoke is made, with MTRErrorCodeInvalidArgument.
+ *                   For an MTRDevice backed by an XPC connection the timeout is not applied, and nothing is
+ *                   refused for it.
  */
 - (instancetype)initWithTimeout:(NSNumber * _Nullable)timeoutMs;
 

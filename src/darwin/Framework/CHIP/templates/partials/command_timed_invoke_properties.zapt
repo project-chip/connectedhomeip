@@ -27,12 +27,13 @@
 /**
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
- * If nil (the default value), the command is queued in order with other work, as before.
+ * If nil (the default value), the command is queued in order with other work.  A command with expected values and
+ * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
- * backed by an XPC connection, cancel works only until the command is submitted; after that it returns NO and the
- * command still runs.  Copies of this object share the token rather than copying it, since cancelling is shared
- * state.
+ * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
+ * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
+ * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
  *
  * @see MTRUserInvokeToken
  */
