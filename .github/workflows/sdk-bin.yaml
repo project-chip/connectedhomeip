@@ -98,7 +98,7 @@ jobs:
                 "$v2_app" \
                 stripped-bins/ota-requestor-app.ota
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux-arm64-${{ matrix.target }}
           path: stripped-bins
@@ -113,7 +113,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Save ccache
         if: github.ref == 'refs/heads/master' && matrix.target == 'all-clusters-ipv6only'
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .ccache
           key: ${{ env.CCACHE_KEY }}
@@ -181,7 +181,7 @@ jobs:
           mkdir -p stripped-bins
           strip --strip-all "$app" -o stripped-bins/openssl3_5-${{ matrix.app }}
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux-arm64-openssl3_5-${{ matrix.target }}
           path: stripped-bins
@@ -242,7 +242,7 @@ jobs:
           mkdir -p openssl-lib
           cp -P /opt/matter/openssl/lib/libssl.so* /opt/matter/openssl/lib/libcrypto.so* openssl-lib/
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: openssl-lib-arm64
           path: openssl-lib
@@ -252,12 +252,12 @@ jobs:
           dist_packages=$(python -c "import site; print(site.getsitepackages()[0])")
           echo "dist_packages=$dist_packages" >> $GITHUB_OUTPUT
       - name: Save usr/local/bin
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: user-local-bin-arm64
           path: /usr/local/bin
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-linux-arm64
           path: ${{ steps.dist-packages.outputs.dist_packages }}
@@ -272,7 +272,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Save ccache
         if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .ccache
           key: ${{ env.CCACHE_KEY }}
@@ -319,7 +319,7 @@ jobs:
           name: openssl-lib-arm64
       # Build and push an image using a new Dockerfile that copies the binaries from the downloaded artifacts
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
         env:

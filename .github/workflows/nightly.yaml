@@ -343,7 +343,7 @@ jobs:
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: junit-results-${{ matrix.filter }}
                   path: out/junit-results/${{ matrix.filter }}-results.xml
@@ -484,7 +484,7 @@ jobs:
                       --report-name "Nightly CI Tests"
 
             - name: Upload Allure Report
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                   name: allure-report-nightly
                   path: allure-report

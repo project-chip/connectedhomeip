@@ -43,6 +43,12 @@
  * removes the Cancelable and/or the associated callback from its internal data structures; the
  * callee MUST NOT access the Cancelable or Callback in any way after the CancelFn returns.
  *
+ * Similarly, the callee MUST NOT access the Cancelable or Callback after invoking the callback:
+ * the callback may cancel, re-register or destroy itself (and possibly the caller) from within
+ * the invocation. A callee that keeps the callback registered across the invocation has to
+ * determine whether it is still registered afterwards without dereferencing it, e.g. by checking
+ * whether its CancelFn has removed it from a list.
+ *
  * Refer to the documentation of Callback and Cancelable below for details.
  *
  * Note that Callback<T>, Cancelable, and related classes are not thread-safe; they must only be
@@ -63,7 +69,8 @@
  * - If the callee has synchronously rejected the call outright (e.g. by returning a CHIP_ERROR)
  *   the callback will not be called at all. If the caller cancels the callback prior to the
  *   operation completing, the callback will not be called. Otherwise, the callback will be called
- *   exactly once.
+ *   exactly once, and the callee will have unregistered it beforehand, so the caller can reuse or
+ *   destroy the callback (or itself) from within that invocation.
  *
  * - Callback parameters should be passed by value as Callback<T>::Owned tokens (though various
  *   existing APIs accept callbacks as plain pointers). The Owned token implicitly constructs from

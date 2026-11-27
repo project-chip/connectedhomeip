@@ -79,7 +79,7 @@ source_set("efr32_test_main") {
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_common_plat_dir}/PigweedLogger.cpp",
+    "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",
     "${examples_common_plat_dir}/uart.cpp",
     "src/main.cpp",
@@ -103,7 +103,7 @@ source_set("efr32_test_main") {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:matter-shell",
+      "${examples_common_plat_dir}/shell:matter-shell",
     ]
   }
 

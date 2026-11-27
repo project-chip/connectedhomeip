@@ -42,14 +42,15 @@ namespace {
 JniGlobalReference sResolverObject;
 JniGlobalReference sBrowserObject;
 JniGlobalReference sMdnsCallbackObject;
-jmethodID sResolveMethod          = nullptr;
-jmethodID sBrowseMethod           = nullptr;
-jmethodID sStopBrowseMethod       = nullptr;
-jmethodID sGetTextEntryKeysMethod = nullptr;
-jmethodID sGetTextEntryDataMethod = nullptr;
-jclass sMdnsCallbackClass         = nullptr;
-jmethodID sPublishMethod          = nullptr;
-jmethodID sRemoveServicesMethod   = nullptr;
+jmethodID sResolveMethod               = nullptr;
+jmethodID sBrowseMethod                = nullptr;
+jmethodID sStopBrowseMethod            = nullptr;
+jmethodID sGetTextEntryKeysMethod      = nullptr;
+jmethodID sGetTextEntryDataMethod      = nullptr;
+jclass sMdnsCallbackClass              = nullptr;
+jmethodID sPublishMethod               = nullptr;
+jmethodID sRemoveServicesMethod        = nullptr;
+jmethodID sFinalizeServiceUpdateMethod = nullptr;
 } // namespace
 
 // Implementation of functions declared in lib/dnssd/platform/Dnssd.h
@@ -66,13 +67,21 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return CHIP_NO_ERROR;
 }
 
-void ChipDnssdShutdown() {}
+void ChipDnssdShutdown()
+{
+    if (sResolverObject.HasValidObjectRef())
+    {
+        SuccessOrLog(ChipDnssdRemoveServices(), Discovery, "Failed to remove services on Dnssd shutdown");
+        SuccessOrLog(ChipDnssdFinalizeServiceUpdate(), Discovery, "Failed to finalize service update on Dnssd shutdown");
+    }
+}
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-
     VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
+                        ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdRemoveServices"));
 
     {
         DeviceLayer::StackUnlock unlock;
@@ -152,6 +161,24 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
+    VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sFinalizeServiceUpdateMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
+                        ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdFinalizeServiceUpdate"));
+
+    {
+        DeviceLayer::StackUnlock unlock;
+        env->CallVoidMethod(sResolverObject.ObjectRef(), sFinalizeServiceUpdateMethod);
+    }
+
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdFinalizeServiceUpdate");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -379,6 +406,13 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
     if (sRemoveServicesMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'removeServices' method");
+        env->ExceptionClear();
+    }
+
+    sFinalizeServiceUpdateMethod = env->GetMethodID(resolverClass, "finalizeServiceUpdate", "()V");
+    if (sFinalizeServiceUpdateMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access Resolver 'finalizeServiceUpdate' method");
         env->ExceptionClear();
     }
 }

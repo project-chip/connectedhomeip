@@ -924,7 +924,9 @@ CHIP_ERROR PairingCommand::MaybeDisplayTermsAndConditions(CommissioningParameter
     VerifyOrReturnError(mUseDCL.ValueOr(false), CHIP_NO_ERROR);
 
     Json::Value tc;
-    auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort);
+    auto securityMode = mDCLDisableHttpsValidation.ValueOr(false) ? tool::https::HttpsSecurityMode::kDisableValidation
+                                                                  : tool::https::HttpsSecurityMode::kDefault;
+    auto client       = tool::dcl::DCLClient(mDCLHostName, mDCLPort, securityMode);
     ReturnErrorOnFailure(client.TermsAndConditions(mOnboardingPayload, tc));
     if (tc != Json::nullValue)
     {
