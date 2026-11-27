@@ -33,7 +33,7 @@ logger.addHandler(sh)
 CIRQUE_URL = "http://localhost:5000"
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
-TEST_SCRIPT_ESC = shlex.quote(str(PYTHON_TESTING_DIR_PATH / "TC_CNET_4_11.py"))
+TEST_SCRIPT_ESC = shlex.quote(str(PYTHON_TESTING_DIR_PATH / "TC_CNET_4_11_provisional.py"))
 
 SSID_1 = "WIFI_1ST_AP"
 PSK_1 = "12345678"
@@ -129,7 +129,7 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
             f"PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:{PSK_2}"
         )
         ret = self.execute_device_cmd(self.th, command)
-        self.assertEqual(int(ret.get("return_code", -1)), 0, f"TC_CNET_4_11 failed: {ret.get('output')}")
+        self.assertEqual(int(ret.get("return_code", -1)), 0, f"TC_CNET_4_11_provisional failed: {ret.get('output')}")
         self.wait_for_wifi_network(self.dut, SSID_2)
         self.wait_for_wifi_network(self.th, SSID_1)
 
