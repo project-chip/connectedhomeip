@@ -146,6 +146,7 @@ static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (void)unitTestWriteDidInstallExpectedValue:(MTRDevice *)device attributePath:(MTRAttributePath *)attributePath;
+- (void)unitTestInvokeWillCancelForQueueTimeout:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;

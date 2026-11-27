@@ -279,6 +279,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldIDIndex = 2
 };
 
+// Why an invoke's work item was cancelled, as recorded by the work queue (MTRAsyncWorkItem.cancelReason).  Zero means
+// any other cancel: a user command token's, or the device going away.
+static const NSUInteger MTRDeviceInvokeCancelReasonQueueTimeout = 1;
+
 typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
     MTRDeviceWriteRequestFieldPathIndex = 0,
     MTRDeviceWriteRequestFieldValueIndex = 1,
@@ -459,6 +463,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (void)unitTestWriteDidInstallExpectedValue:(MTRDevice *)device attributePath:(MTRAttributePath *)attributePath;
+- (void)unitTestInvokeWillCancelForQueueTimeout:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
@@ -783,6 +788,20 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block
 {
     dispatch_sync(self.queue, block);
+}
+
+// Called without the lock held, right before an invoke is cancelled for its queue timeout, so a test can hold that
+// cancel here while it makes another cancel or send happen first.
+- (void)_unitTestInvokeWillCancelForQueueTimeout
+{
+    id testDelegate;
+    {
+        std::lock_guard lock(_lock);
+        testDelegate = [_delegateManager firstDelegate];
+    }
+    if ([testDelegate respondsToSelector:@selector(unitTestInvokeWillCancelForQueueTimeout:)]) {
+        [testDelegate unitTestInvokeWillCancelForQueueTimeout:self];
+    }
 }
 #endif
 
@@ -4298,11 +4317,9 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
     MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
-    // Set before the queue timeout cancels the item, so the cancel is reported as a timeout.  The timeout is taken
-    // once, by whichever comes first: the timer, or the send point finding the deadline passed.  Only the one that
-    // took it cancels the item or clears this, so neither undoes the other.
-    auto cancelledByTimeout = std::make_shared<std::atomic<bool>>(false);
-    auto timeoutTaken = std::make_shared<std::atomic<bool>>(false);
+    // The queue timeout cancels the item with this reason, by the timer or at the send point.  The work queue keeps
+    // the reason of the one cancel that succeeds, so the handlers below report the cancel that won.
+    const NSUInteger queueTimeoutCancelReason = MTRDeviceInvokeCancelReasonQueueTimeout;
     // The queue timeout's deadline, on a monotonic clock, checked again at the send point.
     dispatch_time_t queueDeadline = (queueTimeoutMs != nil)
         ? dispatch_time(DISPATCH_TIME_NOW, (int64_t) (queueTimeoutMs.doubleValue * NSEC_PER_MSEC))
@@ -4325,7 +4342,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             // nothing here.  Any other cancel (the device going away) reports nothing to the caller, so this result
             // still does.
             BOOL accepted = workCompletion(MTRAsyncWorkComplete);
-            if (!accepted && (userInvokeToken || cancelledByTimeout->load())) {
+            if (!accepted && (userInvokeToken || workItem.cancelReason == queueTimeoutCancelReason)) {
                 MTR_LOG("Invoke work item [%llu] was cancelled before its result arrived: %@", workItemID, error);
                 return;
             }
@@ -4365,16 +4382,17 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 mtr_strongify(self);
                 __block BOOL send = YES;
                 if ((userInvokeToken || boundedWithoutToken) && weakWorkItem) {
-                    // Past its queue deadline it is not sent, even if the timer has not run yet: take the timeout
-                    // here and cancel, so the caller hears it timed out.
-                    if (queueDeadline != DISPATCH_TIME_FOREVER && dispatch_time(DISPATCH_TIME_NOW, 0) >= queueDeadline
-                        && !timeoutTaken->exchange(true)) {
-                        cancelledByTimeout->store(true);
-                        if ([workQueue cancelWorkItemIfUnsent:weakWorkItem]) {
-                            MTR_LOG("Invoke work item [%llu] reached its send point after its queue deadline; not sent", workItemID);
-                            return NO;
-                        }
-                        cancelledByTimeout->store(false);
+                    // Past its queue deadline it is not sent, even if the timer has not run yet or is running now:
+                    // cancel it as timed out.  If another cancel got there first, readyToSend below refuses it.
+                    BOOL pastDeadline = (queueDeadline != DISPATCH_TIME_FOREVER && dispatch_time(DISPATCH_TIME_NOW, 0) >= queueDeadline);
+#ifdef DEBUG
+                    if (pastDeadline) {
+                        [self _unitTestInvokeWillCancelForQueueTimeout];
+                    }
+#endif
+                    if (pastDeadline && [workQueue cancelWorkItemIfUnsent:weakWorkItem reason:queueTimeoutCancelReason]) {
+                        MTR_LOG("Invoke work item [%llu] reached its send point after its queue deadline; not sent", workItemID);
+                        return NO;
                     }
                     // A command that has sent nothing can be cancelled up to here: if it was, send nothing.  Its
                     // caller has already been completed by the cancel.  From here on it is sent and completes.
@@ -4430,12 +4448,13 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             if (self && expectedValues) {
                 [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
             }
+            BOOL timedOut = (workItem.cancelReason == queueTimeoutCancelReason);
             if (userInvokeToken) {
-                NSError * error = cancelledByTimeout->load() ? [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT] : [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+                NSError * error = timedOut ? [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT] : [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
                 dispatch_async(queue, ^{
                     completion(nil, error);
                 });
-            } else if (cancelledByTimeout->load()) {
+            } else if (timedOut) {
                 dispatch_async(queue, ^{
                     completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]);
                 });
@@ -4469,16 +4488,19 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // The send point checks the same deadline, for a session that arrives while this timer is still waiting
         // to run.
         MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+#ifdef DEBUG
+        mtr_weakify(self); // only the test hook below uses it
+#endif
         dispatch_after(queueDeadline, self.queue, ^{
             MTRAsyncWorkItem * item = weakWorkItem;
-            if (!item || timeoutTaken->exchange(true)) {
-                return;
+#ifdef DEBUG
+            if (item) {
+                mtr_strongify(self);
+                [self _unitTestInvokeWillCancelForQueueTimeout];
             }
-            cancelledByTimeout->store(true);
-            if ([workQueue cancelWorkItemIfUnsent:item]) {
+#endif
+            if (item && [workQueue cancelWorkItemIfUnsent:item reason:queueTimeoutCancelReason]) {
                 MTR_LOG("Invoke work item [%llu] timed out after %@ ms in the queue before it was sent", workItemID, queueTimeoutMs);
-            } else {
-                cancelledByTimeout->store(false); // already sent: it completes as usual
             }
         });
     }

@@ -98,6 +98,14 @@
     }
 }
 
+- (void)unitTestInvokeWillCancelForQueueTimeout:(MTRDevice *)device
+{
+    dispatch_block_t block = self.onInvokeWillCancelForQueueTimeout;
+    if (block) {
+        block();
+    }
+}
+
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
 {
     return self.forceAttributeReportsIfMatchingCache;

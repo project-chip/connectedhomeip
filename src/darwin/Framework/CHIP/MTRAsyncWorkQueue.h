@@ -132,6 +132,11 @@ MTR_TESTABLE
 /// The work item may or may not have been started already.
 @property (nonatomic, strong, nullable) void (^cancelHandler)(void);
 
+/// Why the item was cancelled, as given to the -cancelWorkItemIfUnsent:reason: call that cancelled it; 0 when it
+/// was cancelled any other way (including when the queue is invalidated) or not at all.  Set, under the queue's
+/// lock, before the cancelHandler is dispatched, by the one cancel that succeeds; a later cancel changes nothing.
+@property (nonatomic, readonly) NSUInteger cancelReason;
+
 @property (nonatomic, readonly) NSUInteger batchingID;
 @property (nonatomic, readonly, nullable) id batchableData;
 @property (nonatomic, readonly, nullable) MTRAsyncWorkBatchingHandler batchingHandler;
@@ -253,6 +258,10 @@ MTR_TESTABLE
 /// enqueueing it later cancels it instead.  Returns NO, and changes nothing, if the item has sent or is no
 /// longer in the queue.
 - (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem;
+
+/// As -cancelWorkItemIfUnsent:, and when it returns YES, records `reason` as the item's cancelReason in the same
+/// step, so the cancelHandler can tell which cancel won.  `reason` is the caller's own non-zero code.
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem reason:(NSUInteger)reason;
 @end
 
 NS_ASSUME_NONNULL_END

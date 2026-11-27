@@ -35,6 +35,7 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onDeviceCachePrimed;
 @property (atomic) BOOL skipExpectedValuesForWrite;
 @property (atomic, copy, nullable) void (^onWriteDidInstallExpectedValue)(MTRAttributePath * attributePath);
+@property (atomic, copy, nullable) dispatch_block_t onInvokeWillCancelForQueueTimeout;
 @property (atomic) BOOL forceAttributeReportsIfMatchingCache;
 @property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @property (atomic) BOOL pretendThreadEnabled;

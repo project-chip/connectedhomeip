@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
 - (void)setCountedAboveWidth:(BOOL)countedAboveWidth;
 - (BOOL)cancelledBeforeEnqueue;
 - (void)setCancelledBeforeEnqueue:(BOOL)cancelledBeforeEnqueue;
+- (void)setCancelReason:(NSUInteger)cancelReason;
 @end
 
 MTR_DIRECT_MEMBERS
@@ -50,6 +51,17 @@ MTR_DIRECT_MEMBERS
     BOOL _sent; // workItem:readyToSend: was called: something has been, or is being, sent
     BOOL _countedAboveWidth; // running as the one user command allowed above the queue's width
     BOOL _cancelledBeforeEnqueue; // cancelWorkItemIfUnsent: came before the item was enqueued; set under the queue lock
+    NSUInteger _cancelReason; // set under the queue lock by the cancelWorkItemIfUnsent:reason: call that succeeded
+}
+
+- (NSUInteger)cancelReason
+{
+    return _cancelReason;
+}
+
+- (void)setCancelReason:(NSUInteger)cancelReason
+{
+    _cancelReason = cancelReason;
 }
 
 - (BOOL)sent
@@ -653,6 +665,11 @@ struct ContextSnapshot {
 
 - (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem *)workItem
 {
+    return [self cancelWorkItemIfUnsent:workItem reason:0];
+}
+
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem *)workItem reason:(NSUInteger)reason
+{
     ContextSnapshot context(self); // outside of lock
     std::lock_guard lock(_lock);
     if (!workItem.isEnqueued) {
@@ -662,6 +679,7 @@ struct ContextSnapshot {
             return NO;
         }
         workItem.cancelledBeforeEnqueue = YES;
+        workItem.cancelReason = reason;
         return YES;
     }
     NSUInteger index = [_items indexOfObjectIdenticalTo:workItem];
@@ -674,6 +692,8 @@ struct ContextSnapshot {
     }
     [_items removeObjectAtIndex:index];
     MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> cancelled work item [%llu] before it sent anything", context.description, static_cast<unsigned long>(_items.count), workItem.uniqueID);
+    // Recorded before the cancelHandler is dispatched, so the handler sees why it was cancelled.
+    workItem.cancelReason = reason;
     // Marks it complete: its readyHandler will not run, and if it is running its completion returns NO.
     [workItem cancel];
     [self _callNextReadyWorkItemWithContext:context];
