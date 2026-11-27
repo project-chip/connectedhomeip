@@ -51,8 +51,9 @@ target_include_directories(app PRIVATE
                            main/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
-                           ${REALTEK_COMMON}/bee/ota
+                           ${REALTEK_COMMON}/ota
                            ${REALTEK_COMMON}/zephyr
+                           ${REALTEK_COMMON}/util
                            ${ZEPHYR_BASE}/../modules/hal/realtek/bee/drivers/wdt/inc
                            ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common)
 
@@ -63,12 +64,31 @@ target_sources(app PRIVATE
                ${REALTEK_COMMON}/zephyr/LEDWidget.cpp
                ${REALTEK_COMMON}/zephyr/matter_button.c)
 
+# Bee alarm implementation: replaces the generic OpenThread alarms with ones
+# driven by the MAC hardware timer, and pulls in the ZBMAC power management.
+target_sources(app PRIVATE ${ZEPHYR_BASE}/tests/boards/realtek/bee/ot-cli/src/alarm.c)
+zephyr_code_relocate(FILES ${ZEPHYR_BASE}/tests/boards/realtek/bee/ot-cli/src/alarm.c LOCATION ITCM_TEXT)
+zephyr_code_relocate(FILES ${ZEPHYR_BASE}/modules/openthread/platform/radio.c LOCATION ITCM_TEXT)
+
 target_link_options(app
               PUBLIC
+                  -Wl,--wrap,memcpy
+                  -Wl,--wrap,memset
                   -Wl,--wrap,mac_EnterCritical_rom
                   -Wl,--wrap,mac_ExitCritical_rom
-                  -Wl,--wrap,mac_RstRF_rom
                   -Wl,--wrap,otPlatReset
+                  -Wl,--wrap,platformAlarmMilliInit
+                  -Wl,--wrap,platformAlarmMilliProcess
+                  -Wl,--wrap,otPlatAlarmMilliGetNow
+                  -Wl,--wrap,otPlatAlarmMilliStartAt
+                  -Wl,--wrap,otPlatAlarmMilliStop
+                  -Wl,--wrap,platformAlarmMicroInit
+                  -Wl,--wrap,platformAlarmMicroProcess
+                  -Wl,--wrap,otPlatAlarmMicroGetNow
+                  -Wl,--wrap,otPlatAlarmMicroStartAt
+                  -Wl,--wrap,otPlatAlarmMicroStop
+                  -Wl,--wrap,otPlatTimeGet
+                  -Wl,--wrap,otPlatLog
           )
 
 chip_configure_data_model(app
@@ -78,7 +98,7 @@ chip_configure_data_model(app
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
   target_sources(app PRIVATE
-                 ${REALTEK_COMMON}/bee/ota/OTAInitializer.cpp
+                 ${REALTEK_COMMON}/ota/OTAInitializer.cpp
                  ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common/matter_ota.c)
 endif()
 
@@ -108,7 +128,7 @@ set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRIN
 
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
-add_subdirectory(third_party/connectedhomeip/examples/platform/realtek/bee/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/examples/platform/realtek/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -198,15 +218,15 @@ pw_proto_library(thread_service
 target_sources(app PRIVATE
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/realtek/PigweedLoggerMutex.cpp
-  ${REALTEK_COMMON}/bee/Rpc.cpp
-  ${REALTEK_COMMON}/bee/PigweedLogger.cpp
+  ${REALTEK_COMMON}/Rpc.cpp
+  ${REALTEK_COMMON}/PigweedLogger.cpp
 )
 
 target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
-  ${REALTEK_COMMON}/bee
+  ${REALTEK_COMMON}
   ../../common
   ../../common/pigweed
   ../../common/pigweed/realtek)

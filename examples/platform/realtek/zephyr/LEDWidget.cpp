@@ -23,14 +23,6 @@
 
 LOG_MODULE_REGISTER(LEDWidget, CONFIG_CHIP_APP_LOG_LEVEL);
 
-static LEDWidget::LEDWidgetStateUpdateHandler sStateUpdateCallback;
-
-void LEDWidget::SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb)
-{
-    if (stateUpdateCb)
-        sStateUpdateCallback = stateUpdateCb;
-}
-
 void LEDWidget::Init(gpio_dt_spec gpio)
 {
     mBlinkOnTimeMS  = 0;
@@ -88,6 +80,16 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
     }
 }
 
+void LEDWidget::BlinkStop()
+{
+    k_timer_stop(&mLedTimer);
+    mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    /* Stop on a known state so the LED does not freeze at whatever half
+     * period the blink happened to be in. Mirrors matter_led_blink_stop()
+     * followed by turning the LED off. */
+    DoSet(false);
+}
+
 void LEDWidget::ScheduleStateChange()
 {
     k_timer_start(&mLedTimer, K_MSEC(mState ? mBlinkOnTimeMS : mBlinkOffTimeMS), K_NO_WAIT);
@@ -119,6 +121,8 @@ void LEDWidget::UpdateState()
 
 void LEDWidget::LedStateTimerHandler(k_timer * timer)
 {
-    if (sStateUpdateCallback)
-        sStateUpdateCallback(reinterpret_cast<LEDWidget *>(timer->user_data));
+    auto * led = reinterpret_cast<LEDWidget *>(timer->user_data);
+
+    /* Blinking is self-sustaining: every toggle re-arms the timer */
+    led->UpdateState();
 }

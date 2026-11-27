@@ -26,8 +26,26 @@ config LOG
 if LOG
 
 choice LOG_MODE
-    default LOG_MODE_MINIMAL
+    default LOG_MODE_MINIMAL if !NET_L2_OPENTHREAD
+    default LOG_MODE_DEFERRED
 endchoice
+
+if LOG_MODE_DEFERRED
+
+config LOG_BACKEND_UART
+    default y
+
+config SHELL_LOG_BACKEND
+    default n
+
+config LOG_RUNTIME_DEFAULT_LEVEL
+    default 4 # debug
+
+config LOG_BUFFER_SIZE
+    default 4096 if NET_L2_OPENTHREAD
+    default 1024
+
+endif # LOG_MODE_DEFERRED
 
 choice MATTER_LOG_LEVEL_CHOICE
     default MATTER_LOG_LEVEL_DBG
@@ -71,10 +89,13 @@ config POSIX_MAX_FDS
     default 16
 
 choice LIBC_IMPLEMENTATION
-	default NEWLIB_LIBC
+	default PICOLIBC
 endchoice
 
 # Application stack size
+# main() does nothing but dispatch the Matter app event loop, so it needs far
+# less than the 8K default. The CHIP task has its own stack, sized separately
+# via CHIP_TASK_STACK_SIZE.
 config MAIN_STACK_SIZE
     default 8192
 
@@ -91,7 +112,7 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
     default 8192 if NET_L2_OPENTHREAD
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 8192
+    default -1
 
 config NET_IPV6_MLD
     default y
@@ -180,14 +201,8 @@ config NVS_LOOKUP_CACHE
 config NVS_LOOKUP_CACHE_SIZE
     default 512
 
-# Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
-# nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
-config SETTINGS_NVS_SECTOR_SIZE_MULT
-    default 1
-
-# Set sector counter of NVS
-config SETTINGS_NVS_SECTOR_COUNT
-    default 8
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+    default y
 
 # Enable OpenThread
 
@@ -235,25 +250,37 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
+choice CHIP_CRYPTO
+	default CHIP_CRYPTO_PSA
+endchoice
+
 # Configure MBEDTLS lib
-config MBEDTLS_USER_CONFIG_ENABLE
-    default y
-
-config MBEDTLS_USER_CONFIG_FILE
-    default "bee4-mbedtls-config.h"
-
-config MBEDTLS_ZEPHYR_ENTROPY
-	default y
-
 config MBEDTLS_ENABLE_HEAP
 	default y
 
 config MBEDTLS_HEAP_SIZE
 	default 8192
 
-config MBEDTLS_ECP_C
-    default y
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+	default 64
 
+config MBEDTLS_ENTROPY_C
+	default y
+
+config MBEDTLS_CTR_DRBG_C
+	default y
+
+config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+	default y
+
+config MBEDTLS_PSA_CRYPTO_STORAGE_C
+	default y
+
+config SECURE_STORAGE
+	default y
+
+config MBEDTLS_SSL_MAX_CONTENT_LEN
+	default 8192
 
 # getopt version
 config GETOPT_LONG

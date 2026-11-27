@@ -53,7 +53,7 @@ public:
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
 
-    LEDWidget & GetLightingDevice(void);
+    LEDWidget & GetLightLED(void);
 
 private:
     CHIP_ERROR Init();
@@ -64,15 +64,15 @@ private:
     static void PostEvent(const AppEvent & event);
     static void DispatchEvent(const AppEvent & event);
     static void FunctionTimerEventHandler(const AppEvent & event);
-    static void UpdateLedStateEventHandler(const AppEvent & event);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void ButtonEventHandler(uint8_t buttonIdx, uint8_t state);
     static void FunctionTimerTimeoutCallback(k_timer * timer);
 
     static void UpdateStatusLED();
-    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
     static void FunctionHandler(const AppEvent & event);
+    static void BLEStartAdvertising(intptr_t arg);
+    static void ToggleLight();
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;

@@ -134,9 +134,8 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
-	bool
-	default y
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	depends on SETTINGS_NVS || SETTINGS_ZMS
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"

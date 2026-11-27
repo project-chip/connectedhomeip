@@ -44,7 +44,6 @@ static_library("realtek_zephyr") {
     "InetPlatformConfig.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "bee4-mbedtls-config.h",
   ]
 
   if (chip_realtek_ic_type == "rtl87x2g") {

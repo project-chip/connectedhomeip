@@ -49,10 +49,13 @@ if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
-matter_add_flags(-D_POSIX_C_SOURCE=200809)
 
-if (CONFIG_ARM)
-    matter_add_cflags(--specs=nosys.specs)
+if(CONFIG_ARM)
+    # nosys.specs is a newlib spec; the current build uses picolibc which does
+    # not provide it. Only add it for newlib so ARM CHIP builds link cleanly.
+    if(CONFIG_NEWLIB_LIBC)
+        matter_add_cflags(--specs=nosys.specs)
+    endif()
 endif()
 
 if(CONFIG_MBEDTLS)
@@ -69,8 +72,8 @@ matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
 
 zephyr_include_directories(
     ${CHIP_ROOT}/src/platform/realtek/zephyr
-    ${CHIP_ROOT}/src/platform/realtek/zephyr/hw_acc
     ${ZEPHYR_BASE}/../modules/crypto/mbedtls/library/
+    ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common
 )
 
 if (CONFIG_BOARD_RTL87X3G_EVB)
@@ -92,8 +95,6 @@ zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
 matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
-
-matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<bee4-mbedtls-config.h>)
 
 # Set up custom OpenThread configuration
 

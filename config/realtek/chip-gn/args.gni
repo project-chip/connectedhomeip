@@ -22,7 +22,7 @@ chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
-chip_crypto = "mbedtls"
+chip_crypto = "psa"
 chip_external_mbedtls = true
 
 custom_toolchain = "${chip_root}/config/realtek/chip-gn/toolchain:zephyr"

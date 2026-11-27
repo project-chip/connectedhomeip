@@ -23,8 +23,6 @@
 struct AppEvent;
 using EventHandler = void (*)(const AppEvent &);
 
-class LEDWidget;
-
 enum class AppEventType : uint8_t
 {
     None = 0,
@@ -32,18 +30,16 @@ enum class AppEventType : uint8_t
     ButtonPushed,
     ButtonReleased,
     Timer,
-    UpdateLedState,
-    Lighting,
     IdentifyStart,
     IdentifyStop,
 };
 
 enum class FunctionEvent : uint8_t
 {
-    NoneSelected   = 0,
-    SoftwareUpdate = 1,
-    FactoryReset,
-    AdvertisingStart
+    NoneSelected = 0,
+    Reset,            // released before kResetTriggerTimeout
+    AdvertisingStart, // held past kResetTriggerTimeout
+    FactoryReset,     // held past kBleAdvTriggerTimeout, cancelable for a window
 };
 
 struct AppEvent
@@ -59,15 +55,6 @@ struct AppEvent
         {
             void * Context;
         } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightingEvent;
-        struct
-        {
-            LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
     };
 
     AppEventType Type{ AppEventType::None };

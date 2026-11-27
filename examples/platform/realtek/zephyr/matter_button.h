@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-#define MATTER_BUTTON_STATE_RELEASE 0
-#define MATTER_BUTTON_STATE_PRESS 1
+#define MATTER_BUTTON_STATE_RELEASE 1
+#define MATTER_BUTTON_STATE_PRESS 0
 
 typedef void (*button_handler_t)(uint8_t button_index, uint8_t state);
 

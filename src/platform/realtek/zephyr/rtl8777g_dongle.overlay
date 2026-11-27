@@ -1,0 +1,75 @@
+/ {
+	chosen {
+		zephyr,ieee802154 = &ieee802154;
+		zephyr,code-partition = &app_partition_0;
+	};
+
+	aliases {
+		/*
+		 * The board dts only aliases led0, so expose the remaining two here.
+		 */
+		led1 = &led1;
+		led2 = &led2;
+	};
+
+	tcm {
+		/delete-node/ memory@133c00;
+
+		tcm1: memory@12cc00 {
+			/* TCM1, used as zephyr-itcm */
+			compatible = "zephyr,memory-region", "arm,itcm";
+			reg = <0x12cc00 DT_SIZE_K(32)>;
+			zephyr,memory-region = "ITCM";
+		};
+
+		tcm_heap: memory@134c00 {
+			/* Reserved memory for realtek osif heap manangement */
+			reg = <0x134c00 DT_SIZE_K(32)>;
+		};
+	};
+};
+
+&flash {
+	reg = <0x4000000 DT_SIZE_M(4)>;
+	partitions {
+		/delete-node/ partition@2d000;
+		/delete-node/ partition@94000;
+		/delete-node/ partition@fc000;
+		/delete-node/ partition@3fc000;
+
+		app_partition_0: partition@2d000 {
+			label = "app-image";
+			reg = <0x2D000 DT_SIZE_K(1024)>;
+		};
+		/* Bank 1 */
+		ota_header_1: partition@12d000 {
+			label = "ota-header-1-image";
+			reg = <0x12D000 DT_SIZE_K(4)>;
+		};
+		system_patch_1: partition@12e000 {
+			label = "system-patch-1-image";
+			reg = <0x12E000 DT_SIZE_K(32)>;
+		};
+		stack_patch_1: partition@136000 {
+			label = "stack-patch-1-image";
+			reg = <0x136000 DT_SIZE_K(72)>;
+		};
+		app_partition_1: partition@148000 {
+			label = "app-image-1";
+			reg = <0x148000 DT_SIZE_K(1024)>;
+		};
+		/* storage */
+		storage_partition: partition@248000 {
+			label = "storage";
+			reg = <0x248000 DT_SIZE_K(40)>;
+		};
+	};
+};
+
+&trng {
+	status = "okay";
+};
+
+&ieee802154 {
+	status = "okay";
+};

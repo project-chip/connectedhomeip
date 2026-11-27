@@ -22,3 +22,8 @@
 
 // Lighting LED config
 #define USE_RGB_PWM 0
+
+#define APP_TOGGLE_BUTTON 0   // SW1: toggle the light on/off
+#define APP_FUNCTION_BUTTON 1 // SW2: reset -> BLE advertising -> factory reset
+#define APP_LEVEL_BUTTON 2    // SW3: dimming, unused while PWM is disabled
+#define APP_BLE_ADV_BUTTON 3  // SW4: toggle BLE advertising
