@@ -182,6 +182,7 @@ class XmlDataTypeComponent:
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Constraints | None = None  # For min/max values, lists, etc.
+    instruction_dependency: str | None = None  # M, O or X; bitmap bits only
 
 
 @dataclass
@@ -869,6 +870,8 @@ class ClusterParser:
             # Extract additional field attributes
             summary = xml_field.attrib.get('summary', None)
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
+            instruction_dependency = xml_field.attrib.get(
+                'instructionDependency', None) if component_type == DataTypeEnum.kBitmap else None
 
             # Check for duplicate IDs to detect invalid XML data
             if aid in components:
@@ -892,7 +895,8 @@ class ClusterParser:
                 type_info=type_info,
                 is_optional=is_optional,
                 is_nullable=is_nullable,
-                constraints=constraints
+                constraints=constraints,
+                instruction_dependency=instruction_dependency
             )
         return components
 
@@ -2077,6 +2081,28 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
         raise SpecParsingException(f'Did not find all 3 global data model files in specified directory {top:!r}')
 
     return global_data_types, problems
+
+
+def instruction_dependency_masks(bitmap: XmlDataType) -> tuple[int, int]:
+    """Derive (dependent, mandatory) bitmasks from a bitmap's instructionDependency column.
+
+    A bit is in the dependent mask if its instructionDependency is "M" or "O", and in the
+    mandatory mask only if it is "M". Raises if the bitmap carries no instructionDependency
+    data at all, which means the source XML predates the scraped Instruction Dependency column
+    (e.g. a stale prebuilt data model) rather than a spec where the column is genuinely empty.
+    """
+    dependent = 0
+    mandatory = 0
+    for bit, component in bitmap.components.items():
+        if component.instruction_dependency in ("M", "O"):
+            dependent |= (1 << int(bit))
+        if component.instruction_dependency == "M":
+            mandatory |= (1 << int(bit))
+    if all(component.instruction_dependency is None for component in bitmap.components.values()):
+        raise SpecParsingException(
+            f"Bitmap {bitmap.name!r} has no instructionDependency data; the data model XML is "
+            "missing the scraped Instruction Dependency column")
+    return dependent, mandatory
 
 
 # BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
