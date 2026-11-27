@@ -17,6 +17,8 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
+#import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceTestDelegate.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
@@ -31,12 +33,17 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 @implementation MTRDeviceReadThroughTests {
     MTRDeviceController * _controller;
     MTRDevice * _device;
+    MTRDeviceTestDelegate * _delegate;
+    BOOL _localTestStorageEnabledBeforeTest;
 }
 
 - (void)setUp
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    _localTestStorageEnabledBeforeTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:[[MTRTestStorage alloc] init]];
@@ -58,6 +65,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 {
     [_controller shutdown];
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeTest;
     [super tearDown];
 }
 
@@ -167,6 +175,148 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // assumeUnknownAttributesReportable defaults to YES.
     XCTAssertFalse([_device _attributeReadNeedsReadThroughForPath:vendorAttribute params:[[MTRReadParams alloc] init]]);
     XCTAssertTrue([_device _attributeReadNeedsReadThroughForPath:vendorAttribute params:[self paramsAssumingUnknownAttributesReportable:NO]]);
+}
+
+#pragma mark - Asynchronous read
+
+- (MTRAttributePath *)onOffPath
+{
+    return [MTRAttributePath attributePathWithEndpointID:@(1)
+                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)];
+}
+
+- (void)injectOnOffValue:(BOOL)value
+{
+    [_device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : [self onOffPath],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRBooleanValueType,
+            MTRValueKey : @(value),
+        },
+    } ]
+                          fromSubscription:YES];
+    [_controller syncRunOnWorkQueue:^{
+    } error:nil];
+    [_device unitTestSyncRunOnDeviceQueue:^ {}];
+}
+
+- (void)addDelegateWhoseSubscriptionNeverEstablishes
+{
+    _delegate = [[MTRDeviceTestDelegate alloc] init];
+    [_device addDelegate:_delegate queue:dispatch_get_main_queue()];
+}
+
+- (void)testSyncReadOfReportedAttributeReturnsCacheWithoutQueueingRead
+{
+    [self addDelegateWhoseSubscriptionNeverEstablishes];
+    [self injectOnOffValue:YES];
+
+    NSUInteger itemCount = _device.asyncWorkQueue.itemCount;
+    NSDictionary<NSString *, id> * value = [_device readAttributeWithEndpointID:@(1)
+                                                                      clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                    attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                                                         params:nil];
+    XCTAssertEqualObjects(value[MTRValueKey], @(YES));
+    XCTAssertEqual(_device.asyncWorkQueue.itemCount, itemCount);
+}
+
+- (void)testAsyncReadOfReportedAttributeCompletesWithCachedValueWithoutQueueingRead
+{
+    [self addDelegateWhoseSubscriptionNeverEstablishes];
+    [self injectOnOffValue:YES];
+
+    NSUInteger itemCount = _device.asyncWorkQueue.itemCount;
+    XCTestExpectation * completed = [self expectationWithDescription:@"read completed"];
+    __block NSArray<NSDictionary<NSString *, id> *> * readValues;
+    __block NSError * readError;
+    [_device readAttributeWithEndpointID:@(1)
+                               clusterID:@(MTRClusterIDTypeOnOffID)
+                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  readValues = values;
+                                  readError = error;
+                                  [completed fulfill];
+                              }];
+    [self waitForExpectations:@[ completed ] timeout:5];
+
+    XCTAssertNil(readError);
+    XCTAssertEqual(readValues.count, 1);
+    XCTAssertEqualObjects(readValues.firstObject[MTRAttributePathKey], [self onOffPath]);
+    NSDictionary<NSString *, id> * syncValue = [_device readAttributeWithEndpointID:@(1)
+                                                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                                                             params:nil];
+    XCTAssertEqualObjects(readValues.firstObject[MTRDataKey], syncValue);
+    XCTAssertEqual(_device.asyncWorkQueue.itemCount, itemCount);
+}
+
+- (void)testAsyncReadNeedingReadThroughWaitsForTheRead
+{
+    // With no delegate there is no subscription, so the value has to be read from the device.
+    [self injectOnOffValue:YES];
+
+    NSUInteger itemCount = _device.asyncWorkQueue.itemCount;
+    XCTestExpectation * completed = [self expectationWithDescription:@"read completed before the device answered"];
+    completed.inverted = YES;
+    [_device readAttributeWithEndpointID:@(1)
+                               clusterID:@(MTRClusterIDTypeOnOffID)
+                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  [completed fulfill];
+                              }];
+    [self waitForExpectations:@[ completed ] timeout:2];
+    XCTAssertEqual(_device.asyncWorkQueue.itemCount, itemCount + 1);
+}
+
+- (void)testAsyncReadWhileSuspendedFailsWithoutQueueingRead
+{
+    [self injectOnOffValue:YES];
+    [_controller suspend];
+    [_device unitTestSyncRunOnDeviceQueue:^ {}];
+
+    NSUInteger itemCount = _device.asyncWorkQueue.itemCount;
+    XCTestExpectation * completed = [self expectationWithDescription:@"read completed"];
+    __block NSError * readError;
+    [_device readAttributeWithEndpointID:@(1)
+                               clusterID:@(MTRClusterIDTypeOnOffID)
+                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  readError = error;
+                                  [completed fulfill];
+                              }];
+    [self waitForExpectations:@[ completed ] timeout:5];
+
+    XCTAssertEqualObjects(readError.domain, MTRErrorDomain);
+    XCTAssertEqual(readError.code, MTRErrorCodeInvalidState);
+    XCTAssertEqual(_device.asyncWorkQueue.itemCount, itemCount);
+}
+
+- (void)testAsyncReadWaitingOnReadThroughIsCancelledOnceWhenDeviceIsInvalidated
+{
+    XCTestExpectation * completed = [self expectationWithDescription:@"read completed"];
+    completed.assertForOverFulfill = YES;
+    __block NSError * readError;
+    [_device readAttributeWithEndpointID:@(1)
+                               clusterID:@(MTRClusterIDTypeOnOffID)
+                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  readError = error;
+                                  [completed fulfill];
+                              }];
+    [_device invalidate];
+    [self waitForExpectations:@[ completed ] timeout:5];
+
+    XCTAssertEqualObjects(readError.domain, MTRErrorDomain);
+    XCTAssertEqual(readError.code, MTRErrorCodeCancelled);
 }
 
 @end

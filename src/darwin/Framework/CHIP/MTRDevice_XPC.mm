@@ -479,6 +479,18 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                                      readAttributePaths
                                      : attributePaths withReply)
 
+- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                        attributeID:(NSNumber *)attributeID
+                             params:(MTRReadParams * _Nullable)params
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED]);
+    });
+}
+
 - (NSArray<MTRDeviceResponseValueDictionary> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
 {
     id values = [self _unvalidatedReadAttributePaths:attributePaths];

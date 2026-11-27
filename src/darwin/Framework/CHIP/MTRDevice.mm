@@ -425,6 +425,19 @@ MTR_DIRECT_MEMBERS
     return nil;
 }
 
+- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                        attributeID:(NSNumber *)attributeID
+                             params:(MTRReadParams * _Nullable)params
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
+}
+
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                          attributeID:(NSNumber *)attributeID
