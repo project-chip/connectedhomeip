@@ -41,6 +41,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
+#include <transport/GroupSession.h>
 
 namespace {
 
@@ -188,7 +189,7 @@ public:
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeFlags = true);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
 private:
@@ -383,14 +384,17 @@ void TestWriteInteraction::AddAttributeStatus(WriteHandler & aWriteHandler)
     EXPECT_EQ(aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success), CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeFlags)
 {
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
     WriteRequestMessage::Builder writeRequestBuilder;
     EXPECT_EQ(writeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
-    writeRequestBuilder.TimedRequest(aIsTimedWrite);
+    if (aIncludeFlags)
+    {
+        writeRequestBuilder.TimedRequest(aIsTimedWrite);
+    }
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
     AttributeDataIBs::Builder & attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -558,6 +562,55 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
             EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
         }
+    }
+}
+
+TEST_F(TestWriteInteraction, TestWriteHandlerUnicastRejectsMissingTimedRequest)
+{
+    using namespace Protocols::InteractionModel;
+
+    // The interaction model revision is not bumped, so unicast must still carry TimedRequest.
+    app::WriteHandler writeHandler;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                     chip::app::InteractionModelEngine::GetInstance()));
+
+    GenerateWriteRequest(/* aIsTimedWrite = */ false, buf, /* aIncludeFlags = */ false);
+
+    TestExchangeDelegate delegate;
+    Messaging::ExchangeContext * exchange = NewExchangeToBob(&delegate);
+
+    EXPECT_EQ(writeHandler.OnWriteRequest(exchange, std::move(buf), /* aIsTimedWrite = */ false), Status::InvalidAction);
+
+    DrainAndServiceIO();
+}
+
+TEST_F(TestWriteInteraction, TestWriteHandlerGroupcastMissingTimedRequestIsFalse)
+{
+    using namespace Protocols::InteractionModel;
+
+    // Groupcast may omit SuppressResponse and TimedRequest; a missing field is FALSE.
+    for (bool transactionIsTimed : { false, true })
+    {
+        app::WriteHandler writeHandler;
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+        EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                         chip::app::InteractionModelEngine::GetInstance()));
+
+        GenerateWriteRequest(/* aIsTimedWrite = */ false, buf, /* aIncludeFlags = */ false);
+
+        TestExchangeDelegate delegate;
+        Transport::IncomingGroupSession incomingSession(GetFriendsGroupId(), GetBobFabricIndex(), GetBobFabric()->GetNodeId());
+        SessionHandle incomingGroupSession(incomingSession);
+        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(incomingGroupSession, &delegate);
+        ASSERT_NE(exchange, nullptr);
+
+        Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+        EXPECT_EQ(status, transactionIsTimed ? Status::TimedRequestMismatch : Status::Success);
+
+        DrainAndServiceIO();
     }
 }
 
