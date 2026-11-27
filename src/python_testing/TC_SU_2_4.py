@@ -156,14 +156,14 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
     async def _wait_for_idle_after_software_update(self, controller:ChipDeviceCtrl.ChipDeviceController, requestor_node_id:int, step_number:str):
-        """Waits for DUT update state reach kIdle after the DUT is on kApplying state.
+        """Waits for DUT UpdateState reach kIdle after the DUT is on kApplying state.
         Fails if is not able to reach the state in the exected timeout.
 
         Args:
             controller (ChipDeviceCtrl.ChipDeviceController): _description_
             requestor_node_id (int): _description_
         """
-        kidle_timeout_sec = self.remaining_test_budget_sec(reserve_sec=60)
+        kidle_timeout_sec = self.remaining_test_budget_sec(reserve_sec=120)
         poll_interval_sec = 5
         is_kidle = False
         t_kidle_wait_start = time.time()
