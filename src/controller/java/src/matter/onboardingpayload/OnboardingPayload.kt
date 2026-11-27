@@ -565,9 +565,12 @@ class InvalidManualPairingCodeFormatException(
   }
 }
 
-class OnboardingPayloadException(
+class OnboardingPayloadException
+@JvmOverloads
+constructor(
   message: String,
-) : Exception(String.format("Failed to encode Onboarding payload to buffer: %s", message)) {
+  cause: Throwable? = null,
+) : Exception(String.format("Failed to encode Onboarding payload to buffer: %s", message), cause) {
   companion object {
     private const val serialVersionUID = 1L
   }

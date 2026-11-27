@@ -424,7 +424,8 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
   }
 
   private fun checkSize(propertyName: String, size: Number) {
-    if (index + size.toInt() > bytes.size) {
+    val requiredSize = size.toInt()
+    if (requiredSize < 0 || requiredSize > bytes.size - index) {
       throw TlvParsingException(
         "Invalid $propertyName length $size at index $index with ${bytes.size - index} available."
       )

@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Element
 import matter.tlv.IntValue
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.Utf8StringValue
 
@@ -90,12 +91,16 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
     }
 
     val reader = TlvReader(byteBuffer.array())
-    while (true) {
-      val element = reader.nextElement()
-      if (reader.isEndOfTlv()) {
-        break
+    try {
+      while (true) {
+        val element = reader.nextElement()
+        if (reader.isEndOfTlv()) {
+          break
+        }
+        parseTLVFields(element, payload)
       }
-      parseTLVFields(element, payload)
+    } catch (exception: TlvParsingException) {
+      throw OnboardingPayloadException("Invalid TLV data: ${exception.message}", exception)
     }
   }
 

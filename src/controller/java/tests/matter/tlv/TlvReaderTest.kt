@@ -269,4 +269,18 @@ class TlvReaderTest {
     assertThat(tag).isInstanceOf(ContextSpecificTag::class.java)
     assertThat((tag as ContextSpecificTag).tagNumber).isEqualTo(0xFE)
   }
+
+  @Test
+  fun onNegativeOrOverflowingValueLength_throwsTlvParsingException() {
+    // Anonymous tag with UTF-8 string 4-byte length (0x0E) and length 0xFFFFFFFF (-1 as Int).
+    val negativeLengthReader =
+      TlvReader(byteArrayOf(0x0E, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte()))
+    assertThrows(TlvParsingException::class.java) { negativeLengthReader.nextElement() }
+
+    // Anonymous tag with UTF-8 string 4-byte length (0x0E) and length Int.MAX_VALUE (0x7FFFFFFF),
+    // which overflows index + size when index > 0.
+    val overflowingLengthReader =
+      TlvReader(byteArrayOf(0x0E, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0x7F))
+    assertThrows(TlvParsingException::class.java) { overflowingLengthReader.nextElement() }
+  }
 }
