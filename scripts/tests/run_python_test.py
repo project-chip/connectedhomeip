@@ -53,6 +53,9 @@ DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 LINUX_WIFI_SSID = "MatterAP"
 LINUX_WIFI_PASSPHRASE = "MatterAPPassword"
+DEFAULT_THREAD_DATASET_HEX = (
+    "0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff"
+)
 
 TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
@@ -112,7 +115,8 @@ class TestRunConfig:
     """Configuration for the app under test.
 
     app_command_prefix runs the app in its isolated network namespace for
-    BLE-WiFi tests. linux_ble_wifi_environment supplies it; other runs leave it empty.
+    BLE-WiFi and BLE-Thread tests. linux_ble_wifi_environment and
+    linux_ble_thread_environment supply it; other runs leave it empty.
     """
     app: str
     app_args: str
@@ -216,14 +220,15 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
-def run_commissioning_args(run: Metadata) -> tuple[str | None, str | None, str | None]:
-    """Return (commissioning_method, wifi_ssid, wifi_passphrase) from a test run's script arguments."""
+def run_commissioning_args(run: Metadata) -> tuple[str | None, str | None, str | None, str | None]:
+    """Return (commissioning_method, wifi_ssid, wifi_passphrase, thread_dataset_hex) from a test run's script arguments."""
     if run.script_args is None:
-        return None, None, None
+        return None, None, None, None
 
     parser = matter_test_args_parser()
     args, _ = parser.parse_known_args(shlex.split(run.script_args))
-    return args.commissioning_method or args.in_test_commissioning_method, args.wifi_ssid, args.wifi_passphrase
+    thread_dataset_hex = args.thread_dataset_hex.hex() if args.thread_dataset_hex is not None else None
+    return args.commissioning_method or args.in_test_commissioning_method, args.wifi_ssid, args.wifi_passphrase, thread_dataset_hex
 
 
 @contextlib.contextmanager
@@ -251,6 +256,28 @@ def linux_ble_wifi_environment(
             passphrase,
             network,
         ))
+        yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
+
+
+@contextlib.contextmanager
+def linux_ble_thread_environment(
+    dataset_hex: str | None = None,
+) -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
+    """Provide isolated Linux app/tool networks with Bluetooth mock and Thread border router."""
+    from matter.testing.linux import BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter
+
+    dataset = dataset_hex if dataset_hex is not None else DEFAULT_THREAD_DATASET_HEX
+
+    with contextlib.ExitStack() as stack:
+        network = stack.enter_context(IsolatedNetworkNamespace(
+            app_link_up=True,
+            add_ula=False,
+            app_link_name=CommissioningMethod.BLE_THREAD.app_link_name,
+            tool_link_name=CommissioningMethod.BLE_THREAD.tool_link_name,
+        ))
+        stack.enter_context(DBusTestSystemBus())
+        stack.enter_context(BluetoothMock())
+        stack.enter_context(ThreadBorderRouter(dataset, network))
         yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
 
 
@@ -306,7 +333,6 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         tag_filter = TagFilter.parse(tags)
     except ValueError as e:
         raise click.BadParameter(str(e), param_hint="--tag")
-
     if load_from_env:
         reader = MetadataReader(load_from_env)
         try:
@@ -369,23 +395,25 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.pre_existing_fabric = pre_existing_fabric
 
     runs_with_commissioning_args = [(run, *run_commissioning_args(run)) for run in runs]
-    uses_linux_ble_wifi = any(
-        bool(run.app) and method == CommissioningMethod.BLE_WIFI
-        for run, method, _, _ in runs_with_commissioning_args
+    uses_linux_isolated_env = any(
+        bool(run.app) and method in (CommissioningMethod.BLE_WIFI, CommissioningMethod.BLE_THREAD)
+        for run, method, _, _, _ in runs_with_commissioning_args
     )
-    if uses_linux_ble_wifi:
+    if uses_linux_isolated_env:
         if sys.platform != "linux":
-            raise click.ClickException("BLE-WiFi commissioning is only supported on Linux")
+            raise click.ClickException("BLE-WiFi and BLE-Thread commissioning are only supported on Linux")
         from matter.testing.linux import ensure_namespace_availability, ensure_private_state
 
         if not internal_inside_unshare:
             ensure_namespace_availability(isolate_root=True)
         ensure_private_state()
 
-    for run, commissioning_method, wifi_ssid, wifi_passphrase in runs_with_commissioning_args:
+    for run, commissioning_method, wifi_ssid, wifi_passphrase, thread_dataset_hex in runs_with_commissioning_args:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         if bool(run.app) and commissioning_method == CommissioningMethod.BLE_WIFI:
             environment = linux_ble_wifi_environment(wifi_ssid, wifi_passphrase)
+        elif bool(run.app) and commissioning_method == CommissioningMethod.BLE_THREAD:
+            environment = linux_ble_thread_environment(thread_dataset_hex)
         else:
             environment = contextlib.nullcontext(((), ()))
         with environment as (app_command_prefix, test_command_prefix):
@@ -662,6 +690,7 @@ class FactoryResetType(enum.Enum):
         runner_files = ('chip_test_restart_app', 'chip-dbus-')
         yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith(runner_files))
         yield from glob.glob('/tmp/repl*')
+        yield from glob.glob('/tmp/openthread-simulation/*.flash')
 
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
             yield match.group("path")
