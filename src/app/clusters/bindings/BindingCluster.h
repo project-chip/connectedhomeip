@@ -21,9 +21,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Binding/Attributes.h>
 #include <clusters/Binding/Structs.h>
-#include <lib/support/ScopedMemoryBuffer.h>
-
-#include <optional>
 
 namespace chip {
 namespace app {
@@ -47,8 +44,6 @@ public:
         DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id)), mClusterContext(std::move(context))
     {}
 
-    void Shutdown(ClusterShutdownType shutdownType) override;
-
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
@@ -61,18 +56,6 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    struct BindingListSnapshot
-    {
-        Platform::ScopedMemoryBuffer<Binding::TableEntry> entries;
-        size_t count       = 0;
-        FabricIndex fabric = kUndefinedFabricIndex;
-        bool valid         = true;
-    };
-
-    bool BindingListEquals(EndpointId endpoint, FabricIndex fabric, const DecodableBindingListType & bindings);
-    bool BindingListEqualsSnapshot(EndpointId endpoint);
-    void SnapshotBindingList(EndpointId endpoint, FabricIndex fabric);
-
     bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry);
 
     CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
@@ -92,7 +75,6 @@ private:
     CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint);
 
     Context mClusterContext;
-    std::optional<BindingListSnapshot> mListWrite;
 };
 
 } // namespace Clusters
