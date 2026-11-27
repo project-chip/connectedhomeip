@@ -262,6 +262,7 @@ private:
 
     AVFormatContext * mFormatContext;
     AVFormatContext * mInputFormatContext;
+    AVIOContext * mInputAvioContext = nullptr;
     AVStream * mVideoStream;
     AVStream * mAudioStream;
     AVCodecContext * mAudioEncoderContext;
