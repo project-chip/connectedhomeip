@@ -8436,8 +8436,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     os_unfair_lock_unlock(&linesLock);
 
     // A new data version and one changed value. DataVersion is noted once per reported attribute (each compares
-    // against the committed version), so there is one DataVersion line per attribute, one reported-values line
-    // and one summary.
+    // against the committed version), so there is one detail-level DataVersion line per attribute. At the default
+    // level there is one reported-values line, one report summary, and one data-version summary after it.
     XCTestExpectation * changedEnd = [self expectationWithDescription:@"changed report end"];
     delegate.onReportEnd = ^{
         [changedEnd fulfill];
@@ -8445,14 +8445,24 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:2 changedAttributeIndex:changedIndex] fromSubscription:YES];
     [self waitForExpectations:@[ changedEnd ] timeout:kTimeoutInSeconds];
 
-    NSArray<NSString *> * dataVersionLines = linesContaining(defaultLines, @"updated DataVersion");
+    NSArray<NSString *> * dataVersionLines = linesContaining(detailLines, @"updated DataVersion");
     NSArray<NSString *> * reportedLines = linesContaining(defaultLines, @"report from reported values");
-    NSArray<NSString *> * summaryLines = linesContaining(defaultLines, [NSString stringWithFormat:@"report of %lu attributes", (unsigned long) attributeCount]);
+    NSString * summaryText = [NSString stringWithFormat:@"report of %lu attributes", (unsigned long) attributeCount];
+    NSArray<NSString *> * summaryLines = linesContaining(defaultLines, summaryText);
+    NSArray<NSString *> * dataVersionSummaryLines = linesContaining(defaultLines, [NSString stringWithFormat:@"%@ data versions updated for 1 clusters", nodeTag]);
     XCTAssertEqual(dataVersionLines.count, attributeCount);
+    XCTAssertEqual(linesContaining(defaultLines, @"updated DataVersion").count, 0);
     XCTAssertEqual(reportedLines.count, 1);
     XCTAssertEqual(summaryLines.count, 1);
+    XCTAssertEqual(dataVersionSummaryLines.count, 1);
+    os_unfair_lock_lock(&linesLock);
+    NSUInteger summaryIndex = [defaultLines indexOfObject:summaryLines.firstObject];
+    NSUInteger dataVersionSummaryIndex = [defaultLines indexOfObject:dataVersionSummaryLines.firstObject];
+    os_unfair_lock_unlock(&linesLock);
+    XCTAssertLessThan(summaryIndex, dataVersionSummaryIndex, @"the data-version summary follows the report summary");
 
-    for (NSString * line in [[dataVersionLines arrayByAddingObjectsFromArray:reportedLines] arrayByAddingObjectsFromArray:summaryLines]) {
+    NSArray<NSString *> * nodeTaggedLines = [[[dataVersionLines arrayByAddingObjectsFromArray:reportedLines] arrayByAddingObjectsFromArray:summaryLines] arrayByAddingObjectsFromArray:dataVersionSummaryLines];
+    for (NSString * line in nodeTaggedLines) {
         XCTAssertTrue([line containsString:nodeTag], @"%@", line);
         XCTAssertFalse([line containsString:descriptionMarker], @"%@", line);
     }
