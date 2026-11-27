@@ -50,9 +50,9 @@
 			label = "system-patch-1-image";
 			reg = <0x12E000 DT_SIZE_K(32)>;
 		};
-		stack_patch_1: partition@1360000 {
+		stack_patch_1: partition@136000 {
 			label = "stack-patch-1-image";
-			reg = <0x1360000 DT_SIZE_K(72)>;
+			reg = <0x136000 DT_SIZE_K(72)>;
 		};
 		app_partition_1: partition@148000 {
 			label = "app-image-1";
