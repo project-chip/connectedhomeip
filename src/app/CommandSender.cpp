@@ -554,6 +554,13 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandSender::SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision)
+{
+    VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
+    mRequestSession.SetFallbackPeerInteractionModelRevision(aFallbackRevision);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
                                          PrepareCommandParameters & aPrepareCommandParams)
 {
