@@ -162,6 +162,7 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
 {
     // StringBuilderBase requires a non-empty buffer.
     VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(nameDesc.type != DiscoveryFilterType::kInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
 
     const char * serviceName;
     switch (type)

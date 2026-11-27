@@ -285,13 +285,12 @@ TEST(TestServiceNaming, TestMakeServiceSubtypeEmptyInstanceName)
     EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST(TestServiceNaming, TestMakeServiceTypeNameOperationalInstanceName)
+TEST(TestServiceNaming, TestMakeServiceTypeNameRejectsInstanceName)
 {
     char buffer[kMaxOperationalServiceNameSize];
     DiscoveryFilter filter(DiscoveryFilterType::kInstanceName, "2906C908D115D362-8FC7772401CD0696");
 
-    EXPECT_SUCCESS(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational));
-    EXPECT_STREQ(buffer, "2906C908D115D362-8FC7772401CD0696._sub._matter");
+    EXPECT_EQ(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
