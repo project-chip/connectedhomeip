@@ -686,10 +686,10 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
         mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
     }
 =======
-    boolValue = false;
-    err       = writeRequestParser.GetTimedRequest(&boolValue);
-    SuccessOrExit(err);
-    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+        boolValue = false;
+        err       = writeRequestParser.GetTimedRequest(&boolValue);
+        SuccessOrExit(err);
+        mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 >>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
 
     // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
