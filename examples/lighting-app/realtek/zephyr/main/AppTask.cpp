@@ -389,15 +389,7 @@ void AppTask::FunctionHandler(const AppEvent & event)
     case APP_TOGGLE_BUTTON:
         if (pushed)
         {
-            bool on = false;
-            if (Clusters::OnOff::Attributes::OnOff::Get(kLightEndpointId, &on) != Protocols::InteractionModel::Status::Success)
-            {
-                LOG_ERR("[BTN] Failed to read the OnOff attribute");
-                break;
-            }
-
-            lightStatusLED.Set(!on);
-            Instance().UpdateClusterState();
+            ToggleLight();
         }
         break;
 
@@ -569,6 +561,28 @@ void AppTask::DispatchEvent(const AppEvent & event)
     {
         LOG_INF("Event received with no handler. Dropping event.");
     }
+}
+
+void AppTask::ToggleLight()
+{
+    // Read and write OnOff in one Matter-context callback: two queued toggles must
+    // not both read the value committed before either of them ran.
+    SystemLayer().ScheduleLambda([] {
+        bool on = false;
+        if (Clusters::OnOff::Attributes::OnOff::Get(kLightEndpointId, &on) != Protocols::InteractionModel::Status::Success)
+        {
+            LOG_ERR("[BTN] Failed to read the OnOff attribute");
+            return;
+        }
+
+        lightStatusLED.Set(!on);
+
+        Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, !on);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
+        }
+    });
 }
 
 void AppTask::UpdateClusterState()

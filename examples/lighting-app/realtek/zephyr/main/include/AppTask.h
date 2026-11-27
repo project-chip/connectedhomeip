@@ -72,6 +72,7 @@ private:
     static void UpdateStatusLED();
     static void FunctionHandler(const AppEvent & event);
     static void BLEStartAdvertising(intptr_t arg);
+    static void ToggleLight();
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
