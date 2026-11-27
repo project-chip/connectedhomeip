@@ -116,11 +116,10 @@ CHIP_ERROR CommandSender::AllocateBuffer()
             mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         RequestFlagsOptions flags;
-        flags.suppressResponse    = mSuppressResponse;
-        flags.timedRequest        = mTimedRequest;
-        flags.peerRevision        = mRequestSession.GetPeerInteractionModelRevision();
-        flags.isGroupcast         = mRequestSession.IsGroupSession();
-        flags.forceOmitFalseFlags = mForceOmitFalseRequestFlags;
+        flags.suppressResponse = mSuppressResponse;
+        flags.timedRequest     = mTimedRequest;
+        flags.peerRevision     = mRequestSession.GetPeerInteractionModelRevision();
+        flags.isGroupcast      = mRequestSession.IsGroupSession();
         mInvokeRequestBuilder.RequestFlags(flags);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
@@ -555,10 +554,10 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SetForceOmitFalseRequestFlags(bool aForce)
+CHIP_ERROR CommandSender::SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision)
 {
     VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
-    mForceOmitFalseRequestFlags = aForce;
+    mRequestSession.SetFallbackPeerInteractionModelRevision(aFallbackRevision);
     return CHIP_NO_ERROR;
 }
 

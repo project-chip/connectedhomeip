@@ -379,15 +379,19 @@ public:
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
     /**
-     * Omit the SuppressResponse and TimedRequest fields of the InvokeRequestMessage when their value is false,
-     * regardless of the interaction model revision reported by the session. By default the fields are omitted
-     * only for unicast sessions whose peer reported an interaction model revision >= 14.
+     * Tells CommandSender which interaction model revision to assume for the peer,as fallback, based on what the caller knows
+     * about the peer state (for example, collected when the group was set up).
      *
-     * Intended for groupcast, when the caller knows every group member supports IM revision >= 14.
+     * The fallback revision is used only when the session passed to the constructor reports none: groupcast,
+     * no session at construction, or a peer that reported none. A revision reported by the session always wins.
+     * The default, std::nullopt, keeps an encoding that every receiver accepts.
+     *
+     * The caller is responsible for the fallback revision being correct. For groupcast, pass the lowest interaction model
+     * revision among the group members. See RequestFlagsOptions for the encoding choices that depend on the revision.
      *
      * @return CHIP_ERROR_INCORRECT_STATE if called after PrepareCommand or AddRequestData.
      */
-    CHIP_ERROR SetForceOmitFalseRequestFlags(bool aForce);
+    CHIP_ERROR SetFallbackPeerInteractionModelRevision(std::optional<uint16_t> aFallbackRevision);
 
     void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
     {
@@ -707,14 +711,13 @@ private:
 
     RequestSession mRequestSession;
 
-    State mState                     = State::Idle;
-    bool mSuppressResponse           = false;
-    bool mTimedRequest               = false;
-    bool mBufferAllocated            = false;
-    bool mBatchCommandsEnabled       = false;
-    bool mUseExtendableCallback      = false;
-    bool mAllowLargePayload          = false;
-    bool mForceOmitFalseRequestFlags = false;
+    State mState                = State::Idle;
+    bool mSuppressResponse      = false;
+    bool mTimedRequest          = false;
+    bool mBufferAllocated       = false;
+    bool mBatchCommandsEnabled  = false;
+    bool mUseExtendableCallback = false;
+    bool mAllowLargePayload     = false;
     std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 

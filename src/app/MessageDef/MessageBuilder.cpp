@@ -33,8 +33,8 @@ CHIP_ERROR MessageBuilder::EncodeRequestFlags(const RequestFlagsOptions & option
     ReturnErrorOnFailure(mError);
     VerifyOrReturnError(!(options.isGroupcast && options.timedRequest), CHIP_ERROR_INVALID_ARGUMENT);
 
-    const bool omitFalseFlags = options.forceOmitFalseFlags ||
-        (options.peerRevision.has_value() && *options.peerRevision >= Revision::kFirstRevisionWithOptionalRequestFlags);
+    const bool omitFalseFlags =
+        options.peerRevision.has_value() && *options.peerRevision >= Revision::kFirstRevisionWithOptionalRequestFlags;
     if (options.suppressResponse || !omitFalseFlags)
     {
         ReturnErrorOnFailure(mpWriter->PutBoolean(suppressResponseTag, options.suppressResponse));
