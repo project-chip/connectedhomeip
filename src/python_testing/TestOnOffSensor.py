@@ -76,11 +76,11 @@ class TestOnOffSensor(MatterTestCommissionedDevice):
                 nodeId=peer_node, setupPinCode=passcode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
-            self.step(1, "Allow the sensor's operational node to operate the peer light")
+            self.step(1, "Allow the sensor's operational node to operate and identify the peer light")
             acl = await self.read_single_attribute_check_success(
                 Clusters.AccessControl, Clusters.AccessControl.Attributes.Acl, node_id=peer_node, endpoint=0)
             acl.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[self.dut_node_id],
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=peer_endpoint)]))
