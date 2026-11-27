@@ -74,6 +74,34 @@
     [_metricsData removeObjectForKey:key];
 }
 
+static NSString * const sUniqueIdentifierCodingKey = @"id";
+static NSString * const sMetricsDataCodingKey = @"md";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+    _uniqueIdentifier = [coder decodeObjectOfClass:NSUUID.class forKey:sUniqueIdentifierCodingKey];
+    NSDictionary * metricsData = [coder decodeDictionaryWithKeysOfClass:NSString.class objectsOfClass:MTRMetricData.class forKey:sMetricsDataCodingKey];
+    if (_uniqueIdentifier == nil || metricsData == nil) {
+        return nil;
+    }
+    _metricsData = [metricsData mutableCopy];
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:_uniqueIdentifier forKey:sUniqueIdentifierCodingKey];
+    [coder encodeObject:_metricsData forKey:sMetricsDataCodingKey];
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTRMetrics: uuid = %@, data = %@>", _uniqueIdentifier, [_metricsData description]];
