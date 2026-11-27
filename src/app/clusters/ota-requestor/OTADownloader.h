@@ -60,6 +60,11 @@ public:
     // The reason parameter should be used to indicate if this is a graceful end or a forceful abort.
     void virtual EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) = 0;
 
+    // Platform calls this method once the image processor has finalized the image, with the result of its checks of the image, when
+    // OTAImageProcessorInterface::ReportsFinalizeResult() is true. A downloader that supports it reports the download complete only
+    // after a successful result, and ends the download as failed otherwise.
+    CHIP_ERROR virtual OnFinalized(CHIP_ERROR status) { return CHIP_NO_ERROR; }
+
     // Fetch the next set of data. May be a no-op for asynchronous protocols.
     CHIP_ERROR virtual FetchNextData() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 

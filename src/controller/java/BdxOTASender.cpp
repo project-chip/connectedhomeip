@@ -247,6 +247,13 @@ CHIP_ERROR BdxOTASession::OnTransferSessionBegin(TransferSession::OutputEvent & 
         ChipLogError(Support, "Exception in call java method");
         env->ExceptionDescribe();
         env->ExceptionClear();
+        if (offset > 0)
+        {
+            // A delegate that cannot serve the image from the requested offset throws, which rejects the offset as the BDX
+            // specification requires; the requestor then downloads from offset 0.
+            AbortTransfer(bdx::StatusCode::kStartOffsetNotSupported, CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            return CHIP_NO_ERROR;
+        }
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
