@@ -316,6 +316,7 @@ complexity:
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
     NestedBlockDepth:
         excludes:

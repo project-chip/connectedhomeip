@@ -20,6 +20,7 @@ package matter.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -445,6 +446,40 @@ class QRCodeTest {
 
     assertTrue(vendor1 == optionalQRCodeInfo1 || vendor1 == optionalQRCodeInfo2)
     assertTrue(vendor2 == optionalQRCodeInfo1 || vendor2 == optionalQRCodeInfo2)
+  }
+
+  @Test
+  fun testQRCodeWithCorruptTlvData_throwsOnboardingPayloadException() {
+    val basePayloadBytes =
+      base38Decode(kDefaultPayloadQRCode.removePrefix(kQRCodePrefix)).toByteArray()
+
+    // Append a truncated TLV element (context-specific 1-byte unsigned int with missing tag/value).
+    val truncatedTlvBytes = basePayloadBytes + byteArrayOf(0x24)
+    val truncatedTlvBuffer = CharArray(base38EncodedLength(truncatedTlvBytes.size))
+    base38Encode(truncatedTlvBytes, truncatedTlvBuffer)
+    val truncatedTlvQrCode = kQRCodePrefix + String(truncatedTlvBuffer)
+
+    val truncatedException =
+      assertThrows(OnboardingPayloadException::class.java) {
+        OnboardingPayloadParser().parseQrCode(truncatedTlvQrCode)
+      }
+    assertThat(truncatedException.message).contains("Invalid TLV data")
+    assertThat(truncatedException.cause).isNotNull()
+
+    // Append a TLV element whose 4-byte length has bit 31 set (0xFFFFFFFF -> -1 as Int).
+    val negativeLengthTlvBytes =
+      basePayloadBytes +
+        byteArrayOf(0x0E, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte())
+    val negativeLengthTlvBuffer = CharArray(base38EncodedLength(negativeLengthTlvBytes.size))
+    base38Encode(negativeLengthTlvBytes, negativeLengthTlvBuffer)
+    val negativeLengthTlvQrCode = kQRCodePrefix + String(negativeLengthTlvBuffer)
+
+    val negativeLengthException =
+      assertThrows(OnboardingPayloadException::class.java) {
+        OnboardingPayloadParser().parseQrCode(negativeLengthTlvQrCode)
+      }
+    assertThat(negativeLengthException.message).contains("Invalid TLV data")
+    assertThat(negativeLengthException.cause).isNotNull()
   }
 
   companion object {
