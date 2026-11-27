@@ -37,6 +37,10 @@ public:
     void ControllerActivated();
     void ControllerDeactivated();
 
+#ifdef DEBUG
+    void UnitTestInjectBrowseResult(DNSServiceFlags aFlags, uint32_t aInterfaceId, const char * aName, const char * aDomain);
+#endif
+
 private:
     static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId, DNSServiceErrorType aError,
         const char * aName, const char * aType, const char * aDomain, void * aContext);
@@ -60,4 +64,7 @@ private:
 
     // Queued-up instance names to notify about.
     NSMutableSet<NSString *> * mAddedInstanceNames = nil;
+
+    // Instance name -> the @[ interface index, domain ] pairs it is currently browsed on.
+    NSMutableDictionary<NSString *, NSMutableSet<NSArray *> *> * mPresentInstances = nil;
 };
