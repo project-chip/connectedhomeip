@@ -54,8 +54,8 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
-<<<<<<< HEAD
-=======
+<< << << < HEAD
+== == == =
 #   run3:
 #     app: ${CAMERA_APP}
 #     app-args: >
@@ -73,7 +73,7 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
->>>>>>> 58fba06 (Make flags more verbose. (#75403))
+>>>>>> > 58fba06(Make flags more verbose. (  # 75403))
 # === END CI TEST ARGUMENTS ===
 
 from matter.testing.decorators import async_test_body
@@ -84,7 +84,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 class TC_DeviceConformance(DeviceConformanceTests):
 
-    @async_test_body
+    @ async_test_body
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
@@ -92,11 +92,11 @@ class TC_DeviceConformance(DeviceConformanceTests):
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
-        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve=self.user_params.get(
             "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", True)
-        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification=self.user_params.get(
             "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
-        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve,
+        success, problems=self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve,
                                                    self.is_pics_sdk_ci_only,
                                                    allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
@@ -104,25 +104,25 @@ class TC_DeviceConformance(DeviceConformanceTests):
             self.fail_current_test("Problems with conformance")
 
     def test_TC_IDM_10_3(self):
-        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve=self.user_params.get(
             "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", False)
-        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve)
+        success, problems=self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
     def test_TC_IDM_10_5(self):
-        fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+        fail_on_extra_clusters=self.user_params.get("fail_on_extra_clusters", True)
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification=self.user_params.get(
             "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
-        success, problems = self.check_device_type(fail_on_extra_clusters,
+        success, problems=self.check_device_type(fail_on_extra_clusters,
                                                    allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
 
     def test_TC_IDM_10_6(self):
-        success, problems = self.check_device_type_revisions()
+        success, problems=self.check_device_type_revisions()
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
@@ -146,7 +146,7 @@ class TC_DeviceConformance(DeviceConformanceTests):
     def test_TC_IDM_14_1(self):
         self.step(0)  # wildcard read - done in setup
         self.step(1)
-        problems = self.check_root_node_restricted_clusters()
+        problems=self.check_root_node_restricted_clusters()
         self.step(2)
         problems.extend(self.check_closure_restricted_clusters())
         self.step(3)
@@ -169,7 +169,7 @@ class TC_DeviceConformance(DeviceConformanceTests):
 
     def test_TC_DESC_2_3(self):
         self.step(0)  # done in setup class
-        problems = []
+        problems=[]
 
         self.step(1)
         problems.extend(self.check_root_endpoint_for_application_device_types())
