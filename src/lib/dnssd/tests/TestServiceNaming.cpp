@@ -23,6 +23,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -267,7 +268,7 @@ TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
     EXPECT_EQ(memcmp(buffer, untouched, sizeof(buffer)), 0);
 
     const uint8_t mac[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
-    EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan(mac)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(MakeHostName(buffer, sizeof(buffer), ByteSpan(mac)));
     EXPECT_STREQ(buffer, "001122334455");
 }
 
@@ -289,7 +290,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeNameOperationalInstanceName)
     char buffer[kMaxOperationalServiceNameSize];
     DiscoveryFilter filter(DiscoveryFilterType::kInstanceName, "2906C908D115D362-8FC7772401CD0696");
 
-    EXPECT_EQ(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational));
     EXPECT_STREQ(buffer, "2906C908D115D362-8FC7772401CD0696._sub._matter");
 }
 
@@ -303,7 +304,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
     constexpr size_t kRequired = 18;
     EXPECT_EQ(MakeServiceTypeName(buffer, kRequired - 1, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
 
-    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode));
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
 }
 
