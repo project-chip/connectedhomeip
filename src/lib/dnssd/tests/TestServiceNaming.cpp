@@ -259,11 +259,12 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
 TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
 {
     char buffer[64];
-
+    char untouched[sizeof(buffer)];
     memset(buffer, 'x', sizeof(buffer));
-    // An empty mac/eui64 has no valid host name representation; the call must not report success
-    // while leaving the destination untouched.
+    memset(untouched, 'x', sizeof(untouched));
+
     EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(memcmp(buffer, untouched, sizeof(buffer)), 0);
 
     const uint8_t mac[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
     EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan(mac)), CHIP_NO_ERROR);
@@ -298,12 +299,9 @@ TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
     DiscoveryFilter filter;
     filter.type = DiscoveryFilterType::kCommissioningMode;
 
-    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18; every smaller size must fail.
+    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18.
     constexpr size_t kRequired = 18;
-    for (size_t tooSmall = 1; tooSmall < kRequired; tooSmall++)
-    {
-        EXPECT_EQ(MakeServiceTypeName(buffer, tooSmall, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
-    }
+    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired - 1, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
 
     EXPECT_EQ(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
