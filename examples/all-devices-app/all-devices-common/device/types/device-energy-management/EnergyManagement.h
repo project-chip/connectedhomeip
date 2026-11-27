@@ -135,7 +135,6 @@ private:
     TimerDelegate & mTimerDelegate;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
     Config mConfig;
-    CodeDrivenDataModelProvider * mProvider                        = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState       = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
     Clusters::DeviceEnergyManagement::OptOutStateEnum mOptOutState = Clusters::DeviceEnergyManagement::OptOutStateEnum::kNoOptOut;
     const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type * mPowerAdjustEntry;

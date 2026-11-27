@@ -108,7 +108,6 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
     VerifyOrReturnError(SingleEndpoint::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     Clusters::DeviceEnergyManagementCluster::Config config(endpoint, mConfig.featureFlags, *this);
@@ -127,21 +126,20 @@ void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
     mTimerDelegate.CancelTimer(this);
     mActivePowerAdjustment.reset();
 
-    mProvider    = nullptr;
-    mESAState    = ESAStateEnum::kOnline;
-    mOptOutState = OptOutStateEnum::kNoOptOut;
-    SetPowerAdjustEntry(kDefaultPowerAdjustEntry);
-    if (!mPowerAdjustmentCapability.IsNull())
-    {
-        mPowerAdjustmentCapability.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
-    }
-
     UnregisterDescriptor(provider);
 
     if (mDemCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mDemCluster.Cluster()));
         mDemCluster.Destroy();
+    }
+
+    mESAState    = ESAStateEnum::kOnline;
+    mOptOutState = OptOutStateEnum::kNoOptOut;
+    SetPowerAdjustEntry(kDefaultPowerAdjustEntry);
+    if (!mPowerAdjustmentCapability.IsNull())
+    {
+        mPowerAdjustmentCapability.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
     }
 }
 
@@ -285,8 +283,8 @@ void EnergyManagement::SetPowerAdjustEntry(const Structs::PowerAdjustStruct::Typ
 
 void EnergyManagement::NotifyAttributeChanged(AttributeId attribute)
 {
-    VerifyOrReturn(mProvider != nullptr);
-    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, attribute }, DataModel::AttributeChangeType::kReportable);
+    VerifyOrReturn(mDemCluster.IsConstructed());
+    mDemCluster.Cluster().NotifyAttributeChanged(attribute);
 }
 
 Protocols::InteractionModel::Status EnergyManagement::StartTimeAdjustRequest(const uint32_t requestedStartTime,

@@ -250,7 +250,10 @@ TEST_F(EnergyManagementTestFixture, UserOptOutEndsMatchingPowerAdjustment)
     ExpectPowerAdjustStartEvent();
 
     // Opting out of local optimization does not affect a grid adjustment.
+    const ConcreteClusterPath clusterPath(kEndpoint, Id);
+    const DataVersion dataVersion = mDevice.EnergyManagementCluster().GetDataVersion(clusterPath);
     ASSERT_SUCCESS(mTestEventTriggerDelegate.HandleEventTriggers(kTriggerOptOutLocal));
+    EXPECT_NE(mDevice.EnergyManagementCluster().GetDataVersion(clusterPath), dataVersion);
     EXPECT_EQ(mDevice.GetOptOutState(), OptOutStateEnum::kLocalOptOut);
     EXPECT_EQ(mDevice.GetESAState(), ESAStateEnum::kPowerAdjustActive);
     ExpectNoEvent();

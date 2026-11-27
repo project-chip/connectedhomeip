@@ -88,6 +88,9 @@ public:
     const BitFlags<DeviceEnergyManagement::Feature> & Features() const { return mFeatureFlags; }
     DeviceEnergyManagement::Delegate & GetDelegate() { return mDelegate; }
 
+    /// The delegate owns the attribute values, so the delegate (or the application) calls this when a value changes.
+    using DefaultServerCluster::NotifyAttributeChanged;
+
     /// The delegate decides when a power adjustment starts and ends, so the delegate (or the application) calls
     /// these to emit the corresponding events. No event is emitted before Startup or after Shutdown.
     void GenerateEvent(const DeviceEnergyManagement::Events::PowerAdjustStart::Type & event);
