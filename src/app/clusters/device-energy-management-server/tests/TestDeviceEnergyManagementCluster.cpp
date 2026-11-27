@@ -27,7 +27,11 @@
 #include <clusters/DeviceEnergyManagement/Attributes.h>
 #include <clusters/DeviceEnergyManagement/Commands.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
+#include <lib/support/TimeUtils.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemClock.h>
+
+#include <limits>
 
 using namespace chip;
 using namespace chip::app;
@@ -705,10 +709,26 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerRangeAdjustRequest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+class StartTimeAdjustmentDelegate : public DeviceEnergyManagementMockDelegate
+{
+public:
+    Protocols::InteractionModel::Status StartTimeAdjustRequest(uint32_t requestedStartTime, AdjustmentCauseEnum cause) override
+    {
+        startTimeAdjustCalls++;
+        return DeviceEnergyManagementMockDelegate::StartTimeAdjustRequest(requestedStartTime, cause);
+    }
+
+    uint32_t startTimeAdjustCalls = 0;
+};
+
 TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
 {
+    constexpr uint32_t kNow = 1000;
+    System::Clock::Internal::RAIIMockClock clock;
+    clock.mRealTime =
+        System::Clock::Microseconds64((static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) + kNow - 1) * kMicrosecondsPerSecond);
     TestServerClusterContext context;
-    DeviceEnergyManagementMockDelegate mockDelegate;
+    StartTimeAdjustmentDelegate mockDelegate;
     BitMask<Feature> features(Feature::kStartTimeAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
@@ -730,6 +750,22 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
     // Valid start time within range - succeeds
     command.requestedStartTime = 1000;
     EXPECT_TRUE(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).IsSuccess());
+    EXPECT_EQ(mockDelegate.startTimeAdjustCalls, 1u);
+
+    auto & forecast = mockDelegate.GetForecastMutable().Value();
+    forecast.earliestStartTime.SetValue(DataModel::Nullable<uint32_t>(0));
+    clock.mRealTime =
+        System::Clock::Microseconds64((static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) + kNow) * kMicrosecondsPerSecond);
+    command.requestedStartTime = kNow;
+    EXPECT_EQ(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+    EXPECT_EQ(mockDelegate.startTimeAdjustCalls, 1u);
+
+    forecast.latestEndTime.SetValue(std::numeric_limits<uint32_t>::max() - 1);
+    command.requestedStartTime = std::numeric_limits<uint32_t>::max() - 500;
+    EXPECT_EQ(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+    EXPECT_EQ(mockDelegate.startTimeAdjustCalls, 1u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
