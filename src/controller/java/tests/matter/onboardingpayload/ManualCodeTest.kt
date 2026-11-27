@@ -24,6 +24,7 @@ import kotlin.math.ceil
 import kotlin.math.log10
 import kotlin.math.pow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -770,5 +771,37 @@ class ManualCodeTest {
         )
       )
       .isEqualTo("749701123309050177298")
+  }
+
+  @Test
+  fun testParseManualPairingCode_nonDigitInput_throwsInvalidManualPairingCodeFormatException() {
+    val parser = OnboardingPayloadParser()
+
+    val urlException =
+      assertThrows(InvalidManualPairingCodeFormatException::class.java) {
+        parser.parseManualPairingCode("https://example.com/setup")
+      }
+    assertThat(urlException.message).contains("Character was invalid h")
+
+    val invalidBodyException =
+      assertThrows(InvalidManualPairingCodeFormatException::class.java) {
+        parser.parseManualPairingCode("24184.21960")
+      }
+    assertThat(invalidBodyException.message).contains("Character was invalid .")
+
+    val invalidCheckDigitException =
+      assertThrows(InvalidManualPairingCodeFormatException::class.java) {
+        parser.parseManualPairingCode("3497011233a")
+      }
+    assertThat(invalidCheckDigitException.message).contains("Character was invalid a")
+
+    // Non-ASCII Unicode digits (Arabic-Indic digits) must also be rejected as format errors.
+    val nonAsciiDigits = "\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669\u0660\u0661"
+    assertThrows(InvalidManualPairingCodeFormatException::class.java) {
+      parser.parseManualPairingCode(nonAsciiDigits)
+    }
+    assertThrows(InvalidManualPairingCodeFormatException::class.java) {
+      ManualOnboardingPayloadParser.toNumber(nonAsciiDigits)
+    }
   }
 }
