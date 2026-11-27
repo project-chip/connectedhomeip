@@ -671,7 +671,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
                 WriteRequestMessage::Parser parser;
                 ASSERT_SUCCESS(parser.Init(reader));
                 bool flag = true;
-                // Groupcast has no peer revision, so the fields are omitted only if the caller provided a assumed revision
+                // Groupcast has no peer revision, so the fields are omitted only if the caller provided a fallback revision
                 // that allows it.
                 if (expectOmitted)
                 {

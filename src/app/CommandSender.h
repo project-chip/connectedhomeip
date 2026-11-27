@@ -379,7 +379,7 @@ public:
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
     /**
-     * Tells CommandSender which interaction model revision to assume for the peer,as fallback, based on what the caller knows
+     * Tells CommandSender which interaction model revision to assume, as fallback, for the peer, based on what the caller knows
      * about the peer state (for example, collected when the group was set up).
      *
      * The fallback revision is used only when the session passed to the constructor reports none: groupcast,
