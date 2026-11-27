@@ -321,9 +321,10 @@ TEST_F(BatteryStorageTestFixture, UsesInjectedSensorConfigurationsAndDelegates)
     using namespace Clusters::ElectricalPowerMeasurement;
     FixedElectricalReadings grid(PowerModeEnum::kAc, 230'000);
     FixedElectricalReadings battery(PowerModeEnum::kDc, 48'000);
-    ConfiguredBatteryStorage device({ .timerDelegate           = mTimerDelegate,
-                                      .gridElectricalSensor    = grid.GetConfig(mTimerDelegate, Feature::kAlternatingCurrent),
-                                      .batteryElectricalSensor = battery.GetConfig(mTimerDelegate, Feature::kDirectCurrent) });
+    ConfiguredBatteryStorage device({ .timerDelegate            = mTimerDelegate,
+                                      .testEventTriggerDelegate = mTestEventTriggerDelegate,
+                                      .gridElectricalSensor     = grid.GetConfig(mTimerDelegate, Feature::kAlternatingCurrent),
+                                      .batteryElectricalSensor  = battery.GetConfig(mTimerDelegate, Feature::kDirectCurrent) });
     ConsecutiveEndpointIdAllocator allocator;
     ASSERT_SUCCESS(device.Register(allocator, mProvider));
     ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
@@ -422,8 +423,7 @@ TEST_F(BatteryStorageTestFixture, RegistersRequiredTopologyAndDeviceTypes)
     ExpectSingleDeviceType(mProvider, batterySourceEndpoint, Device::Type::kPowerSource);
 
     ExpectServerClusters(mProvider, parentEndpoint, { Clusters::Descriptor::Id, Clusters::Identify::Id });
-    ExpectServerClusters(mProvider, energyEndpoint,
-                         { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::DeviceEnergyManagement::Id });
+    ExpectServerClusters(mProvider, energyEndpoint, { Clusters::Descriptor::Id, Clusters::DeviceEnergyManagement::Id });
     for (EndpointId sensorEndpoint : { gridSensorEndpoint, batterySensorEndpoint })
     {
         ExpectServerClusters(mProvider, sensorEndpoint,

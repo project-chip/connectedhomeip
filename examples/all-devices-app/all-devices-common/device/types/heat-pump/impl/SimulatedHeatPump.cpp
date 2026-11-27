@@ -70,7 +70,7 @@ private:
 
 SimulatedHeatPumpParts::SimulatedHeatPumpParts(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate) :
     mPowerSource("Heat pump grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc),
-    mEnergyManagement(timerDelegate,
+    mEnergyManagement({ .timerDelegate = timerDelegate, .testEventTriggerDelegate = testEventTriggerDelegate },
                       EnergyManagement::Config{
                           .featureFlags = BitMask<Clusters::DeviceEnergyManagement::Feature>(
                               Clusters::DeviceEnergyManagement::Feature::kPowerAdjustment),

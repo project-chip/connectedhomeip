@@ -34,6 +34,7 @@ public:
     struct Context
     {
         TimerDelegate & timerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
         ElectricalSensor::Config gridElectricalSensor;
         ElectricalSensor::Config batteryElectricalSensor;
     };

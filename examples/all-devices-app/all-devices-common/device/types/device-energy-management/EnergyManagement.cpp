@@ -15,7 +15,12 @@
  */
 
 #include <device/types/device-energy-management/EnergyManagement.h>
+
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <devices/Types.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
@@ -28,15 +33,57 @@ constexpr Structs::PowerAdjustStruct::Type kDefaultPowerAdjustEntry = {
     .maxDuration = 3600,
 };
 
+// Limits reported between the Power Adjustment and Power Adjustment Clear test event triggers.
+// The default limits allow a duration of 0 seconds, which ends an adjustment as soon as it starts. These limits
+// have a 10 second minimum, so an adjustment requested with the minimum duration stays active for 10 seconds.
+constexpr Structs::PowerAdjustStruct::Type kTestEventPowerAdjustEntry = {
+    .minPower    = 5'000'000,
+    .maxPower    = 30'000'000,
+    .minDuration = 10,
+    .maxDuration = 60,
+};
+
+constexpr uint64_t kEventTriggerEndpointMask = 0x0000'FFFF'0000'0000;
+
+bool IsOptedOut(OptOutStateEnum optOutState, PowerAdjustReasonEnum adjustmentReason)
+{
+    switch (adjustmentReason)
+    {
+    case PowerAdjustReasonEnum::kLocalOptimizationAdjustment:
+        return optOutState == OptOutStateEnum::kLocalOptOut || optOutState == OptOutStateEnum::kOptOut;
+    case PowerAdjustReasonEnum::kGridOptimizationAdjustment:
+        return optOutState == OptOutStateEnum::kGridOptOut || optOutState == OptOutStateEnum::kOptOut;
+    default:
+        return false;
+    }
+}
+
+// OptOutStateEnum values are bit flags: kLocalOptOut (0x01) | kGridOptOut (0x02) == kOptOut (0x03).
+OptOutStateEnum AddOptOut(OptOutStateEnum current, OptOutStateEnum added)
+{
+    return static_cast<OptOutStateEnum>(chip::to_underlying(current) | chip::to_underlying(added));
+}
+
+constexpr int64_t kMillisecondsPerHour = 3'600'000;
+
+// Energy in mW*ms. The value is converted to mWh once, for the whole adjustment, so that the division does not
+// drop a remainder for every interval.
+int64_t EnergyMilliwattMilliseconds(int64_t powerMilliwatts, chip::System::Clock::Milliseconds64 duration)
+{
+    const int64_t absolutePower = powerMilliwatts < 0 ? -powerMilliwatts : powerMilliwatts;
+    return absolutePower * static_cast<int64_t>(duration.count());
+}
+
 } // namespace
 
 namespace chip::app {
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) : EnergyManagement(timerDelegate, Config{}) {}
+EnergyManagement::EnergyManagement(const Context & context) : EnergyManagement(context, Config{}) {}
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config) :
+EnergyManagement::EnergyManagement(const Context & context, Config config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config)
+    mTimerDelegate(context.timerDelegate), mTestEventTriggerDelegate(context.testEventTriggerDelegate), mConfig(config),
+    mPowerAdjustEntry(&kDefaultPowerAdjustEntry)
 {
     if (!mConfig.featureFlags.Has(Feature::kPowerAdjustment))
     {
@@ -45,9 +92,15 @@ EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config)
 
     Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
     capabilityStruct.powerAdjustCapability.SetNonNull(
-        DataModel::List<const Structs::PowerAdjustStruct::Type>(&kDefaultPowerAdjustEntry, 1));
+        DataModel::List<const Structs::PowerAdjustStruct::Type>(mPowerAdjustEntry, 1));
     capabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
     mPowerAdjustmentCapability.SetNonNull(capabilityStruct);
+}
+
+EnergyManagement::~EnergyManagement()
+{
+    mTimerDelegate.CancelTimer(this);
+    mTestEventTriggerDelegate.RemoveHandler(this);
 }
 
 CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -55,29 +108,23 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
     VerifyOrReturnError(SingleEndpoint::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     Clusters::DeviceEnergyManagementCluster::Config config(endpoint, mConfig.featureFlags, *this);
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
 void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mProvider = nullptr;
-    mESAState = ESAStateEnum::kOnline;
-    if (!mPowerAdjustmentCapability.IsNull())
-    {
-        mPowerAdjustmentCapability.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
-    }
+    mTestEventTriggerDelegate.RemoveHandler(this);
+    mTimerDelegate.CancelTimer(this);
+    mActivePowerAdjustment.reset();
 
     UnregisterDescriptor(provider);
 
@@ -87,29 +134,157 @@ void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
         mDemCluster.Destroy();
     }
 
-    if (mIdentifyCluster.IsConstructed())
+    mESAState    = ESAStateEnum::kOnline;
+    mOptOutState = OptOutStateEnum::kNoOptOut;
+    SetPowerAdjustEntry(kDefaultPowerAdjustEntry);
+    if (!mPowerAdjustmentCapability.IsNull())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
+        mPowerAdjustmentCapability.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
     }
 }
 
 Protocols::InteractionModel::Status EnergyManagement::PowerAdjustRequest(const int64_t power, const uint32_t duration,
                                                                          AdjustmentCauseEnum cause)
 {
-    VerifyOrReturnValue(SetESAState(ESAStateEnum::kPowerAdjustActive) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::Failure);
-    VerifyOrReturnValue(SetPowerAdjustmentCause(AdjustmentCauseToPowerAdjustReason(cause)) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::Failure);
-    return Protocols::InteractionModel::Status::Success;
+    using Protocols::InteractionModel::Status;
+
+    VerifyOrReturnValue(!mPowerAdjustmentCapability.IsNull(), Status::Failure);
+
+    mTimerDelegate.CancelTimer(this);
+    VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(duration)) == CHIP_NO_ERROR, Status::Failure,
+                        EndPowerAdjustment(CauseEnum::kCancelled));
+
+    const System::Clock::Timestamp now = mTimerDelegate.GetCurrentMonotonicTimestamp();
+    const bool isNewAdjustment         = !mActivePowerAdjustment.has_value();
+    if (isNewAdjustment)
+    {
+        mActivePowerAdjustment =
+            ActivePowerAdjustment{ .startTime = now, .intervalStartTime = now, .power = power, .energyMilliwattMilliseconds = 0 };
+    }
+    else
+    {
+        ActivePowerAdjustment & adjustment = *mActivePowerAdjustment;
+        adjustment.energyMilliwattMilliseconds += EnergyMilliwattMilliseconds(adjustment.power, now - adjustment.intervalStartTime);
+        adjustment.intervalStartTime = now;
+        adjustment.power             = power;
+    }
+
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kPowerAdjustActive));
+    LogErrorOnFailure(SetPowerAdjustmentCause(AdjustmentCauseToPowerAdjustReason(cause)));
+
+    if (isNewAdjustment && mDemCluster.IsConstructed())
+    {
+        mDemCluster.Cluster().GenerateEvent(Events::PowerAdjustStart::Type{});
+    }
+    return Status::Success;
 }
 
 Protocols::InteractionModel::Status EnergyManagement::CancelPowerAdjustRequest()
 {
-    VerifyOrReturnValue(SetESAState(ESAStateEnum::kOnline) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
-    VerifyOrReturnValue(SetPowerAdjustmentCause(PowerAdjustReasonEnum::kNoAdjustment) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::Failure);
+    EndPowerAdjustment(CauseEnum::kCancelled);
     return Protocols::InteractionModel::Status::Success;
+}
+
+void EnergyManagement::TimerFired()
+{
+    EndPowerAdjustment(CauseEnum::kNormalCompletion);
+}
+
+void EnergyManagement::EndPowerAdjustment(CauseEnum cause)
+{
+    mTimerDelegate.CancelTimer(this);
+    LogErrorOnFailure(SetESAState(ESAStateEnum::kOnline));
+    if (!mPowerAdjustmentCapability.IsNull())
+    {
+        LogErrorOnFailure(SetPowerAdjustmentCause(PowerAdjustReasonEnum::kNoAdjustment));
+    }
+
+    VerifyOrReturn(mActivePowerAdjustment.has_value());
+    const ActivePowerAdjustment adjustment = *mActivePowerAdjustment;
+    mActivePowerAdjustment.reset();
+
+    const System::Clock::Timestamp now = mTimerDelegate.GetCurrentMonotonicTimestamp();
+    Events::PowerAdjustEnd::Type event;
+    event.cause     = cause;
+    event.duration  = static_cast<uint32_t>(((now - adjustment.startTime).count() + 500) / 1000);
+    event.energyUse = (adjustment.energyMilliwattMilliseconds +
+                       EnergyMilliwattMilliseconds(adjustment.power, now - adjustment.intervalStartTime)) /
+        kMillisecondsPerHour;
+
+    VerifyOrReturn(mDemCluster.IsConstructed());
+    mDemCluster.Cluster().GenerateEvent(event);
+}
+
+void EnergyManagement::SetOptOutState(OptOutStateEnum state)
+{
+    if (mOptOutState != state)
+    {
+        mOptOutState = state;
+        NotifyAttributeChanged(Attributes::OptOutState::Id);
+    }
+
+    if (mActivePowerAdjustment.has_value() && !mPowerAdjustmentCapability.IsNull() &&
+        IsOptedOut(mOptOutState, mPowerAdjustmentCapability.Value().cause))
+    {
+        EndPowerAdjustment(CauseEnum::kUserOptOut);
+    }
+}
+
+CHIP_ERROR EnergyManagement::HandleEventTrigger(uint64_t eventTrigger)
+{
+    const EndpointId triggerEndpoint = static_cast<EndpointId>((eventTrigger & kEventTriggerEndpointMask) >> 32);
+    VerifyOrReturnError(triggerEndpoint == kRootEndpointId || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const bool supportsPowerAdjustment = mConfig.featureFlags.Has(Feature::kPowerAdjustment);
+
+    switch (static_cast<DeviceEnergyManagementTrigger>(clearEndpointInEventTrigger(eventTrigger)))
+    {
+    case DeviceEnergyManagementTrigger::kPowerAdjustment:
+        VerifyOrReturnError(supportsPowerAdjustment, CHIP_ERROR_INVALID_ARGUMENT);
+        SetPowerAdjustEntry(kTestEventPowerAdjustEntry);
+        return CHIP_NO_ERROR;
+    case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
+        VerifyOrReturnError(supportsPowerAdjustment, CHIP_ERROR_INVALID_ARGUMENT);
+        SetPowerAdjustEntry(kDefaultPowerAdjustEntry);
+        return CHIP_NO_ERROR;
+    case DeviceEnergyManagementTrigger::kUserOptOutLocalOptimization:
+        SetOptOutState(AddOptOut(mOptOutState, OptOutStateEnum::kLocalOptOut));
+        return CHIP_NO_ERROR;
+    case DeviceEnergyManagementTrigger::kUserOptOutGridOptimization:
+        SetOptOutState(AddOptOut(mOptOutState, OptOutStateEnum::kGridOptOut));
+        return CHIP_NO_ERROR;
+    case DeviceEnergyManagementTrigger::kUserOptOutClearAll:
+        SetOptOutState(OptOutStateEnum::kNoOptOut);
+        return CHIP_NO_ERROR;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
+void EnergyManagement::SetPowerAdjustEntry(const Structs::PowerAdjustStruct::Type & entry)
+{
+    VerifyOrReturn(mPowerAdjustEntry != &entry);
+
+    // The active adjustment was validated against the previous limits.
+    if (mActivePowerAdjustment.has_value())
+    {
+        EndPowerAdjustment(CauseEnum::kCancelled);
+    }
+
+    mPowerAdjustEntry = &entry;
+    NotifyAttributeChanged(Attributes::AbsMinPower::Id);
+    NotifyAttributeChanged(Attributes::AbsMaxPower::Id);
+
+    VerifyOrReturn(!mPowerAdjustmentCapability.IsNull());
+    mPowerAdjustmentCapability.Value().powerAdjustCapability.SetNonNull(
+        DataModel::List<const Structs::PowerAdjustStruct::Type>(mPowerAdjustEntry, 1));
+    NotifyAttributeChanged(Attributes::PowerAdjustmentCapability::Id);
+}
+
+void EnergyManagement::NotifyAttributeChanged(AttributeId attribute)
+{
+    VerifyOrReturn(mDemCluster.IsConstructed());
+    mDemCluster.Cluster().NotifyAttributeChanged(attribute);
 }
 
 Protocols::InteractionModel::Status EnergyManagement::StartTimeAdjustRequest(const uint32_t requestedStartTime,
@@ -177,17 +352,17 @@ ESAStateEnum EnergyManagement::GetESAState()
 
 int64_t EnergyManagement::GetAbsMinPower()
 {
-    return kDefaultPowerAdjustEntry.minPower;
+    return mPowerAdjustEntry->minPower;
 }
 
 int64_t EnergyManagement::GetAbsMaxPower()
 {
-    return kDefaultPowerAdjustEntry.maxPower;
+    return mPowerAdjustEntry->maxPower;
 }
 
 OptOutStateEnum EnergyManagement::GetOptOutState()
 {
-    return OptOutStateEnum::kNoOptOut;
+    return mOptOutState;
 }
 
 const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & EnergyManagement::GetPowerAdjustmentCapability()
@@ -210,10 +385,7 @@ CHIP_ERROR EnergyManagement::SetESAState(ESAStateEnum state)
     VerifyOrReturnValue(mESAState != state, CHIP_NO_ERROR);
     mESAState = state;
 
-    VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
-    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::ESAState::Id },
-                                      DataModel::AttributeChangeType::kReportable);
-
+    NotifyAttributeChanged(Attributes::ESAState::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -223,10 +395,7 @@ CHIP_ERROR EnergyManagement::SetPowerAdjustmentCause(PowerAdjustReasonEnum cause
     VerifyOrReturnValue(mPowerAdjustmentCapability.Value().cause != cause, CHIP_NO_ERROR);
     mPowerAdjustmentCapability.Value().cause = cause;
 
-    VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
-    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::PowerAdjustmentCapability::Id },
-                                      DataModel::AttributeChangeType::kReportable);
-
+    NotifyAttributeChanged(Attributes::PowerAdjustmentCapability::Id);
     return CHIP_NO_ERROR;
 }
 

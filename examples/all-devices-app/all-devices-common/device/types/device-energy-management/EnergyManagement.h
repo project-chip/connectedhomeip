@@ -16,15 +16,34 @@
 
 #pragma once
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
+#include <system/SystemClock.h>
+
+#include <optional>
 
 namespace chip::app {
 
-class EnergyManagement : public SingleEndpoint, public Clusters::DeviceEnergyManagement::Delegate
+/// Device Energy Management device type (0x050D) with a simulated power adjustment.
+///
+/// Power adjustment states (ESAState):
+///
+///   Online --PowerAdjustRequest--> PowerAdjustActive      (PowerAdjustStart event)
+///   PowerAdjustActive --PowerAdjustRequest--> PowerAdjustActive  (duration restarts, no event)
+///   PowerAdjustActive --> Online                          (PowerAdjustEnd event), on:
+///       duration expiry             cause NormalCompletion
+///       CancelPowerAdjustRequest    cause Cancelled
+///       user opt-out of the cause   cause UserOptOut
+///
+/// Device Energy Management test event triggers for power adjustment and user opt-out are handled while the
+/// device is registered.
+class EnergyManagement : public SingleEndpoint,
+                         public Clusters::DeviceEnergyManagement::Delegate,
+                         public TimerContext,
+                         public TestEventTriggerHandler
 {
 public:
     using SingleEndpoint::GetEndpointId;
@@ -37,9 +56,15 @@ public:
         bool esaCanGenerate                                   = false;
     };
 
-    explicit EnergyManagement(TimerDelegate & timerDelegate);
-    explicit EnergyManagement(TimerDelegate & timerDelegate, Config config);
-    ~EnergyManagement() override = default;
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
+    };
+
+    explicit EnergyManagement(const Context & context);
+    EnergyManagement(const Context & context, Config config);
+    ~EnergyManagement() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -79,22 +104,45 @@ public:
     GetPowerRangeAdjustment() override;
     CHIP_ERROR SetESAState(Clusters::DeviceEnergyManagement::ESAStateEnum state) override;
 
+    /// Sets the user opt-out state. An active power adjustment ends with cause UserOptOut when `state` opts out
+    /// of the cause of that adjustment.
+    void SetOptOutState(Clusters::DeviceEnergyManagement::OptOutStateEnum state);
+
     // Public getters for programmatic control
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::DeviceEnergyManagementCluster & EnergyManagementCluster() { return mDemCluster.Cluster(); }
 
+    // TimerContext
+    void TimerFired() override;
+
+    // TestEventTriggerHandler
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
 private:
+    struct ActivePowerAdjustment
+    {
+        System::Clock::Timestamp startTime;
+        // Start of the interval that uses `power`. A PowerAdjustRequest during an active adjustment starts a new interval.
+        System::Clock::Timestamp intervalStartTime;
+        int64_t power;                       // mW
+        int64_t energyMilliwattMilliseconds; // mW*ms, of the intervals before `intervalStartTime`
+    };
+
     CHIP_ERROR SetPowerAdjustmentCause(Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum cause);
+    void SetPowerAdjustEntry(const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type & entry);
+    void EndPowerAdjustment(Clusters::DeviceEnergyManagement::CauseEnum cause);
+    void NotifyAttributeChanged(AttributeId attribute);
 
     TimerDelegate & mTimerDelegate;
+    TestEventTriggerDelegate & mTestEventTriggerDelegate;
     Config mConfig;
-    CodeDrivenDataModelProvider * mProvider                  = nullptr;
-    Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
+    Clusters::DeviceEnergyManagement::ESAStateEnum mESAState       = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
+    Clusters::DeviceEnergyManagement::OptOutStateEnum mOptOutState = Clusters::DeviceEnergyManagement::OptOutStateEnum::kNoOptOut;
+    const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type * mPowerAdjustEntry;
+    std::optional<ActivePowerAdjustment> mActivePowerAdjustment;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
 
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::DeviceEnergyManagementCluster> mDemCluster;
 };
 
