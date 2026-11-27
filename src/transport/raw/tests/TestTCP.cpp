@@ -109,6 +109,68 @@ CHIP_ERROR RetryPortSetup(uint16_t & outPort, std::function<CHIP_ERROR(uint16_t)
     return err;
 }
 
+// A deterministic TCPEndPoint test implementation whose ConnectImpl completes
+// the connection synchronously inside Connect(), exercising the path where a
+// newly allocated endpoint invokes OnConnectComplete before Connect() returns.
+class SyncConnectTCPEndPoint : public Inet::TCPEndPoint
+{
+public:
+    using EndPoint = Inet::TCPEndPoint;
+
+    explicit SyncConnectTCPEndPoint(Inet::EndPointManager<Inet::TCPEndPoint> & endPointManager) : Inet::TCPEndPoint(endPointManager)
+    {}
+
+    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override
+    {
+        *retAddr = mPeerAddr;
+        *retPort = mPeerPort;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const override
+    {
+        *retAddr = mPeerAddr;
+        *retPort = mPeerPort;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface) override
+    {
+        *retInterface = mIntfId;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR EnableNoDelay() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DisableKeepAlive() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR AckReceive(size_t len) override { return CHIP_NO_ERROR; }
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    void TCPUserTimeoutHandler() override {}
+#endif
+
+private:
+    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR ListenImpl(uint16_t backlog) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override
+    {
+        mPeerAddr = addr;
+        mPeerPort = port;
+        mIntfId   = intfId;
+        mState    = State::kConnecting;
+        HandleConnectComplete(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DriveSendingImpl() override { return CHIP_NO_ERROR; }
+    void HandleConnectCompleteImpl() override {}
+    void DoCloseImpl(CHIP_ERROR err, State oldState) override {}
+
+    IPAddress mPeerAddr = IPAddress::Any;
+    uint16_t mPeerPort  = 0;
+    InterfaceId mIntfId = InterfaceId::Null();
+};
+
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
 public:
@@ -172,6 +234,10 @@ public:
     void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
     {
         EXPECT_TRUE(conn);
+        if (mExpectedOutConnHandle != nullptr)
+        {
+            EXPECT_EQ(*mExpectedOutConnHandle, conn);
+        }
         ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
                         PeerAddrString(conn->mPeerAddr), conErr.Format());
         mHandleConnectionCompleteCalled = &*conn;
@@ -217,6 +283,7 @@ public:
         mHandleConnectionCompleteError  = CHIP_NO_ERROR;
         mHandleConnectionCloseCalled    = nullptr;
         mHandleConnectionReceivedCalled = nullptr;
+        mExpectedOutConnHandle          = nullptr;
 
         return CHIP_NO_ERROR;
     }
@@ -355,13 +422,55 @@ public:
     void HandleConnectCompleteCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
         // Connect and wait for seeing active connection and connection complete
-        // handler being called.
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        // handler being called. Verify outPeerConnState (activeTCPConnState) is
+        // already populated at the moment HandleConnectionAttemptComplete fires
+        // (including when connect() completes synchronously).
+        mExpectedOutConnHandle = &activeTCPConnState;
+        CHIP_ERROR err         = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
         EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+
+        // Reusing the already-connected TCP connection must populate refHolder and invoke
+        // HandleConnectionAttemptComplete synchronously before TCPConnect returns.
+        mHandleConnectionCompleteCalled = nullptr;
+        mExpectedOutConnHandle          = &refHolder;
+        err                             = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(refHolder, activeTCPConnState);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*refHolder);
+        mExpectedOutConnHandle = nullptr;
+
+        // Also verify the path where a newly allocated endpoint invokes OnConnectComplete
+        // synchronously from inside endPoint->Connect(): outPeerConnState (syncConnState)
+        // must already be populated when HandleConnectionAttemptComplete fires.
+        Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+        ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+
+        TCPImpl syncTcp;
+        ASSERT_SUCCESS(syncTcp.Init(Transport::TcpListenParameters(&syncEndPointManager)
+                                        .SetAddressType(addr.Type())
+                                        .SetListenPort(port)
+                                        .SetServerListenEnabled(false)));
+
+        TransportMgrBase syncTransportMgr;
+        syncTransportMgr.SetSessionManager(this);
+        ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+        ActiveTCPConnectionHandle syncConnState;
+        mHandleConnectionCompleteCalled = nullptr;
+        mExpectedOutConnHandle          = &syncConnState;
+        err                             = syncTcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, syncConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(syncConnState);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*syncConnState);
+        mExpectedOutConnHandle = nullptr;
+
+        syncConnState.Release();
+        syncTcp.Close();
+        syncEndPointManager.Shutdown();
     }
 
     void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -473,11 +582,12 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount              = 0;
-    void * mHandleConnectionCompleteCalled    = nullptr;
-    CHIP_ERROR mHandleConnectionCompleteError = CHIP_NO_ERROR;
-    void * mHandleConnectionCloseCalled       = nullptr;
-    void * mHandleConnectionReceivedCalled    = nullptr;
+    int mReceiveHandlerCallCount                       = 0;
+    void * mHandleConnectionCompleteCalled             = nullptr;
+    CHIP_ERROR mHandleConnectionCompleteError          = CHIP_NO_ERROR;
+    void * mHandleConnectionCloseCalled                = nullptr;
+    void * mHandleConnectionReceivedCalled             = nullptr;
+    ActiveTCPConnectionHandle * mExpectedOutConnHandle = nullptr;
 
 private:
     IOContext * mIOContext;
@@ -1002,22 +1112,22 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 111, 0 }));
+    ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 111, 0 }));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 1, 122, 123, 0 }));
+    ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 1, 122, 123, 0 }));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test two messages in a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 131, 0 }));
-    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 132, 0 }));
+    ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 131, 0 }));
+    ASSERT_TRUE(testData[1].Init((const uint32_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -1025,25 +1135,28 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
 
     // Test a chain of two messages, each a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 141, 142, 0 }));
-    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 143, 144, 0 }));
+    ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 141, 142, 0 }));
+    ASSERT_TRUE(testData[1].Init((const uint32_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
-    // Test a single packet buffer that is larger than
-    // kMaxSizeWithoutReserve but less than CHIP_CONFIG_MAX_LARGE_PAYLOAD_SIZE_BYTES.
-    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ System::PacketBuffer::kMaxSizeWithoutReserve + 1, 0 }));
-    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+    // Test a single packet buffer that is larger than kMaxSizeWithoutReserve but not larger than
+    // kMaxAllocSize. Skipped on internal-pool and LwIP standard-pool builds, where the two are asserted equal.
+    if constexpr (System::PacketBuffer::kMaxAllocSize > System::PacketBuffer::kMaxSizeWithoutReserve)
+    {
+        gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+        ASSERT_TRUE(testData[0].Init((const uint32_t[]){ System::PacketBuffer::kMaxSizeWithoutReserve + 1, 0 }));
+        err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+    }
 
     // Test a message that is too large to coalesce into a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, &testData[1]);
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 51, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES, 0 }));
+    ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 51, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES, 0 }));
     // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
     err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
@@ -1082,6 +1195,186 @@ TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
     }
 }
 
+TEST_F(TestTCP, MaxActiveConnectionsBoundary)
+{
+    Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+    ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+
+    TCPImpl syncTcp;
+    ASSERT_SUCCESS(syncTcp.Init(
+        Transport::TcpListenParameters(&syncEndPointManager).SetAddressType(IPAddressType::kIPv6).SetServerListenEnabled(false)));
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    TransportMgrBase syncTransportMgr;
+    syncTransportMgr.SetSessionManager(&gMockTransportMgrDelegate);
+    ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+
+    constexpr uint16_t kBasePort = 5540;
+    ActiveTCPConnectionHandle conns[kMaxTcpActiveConnectionCount];
+
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        auto peerAddr  = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + i));
+        CHIP_ERROR err = syncTcp.TCPConnect(peerAddr, nullptr, conns[i]);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_FALSE(conns[i].IsNull());
+    }
+
+    // With all active connection slots in use, the (kMaxTcpActiveConnectionCount + 1)th
+    // TCPConnect must fail with CHIP_ERROR_NO_MEMORY.
+    ActiveTCPConnectionHandle extraConn;
+    auto extraPeerAddr = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + kMaxTcpActiveConnectionCount));
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_ERROR_NO_MEMORY);
+    EXPECT_TRUE(extraConn.IsNull());
+
+    // Releasing one active connection handle frees a slot, allowing a subsequent TCPConnect to succeed.
+    conns[0].Release();
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_NO_ERROR);
+    EXPECT_FALSE(extraConn.IsNull());
+
+    extraConn.Release();
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        conns[i].Release();
+    }
+    syncTcp.Close();
+    syncEndPointManager.Shutdown();
+}
+
+TEST_F(TestTCP, ReconnectDuringHandleConnectionClosedDoesNotClobberClosingSlot)
+{
+    class ReconnectOnCloseDelegate : public chip::TransportMgrDelegate
+    {
+    public:
+        void OnMessageReceived(const Transport::PeerAddress &, System::PacketBufferHandle &&,
+                               Transport::MessageTransportContext *) override
+        {}
+        void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle &, CHIP_ERROR) override {}
+        void HandleConnectionReceived(ActiveTCPConnectionState &) override {}
+        void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR) override
+        {
+            if (mOnClosed)
+            {
+                mOnClosed(conn);
+            }
+        }
+
+        std::function<void(ActiveTCPConnectionState &)> mOnClosed;
+    };
+
+    Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+    ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+    auto shutdownManager = ScopeExit([&]() { syncEndPointManager.Shutdown(); });
+
+    TCPImpl syncTcp;
+    ASSERT_SUCCESS(syncTcp.Init(
+        Transport::TcpListenParameters(&syncEndPointManager).SetAddressType(IPAddressType::kIPv6).SetServerListenEnabled(false)));
+    auto closeTcp = ScopeExit([&]() { syncTcp.Close(); });
+
+    ReconnectOnCloseDelegate delegate;
+    TransportMgrBase syncTransportMgr;
+    syncTransportMgr.SetSessionManager(&delegate);
+    ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+
+    constexpr uint16_t kBasePort = 5640;
+
+    auto sendOversizedPrefixToClose = [&](const Transport::PeerAddress & peerAddr) {
+        TCPEndPointHandle endPoint;
+        {
+            // Scope `state` so its internal ActiveTCPConnectionHandle does not hold an extra reference
+            // during ProcessReceivedBuffer -> CloseConnectionInternal -> HandleConnectionClosed.
+            auto state = TestAccess::FindActiveConnection(syncTcp, const_cast<Transport::PeerAddress &>(peerAddr));
+            VerifyOrReturnValue(bool(state), CHIP_ERROR_INCORRECT_STATE);
+            endPoint = TestAccess::GetEndpoint(state);
+        }
+        uint8_t oversizedPrefix[kPacketSizeBytes];
+        Encoding::LittleEndian::Put32(oversizedPrefix, static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve));
+        System::PacketBufferHandle head = System::PacketBufferHandle::NewWithData(oversizedPrefix, sizeof(oversizedPrefix));
+        VerifyOrReturnValue(!head.IsNull(), CHIP_ERROR_NO_MEMORY);
+        return TestAccess::ProcessReceivedBuffer(syncTcp, endPoint, peerAddr, std::move(head));
+    };
+
+    // Case 1: Other slots are free when `conn0` closes via a raw-pointer path (ProcessReceivedBuffer).
+    // Dropping the last external handle and synchronously calling TCPConnect inside HandleConnectionClosed
+    // must allocate a distinct slot rather than reusing `conn0` and having `connection.Free()` wipe it.
+    {
+        ActiveTCPConnectionHandle conn0;
+        auto peerAddr0 = Transport::PeerAddress::TCP(addr, kBasePort);
+        ASSERT_EQ(syncTcp.TCPConnect(peerAddr0, nullptr, conn0), CHIP_NO_ERROR);
+        ASSERT_FALSE(conn0.IsNull());
+
+        ActiveTCPConnectionHandle reconnectedConn;
+        auto reconnectPeerAddr  = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + 10));
+        CHIP_ERROR reconnectErr = CHIP_ERROR_INTERNAL;
+        bool callbackInvoked    = false;
+
+        delegate.mOnClosed = [&](ActiveTCPConnectionState & closingConn) {
+            callbackInvoked = true;
+            conn0.Release();
+            reconnectErr = syncTcp.TCPConnect(reconnectPeerAddr, nullptr, reconnectedConn);
+            EXPECT_NE(&closingConn, static_cast<const void *>(reconnectedConn));
+        };
+
+        EXPECT_EQ(sendOversizedPrefixToClose(peerAddr0), CHIP_ERROR_MESSAGE_TOO_LONG);
+        delegate.mOnClosed = nullptr;
+
+        EXPECT_TRUE(callbackInvoked);
+        EXPECT_EQ(reconnectErr, CHIP_NO_ERROR);
+        ASSERT_FALSE(reconnectedConn.IsNull());
+        auto activeReconnected = TestAccess::FindActiveConnection(syncTcp, reconnectPeerAddr);
+        ASSERT_TRUE(bool(activeReconnected));
+        EXPECT_FALSE(TestAccess::GetEndpoint(activeReconnected).IsNull());
+
+        reconnectedConn.Release();
+    }
+
+    // Case 2: All active connection slots are occupied when `conns[0]` closes. While HandleConnectionClosed
+    // is still on the stack (before `connection.Free()` completes), UsedEndPointCount() still counts the
+    // closing slot as occupied, so a synchronous TCPConnect returns CHIP_ERROR_NO_MEMORY; once
+    // CloseConnectionInternal finishes `connection.Free()`, the slot becomes available for TCPConnect.
+    {
+        ActiveTCPConnectionHandle conns[kMaxTcpActiveConnectionCount];
+        for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+        {
+            auto peerAddr = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + i));
+            ASSERT_EQ(syncTcp.TCPConnect(peerAddr, nullptr, conns[i]), CHIP_NO_ERROR);
+            ASSERT_FALSE(conns[i].IsNull());
+        }
+
+        ActiveTCPConnectionHandle midCloseConn;
+        auto extraPeerAddr     = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + kMaxTcpActiveConnectionCount));
+        CHIP_ERROR midCloseErr = CHIP_NO_ERROR;
+
+        delegate.mOnClosed = [&](ActiveTCPConnectionState &) {
+            conns[0].Release();
+            midCloseErr = syncTcp.TCPConnect(extraPeerAddr, nullptr, midCloseConn);
+        };
+
+        auto peerAddr0 = Transport::PeerAddress::TCP(addr, kBasePort);
+        EXPECT_EQ(sendOversizedPrefixToClose(peerAddr0), CHIP_ERROR_MESSAGE_TOO_LONG);
+        delegate.mOnClosed = nullptr;
+
+        EXPECT_EQ(midCloseErr, CHIP_ERROR_NO_MEMORY);
+        EXPECT_TRUE(midCloseConn.IsNull());
+
+        // Now that CloseConnectionInternal has completed connection.Free(), the freed slot can be allocated.
+        EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, midCloseConn), CHIP_NO_ERROR);
+        EXPECT_FALSE(midCloseConn.IsNull());
+
+        midCloseConn.Release();
+        for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+        {
+            conns[i].Release();
+        }
+    }
+}
+
 TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
 {
     TCPImpl tcp;
@@ -1104,14 +1397,27 @@ TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[1];
 
-    // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
-    // should be accepted, not rejected.
-    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
-    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
-    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+    // A length prefix of exactly kMaxTCPMessageSize is accepted. Init() writes (total - 4) into the
+    // prefix, so the buffer holds kLargeBufMaxSizeWithoutReserve bytes.
+    {
+        gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+        ASSERT_TRUE(testData[0].Init((const uint32_t[]){ System::PacketBuffer::kLargeBufMaxSizeWithoutReserve, 0 }));
+        err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+    }
+
+    // A length prefix of kMaxTCPMessageSize + 1 is rejected and closes the connection. Only the
+    // 4-byte head carrying the prefix is delivered.
+    {
+        gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+        ASSERT_TRUE(testData[0].Init((const uint32_t[]){ 4, System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 3, 0 }));
+        System::PacketBufferHandle head = testData[0].mHandle.PopHead();
+        err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
+        EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
+        EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
+        EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
+    }
 }
 
 } // namespace

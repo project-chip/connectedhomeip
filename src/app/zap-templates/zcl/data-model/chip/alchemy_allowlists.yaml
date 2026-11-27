@@ -15,7 +15,6 @@
 MANUAL_ALLOWLIST:
     - access-control-definitions.xml
     - ballast-configuration-cluster.xml
-    - channel-cluster.xml
     - chip-ota.xml
     - chip-types.xml
     - clusters-extensions.xml
@@ -24,7 +23,6 @@ MANUAL_ALLOWLIST:
     - global-bitmaps.xml
     - measurement-and-sensing.xml
 
-    - mode-base-cluster.xml
     - proxy-configuration-cluster.xml
     - proxy-discovery-cluster.xml
     - proxy-valid-cluster.xml
@@ -33,32 +31,14 @@ MANUAL_ALLOWLIST:
     - semantic-tag-namespace-enums.xml
     - test-cluster.xml
     - test-hidden-manufacturer-specific-cluster.xml
-    - wake-on-lan-cluster.xml
 
 INCOMPLETE_METADATA_ALLOWLIST:
-    - commodity-price-cluster.xml
     - electrical-energy-measurement-cluster.xml
     - electrical-power-measurement-cluster.xml
-    - energy-evse-mode-cluster.xml
-    - fan-control-cluster.xml
-    - general-commissioning-cluster.xml
     - global-structs.xml
-    - laundry-dryer-controls-cluster.xml
-    - localization-configuration-cluster.xml
-    - media-input-cluster.xml
-    - microwave-oven-control-cluster.xml
-    - mode-select-cluster.xml
-    - power-source-configuration-cluster.xml
-    - pressure-measurement-cluster.xml
-    - pump-configuration-and-control-cluster.xml
     - push-av-stream-transport-cluster.xml
-    - refrigerator-alarm.xml
     - relative-humidity-measurement-cluster.xml
-    - scene.xml
     - service-area-cluster.xml
-    - smoke-co-alarm-cluster.xml
-    - software-diagnostics-cluster.xml
-    - soil-measurement-cluster.xml
     - switch-cluster.xml
     - temperature-control-cluster.xml
     - temperature-measurement-cluster.xml

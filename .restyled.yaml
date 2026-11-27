@@ -210,13 +210,13 @@ restylers:
           - "**/*.yaml"
     - name: shellharden
       image: public.ecr.aws/restyled-io/restyler-shellharden:v4.3
-      enabled: true
+      enabled: false
       include:
           - "**/*.sh"
           - "**/*.bash"
     - name: shfmt
       image: public.ecr.aws/restyled-io/restyler-shfmt:v3.13
-      enabled: true
+      enabled: false # Moved to pre-commit.ci
       command:
           - shfmt
           - "-w"

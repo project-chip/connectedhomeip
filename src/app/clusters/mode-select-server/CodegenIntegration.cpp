@@ -122,7 +122,7 @@ public:
         chip::CharSpan descSpan;
         Attributes::Description::GetDefaultOr(endpointId, descSpan, chip::CharSpan());
 
-        // Read StandardNamespace from Ember RAM storage (ZAP default = null).
+        // Read StandardNamespace default from attribute metadata (flash; ZAP default = null).
         DataModel::Nullable<uint16_t> standardNamespace;
         Attributes::StandardNamespace::GetDefaultOr(endpointId, standardNamespace, DataModel::NullNullable);
 

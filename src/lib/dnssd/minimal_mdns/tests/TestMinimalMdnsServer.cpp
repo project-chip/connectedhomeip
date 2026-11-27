@@ -20,9 +20,12 @@
 #include <inet/InetConfig.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace {
@@ -89,6 +92,92 @@ private:
     InterfaceIterator mIterator;
 };
 
+/// Hands out UDP endpoints from a pool of one, as a platform with a single endpoint left would.
+class OneUdpEndPoint : public EndPointManager<UDPEndPoint>
+{
+public:
+    Loop ForEachEndPoint(const EndPointVisitor visitor) override
+    {
+        return mPool.ForEachActiveObject([&](UDPEndPointImpl * endPoint) {
+            TypedEndPointHandle handle(endPoint);
+            return visitor(handle);
+        });
+    }
+
+protected:
+    TypedEndPointHandle CreateEndPoint() override { return mPool.CreateObject(*this); }
+
+private:
+    void ReleaseEndPoint(UDPEndPoint * endPoint) override { mPool.ReleaseObject(static_cast<UDPEndPointImpl *>(endPoint)); }
+
+    BitMapObjectPool<UDPEndPointImpl, 1> mPool;
+};
+
+struct Listed
+{
+    InterfaceId id;
+    IPAddressType type;
+};
+
+/// Yields the given interfaces and address types.
+class TheseInterfaces : public ListenIterator
+{
+public:
+    template <size_t N>
+    explicit TheseInterfaces(const Listed (&listed)[N]) : mListed(listed), mCount(N)
+    {}
+    TheseInterfaces() = default;
+
+    bool Next(InterfaceId * id, IPAddressType * type) override
+    {
+        if (mNext == mCount)
+        {
+            return false;
+        }
+        *id   = mListed[mNext].id;
+        *type = mListed[mNext].type;
+        mNext++;
+        return true;
+    }
+
+private:
+    const Listed * mListed = nullptr;
+    size_t mCount          = 0;
+    size_t mNext           = 0;
+};
+
+/// Records the endpoints a Listen() call opens.
+class AddedEndpoints : public ServerBase::ListenDelegate
+{
+public:
+    void OnEndpointAdded(InterfaceId id, IPAddressType type) override
+    {
+        if (mCount < MATTER_ARRAY_SIZE(mAdded))
+        {
+            mAdded[mCount] = { id, type };
+        }
+        mCount++;
+    }
+
+    size_t Count() const { return mCount; }
+    bool Has(InterfaceId id, IPAddressType type) const
+    {
+        for (size_t i = 0; i < mCount && i < MATTER_ARRAY_SIZE(mAdded); i++)
+        {
+            if (mAdded[i].id == id && mAdded[i].type == type)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    void Clear() { mCount = 0; }
+
+private:
+    Listed mAdded[4];
+    size_t mCount = 0;
+};
+
 class TestMinimalMdnsServer : public ::testing::Test
 {
 public:
@@ -118,6 +207,29 @@ public:
         }
         server.Shutdown();
     }
+
+    /// An interface the server can listen on for IPv6; skips the test if there is none.
+    static InterfaceId UsableInterface()
+    {
+        for (InterfaceIterator it; it.HasCurrent(); it.Next())
+        {
+            if (!it.IsUp() || !it.SupportsMulticast())
+            {
+                continue;
+            }
+            Server<10> server;
+            AddedEndpoints added;
+            const Listed listed[] = { { it.GetInterfaceId(), IPAddressType::kIPv6 } };
+            TheseInterfaces interfaces(listed);
+            if (server.Listen(EndPoints(), &interfaces, 0, &added) == CHIP_NO_ERROR && added.Count() == 1)
+            {
+                server.Shutdown();
+                return it.GetInterfaceId();
+            }
+            server.Shutdown();
+        }
+        return InterfaceId::Null();
+    }
 };
 
 TEST_F(TestMinimalMdnsServer, SkipsAnInterfaceThatIsGone)
@@ -145,19 +257,123 @@ TEST_F(TestMinimalMdnsServer, KeepsWhatIsBoundWhenEndpointsRunOut)
 {
     RequireAUsableInterface();
 
-    // Leave a single UDP endpoint: the first usable interface takes it, the next finds none.
-    UDPEndPointHandle held[INET_CONFIG_NUM_UDP_ENDPOINTS - 1];
-    for (auto & endpoint : held)
-    {
-        ASSERT_EQ(EndPoints()->NewEndPoint(endpoint), CHIP_NO_ERROR);
-    }
+    // The first usable interface takes the only endpoint, the next finds none.
+    OneUdpEndPoint endPoints;
+    ASSERT_EQ(endPoints.Init(DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
 
     Server<10> server;
     SomeInterfaces interfaces(/* vanished = */ false, /* real = */ true);
 
-    EXPECT_EQ(server.Listen(EndPoints(), &interfaces, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(server.Listen(&endPoints, &interfaces, 0), CHIP_NO_ERROR);
     EXPECT_TRUE(server.IsListening());
     server.Shutdown();
+    endPoints.Shutdown();
+}
+
+TEST_F(TestMinimalMdnsServer, KeepsTheEndpointsOfInterfacesStillListed)
+{
+    const InterfaceId usable = UsableInterface();
+    if (!usable.IsPresent())
+    {
+        GTEST_SKIP() << "no usable interface on this host";
+    }
+
+    Server<10> server;
+    AddedEndpoints added;
+    const Listed listed[] = { { usable, IPAddressType::kIPv6 } };
+
+    TheseInterfaces first(listed);
+    EXPECT_EQ(server.Listen(EndPoints(), &first, 0, &added), CHIP_NO_ERROR);
+    EXPECT_EQ(added.Count(), 1u);
+
+    added.Clear();
+    TheseInterfaces again(listed);
+    EXPECT_EQ(server.Listen(EndPoints(), &again, 0, &added), CHIP_NO_ERROR);
+    EXPECT_EQ(added.Count(), 0u);
+    EXPECT_TRUE(server.IsListening());
+    server.Shutdown();
+}
+
+TEST_F(TestMinimalMdnsServer, ClosesTheEndpointsOfInterfacesNoLongerListed)
+{
+    const InterfaceId usable = UsableInterface();
+    if (!usable.IsPresent())
+    {
+        GTEST_SKIP() << "no usable interface on this host";
+    }
+
+    Server<10> server;
+    const Listed listed[] = { { usable, IPAddressType::kIPv6 } };
+
+    TheseInterfaces first(listed);
+    EXPECT_EQ(server.Listen(EndPoints(), &first, 0), CHIP_NO_ERROR);
+    EXPECT_TRUE(server.IsListening());
+
+    TheseInterfaces none;
+    EXPECT_EQ(server.Listen(EndPoints(), &none, 0), CHIP_NO_ERROR);
+    EXPECT_FALSE(server.IsListening());
+}
+
+TEST_F(TestMinimalMdnsServer, OpensOnlyTheEndpointsOfNewInterfaces)
+{
+    const InterfaceId usable = UsableInterface();
+    if (!usable.IsPresent())
+    {
+        GTEST_SKIP() << "no usable interface on this host";
+    }
+
+    Server<10> server;
+    AddedEndpoints added;
+
+    TheseInterfaces none;
+    EXPECT_EQ(server.Listen(EndPoints(), &none, 0, &added), CHIP_NO_ERROR);
+    EXPECT_EQ(added.Count(), 0u);
+
+    const Listed one[] = { { usable, IPAddressType::kIPv6 } };
+    TheseInterfaces first(one);
+    EXPECT_EQ(server.Listen(EndPoints(), &first, 0, &added), CHIP_NO_ERROR);
+    EXPECT_EQ(added.Count(), 1u);
+    EXPECT_TRUE(added.Has(usable, IPAddressType::kIPv6));
+
+    // Whether the IPv4 endpoint can be opened depends on the host; the IPv6 one is not opened again.
+    added.Clear();
+#if INET_CONFIG_ENABLE_IPV4
+    const Listed two[] = { { usable, IPAddressType::kIPv6 }, { usable, IPAddressType::kIPv4 } };
+#else
+    const Listed two[] = { { usable, IPAddressType::kIPv6 }, { InterfaceId(kNoSuchInterface), IPAddressType::kIPv6 } };
+#endif
+    TheseInterfaces second(two);
+    EXPECT_EQ(server.Listen(EndPoints(), &second, 0, &added), CHIP_NO_ERROR);
+    EXPECT_FALSE(added.Has(usable, IPAddressType::kIPv6));
+    EXPECT_TRUE(server.IsListening());
+    server.Shutdown();
+}
+
+TEST_F(TestMinimalMdnsServer, KeepsListedEndpointsWhenTheTableIsFull)
+{
+#if INET_CONFIG_ENABLE_IPV4
+    const InterfaceId usable = UsableInterface();
+    if (!usable.IsPresent())
+    {
+        GTEST_SKIP() << "no usable interface on this host";
+    }
+
+    // One slot: the open IPv6 endpoint takes it.
+    Server<1> server;
+    const Listed one[] = { { usable, IPAddressType::kIPv6 } };
+    TheseInterfaces first(one);
+    EXPECT_EQ(server.Listen(EndPoints(), &first, 0), CHIP_NO_ERROR);
+    EXPECT_TRUE(server.IsListening());
+
+    // The IPv4 endpoint listed ahead of it finds no slot; the IPv6 one stays open.
+    const Listed two[] = { { usable, IPAddressType::kIPv4 }, { usable, IPAddressType::kIPv6 } };
+    TheseInterfaces second(two);
+    EXPECT_EQ(server.Listen(EndPoints(), &second, 0), CHIP_NO_ERROR);
+    EXPECT_TRUE(server.IsListening());
+    server.Shutdown();
+#else
+    GTEST_SKIP() << "needs a second endpoint on the same interface";
+#endif
 }
 
 } // namespace

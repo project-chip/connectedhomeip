@@ -24,10 +24,19 @@
 
 namespace chip::app {
 
-class WaterValve : public SingleEndpoint, public Clusters::ValveConfigurationAndControl::Delegate
+struct WaterValveConfig
+{
+    BitFlags<Clusters::ValveConfigurationAndControl::Feature> features{ Clusters::ValveConfigurationAndControl::Feature::kLevel };
+    Clusters::ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributes;
+    Clusters::ValveConfigurationAndControlCluster::StartupConfiguration startup{ DataModel::NullNullable };
+    Clusters::ValveConfigurationAndControl::TimeSyncTracker * tsTracker = nullptr;
+};
+class WaterValve : public SingleEndpoint
 {
 public:
-    WaterValve(TimerDelegate & timerDelegate);
+    explicit WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurationAndControl::Delegate & delegate,
+                        const WaterValveConfig & config = {});
+
     ~WaterValve() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -39,13 +48,17 @@ public:
 
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
 
-    // Clusters::ValveConfigurationAndControl::Delegate implementation
-    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
-    CHIP_ERROR HandleCloseValve() override;
-    void HandleRemainingDurationTick(uint32_t duration) override;
+    bool IsOpen() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), false);
+        auto state = mValveCluster.Cluster().GetCurrentState();
+        return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
+    }
 
 protected:
     TimerDelegate & mTimerDelegate;
+    Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
+    const WaterValveConfig mConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };

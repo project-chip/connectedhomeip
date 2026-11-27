@@ -67,7 +67,8 @@ CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
 CHIP_ERROR EnergyEvseCluster::SetFaultState(FaultStateEnum newValue)
 {
     VerifyOrReturnError(mFaultState != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(newValue < FaultStateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(EnsureKnownEnumValue(newValue) != FaultStateEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mFaultState = newValue;
     mDelegate.OnFaultStateChanged(newValue);
     NotifyAttributeChanged(FaultState::Id);
@@ -483,6 +484,11 @@ DataModel::ActionReturnStatus EnergyEvseCluster::HandleEnableCharging(const Data
     VerifyOrReturnValue(maximumChargeCurrent >= kMinimumChargeCurrentLimit, Status::ConstraintError);
     VerifyOrReturnValue(minimumChargeCurrent <= maximumChargeCurrent, Status::ConstraintError);
 
+    if (const auto reject = RejectIfFaultOrDiagnosticsActive())
+    {
+        return *reject;
+    }
+
     return mDelegate.EnableCharging(chargingEnabledUntil, minimumChargeCurrent, maximumChargeCurrent);
 }
 
@@ -497,13 +503,76 @@ DataModel::ActionReturnStatus EnergyEvseCluster::HandleEnableDischarging(const D
 
     VerifyOrReturnValue(maximumDischargeCurrent >= kMinimumChargeCurrentLimit, Status::ConstraintError);
 
+    if (const auto reject = RejectIfFaultOrDiagnosticsActive())
+    {
+        return *reject;
+    }
+
     return mDelegate.EnableDischarging(dischargingEnabledUntil, maximumDischargeCurrent);
 }
 
 DataModel::ActionReturnStatus EnergyEvseCluster::HandleStartDiagnostics(const DataModel::InvokeRequest & request,
                                                                         TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
+    if (mSupplyState != SupplyStateEnum::kDisabled)
+    {
+        return Status::Failure;
+    }
+
     return mDelegate.StartDiagnostics();
+}
+
+std::optional<Status> EnergyEvseCluster::RejectIfFaultOrDiagnosticsActive() const
+{
+    if (mFaultState != FaultStateEnum::kNoError)
+    {
+        return Status::Failure;
+    }
+    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    {
+        return Status::Failure;
+    }
+    return std::nullopt;
+}
+
+namespace {
+template <typename EventType>
+CHIP_ERROR GenerateClusterEvent(ServerClusterContext * context, const ConcreteClusterPath & path, const EventType & event)
+{
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return context->interactionContext.eventsGenerator.GenerateEvent(event, path.mEndpointId).has_value() ? CHIP_NO_ERROR
+                                                                                                          : CHIP_ERROR_INTERNAL;
+}
+} // namespace
+
+CHIP_ERROR EnergyEvseCluster::LogEvConnectedEvent(const Events::EVConnected::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
+}
+
+CHIP_ERROR EnergyEvseCluster::LogEvNotDetectedEvent(const Events::EVNotDetected::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
+}
+
+CHIP_ERROR EnergyEvseCluster::LogEnergyTransferStartedEvent(const Events::EnergyTransferStarted::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
+}
+
+CHIP_ERROR EnergyEvseCluster::LogEnergyTransferStoppedEvent(const Events::EnergyTransferStopped::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
+}
+
+CHIP_ERROR EnergyEvseCluster::LogFaultEvent(const Events::Fault::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
+}
+
+CHIP_ERROR EnergyEvseCluster::LogRfidEvent(const Events::Rfid::Type & event)
+{
+    return GenerateClusterEvent(mContext, mPath, event);
 }
 
 Status EnergyEvseCluster::ValidateTargets(

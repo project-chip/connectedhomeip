@@ -46,6 +46,10 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCP.h>
+#include <transport/raw/tests/TCPBaseTestAccess.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 using namespace chip;
 using namespace Credentials;
@@ -138,6 +142,17 @@ public:
                                           TestCASESecurePairingDelegate & delegateCommissioner);
 
     void SimulateUpdateNOCInvalidatePendingEstablishment();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    [[nodiscard]] CHIP_ERROR InitCASESessionForTCPConnectionAttempt(SessionManager & sessionManager, CASESession & pairing,
+                                                                    SessionEstablishmentDelegate & delegate,
+                                                                    const Transport::ActiveTCPConnectionHandle & conn);
+    void TCPConnectionClosedDuringSendSigma1();
+    void TCPConnectionClosedDuringSendSigma1DeletesSessionInDelegate();
+    void TCPConnectionAttemptFailureAndUnrelatedConnection();
+    void TCPSyncConnectAttemptDuringEstablishSession();
+    void TCPConnectionClosedDuringSendSigma3DeletesSessionInDelegate();
+    void TCPConnectionClosedDuringSendStatusReportDeletesSessionInDelegate();
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 void TestCASESession::ServiceEvents()
@@ -232,6 +247,88 @@ public:
     uint32_t mNumPairingComplete      = 0;
     uint32_t mNumBusyResponses        = 0;
     uint32_t mNumInvalidParamResponse = 0;
+};
+
+class RecordBusyStatusReport : public Testing::LoopbackTransportDelegate
+{
+public:
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasMessageType(SecureChannel::MsgType::StatusReport));
+
+        SecureChannel::StatusReport report;
+        VerifyOrReturn(report.Parse(std::move(copy)) == CHIP_NO_ERROR);
+        VerifyOrReturn(report.IsBusy());
+
+        mNumBusySent++;
+        mBusyPayloadHeader = payloadHeader;
+    }
+
+    uint32_t mNumBusySent = 0;
+    PayloadHeader mBusyPayloadHeader;
+};
+
+class CheckResponderMRPConfigOnSigma2Messages : public Testing::LoopbackTransportDelegate
+{
+public:
+    CheckResponderMRPConfigOnSigma2Messages(ExchangeManager & exchangeManager,
+                                            const ReliableMessageProtocolConfig & expectedConfig) :
+        mExchangeManager(exchangeManager),
+        mExpectedConfig(expectedConfig)
+    {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        const bool isSigma2       = payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_Sigma2);
+        const bool isSigma2Resume = payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_Sigma2Resume);
+        VerifyOrReturn(isSigma2 || isSigma2Resume);
+
+        size_t numMatchingEntries = 0;
+        mExchangeManager.GetReliableMessageMgr()->EnumerateRetransTable([&](ReliableMessageMgr::RetransTableEntry * entry) {
+            if (!entry->ec->IsInitiator() && entry->ec->GetExchangeId() == payloadHeader.GetExchangeID())
+            {
+                numMatchingEntries++;
+                SessionHandle session = entry->ec->GetSessionHandle();
+                EXPECT_TRUE(session->IsUnauthenticatedSession());
+                EXPECT_EQ(session->GetRemoteMRPConfig(), mExpectedConfig);
+            }
+            return Loop::Continue;
+        });
+        EXPECT_EQ(numMatchingEntries, 1u);
+
+        if (isSigma2)
+        {
+            mNumSigma2Messages++;
+        }
+        else
+        {
+            mNumSigma2ResumeMessages++;
+        }
+    }
+
+    uint32_t mNumSigma2Messages       = 0;
+    uint32_t mNumSigma2ResumeMessages = 0;
+
+private:
+    ExchangeManager & mExchangeManager;
+    ReliableMessageProtocolConfig mExpectedConfig;
 };
 
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
@@ -564,6 +661,9 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
+    CheckResponderMRPConfigOnSigma2Messages checkResponderMRPConfig(GetExchangeManager(), nonSleepyCommissionerRmpConfig);
+    loopback.SetLoopbackTransportDelegate(&checkResponderMRPConfig);
+
     EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
                                                                             &pairingAccessory),
               CHIP_NO_ERROR);
@@ -579,7 +679,10 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
                   nullptr, nullptr, &delegateCommissioner, MakeOptional(nonSleepyCommissionerRmpConfig)),
               CHIP_NO_ERROR);
     ServiceEvents();
+    loopback.SetLoopbackTransportDelegate(nullptr);
 
+    EXPECT_EQ(checkResponderMRPConfig.mNumSigma2Messages, 1u);
+    EXPECT_EQ(checkResponderMRPConfig.mNumSigma2ResumeMessages, 0u);
     EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount);
     EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
@@ -796,6 +899,9 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
+    RecordBusyStatusReport busyRecorder;
+    loopback.SetLoopbackTransportDelegate(&busyRecorder);
+
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
               CHIP_NO_ERROR);
@@ -813,11 +919,12 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
 
     ServiceEvents();
 
-    // We should have one full handshake and one Sigma1 + Busy + ack.  If that
-    // ever changes (e.g. because our server starts supporting multiple parallel
-    // handshakes), this test needs to be fixed so that the server is still
-    // responding BUSY to the client.
-    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount + 3);
+    // We should have one full handshake and one Sigma1 + Busy.  Busy is sent
+    // with the R flag cleared, so it is not acked.  If that ever changes (e.g.
+    // because our server starts supporting multiple parallel handshakes), this
+    // test needs to be fixed so that the server is still responding BUSY to the
+    // client.
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount + 2);
     EXPECT_EQ(delegateCommissioner1.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 0u);
 
@@ -827,6 +934,13 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     EXPECT_EQ(delegateCommissioner1.mNumBusyResponses, 0u);
     EXPECT_EQ(delegateCommissioner2.mNumBusyResponses, 1u);
 
+    // The spec requires the Busy StatusReport to have the R flag cleared. It
+    // still acknowledges the Sigma1 that triggered it.
+    EXPECT_EQ(busyRecorder.mNumBusySent, 1u);
+    EXPECT_FALSE(busyRecorder.mBusyPayloadHeader.NeedsAck());
+    EXPECT_TRUE(busyRecorder.mBusyPayloadHeader.IsAckMsg());
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
     gPairingServer.Shutdown();
 }
 
@@ -912,6 +1026,132 @@ struct Sigma1Params
 
     static constexpr bool kExpectSuccess = true;
 };
+
+namespace {
+
+class MockInitiatorDelegate : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        mNumResponses++;
+        mLastMessageType = payloadHeader.GetMessageType();
+        return CHIP_NO_ERROR;
+    }
+
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
+
+    uint32_t mNumResponses   = 0;
+    uint8_t mLastMessageType = 0;
+};
+
+// Encodes a Sigma1 for the device fabric's node that omits the optional initiatorSessionParams.
+CHIP_ERROR EncodeSigma1WithoutSessionParameters(System::PacketBufferHandle & msg)
+{
+    using namespace TLV;
+
+    uint8_t initiatorRandom[Sigma1Params::kInitiatorRandomLen];
+    memset(initiatorRandom, 0xA5, sizeof(initiatorRandom));
+
+    const FabricInfo * fabricInfo = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
+
+    Crypto::P256PublicKey rootPubKey;
+    ReturnErrorOnFailure(gDeviceFabrics.FetchRootPubkey(gDeviceFabricIndex, rootPubKey));
+
+    Credentials::GroupDataProvider::KeySet ipkKeySet;
+    ReturnErrorOnFailure(gDeviceGroupDataProvider.GetIpkKeySet(gDeviceFabricIndex, ipkKeySet));
+    VerifyOrReturnError(ipkKeySet.num_keys_used > 0, CHIP_ERROR_INTERNAL);
+
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan destinationIdSpan(destinationId);
+    ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(ipkKeySet.epoch_keys[0].key), ByteSpan(initiatorRandom),
+                                                   Credentials::P256PublicKeySpan(rootPubKey.ConstBytes()),
+                                                   fabricInfo->GetFabricId(), fabricInfo->GetNodeId(), destinationIdSpan));
+
+    Crypto::P256Keypair ephemeralKey;
+    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDH));
+
+    msg = System::PacketBufferHandle::New(
+        EstimateStructOverhead(sizeof(initiatorRandom), sizeof(uint16_t), sizeof(destinationId), Crypto::kP256_PublicKey_Length));
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    System::PacketBufferTLVWriter tlvWriter;
+    tlvWriter.Init(std::move(msg));
+
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kInitiatorRandomTag), ByteSpan(initiatorRandom)));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kInitiatorSessionIdTag), static_cast<uint16_t>(1)));
+    ReturnErrorOnFailure(tlvWriter.Put(Sigma1Params::NumToTag(Sigma1Params::kDestinationIdTag), ByteSpan(destinationIdSpan)));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(Sigma1Params::NumToTag(Sigma1Params::kInitiatorEphPubKeyTag),
+                                            ephemeralKey.Pubkey().ConstBytes(),
+                                            static_cast<uint32_t>(ephemeralKey.Pubkey().Length())));
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    return tlvWriter.Finalize(&msg);
+}
+
+} // namespace
+
+// A Sigma1 without initiatorSessionParams must leave the CASEServer session with the default
+// parameters, not the ones from the previous handshake on the same session.
+TEST_F(TestCASESession, Sigma1WithoutSessionParametersUsesDefaults)
+{
+    System::PacketBufferHandle sigma1;
+    ASSERT_SUCCESS(EncodeSigma1WithoutSessionParameters(sigma1));
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    {
+        TemporarySessionManager sessionManager(*this);
+        TestCASESecurePairingDelegate delegateCommissioner;
+        CASESession pairingCommissioner;
+        pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+        SessionParameters commissionerSessionParams;
+        commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+        commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+        pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+        ReliableMessageProtocolConfig commissionerMrpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                            System::Clock::Milliseconds16(4000));
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+        EXPECT_EQ(pairingCommissioner.EstablishSession(
+                      sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                      contextCommissioner, nullptr, nullptr, &delegateCommissioner, MakeOptional(commissionerMrpConfig)),
+                  CHIP_NO_ERROR);
+        ServiceEvents();
+
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    }
+
+    MockInitiatorDelegate initiatorDelegate;
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&initiatorDelegate);
+    EXPECT_SUCCESS(
+        contextInitiator->SendMessage(SecureChannel::MsgType::CASE_Sigma1, std::move(sigma1), SendMessageFlags::kExpectResponse));
+    ServiceEvents();
+    if (initiatorDelegate.mNumResponses == 0)
+    {
+        contextInitiator->Close();
+    }
+
+    // A Sigma2 response shows that the responder accepted this Sigma1.
+    EXPECT_EQ(initiatorDelegate.mNumResponses, 1u);
+    EXPECT_EQ(initiatorDelegate.mLastMessageType, to_underlying(SecureChannel::MsgType::CASE_Sigma2));
+
+    const SessionParameters & remoteSessionParams = gPairingServer.GetSession().GetRemoteSessionParameters();
+    EXPECT_EQ(remoteSessionParams.GetSupportedTransports(), 0u);
+    EXPECT_EQ(remoteSessionParams.GetMaxTCPPayloadSize(), 0u);
+    EXPECT_EQ(remoteSessionParams.GetMRPConfig(), GetDefaultMRPConfig());
+
+    gPairingServer.Shutdown();
+}
 
 TEST_F(TestCASESession, DestinationIdTest)
 {
@@ -1878,12 +2118,17 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         },
     };
 
+    ReliableMessageProtocolConfig commissionerMrpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                        System::Clock::Milliseconds16(4000));
+
     auto & loopback = GetLoopback();
     for (size_t i = 0; i < sizeof(testVectors) / sizeof(testVectors[0]); ++i)
     {
         auto * pairingCommissioner = chip::Platform::New<CASESession>();
         pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
         loopback.mSentMessageCount = 0;
+        CheckResponderMRPConfigOnSigma2Messages checkResponderMRPConfig(GetExchangeManager(), commissionerMrpConfig);
+        loopback.SetLoopbackTransportDelegate(&checkResponderMRPConfig);
         EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                                &testVectors[i].responderStorage, nullptr,
                                                                &gDeviceGroupDataProvider),
@@ -1892,9 +2137,12 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
             GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
             contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
-            Optional<ReliableMessageProtocolConfig>::Missing());
+            MakeOptional(commissionerMrpConfig));
         ServiceEvents();
+        loopback.SetLoopbackTransportDelegate(nullptr);
         EXPECT_EQ(establishmentReturnVal, CHIP_NO_ERROR);
+        EXPECT_EQ(checkResponderMRPConfig.mNumSigma2Messages, i == 0 ? 0u : 1u);
+        EXPECT_EQ(checkResponderMRPConfig.mNumSigma2ResumeMessages, i == 0 ? 1u : 0u);
         EXPECT_EQ(loopback.mSentMessageCount, testVectors[i].expectedSentMessageCount);
         EXPECT_EQ(delegateCommissioner.mNumPairingComplete, i + 1);
         SessionHolder & holder = delegateCommissioner.GetSessionHolder();
@@ -2122,6 +2370,19 @@ private:
         EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
         EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
         EXPECT_EQ(statusReport.GetProtocolCode(), mExpectedProtocolCode);
+
+        // The failure StatusReport remains reliable, but the rejected Sigma1's MRP parameters must not govern its retransmission.
+        EXPECT_TRUE(payloadHeader.NeedsAck());
+        size_t numResponderRetransmissions = 0;
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->EnumerateRetransTable([&](ReliableMessageMgr::RetransTableEntry * entry) {
+            if (!entry->ec->IsInitiator())
+            {
+                numResponderRetransmissions++;
+                EXPECT_EQ(entry->ec->GetSessionHandle()->GetRemoteMRPConfig(), GetDefaultMRPConfig());
+            }
+            return Loop::Continue;
+        });
+        EXPECT_EQ(numResponderRetransmissions, 1u);
         return CHIP_NO_ERROR;
     }
 
@@ -2146,6 +2407,58 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
     // This uses a bogus destination id that is not going to match anything in practice.
     EXPECT_EQ(EncodeSigma1Helper<Sigma1Params>(buf), CHIP_NO_ERROR);
     data->SetDataLength(static_cast<uint16_t>(buf.size()));
+
+    Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
+    EXPECT_TRUE(session.HasValue());
+
+    TestCASESecurePairingDelegate caseDelegate;
+    CASESession caseSession;
+    caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
+                                                         ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession), CHIP_NO_ERROR);
+
+    ExpectErrorExchangeDelegate delegate(SecureChannel::kProtocolCodeNoSharedRoot);
+    ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
+    ASSERT_NE(exchange, nullptr);
+
+    EXPECT_SUCCESS(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse));
+
+    ServiceEvents();
+
+    EXPECT_EQ(caseDelegate.mNumPairingErrors, 1u);
+    EXPECT_EQ(caseDelegate.mNumPairingComplete, 0u);
+
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1));
+    caseSession.Clear();
+}
+
+TEST_F(TestCASESession, RejectedSigma1WithLargeMRPIntervalsUsesDefaultConfig)
+{
+    using SecureChannel::MsgType;
+
+    SessionManager & sessionManager = GetSecureSessionManager();
+
+    uint8_t initiatorRandom[Crypto::kSHA256_Hash_Length] = { 1 };
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length]   = { 2 };
+    Crypto::P256Keypair ephemeralKey;
+    ASSERT_SUCCESS(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDH));
+
+    CASESessionAccess::EncodeSigma1Inputs encodeParams;
+    encodeParams.initiatorRandom    = ByteSpan(initiatorRandom);
+    encodeParams.initiatorSessionId = 0;
+    encodeParams.destinationId      = ByteSpan(destinationId);
+    encodeParams.initiatorEphPubKey = &ephemeralKey.Pubkey();
+    const auto defaultMRPConfig     = GetDefaultMRPConfig();
+    const auto largeIntervalMRPConfig =
+        ReliableMessageProtocolConfig(System::Clock::Milliseconds32(UINT32_MAX), System::Clock::Milliseconds32(UINT32_MAX),
+                                      defaultMRPConfig.mActiveThresholdTime);
+    encodeParams.initiatorSessionParams.SetMRPConfig(largeIntervalMRPConfig);
+
+    System::PacketBufferHandle data;
+    ASSERT_SUCCESS(CASESessionAccess::EncodeSigma1(data, encodeParams));
 
     Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
     EXPECT_TRUE(session.HasValue());
@@ -2621,5 +2934,657 @@ TEST_F(TestCASESession, ParseSigma3TBEData)
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElement);
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElementNoStructEnd);
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+namespace {
+
+class CloseTCPConnectionOnSend : public Testing::LoopbackTransportDelegate
+{
+public:
+    CloseTCPConnectionOnSend(Testing::LoopbackTransport & loopback, SessionManager & sessionManager,
+                             const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR sendError,
+                             Optional<Protocols::SecureChannel::MsgType> targetMsgType = NullOptional) :
+        mLoopback(loopback),
+        mSessionManager(sessionManager), mConn(conn), mSendError(sendError), mTargetMsgType(targetMsgType)
+    {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        VerifyOrReturn(!mTriggered && !mConn.IsNull());
+
+        if (mTargetMsgType.HasValue())
+        {
+            System::PacketBufferHandle copy = message.CloneData();
+            VerifyOrReturn(!copy.IsNull());
+
+            PacketHeader packetHeader;
+            VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+            PayloadHeader payloadHeader;
+            VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+            VerifyOrReturn(payloadHeader.HasMessageType(mTargetMsgType.Value()));
+        }
+
+        mTriggered = true;
+
+        // Simulate TCPBase::CloseConnectionInternal synchronously closing the TCP connection
+        // during SendMessage (which evicts sessions bound to the connection).
+        mSessionManager.HandleConnectionClosed(*mConn, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
+
+        if (mSendError != CHIP_NO_ERROR)
+        {
+            mLoopback.mNumMessagesToAllowBeforeError = 0;
+            mLoopback.mMessageSendError              = mSendError;
+        }
+    }
+
+    bool WasTriggered() const { return mTriggered; }
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    SessionManager & mSessionManager;
+    Transport::ActiveTCPConnectionHandle mConn;
+    CHIP_ERROR mSendError;
+    Optional<Protocols::SecureChannel::MsgType> mTargetMsgType;
+    bool mTriggered = false;
+};
+
+class SelfDeletingCASEDelegate : public SessionEstablishmentDelegate
+{
+public:
+    explicit SelfDeletingCASEDelegate(CASESession *& sessionToFree, std::function<void()> beforeDelete = nullptr) :
+        mSessionToFree(sessionToFree), mBeforeDelete(std::move(beforeDelete))
+    {}
+
+    void OnSessionEstablishmentStarted() override { mNumPairingStarted++; }
+
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override
+    {
+        mNumPairingErrors++;
+        mLastError = error;
+        mLastStage = stage;
+        if (mSessionToFree != nullptr)
+        {
+            if (mBeforeDelete)
+            {
+                mBeforeDelete();
+            }
+            chip::Platform::Delete(mSessionToFree);
+            mSessionToFree = nullptr;
+        }
+    }
+
+    void OnSessionEstablished(const SessionHandle & session) override { mNumPairingComplete++; }
+
+    CASESession *& mSessionToFree;
+    std::function<void()> mBeforeDelete;
+    uint32_t mNumPairingStarted          = 0;
+    uint32_t mNumPairingErrors           = 0;
+    uint32_t mNumPairingComplete         = 0;
+    CHIP_ERROR mLastError                = CHIP_NO_ERROR;
+    SessionEstablishmentStage mLastStage = SessionEstablishmentStage::kUnknown;
+};
+
+class LoopbackWithSyncTCPConnectTransport : public Transport::Base
+{
+public:
+    LoopbackWithSyncTCPConnectTransport(Testing::LoopbackTransport & loopback, const Transport::ActiveTCPConnectionHandle & conn,
+                                        CHIP_ERROR connectCompleteErr) :
+        mLoopback(loopback),
+        mConn(conn), mConnectCompleteErr(connectCompleteErr)
+    {}
+
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    {
+        return mLoopback.SendMessage(address, std::move(msgBuf));
+    }
+
+    bool CanSendToPeer(const Transport::PeerAddress & address) override { return mLoopback.CanSendToPeer(address); }
+
+    CHIP_ERROR TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionHandle & outPeerConnHandle) override
+    {
+        outPeerConnHandle = mConn;
+        HandleConnectionAttemptComplete(outPeerConnHandle, mConnectCompleteErr);
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    Transport::ActiveTCPConnectionHandle mConn;
+    CHIP_ERROR mConnectCompleteErr;
+};
+
+} // namespace
+
+CHIP_ERROR TestCASESession::InitCASESessionForTCPConnectionAttempt(SessionManager & sessionManager, CASESession & pairing,
+                                                                   SessionEstablishmentDelegate & delegate,
+                                                                   const Transport::ActiveTCPConnectionHandle & conn)
+{
+    Transport::PeerAddress tcpPeerAddr    = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+    Optional<SessionHandle> unauthSession = sessionManager.CreateUnauthenticatedSession(tcpPeerAddr, GetDefaultMRPConfig());
+    VerifyOrReturnError(unauthSession.HasValue(), CHIP_ERROR_NO_MEMORY);
+
+    ExchangeContext * context = GetExchangeManager().NewContext(unauthSession.Value(), &pairing);
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    ScopedNodeId peerScopedNodeId{ Node01_01, gCommissionerFabricIndex };
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        context->Close();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    pairing.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    CHIP_ERROR err = pairing.Init(sessionManager, nullptr, &delegate, peerScopedNodeId);
+    if (err != CHIP_NO_ERROR)
+    {
+        context->Close();
+        return err;
+    }
+    pairing.mRole = CryptoContext::SessionRole::kInitiator;
+    pairing.AdoptExchange(*context);
+    ReturnErrorOnFailure(gCommissionerFabrics.AddFabricDelegate(&pairing));
+    pairing.mSecureSessionHolder->AsSecureSession()->SetPeerAddress(tcpPeerAddr);
+    pairing.mFabricsTable   = &gCommissionerFabrics;
+    pairing.mFabricIndex    = fabricInfo->GetFabricIndex();
+    pairing.mLocalMRPConfig = MakeOptional(GetDefaultMRPConfig());
+    ReturnErrorOnFailure(pairing.mExchangeCtxt->UseSuggestedResponseTimeout(System::Clock::Seconds16(2)));
+    pairing.mPeerNodeId    = peerScopedNodeId.GetNodeId();
+    pairing.mLocalNodeId   = fabricInfo->GetNodeId();
+    pairing.mPeerConnState = conn;
+    return CHIP_NO_ERROR;
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma1)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        CASESession * noDelete = nullptr;
+        SelfDeletingCASEDelegate delegate(noDelete);
+        CASESession pairing;
+        ASSERT_EQ(InitCASESessionForTCPConnectionAttempt(GetSecureSessionManager(), pairing, delegate, conn.Handle()),
+                  CHIP_NO_ERROR);
+
+        auto & loopback                         = GetLoopback();
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        auto drainEvents = ScopeExit([&]() { ServiceEvents(); });
+        CloseTCPConnectionOnSend closeOnSend(loopback, GetSecureSessionManager(), conn.Handle(), sendError);
+        loopback.SetLoopbackTransportDelegate(&closeOnSend);
+        auto resetLoopback = ScopeExit([&]() {
+            loopback.SetLoopbackTransportDelegate(nullptr);
+            loopback.Reset();
+        });
+
+        Transport::ActiveTCPConnectionHandle connHandle = conn.Handle();
+        GetSecureSessionManager().HandleConnectionAttemptComplete(connHandle, CHIP_NO_ERROR);
+
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        EXPECT_TRUE(closeOnSend.WasTriggered());
+        EXPECT_EQ(delegate.mNumPairingStarted, 0u);
+        EXPECT_EQ(delegate.mNumPairingErrors, 1u);
+        EXPECT_EQ(delegate.mLastError, expectedError);
+        EXPECT_EQ(delegate.mLastStage, SessionEstablishmentStage::kNotInKeyExchange);
+        EXPECT_EQ(delegate.mNumPairingComplete, 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma1DeletesSessionInDelegate)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        CASESession * pairing = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairing, nullptr);
+        auto cleanupPairing = ScopeExit([&]() {
+            if (pairing != nullptr)
+            {
+                chip::Platform::Delete(pairing);
+            }
+        });
+        SelfDeletingCASEDelegate delegate(pairing);
+        ASSERT_EQ(InitCASESessionForTCPConnectionAttempt(GetSecureSessionManager(), *pairing, delegate, conn.Handle()),
+                  CHIP_NO_ERROR);
+
+        auto & loopback                         = GetLoopback();
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        auto drainEvents = ScopeExit([&]() { ServiceEvents(); });
+        CloseTCPConnectionOnSend closeOnSend(loopback, GetSecureSessionManager(), conn.Handle(), sendError);
+        loopback.SetLoopbackTransportDelegate(&closeOnSend);
+        auto resetLoopback = ScopeExit([&]() {
+            loopback.SetLoopbackTransportDelegate(nullptr);
+            loopback.Reset();
+        });
+
+        Transport::ActiveTCPConnectionHandle connHandle = conn.Handle();
+        GetSecureSessionManager().HandleConnectionAttemptComplete(connHandle, CHIP_NO_ERROR);
+
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        EXPECT_TRUE(closeOnSend.WasTriggered());
+        EXPECT_EQ(pairing, nullptr);
+        EXPECT_EQ(delegate.mNumPairingStarted, 0u);
+        EXPECT_EQ(delegate.mNumPairingErrors, 1u);
+        EXPECT_EQ(delegate.mLastError, expectedError);
+        EXPECT_EQ(delegate.mLastStage, SessionEstablishmentStage::kNotInKeyExchange);
+        EXPECT_EQ(delegate.mNumPairingComplete, 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionAttemptFailureAndUnrelatedConnection)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    Transport::TCP<2, 2> tcp;
+    Inet::TCPEndPointHandle endPoint1;
+    Inet::TCPEndPointHandle endPoint2;
+    ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint1), CHIP_NO_ERROR);
+    ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint2), CHIP_NO_ERROR);
+
+    Transport::PeerAddress tcpPeerAddr1 = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+    Transport::PeerAddress tcpPeerAddr2 =
+        Transport::PeerAddress::TCP(GetAliceAddress().GetIPAddress(), GetAliceAddress().GetPort());
+
+    TCPAccess::Connection conn1 = TCPAccess::AllocateConnection(tcp, endPoint1, tcpPeerAddr1, Transport::TCPState::kConnecting);
+    TCPAccess::Connection conn2 = TCPAccess::AllocateConnection(tcp, endPoint2, tcpPeerAddr2, Transport::TCPState::kConnecting);
+    ASSERT_TRUE(bool(conn1));
+    ASSERT_TRUE(bool(conn2));
+
+    TestCASESecurePairingDelegate delegate;
+    CASESession pairing;
+    ASSERT_EQ(InitCASESessionForTCPConnectionAttempt(GetSecureSessionManager(), pairing, delegate, conn1.Handle()), CHIP_NO_ERROR);
+
+    // An unrelated connection attempt completing with an error must be ignored by `pairing`.
+    Transport::ActiveTCPConnectionHandle unrelatedHandle = conn2.Handle();
+    GetSecureSessionManager().HandleConnectionAttemptComplete(unrelatedHandle, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(delegate.mNumPairingErrors, 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    // When `pairing`'s own connection attempt fails, it must clean up and report the error.
+    Transport::ActiveTCPConnectionHandle matchingHandle = conn1.Handle();
+    GetSecureSessionManager().HandleConnectionAttemptComplete(matchingHandle, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(delegate.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegate.mNumPairingComplete, 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    // Once a CASESession has already sent Sigma1 (mState == State::kSentSigma1), a subsequent
+    // HandleConnectionAttemptComplete notification for the same connection (e.g. from reusing an
+    // already-connected TCP connection) must be ignored and not re-send Sigma1 or abort the session.
+    auto & loopback                         = GetLoopback();
+    loopback.mSentMessageCount              = 0;
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+    loopback.mNumMessagesToDrop             = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    auto drainEvents                        = ScopeExit([&]() { ServiceEvents(); });
+    auto resetLoopback                      = ScopeExit([&]() { loopback.Reset(); });
+
+    CASESession * noDelete = nullptr;
+    SelfDeletingCASEDelegate inFlightDelegate(noDelete);
+    CASESession inFlightPairing;
+    auto clearInFlight = ScopeExit([&]() { inFlightPairing.Clear(); });
+    ASSERT_EQ(InitCASESessionForTCPConnectionAttempt(GetSecureSessionManager(), inFlightPairing, inFlightDelegate, conn1.Handle()),
+              CHIP_NO_ERROR);
+
+    GetSecureSessionManager().HandleConnectionAttemptComplete(matchingHandle, CHIP_NO_ERROR);
+    EXPECT_EQ(inFlightDelegate.mNumPairingStarted, 1u);
+    EXPECT_EQ(inFlightDelegate.mNumPairingErrors, 0u);
+    EXPECT_EQ(loopback.mSentMessageCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    // Re-firing HandleConnectionAttemptComplete (success or error) while in State::kSentSigma1 must be a no-op.
+    GetSecureSessionManager().HandleConnectionAttemptComplete(matchingHandle, CHIP_NO_ERROR);
+    GetSecureSessionManager().HandleConnectionAttemptComplete(matchingHandle, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(inFlightDelegate.mNumPairingStarted, 1u);
+    EXPECT_EQ(inFlightDelegate.mNumPairingErrors, 0u);
+    EXPECT_EQ(loopback.mSentMessageCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPSyncConnectAttemptDuringEstablishSession)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        auto & loopback                         = GetLoopback();
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        LoopbackWithSyncTCPConnectTransport syncTransport(loopback, conn.Handle(), CHIP_NO_ERROR);
+        GetTransportMgr().Close();
+        ASSERT_EQ(GetTransportMgr().Init(&syncTransport), CHIP_NO_ERROR);
+        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
+        auto restoreTransport = ScopeExit([&]() {
+            GetTransportMgr().Close();
+            EXPECT_EQ(GetTransportMgr().Init(&loopback), CHIP_NO_ERROR);
+            GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
+        });
+
+        CloseTCPConnectionOnSend closeOnSend(loopback, GetSecureSessionManager(), conn.Handle(), sendError);
+        loopback.SetLoopbackTransportDelegate(&closeOnSend);
+        auto resetLoopback = ScopeExit([&]() {
+            loopback.SetLoopbackTransportDelegate(nullptr);
+            loopback.Reset();
+        });
+
+        Optional<SessionHandle> unauthSession =
+            GetSecureSessionManager().CreateUnauthenticatedSession(tcpPeerAddr, GetDefaultMRPConfig());
+        ASSERT_TRUE(unauthSession.HasValue());
+
+        CASESession * pairing = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairing, nullptr);
+        auto cleanupPairing = ScopeExit([&]() {
+            if (pairing != nullptr)
+            {
+                chip::Platform::Delete(pairing);
+            }
+        });
+        pairing->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        SelfDeletingCASEDelegate delegate(pairing);
+
+        ExchangeContext * context = GetExchangeManager().NewContext(unauthSession.Value(), pairing);
+        ASSERT_NE(context, nullptr);
+
+        // EstablishSession must return the synchronous failure directly and NOT invoke OnSessionEstablishmentError
+        // before EstablishSession returns.
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        CHIP_ERROR err           = pairing->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                             ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
+                                                             &delegate, Optional<ReliableMessageProtocolConfig>::Missing());
+        EXPECT_EQ(err, expectedError);
+        EXPECT_TRUE(closeOnSend.WasTriggered());
+        EXPECT_NE(pairing, nullptr);
+        EXPECT_EQ(delegate.mNumPairingStarted, 0u);
+        EXPECT_EQ(delegate.mNumPairingErrors, 0u);
+        EXPECT_EQ(delegate.mNumPairingComplete, 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+        loopback.SetLoopbackTransportDelegate(nullptr);
+        loopback.Reset();
+        ServiceEvents();
+        EXPECT_EQ(delegate.mNumPairingErrors, 0u);
+    }
+
+    // Also verify that when HandleConnectionAttemptComplete itself fires synchronously with a connection error
+    // during EstablishSession, EstablishSession returns that error directly without invoking OnSessionEstablishmentError.
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        auto & loopback = GetLoopback();
+        LoopbackWithSyncTCPConnectTransport syncTransport(loopback, conn.Handle(), CHIP_ERROR_CONNECTION_ABORTED);
+        GetTransportMgr().Close();
+        ASSERT_EQ(GetTransportMgr().Init(&syncTransport), CHIP_NO_ERROR);
+        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
+        auto restoreTransport = ScopeExit([&]() {
+            GetTransportMgr().Close();
+            EXPECT_EQ(GetTransportMgr().Init(&loopback), CHIP_NO_ERROR);
+            GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
+        });
+
+        Optional<SessionHandle> unauthSession =
+            GetSecureSessionManager().CreateUnauthenticatedSession(tcpPeerAddr, GetDefaultMRPConfig());
+        ASSERT_TRUE(unauthSession.HasValue());
+
+        CASESession * pairing = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairing, nullptr);
+        auto cleanupPairing = ScopeExit([&]() {
+            if (pairing != nullptr)
+            {
+                chip::Platform::Delete(pairing);
+            }
+        });
+        pairing->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        SelfDeletingCASEDelegate delegate(pairing);
+
+        ExchangeContext * context = GetExchangeManager().NewContext(unauthSession.Value(), pairing);
+        ASSERT_NE(context, nullptr);
+
+        CHIP_ERROR err = pairing->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
+                                                   &delegate, Optional<ReliableMessageProtocolConfig>::Missing());
+        EXPECT_EQ(err, CHIP_ERROR_CONNECTION_ABORTED);
+        EXPECT_NE(pairing, nullptr);
+        EXPECT_EQ(delegate.mNumPairingStarted, 0u);
+        EXPECT_EQ(delegate.mNumPairingErrors, 0u);
+        EXPECT_EQ(delegate.mNumPairingComplete, 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma3DeletesSessionInDelegate)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { kFatalSendErrorNotRemappedToSuccessByMapSendError, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        CASESession * pairingCommissioner = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairingCommissioner, nullptr);
+        auto cleanupCommissioner = ScopeExit([&]() {
+            if (pairingCommissioner != nullptr)
+            {
+                chip::Platform::Delete(pairingCommissioner);
+            }
+        });
+        pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        SelfDeletingCASEDelegate delegateCommissioner(pairingCommissioner);
+
+        auto drainEvents = ScopeExit([&]() { ServiceEvents(); });
+        ASSERT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                               nullptr, nullptr, &gDeviceGroupDataProvider),
+                  CHIP_NO_ERROR);
+        auto shutdownServer = ScopeExit([&]() { gPairingServer.Shutdown(); });
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+        ASSERT_NE(contextCommissioner, nullptr);
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn.Handle());
+
+        auto & loopback                         = GetLoopback();
+        loopback.mSentMessageCount              = 0;
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        CloseTCPConnectionOnSend closeOnSigma3(loopback, GetSecureSessionManager(), conn.Handle(), sendError,
+                                               MakeOptional(Protocols::SecureChannel::MsgType::CASE_Sigma3));
+        loopback.SetLoopbackTransportDelegate(&closeOnSigma3);
+        auto resetLoopback = ScopeExit([&]() {
+            loopback.SetLoopbackTransportDelegate(nullptr);
+            loopback.Reset();
+        });
+
+        ASSERT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                        nullptr, nullptr, &delegateCommissioner,
+                                                        Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+        // Bind the pending SecureSession to the TCP connection so that HandleConnectionClosed
+        // during SendSigma3c evicts mSecureSessionHolder and invokes CASESession::OnSessionReleased().
+        ASSERT_TRUE(bool(pairingCommissioner->mSecureSessionHolder));
+        pairingCommissioner->mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn.Handle());
+
+        ServiceEvents();
+
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        EXPECT_TRUE(closeOnSigma3.WasTriggered());
+        EXPECT_EQ(pairingCommissioner, nullptr);
+        EXPECT_EQ(delegateCommissioner.mNumPairingStarted, 1u);
+        EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+        EXPECT_EQ(delegateCommissioner.mLastError, expectedError);
+        EXPECT_EQ(delegateCommissioner.mLastStage, SessionEstablishmentStage::kReceivedSigma2);
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+#if CHIP_CONFIG_SLOW_CRYPTO
+        // With CHIP_CONFIG_SLOW_CRYPTO, OnMessageReceived flushes a standalone MRP Ack for each
+        // received Sigma message (Sigma1 and Sigma2 when Sigma3 send fails; Sigma1, Sigma2, and
+        // Sigma3 when Sigma3 send succeeds).
+        constexpr uint32_t kExpectedSentOnSigma3Success = 7u;
+        constexpr uint32_t kExpectedSentOnSigma3Failure = 4u;
+#else
+        // When sendError == CHIP_NO_ERROR, Sigma1, Sigma2, Sigma3, and the responder's success StatusReport
+        // are sent (4 messages); when sendError != CHIP_NO_ERROR, only Sigma1 and Sigma2 are sent (2 messages).
+        constexpr uint32_t kExpectedSentOnSigma3Success = 4u;
+        constexpr uint32_t kExpectedSentOnSigma3Failure = 2u;
+#endif
+        // In neither case does HandleSigma2_and_SendSigma3 send an initiator error StatusReport after eviction.
+        EXPECT_EQ(loopback.mSentMessageCount,
+                  (sendError == CHIP_NO_ERROR) ? kExpectedSentOnSigma3Success : kExpectedSentOnSigma3Failure);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendStatusReportDeletesSessionInDelegate)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { kFatalSendErrorNotRemappedToSuccessByMapSendError, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        bool sigma1HandlerRegistered   = false;
+        CASESession * pairingResponder = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairingResponder, nullptr);
+        auto cleanupResponder = ScopeExit([&]() {
+            if (pairingResponder != nullptr)
+            {
+                chip::Platform::Delete(pairingResponder);
+            }
+        });
+        pairingResponder->SetGroupDataProvider(&gDeviceGroupDataProvider);
+        SelfDeletingCASEDelegate delegateResponder(pairingResponder, [&]() {
+            if (sigma1HandlerRegistered)
+            {
+                EXPECT_EQ(
+                    GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1),
+                    CHIP_NO_ERROR);
+                sigma1HandlerRegistered = false;
+            }
+        });
+
+        auto drainEvents = ScopeExit([&]() { ServiceEvents(); });
+        ASSERT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                                pairingResponder),
+                  CHIP_NO_ERROR);
+        sigma1HandlerRegistered = true;
+        auto unregisterSigma1   = ScopeExit([&]() {
+            if (sigma1HandlerRegistered)
+            {
+                EXPECT_EQ(
+                    GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1),
+                    CHIP_NO_ERROR);
+                sigma1HandlerRegistered = false;
+            }
+        });
+
+        ASSERT_EQ(pairingResponder->PrepareForSessionEstablishment(GetSecureSessionManager(), &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+        // Bind the responder's pending SecureSession to the TCP connection so that HandleConnectionClosed
+        // during SendStatusReport in HandleSigma3c evicts mSecureSessionHolder and invokes CASESession::OnSessionReleased().
+        ASSERT_TRUE(bool(pairingResponder->mSecureSessionHolder));
+        pairingResponder->mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn.Handle());
+
+        CASESession pairingCommissioner;
+        pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        TestCASESecurePairingDelegate delegateCommissioner;
+        auto clearCommissioner = ScopeExit([&]() { pairingCommissioner.Clear(); });
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+        ASSERT_NE(contextCommissioner, nullptr);
+
+        auto & loopback                         = GetLoopback();
+        loopback.mSentMessageCount              = 0;
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        CloseTCPConnectionOnSend closeOnStatusReport(loopback, GetSecureSessionManager(), conn.Handle(), sendError,
+                                                     MakeOptional(Protocols::SecureChannel::MsgType::StatusReport));
+        loopback.SetLoopbackTransportDelegate(&closeOnStatusReport);
+        auto resetLoopback = ScopeExit([&]() {
+            loopback.SetLoopbackTransportDelegate(nullptr);
+            loopback.Reset();
+        });
+
+        ASSERT_EQ(pairingCommissioner.EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                       ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                       nullptr, nullptr, &delegateCommissioner,
+                                                       Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+
+        ServiceEvents();
+
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        EXPECT_TRUE(closeOnStatusReport.WasTriggered());
+        EXPECT_EQ(pairingResponder, nullptr);
+        EXPECT_FALSE(sigma1HandlerRegistered);
+        EXPECT_EQ(delegateResponder.mNumPairingStarted, 1u);
+        EXPECT_EQ(delegateResponder.mNumPairingErrors, 1u);
+        EXPECT_EQ(delegateResponder.mLastError, expectedError);
+        EXPECT_EQ(delegateResponder.mLastStage, SessionEstablishmentStage::kReceivedSigma3);
+        EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+#if CHIP_CONFIG_SLOW_CRYPTO
+        // With CHIP_CONFIG_SLOW_CRYPTO, OnMessageReceived flushes a standalone MRP Ack for each
+        // received Sigma message (Sigma1, Sigma2, and Sigma3 -> 3 Sigma messages + 3 Acks = 6 messages;
+        // when sendError == CHIP_NO_ERROR, the responder's StatusReport and the initiator's StandaloneAck
+        // for it add 2 more -> 8 messages).
+        constexpr uint32_t kExpectedSentOnStatusReportSuccess = 8u;
+        constexpr uint32_t kExpectedSentOnStatusReportFailure = 6u;
+#else
+        // When sendError == CHIP_NO_ERROR, Sigma1, Sigma2, Sigma3, the responder's success StatusReport,
+        // and the initiator's StandaloneAck for that StatusReport are sent (5 messages); when
+        // sendError != CHIP_NO_ERROR, only Sigma1, Sigma2, and Sigma3 are sent (3 messages).
+        constexpr uint32_t kExpectedSentOnStatusReportSuccess = 5u;
+        constexpr uint32_t kExpectedSentOnStatusReportFailure = 3u;
+#endif
+        // In neither case does HandleSigma3c send a follow-up InvalidParam StatusReport after SendStatusReport fails.
+        EXPECT_EQ(loopback.mSentMessageCount,
+                  (sendError == CHIP_NO_ERROR) ? kExpectedSentOnStatusReportSuccess : kExpectedSentOnStatusReportFailure);
+    }
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace chip

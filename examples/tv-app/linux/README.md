@@ -170,6 +170,44 @@ Navigate to a new target:
     $ ./out/debug/chip-tool targetnavigator navigate-target Target Data node-id endpoint-id
     $ ./out/debug/chip-tool targetnavigator navigate-target 2 foo1 1234 6 (target id 2 on endpoint 6)
 
+## Content Launcher playback queue
+
+The tv-app has no media player. For `LaunchURL` commands that use the
+ContentQueueing fields, it logs what a player would act on, so the
+playback-confirmation prompts in TC-CONTENTLAUNCHER-10.9 are checked against
+these `ContentLauncherManager::HandleLaunchUrlRequest` log lines:
+
+-   `QueueType=<n> (Replace|Next|Last)`, `OffsetMillisecs=<n>`,
+    `NextURL provided` and `ContentHeaders count=<n>` when those fields are
+    present.
+-   A `ContentType` that matches an `AcceptHeader` entry is accepted. Any other
+    `ContentType` is rejected with `URLNotAvailable`.
+
+TC-CONTENTLAUNCHER-10.9 also requires a playable URL:
+`--string-arg content_url:<url>`.
+
+## Media File Management
+
+The tv-app implements the Media File Management cluster with the MediaSharing
+feature on endpoint 1. Files are stored under `/tmp/chip-media-files`, which
+survives a KVS factory reset but not a reboot.
+
+-   User consent: the tv-app has no consent UI. It grants consent automatically
+    for both `RequestSharedFiles` and `OfferFile`, and logs
+    `auto-granting consent ...` when it does. When a test asks you to approve a
+    share or accept an offered file on the DUT, no action is needed; press Enter
+    to continue.
+-   Sharing files: `RequestSharedFiles` shares every stored file that matches
+    the optional `SupportedMimeTypes` filter, emitting one `SharedFilesAdded`
+    event per file. At least one file must already be stored, for example one
+    added with `AddFile`.
+-   Making a shared file unavailable: delete it with `DeleteFile`, for example
+    from a second controller such as chip-tool. A `GetSharedFile` for its
+    ResponseID then returns `FileNotAvailable`. TC-MFILEMAN-3.1 skips step 5 if
+    the file is left in place.
+-   Supported MIME types: `video/mp4`, `audio/mpeg` and `image/jpeg`. `AddFile`
+    and `OfferFile` reject any other type with `UnsupportedMimeType`.
+
 ## Casting
 
 The tv-casting-app can be used to discover casting video players, selecting one,

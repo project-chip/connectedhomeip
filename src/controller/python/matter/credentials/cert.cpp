@@ -18,12 +18,27 @@
 
 #include "cert.h"
 
+#include <controller/AutoCommissioner.h>
 #include <controller/CertificateChainRequestTracker.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::Credentials;
+
+PyChipError pychip_ValidateAttestationCertificateProfile(const uint8_t * certificate, size_t certificateLen, uint8_t subjectProfile,
+                                                         uint8_t issuerProfile)
+{
+    return ToPyChipError(ValidateAttestationCertificateProfile(ByteSpan(certificate, certificateLen),
+                                                               static_cast<DeviceAttestationCertProfile>(subjectProfile),
+                                                               static_cast<DeviceAttestationCertProfile>(issuerProfile)));
+}
+
+uint32_t pychip_GetSupportedAttestationProfiles()
+{
+    return Controller::Internal::GetControllerSupportedAttestationRequestProfiles().Raw();
+}
 
 uint32_t pychip_GetMaxCertificateChainDocumentSize()
 {

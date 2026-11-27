@@ -28,6 +28,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 #include <clusters/HepaFilterMonitoring/Attributes.h>
 #include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
 
 #include <app/clusters/resource-monitoring-server/MigrateResourceMonitoringServerStorage.h>
 #include <lib/core/CHIPEncoding.h>
@@ -105,7 +106,7 @@ struct TestResourceMonitoringCluster : public ::testing::Test
                                               ResourceMonitoring::Feature::kReplacementProductList);
 
     TestResourceMonitoringCluster() :
-        activatedCarbonFilterMonitoring(kEndpointId, ActivatedCarbonFilterMonitoring::Id, kResourceMonitoringFeatureMap,
+        activatedCarbonFilterMonitoring(kEndpointId, kActivatedCarbonFilterMonitoring, kResourceMonitoringFeatureMap,
                                         ResourceMonitoringCluster::OptionalAttributeSet()
                                             .Set<Attributes::InPlaceIndicator::Id>()
                                             .Set<Attributes::LastChangedTime::Id>(),
@@ -180,6 +181,50 @@ TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_4"_span));
 
     ASSERT_FALSE(it.Next());
+}
+
+// Each aliased cluster must report its own ClusterRevision and cluster ID.
+TEST_F(TestResourceMonitoringCluster, ClusterRevisionPerAliasedCluster)
+{
+    struct Case
+    {
+        ClusterEntry entry;
+        uint32_t expectedRevision;
+    };
+
+    const Case kCases[] = {
+        { kActivatedCarbonFilterMonitoring, ActivatedCarbonFilterMonitoring::kRevision },
+        { kHepaFilterMonitoring, HepaFilterMonitoring::kRevision },
+        { kWaterTankLevelMonitoring, WaterTankLevelMonitoring::kRevision },
+    };
+
+    for (const Case & testCase : kCases)
+    {
+        ResourceMonitoringCluster cluster(kEndpointId, testCase.entry, kResourceMonitoringFeatureMap,
+                                          ResourceMonitoringCluster::OptionalAttributeSet(),
+                                          ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_EQ(cluster.GetClusterId(), testCase.entry.id);
+
+        ClusterTester tester(cluster);
+        uint32_t revision{};
+        ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+        EXPECT_EQ(revision, testCase.expectedRevision);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+// Revisions are part of the on-wire contract with devices on older spec versions; guard against accidental changes.
+TEST_F(TestResourceMonitoringCluster, ClusterEntryConstantsMatchMetadata)
+{
+    EXPECT_EQ(kActivatedCarbonFilterMonitoring.id, ActivatedCarbonFilterMonitoring::Id);
+    EXPECT_EQ(kActivatedCarbonFilterMonitoring.revision, 1u);
+    EXPECT_EQ(kHepaFilterMonitoring.id, HepaFilterMonitoring::Id);
+    EXPECT_EQ(kHepaFilterMonitoring.revision, 1u);
+    EXPECT_EQ(kWaterTankLevelMonitoring.id, WaterTankLevelMonitoring::Id);
+    EXPECT_EQ(kWaterTankLevelMonitoring.revision, 1u);
 }
 
 // Verify that a value stored in SafeAttributePersistenceProvider via WriteScalarValue (little-endian)

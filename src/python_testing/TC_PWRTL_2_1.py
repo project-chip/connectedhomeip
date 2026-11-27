@@ -78,7 +78,7 @@ class TC_PWRTL_2_1(MatterTestCommissionedDevice):
         cluster = Clusters.PowerTopology
         attributes = cluster.Attributes
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)

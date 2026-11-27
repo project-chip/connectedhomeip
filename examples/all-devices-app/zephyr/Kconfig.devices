@@ -35,6 +35,9 @@ config ALL_DEVICES_DEVICE_AIR_QUALITY_SENSOR
 config ALL_DEVICES_DEVICE_AMBIENT_CONTEXT_SENSOR
 	bool "Ambient context sensor"
 
+config ALL_DEVICES_DEVICE_BATTERY_STORAGE
+	bool "Battery storage"
+
 config ALL_DEVICES_DEVICE_BRIDGED_NODE
 	bool "Bridged node"
 
@@ -43,6 +46,9 @@ config ALL_DEVICES_DEVICE_CHIME
 
 config ALL_DEVICES_DEVICE_CLOSURE
 	bool "Closure"
+
+config ALL_DEVICES_DEVICE_CLOSURE_CONTROLLER
+	bool "Closure controller"
 
 config ALL_DEVICES_DEVICE_COLOR_TEMPERATURE_LIGHT
 	bool "Color temperature light"
@@ -71,6 +77,9 @@ config ALL_DEVICES_DEVICE_DISHWASHER
 config ALL_DEVICES_DEVICE_DOORBELL
 	bool "Doorbell"
 
+config ALL_DEVICES_DEVICE_ELECTRICAL_ENERGY_TARIFF
+	bool "Electrical energy tariff"
+
 config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
 	bool "Electrical sensor"
 
@@ -89,11 +98,17 @@ config ALL_DEVICES_DEVICE_FLOW_SENSOR
 config ALL_DEVICES_DEVICE_GENERIC_SWITCH
 	bool "Generic switch"
 
+config ALL_DEVICES_DEVICE_HEAT_PUMP
+	bool "Heat pump"
+
 config ALL_DEVICES_DEVICE_HUMIDITY_CONDITIONER
 	bool "Humidity conditioner"
 
 config ALL_DEVICES_DEVICE_HUMIDITY_SENSOR
 	bool "Humidity sensor"
+
+config ALL_DEVICES_DEVICE_IRRIGATION_SYSTEM
+	bool "Irrigation system"
 
 config ALL_DEVICES_DEVICE_LAUNDRY_DRYER
 	bool "Laundry dryer"
@@ -132,6 +147,9 @@ config ALL_DEVICES_DEVICE_ON_OFF_LIGHT_SWITCH
 config ALL_DEVICES_DEVICE_ON_OFF_PLUG_IN_UNIT
 	bool "On/off plug-in unit"
 
+config ALL_DEVICES_DEVICE_ON_OFF_SENSOR
+	bool "On/off sensor"
+
 config ALL_DEVICES_DEVICE_OVEN
 	bool "Oven"
 
@@ -162,17 +180,25 @@ config ALL_DEVICES_DEVICE_SMOKE_CO_ALARM
 config ALL_DEVICES_DEVICE_SOIL_SENSOR
 	bool "Soil sensor"
 
+config ALL_DEVICES_DEVICE_SOLAR_POWER
+	bool "Solar power"
+
 config ALL_DEVICES_DEVICE_SPEAKER
 	bool "Speaker"
 
 config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
 	bool "Temperature sensor"
 
+config ALL_DEVICES_DEVICE_THERMOSTAT
+	bool "Thermostat"
 config ALL_DEVICES_DEVICE_THREAD_BORDER_ROUTER
 	bool "Thread border router"
 
 config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
 	bool "Water freeze detector"
+
+config ALL_DEVICES_DEVICE_WATER_HEATER
+	bool "Water heater"
 
 config ALL_DEVICES_DEVICE_WATER_LEAK_DETECTOR
 	bool "Water leak detector"

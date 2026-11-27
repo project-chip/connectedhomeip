@@ -65,12 +65,12 @@ class TC_HSTAT_2_1(HSTATBase):
 
     def steps_TC_HSTAT_2_1(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH reads from the DUT the FeatureMap attribute.",
                         "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep(3, "TH reads from the DUT the SupportedModesMode attribute.",
                         "Verify that the DUT response contains a list with up to 4 entries. Verify: "
-                        "- Each list item corresponds to a valid ModeEnum value. "
+                        "- Each list item corresponds to a valid HumidistatModeEnum value. "
                         "- Each list item is unique among other entries. "
                         "- Each list item is supported by the FeatureMap. "
                         "* If Humidifier mode is present, HSTAT.S.F00(HUM) SHALL be supported. "
@@ -82,9 +82,9 @@ class TC_HSTAT_2_1(HSTATBase):
                         "* If HSTAT.S.F01(DEHUM) is supported, Dehumidifier mode SHALL be present. "
                         "* If HSTAT.S.F04(AUTO) is supported, Auto mode SHALL be present. "
                         "* If HSTAT.S.F05(FAN) is supported, FanOnly mode SHALL be present."),
-            TestStep(4, "TH reads from the DUT the Mode attribute.",
+            TestStep(4, "TH reads from the DUT the HumidistatMode attribute.",
                         "Verify that the DUT response contains a value between 0 and 3 inclusive."),
-            TestStep(5, "TH reads from the DUT the SystemState attribute.",
+            TestStep(5, "TH reads from the DUT the HumidistatSystemState attribute.",
                         "Verify that the DUT response contains a value between 0 and 3 inclusive."),
             TestStep(6, "TH reads from the DUT the MinSetpoint attribute.",
                         "Verify that the DUT response contains a value between 0 and 99 inclusive. Store the value as MinSetpointValue"),
@@ -141,27 +141,27 @@ class TC_HSTAT_2_1(HSTATBase):
         dehumidifierModeSupported = False
         autoModeSupported = False
         fanOnlyModeSupported = False
-        #   - Each list item corresponds to a valid ModeEnum value.
+        #   - Each list item corresponds to a valid HumidistatModeEnum value.
         for mode in SupportedModes:
             #   - Each list item is supported by the FeatureMap.
             match mode:
-                case self.ModeEnum.kHumidifier:
+                case self.HumidistatModeEnum.kHumidifier:
                     humidifierModeSupported = True
                     asserts.assert_true(self.humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
-                case self.ModeEnum.kDehumidifier:
+                case self.HumidistatModeEnum.kDehumidifier:
                     dehumidifierModeSupported = True
                     asserts.assert_true(self.dehumidifierFeatureSupported,
                                         "Dehumidifier mode was supported while the feature was not")
-                case self.ModeEnum.kAuto:
+                case self.HumidistatModeEnum.kAuto:
                     autoModeSupported = True
                     asserts.assert_true(self.autoFeatureSupported, "Auto mode was supported while the feature was not")
-                case self.ModeEnum.kFanOnly:
+                case self.HumidistatModeEnum.kFanOnly:
                     fanOnlyModeSupported = True
                     asserts.assert_true(self.fanOnlyFeatureSupported, "FanOnly mode was supported while the feature was not")
                 case _:
                     asserts.fail("Unknown mode value encountered in SupportModes")
-            asserts.assert_greater_equal(mode, self.ModeEnum.kHumidifier, "SupportedModes entry is out of range")
-            asserts.assert_less_equal(mode, self.ModeEnum.kFanOnly, "SupportedModes entry is out of range")
+            asserts.assert_greater_equal(mode, self.HumidistatModeEnum.kHumidifier, "SupportedModes entry is out of range")
+            asserts.assert_less_equal(mode, self.HumidistatModeEnum.kFanOnly, "SupportedModes entry is out of range")
         asserts.assert_equal(humidifierModeSupported, self.humidifierFeatureSupported,
                              "Humidifier mode was supported while the feature was not")
         asserts.assert_equal(dehumidifierModeSupported, self.dehumidifierFeatureSupported,
@@ -171,18 +171,20 @@ class TC_HSTAT_2_1(HSTATBase):
                              "FanOnly mode was supported while the feature was not")
 
         self.step(4)
-        # TH reads from the DUT the Mode attribute.
+        # TH reads from the DUT the HumidistatMode attribute.
         # Verify that the DUT response contains a value between 0 and 3 inclusive.
-        dut_Mode = await self.read_attribute_expect_success(attribute=self.attributes.Mode)
-        asserts.assert_greater_equal(dut_Mode, self.ModeEnum.kHumidifier, "Mode attribute is out of range")
-        asserts.assert_less_equal(dut_Mode, self.ModeEnum.kFanOnly, "Mode attribute is out of range")
+        dut_Mode = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatMode)
+        asserts.assert_greater_equal(dut_Mode, self.HumidistatModeEnum.kHumidifier, "HumidistatMode attribute is out of range")
+        asserts.assert_less_equal(dut_Mode, self.HumidistatModeEnum.kFanOnly, "HumidistatMode attribute is out of range")
 
         self.step(5)
-        # TH reads from the DUT the SystemState attribute.
+        # TH reads from the DUT the HumidistatSystemState attribute.
         # Verify that the DUT response contains a value between 0 and 3 inclusive.
-        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
-        asserts.assert_greater_equal(dut_SystemState, self.SystemStateEnum.kHumidifying, "SystemState attribute is out of range")
-        asserts.assert_less_equal(dut_SystemState, self.SystemStateEnum.kIdle, "SystemState attribute is out of range")
+        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
+        asserts.assert_greater_equal(dut_SystemState, self.HumidistatSystemStateEnum.kHumidifying,
+                                     "HumidistatSystemState attribute is out of range")
+        asserts.assert_less_equal(dut_SystemState, self.HumidistatSystemStateEnum.kIdle,
+                                  "HumidistatSystemState attribute is out of range")
 
         # TH reads from the DUT the MinSetpoint attribute.
         # Verify that the DUT response contains a value between 0 and 99 inclusive. Store the value as MinSetpointValue

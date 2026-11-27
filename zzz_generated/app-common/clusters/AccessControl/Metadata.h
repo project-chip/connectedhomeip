@@ -32,24 +32,28 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, Access::Privilege::kAdminister);
 } // namespace Extension
 namespace SubjectsPerAccessControlEntry {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SubjectsPerAccessControlEntry::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SubjectsPerAccessControlEntry::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SubjectsPerAccessControlEntry
 namespace TargetsPerAccessControlEntry {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetsPerAccessControlEntry::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TargetsPerAccessControlEntry::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace TargetsPerAccessControlEntry
 namespace AccessControlEntriesPerFabric {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AccessControlEntriesPerFabric::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AccessControlEntriesPerFabric::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace AccessControlEntriesPerFabric
 namespace CommissioningARL {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CommissioningARL::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CommissioningARL
 namespace Arl {
@@ -59,7 +63,9 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Arl
 namespace AuxiliaryACL {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(AuxiliaryACL::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(AuxiliaryACL::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kChangesOmitted),
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace AuxiliaryACL
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {

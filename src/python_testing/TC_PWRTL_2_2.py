@@ -84,7 +84,7 @@ class TC_PWRTL_2_2(MatterTestCommissionedDevice):
         attr = cluster.Attributes.ElectricalCircuitNodes
         CircuitNodeStruct = cluster.Structs.CircuitNodeStruct
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         self.step(2, "TH1 writes ElectricalCircuitNodes with a valid list of 2 CircuitNodeStruct entries",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00).")

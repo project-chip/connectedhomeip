@@ -69,8 +69,11 @@ public:
     // out of a disconnected BLE_CONNECTION_OBJECT.
     virtual void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) = 0;
 
-    // Call this function to stop the connection
+    // Stop the connection. Success guarantees no further connection callbacks.
+    // On failure, a terminal callback may still arrive; keep the layer and delegates alive until it does.
     virtual CHIP_ERROR CancelConnection() = 0;
+
+    virtual CHIP_ERROR CancelPendingConnection() { return CancelConnection(); }
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral that matches any of the given discriminators.
@@ -81,7 +84,7 @@ public:
     // If the onConnectionError callback is called, that indicates that there will be no more
     // onConnectionComplete callbacks until the next NewConnection call.
     //
-    // Calling CancelConnection will ensure no more calls to onConnectionComplete or
+    // Successfully calling CancelConnection will ensure no more calls to onConnectionComplete or
     // onConnectionError until the next NewConnection call.
     //
     // The implementation must not assume that the memory backing the "discriminators" argument will

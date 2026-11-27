@@ -25,6 +25,7 @@
 #include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <clusters/MicrowaveOvenMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -47,7 +48,16 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::OperationalState::OperationalStateCluster & OperationalState()
+    {
+        VerifyOrDie(mOperationalStateCluster.IsConstructed());
+        return mOperationalStateCluster.Cluster();
+    }
+    const Clusters::OperationalState::OperationalStateCluster & OperationalState() const
+    {
+        VerifyOrDie(mOperationalStateCluster.IsConstructed());
+        return mOperationalStateCluster.Cluster();
+    }
     Clusters::MicrowaveOvenControlCluster & MicrowaveOvenControl() { return mMicrowaveOvenControlCluster.Cluster(); }
     Clusters::ModeBaseCluster & MicrowaveOvenMode() { return mMicrowaveOvenModeCluster.Cluster(); }
 

@@ -32,6 +32,7 @@
 #include <inttypes.h>
 #include <lib/support/SafeInt.h>
 #include <limits.h>
+#include <limits>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
@@ -1360,8 +1361,11 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         // for a NULL entry.
         if (argListSize == static_cast<size_t>(argCount + 1))
         {
+            if (argListSize > std::numeric_limits<size_t>::max() / (2 * sizeof(char *)))
+                return -1;
             argListSize *= 2;
-            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize));
+            // argListSize counts entries; MemoryRealloc takes a size in bytes.
+            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize * sizeof(char *)));
             if (argList == nullptr)
                 return -1;
         }

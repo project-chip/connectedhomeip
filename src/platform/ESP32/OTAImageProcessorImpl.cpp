@@ -300,6 +300,10 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
+
+    imageProcessor->mParams.downloadedBytes = 0;
+    imageProcessor->mParams.totalFileBytes  = 0;
+
     imageProcessor->mOTAUpdatePartition = esp_ota_get_next_update_partition(NULL);
     if (imageProcessor->mOTAUpdatePartition == NULL)
     {

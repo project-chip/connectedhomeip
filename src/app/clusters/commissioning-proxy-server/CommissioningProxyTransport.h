@@ -107,7 +107,10 @@ public:
     /**
      * @brief Forward a Matter packet to the commissionee.
      *
-     * The commissionee reply arrives asynchronously; the driver routes it back via
+     * The commissionee reply arrives asynchronously; the driver checks every message
+     * from the commissionee with CommissioningProxySessionManager::
+     * ValidateCommissioneeMessage(), terminates the transport connection and removes
+     * the session if that fails, and otherwise routes it back via
      * host->Sessions().DispatchMessageResponse(). A mid-flight session drop is
      * reported via DispatchMessageFailure().
      */

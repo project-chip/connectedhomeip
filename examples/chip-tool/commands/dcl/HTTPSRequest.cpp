@@ -31,7 +31,9 @@
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
 #if (CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
+#include <arpa/inet.h>
 #include <netdb.h>
+#include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <unistd.h>
 #ifdef SHA256_DIGEST_LENGTH
@@ -97,7 +99,14 @@ constexpr const char * kErrorConnection          = "Failed to connect to: ";
 constexpr const char * kErrorSSLContextCreate    = "Failed to create SSL context";
 constexpr const char * kErrorSSLObjectCreate     = "Failed to create SSL object";
 constexpr const char * kErrorSSLHandshake        = "SSL handshake failed";
-constexpr const char * kErrorDigestMismatch      = "The response digest does not match the expected digest";
+constexpr const char * kErrorSSLTrustStore       = "Failed to load the system trusted certificates";
+constexpr const char * kErrorSSLHostName         = "Failed to set the expected server name";
+constexpr const char * kErrorSSLIPAddress        = "Failed to set the expected server IP address";
+constexpr const char * kErrorSSLCertificateHint =
+    "To trust a server with a private or self-signed certificate, set SSL_CERT_FILE to its CA certificate. The certificate "
+    "must be issued for the requested hostname. Certificate validation can also be disabled from the command line.";
+constexpr const char * kSSLValidationDisabled = "Validation of the server certificate is disabled";
+constexpr const char * kErrorDigestMismatch   = "The response digest does not match the expected digest";
 class AddressInfoHolder
 {
 public:
@@ -138,6 +147,9 @@ public:
 
     ~HTTPSSessionHolder()
     {
+        // Leave the per-thread OpenSSL error queue empty for later callers.
+        ERR_clear_error();
+
         if (nullptr != mContext)
         {
             SSL_free(mSSL);
@@ -148,18 +160,13 @@ public:
         {
             close(mSock);
         }
-
-#if !defined(OPENSSL_IS_BORINGSSL)
-        EVP_cleanup();
-#endif
     }
 
     CHIP_ERROR Init(std::string & hostname, uint16_t port, HttpsSecurityMode securityMode)
     {
-        int sock;
-        VerifyOrReturnError(securityMode == HttpsSecurityMode::kDefault, CHIP_ERROR_NOT_IMPLEMENTED);
-        ReturnErrorOnFailure(InitSocket(hostname, port, sock));
-        ReturnErrorOnFailure(InitSSL(sock, hostname));
+        VerifyOrReturnError(securityMode != HttpsSecurityMode::kDisableHttps, CHIP_ERROR_NOT_IMPLEMENTED);
+        ReturnErrorOnFailure(InitSocket(hostname, port, mSock));
+        ReturnErrorOnFailure(InitSSL(hostname, securityMode != HttpsSecurityMode::kDisableValidation));
         return CHIP_NO_ERROR;
     }
 
@@ -215,24 +222,67 @@ private:
         return CHIP_ERROR_NOT_CONNECTED;
     }
 
-    CHIP_ERROR InitSSL(int sock, const std::string & hostname)
+    static bool IsIPAddress(const std::string & hostname)
     {
-        SSL_load_error_strings();
-        OpenSSL_add_ssl_algorithms();
+        in6_addr address;
+        return inet_pton(AF_INET, hostname.c_str(), &address) == 1 || inet_pton(AF_INET6, hostname.c_str(), &address) == 1;
+    }
 
-        auto * context = SSL_CTX_new(TLS_client_method());
-        VerifyOrReturnError(nullptr != context, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLContextCreate));
+    CHIP_ERROR InitSSL(const std::string & hostname, bool validateCertificate)
+    {
+        mContext = SSL_CTX_new(TLS_client_method());
+        VerifyOrReturnError(nullptr != mContext, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLContextCreate));
 
-        auto * ssl = SSL_new(context);
-        VerifyOrReturnError(nullptr != ssl, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLObjectCreate));
+        if (validateCertificate)
+        {
+            SSL_CTX_set_verify(mContext, SSL_VERIFY_PEER, nullptr);
+            VerifyOrReturnError(SSL_CTX_set_default_verify_paths(mContext) == 1, CHIP_ERROR_NOT_CONNECTED,
+                                ChipLogError(chipTool, "%s", kErrorSSLTrustStore));
+        }
+        else
+        {
+            ChipLogProgress(chipTool, "%s", kSSLValidationDisabled);
+        }
 
-        SSL_set_fd(ssl, sock);
-        SSL_set_tlsext_host_name(ssl, hostname.c_str());
-        VerifyOrReturnError(SSL_connect(ssl) > 0, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLHandshake));
+        mSSL = SSL_new(mContext);
+        VerifyOrReturnError(nullptr != mSSL, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLObjectCreate));
 
-        mContext = context;
-        mSSL     = ssl;
-        mSock    = sock;
+        SSL_set_fd(mSSL, mSock);
+        if (IsIPAddress(hostname))
+        {
+            // An IP address is matched against the certificate IP addresses and is not sent as SNI (RFC 6066 section 3).
+            if (validateCertificate)
+            {
+                VerifyOrReturnError(X509_VERIFY_PARAM_set1_ip_asc(SSL_get0_param(mSSL), hostname.c_str()) == 1,
+                                    CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLIPAddress));
+            }
+        }
+        else
+        {
+            SSL_set_tlsext_host_name(mSSL, hostname.c_str());
+            if (validateCertificate)
+            {
+                VerifyOrReturnError(SSL_set1_host(mSSL, hostname.c_str()) == 1, CHIP_ERROR_NOT_CONNECTED,
+                                    ChipLogError(chipTool, "%s", kErrorSSLHostName));
+            }
+        }
+
+        ERR_clear_error();
+        if (SSL_connect(mSSL) <= 0)
+        {
+            auto error = ERR_peek_last_error();
+            if (ERR_GET_LIB(error) == ERR_LIB_SSL && ERR_GET_REASON(error) == SSL_R_CERTIFICATE_VERIFY_FAILED)
+            {
+                ChipLogError(chipTool, "%s: %s", kErrorSSLHandshake, X509_verify_cert_error_string(SSL_get_verify_result(mSSL)));
+                ChipLogError(chipTool, "%s", kErrorSSLCertificateHint);
+            }
+            else
+            {
+                ChipLogError(chipTool, "%s", kErrorSSLHandshake);
+            }
+            return CHIP_ERROR_NOT_CONNECTED;
+        }
+
         return CHIP_NO_ERROR;
     }
 

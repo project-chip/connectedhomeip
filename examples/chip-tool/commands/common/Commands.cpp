@@ -297,6 +297,8 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
     int argumentsPosition = isGlobalCommand ? 4 : 3;
     if (!command->InitArguments(argc - argumentsPosition, &argv[argumentsPosition]))
     {
+        // In interactive mode the command object is reused, so drop the optional arguments that were parsed before the failure.
+        command->ResetArguments();
         if (interactive)
         {
             DetectAndLogMismatchedDoubleQuotes(argc - argumentsPosition, &argv[argumentsPosition]);

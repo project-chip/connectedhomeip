@@ -40,6 +40,8 @@
 
 #include "CHIPAttCert_test_vectors.h"
 
+#include <crypto/tests/DacValidationExplicitVectors.h>
+
 #include <sstream>
 
 using namespace chip;
@@ -279,6 +281,73 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderRejectsUnknownEnu
     EXPECT_EQ(provider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kDACCertificate,
                                                            DeviceAttestationCertProfile::kUnknownEnumValue, 0, span, documentSize),
               CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+TEST_F(TestDeviceAttestationCredentials, ExactChainSegmentSelection)
+{
+    using namespace chip::Credentials::Examples;
+    using Profile             = DeviceAttestationCertProfile;
+    constexpr uint8_t dac44[] = { 0x11, 0x12 };
+    constexpr uint8_t pai44[] = { 0x21, 0x22 };
+    constexpr uint8_t dac65[] = { 0x31, 0x32 };
+    constexpr uint8_t pai65[] = { 0x41, 0x42 };
+    for (auto paiProfile : { Profile::kEcdsaMatterLegacy, Profile::kMlDsa44, Profile::kMlDsa65 })
+    {
+        TestHarnessDACProviderData data;
+        data.pqcDacCertMlDsa44.SetValue(ByteSpan(dac44));
+        data.pqcPaiCertMlDsa44.SetValue(ByteSpan(pai44));
+        data.pqcDacCertMlDsa65.SetValue(ByteSpan(dac65));
+        data.pqcPaiCertMlDsa65.SetValue(ByteSpan(pai65));
+        data.paiProfileMlDsa44 = paiProfile == Profile::kMlDsa65 ? Profile::kMlDsa44 : paiProfile;
+        data.paiProfileMlDsa65 = paiProfile;
+        TestHarnessDACProvider provider;
+        provider.Init(data);
+        for (auto paa : { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kMlDsa65 })
+        {
+            DeviceAttestationChainProfile chain;
+            chain.PAACrypto = paa;
+            chain.PAICrypto = paa == Profile::kMlDsa65 ? paiProfile : data.paiProfileMlDsa44;
+            for (auto type : { DeviceAttestationDocumentType::kDACCertificate, DeviceAttestationDocumentType::kPAICertificate })
+            {
+                uint8_t buffer[1];
+                MutableByteSpan segment(buffer);
+                size_t totalSize = 0;
+                ASSERT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(type, chain, 1, segment, totalSize), CHIP_NO_ERROR);
+                EXPECT_EQ(totalSize, 2u);
+                const uint8_t expected = type == DeviceAttestationDocumentType::kDACCertificate
+                    ? (paa == Profile::kMlDsa65 ? dac65[1] : dac44[1])
+                    : (paa == Profile::kMlDsa65 ? pai65[1] : pai44[1]);
+                EXPECT_EQ(segment[0], expected);
+            }
+        }
+        // A different PAI algorithm must not select a chain solely by its PAA.
+        DeviceAttestationChainProfile absent;
+        absent.PAACrypto = Profile::kMlDsa65;
+        absent.PAICrypto = paiProfile == Profile::kMlDsa44 ? Profile::kEcdsaMatterLegacy : Profile::kMlDsa44;
+        uint8_t buffer[600];
+        MutableByteSpan segment(buffer);
+        size_t totalSize = 0;
+        EXPECT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType::kDACCertificate, absent, 0,
+                                                                       segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+        DeviceAttestationChainProfile legacy;
+        ASSERT_EQ(provider.DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegmentForChain(
+                      DeviceAttestationDocumentType::kDACCertificate, legacy, 0, segment, totalSize),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(segment.data_equal(DevelopmentCerts::kDacCert));
+        EXPECT_EQ(provider.DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegmentForChain(
+                      DeviceAttestationDocumentType::kDACCertificate, absent, 0, segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+
+        data.pqcDacCertMlDsa65.ClearValue();
+        provider.Init(data);
+        DeviceAttestationChainProfile incomplete;
+        incomplete.PAACrypto = Profile::kMlDsa65;
+        incomplete.PAICrypto = paiProfile;
+        EXPECT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType::kPAICertificate, incomplete,
+                                                                       0, segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+    }
 }
 
 TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
@@ -1106,6 +1175,53 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl_SerialNumberHighBitSet)
+{
+    uint8_t attestationElementsTestVector[]  = { 0 };
+    uint8_t attestationChallengeTestVector[] = { 0 };
+    uint8_t attestationSignatureTestVector[] = { 0 };
+    uint8_t attestationNonceTestVector[]     = { 0 };
+
+    struct TestCase
+    {
+        ByteSpan dac;
+        const char * revokedSerialNumber;
+    };
+
+    // The DACs are issued by TestCerts::sTestCert_PAI_FFF1_8000_Cert. The revocation set entries use the
+    // DCL revocation-set format, where a serial number is the hex encoding of its value.
+    const TestCase testCases[] = {
+        { ByteSpan(kDacSerialHighBit8Bytes), "8EA1B2C3D4E5F607" },
+        { ByteSpan(kDacSerialHighBit20Bytes), "8EA1B2C3D4E5F60718293A4B5C6D7E8F90A1B2C3" },
+    };
+
+    for (const auto & testCase : testCases)
+    {
+        Credentials::DeviceAttestationVerifier::AttestationInfo info(
+            ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector),
+            ByteSpan(attestationSignatureTestVector), TestCerts::sTestCert_PAI_FFF1_8000_Cert, testCase.dac,
+            ByteSpan(attestationNonceTestVector), static_cast<VendorId>(0xFFF1), 0x8000);
+
+        AttestationVerificationResult attestationResult = AttestationVerificationResult::kNotImplemented;
+        Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+            attestationInformationVerificationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+        std::string jsonData = std::string(R"([{
+            "type": "revocation_set",
+            "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+            "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+            "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+            "revoked_serial_numbers": [")") +
+            testCase.revokedSerialNumber + R"("]
+        }])";
+
+        TestDACRevocationDelegateImpl revocationDelegateImpl;
+        EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
+        revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+        EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+    }
 }
 
 TEST(DeviceAttestationVerifier, GetAttestationResultDescriptionWorks)

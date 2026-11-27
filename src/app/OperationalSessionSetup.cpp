@@ -373,10 +373,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Clear out mConnectionRetry, so that those cancelables are not holding
     // pointers to us, since we're about to go away.
-    while (auto * cb = mConnectionRetry.First())
-    {
-        cb->Cancel();
-    }
+    mConnectionRetry.Clear();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     // Gather up state we will need for our notifications.
@@ -874,7 +871,7 @@ void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * 
 
 void OperationalSessionSetup::AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry)
 {
-    mConnectionRetry.Enqueue(onRetry->Cancel());
+    mConnectionRetry.Enqueue(onRetry);
 }
 
 void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, const ReliableMessageProtocolConfig & remoteMrpConfig,
@@ -911,15 +908,13 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
     // 3) If notifying the handler does not cancel it, add it back to our list
     //    of handlers so we will notify it on future retries.
 
-    CallbackDeque retryHandlerListSnapshot;
+    TypedCallbackDeque<OnDeviceConnectionRetry> retryHandlerListSnapshot;
     mConnectionRetry.DequeueAll(retryHandlerListSnapshot);
 
-    while (!retryHandlerListSnapshot.IsEmpty())
+    while (auto * cb = retryHandlerListSnapshot.First())
     {
-        auto * cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(retryHandlerListSnapshot.First());
-
-        CallbackDeque currentCallbackHolder;
-        currentCallbackHolder.Enqueue(cb->Cancel());
+        TypedCallbackDeque<OnDeviceConnectionRetry> currentCallbackHolder;
+        currentCallbackHolder.Enqueue(cb);
 
         cb->mCall(cb->mContext, mPeerId, error, timeoutEstimate);
 

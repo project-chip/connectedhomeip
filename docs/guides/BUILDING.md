@@ -306,6 +306,27 @@ source scripts/bootstrap.sh
 The `scripts/bootstrap.sh` script re-creates the environment from scratch, which
 is expensive, so avoid running it unless the environment is out of date.
 
+### Sharing an environment between checkouts
+
+Additional checkouts of the repository (e.g. created with `git worktree`) can
+use the environment of an existing checkout instead of bootstrapping their own:
+
+```shell
+source scripts/activate.sh --environment-root /path/to/connectedhomeip/.environment
+```
+
+With `--environment-root`, `activate.sh` fails instead of bootstrapping a new
+environment if the directory does not contain one. Note that:
+
+-   The additional checkout still needs its own submodules (at least
+    `third_party/pigweed/repo`).
+-   The checkouts should be at similar revisions, because the environment
+    provides the tool and Python package versions of the revision it was
+    bootstrapped from.
+-   Only run `bootstrap.sh` in the checkout the environment was created from.
+    Bootstrapping it from another checkout ties the environment to that checkout
+    instead.
+
 ## Build for the host OS (Linux or macOS)
 
 Run the following commands to build all sources, libraries, and tests for the

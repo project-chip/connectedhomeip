@@ -211,12 +211,19 @@ void ApplicationInit()
     }
     else
     {
+        // Let the manager report AvailableFiles/AvailableStorage when files are added or
+        // removed, so subscribers are not left holding a stale list.
+        gMediaFileManagementManager->SetCluster(&gMediaFileManagementServer->Cluster());
+
         // Bring up the BDX byte-transfer layer for the sharing commands.
         gMediaFileManagementBdxProvider.emplace();
         gMediaFileManagementBdxRequestor.emplace();
         gMediaFileManagementBdxCoordinator.emplace(*gMediaFileManagementManager, *gMediaFileManagementBdxProvider,
                                                    *gMediaFileManagementBdxRequestor, gMediaFileManagementServer->Cluster());
         gMediaFileManagementManager->SetBdxCoordinator(&*gMediaFileManagementBdxCoordinator);
+
+        // Retire a shared file's ResponseID once the client has actually pulled the bytes.
+        gMediaFileManagementBdxProvider->SetRetrievalObserver(&*gMediaFileManagementBdxCoordinator);
 
         // The provider serves incoming (client-initiated) BDX pulls, so it must
         // be the unsolicited handler for the BDX protocol. This tv-app is a

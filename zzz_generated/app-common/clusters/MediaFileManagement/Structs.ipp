@@ -37,7 +37,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kName), name);
     encoder.Encode(to_underlying(Fields::kSize), size);
     encoder.Encode(to_underlying(Fields::kMimeType), mimeType);
-    encoder.Encode(to_underlying(Fields::kImageUri), imageUri);
+    encoder.Encode(to_underlying(Fields::kImageURI), imageURI);
     return encoder.Finalize();
 }
 
@@ -67,9 +67,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, mimeType);
         }
-        else if (__context_tag == to_underlying(Fields::kImageUri))
+        else if (__context_tag == to_underlying(Fields::kImageURI))
         {
-            err = DataModel::Decode(reader, imageUri);
+            err = DataModel::Decode(reader, imageURI);
         }
 
         ReturnErrorOnFailure(err);

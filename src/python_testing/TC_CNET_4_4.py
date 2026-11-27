@@ -15,6 +15,30 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_4_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_4_admin_storage.json
+#       --commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import random
 import string
@@ -33,7 +57,7 @@ log = logging.getLogger(__name__)
 
 class TC_CNET_4_4(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_4(self):
-        return [TestStep("precondition", "TH is commissioned", is_commissioning=True),
+        return [TestStep("precondition", "TH is commissioned"),
                 TestStep(1, 'TH reads from the DUT the Network Commissioning Cluster FeatureMap. If the FeatureMap does not include the WI flag (bit 0), skip the remaining steps in this test case'),
                 TestStep(2, 'TH reads from the DUT the SupportedWifiBands attribute and saves as supported_wifi_bands'),
                 TestStep(3, 'TH reads from the DUT the Networks attribute.'),

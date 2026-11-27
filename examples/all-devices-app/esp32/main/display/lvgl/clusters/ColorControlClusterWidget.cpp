@@ -157,14 +157,12 @@ void SetTemperatureLabel(lv_obj_t * label, uint16_t mireds)
 lv_obj_t * CreateGroup(lv_obj_t * card)
 {
     lv_obj_t * group = lv_obj_create(card);
+    lv_obj_remove_style_all(group);
     lv_obj_set_width(group, LV_PCT(100));
     lv_obj_set_height(group, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(group, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(group, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_row(group, 10, LV_PART_MAIN);
-    lv_obj_set_style_border_width(group, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(group, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(group, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(group, LV_OBJ_FLAG_HIDDEN);
 
@@ -367,13 +365,11 @@ void CreateHueSaturationGroup(ColorControlContext * context, lv_obj_t * card, bo
     context->group[Index(ColorMode::kHueSaturation)] = group;
 
     lv_obj_t * headerRow = lv_obj_create(group);
+    lv_obj_remove_style_all(headerRow);
     lv_obj_set_width(headerRow, LV_PCT(100));
     lv_obj_set_height(headerRow, 30);
     lv_obj_set_flex_flow(headerRow, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(headerRow, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(headerRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(headerRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(headerRow, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(headerRow, LV_OBJ_FLAG_SCROLLABLE);
 
     context->hueLabel = lv_label_create(headerRow);

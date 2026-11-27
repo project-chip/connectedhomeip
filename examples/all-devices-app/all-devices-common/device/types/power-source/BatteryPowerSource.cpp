@@ -23,23 +23,43 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
+BatteryPowerSource::BatteryPowerSource(TimerDelegate & timerDelegate) :
+    BatteryPowerSource("Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
+{}
+
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                                       TimerDelegate & timerDelegate) :
+                                       TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability)
+    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order),
+    mChargingCapability(chargingCapability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                         EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Power Source (some arbitrary configuration)
     SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
+    config.usedOptionalAttributes = {};
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.usedOptionalAttributes.Set<BatVoltageId>();
+    if (mChargingCapability == ChargingCapability::kRechargeable)
+    {
+        config.MakeRechargeable();
+        config.usedOptionalAttributes.Set<ActiveBatChargeFaultsId>();
+        config.usedOptionalAttributes.Set<ActiveBatFaultsId>();
+        config.usedOptionalAttributes.Set<BatCapacityId>();
+        config.usedOptionalAttributes.Set<BatChargingCurrentId>();
+        config.usedOptionalAttributes.Set<BatTimeRemainingId>();
+        config.usedOptionalAttributes.Set<BatTimeToFullChargeId>();
+        config.batCapacity = 2'000;
+    }
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
-    config.order  = 0;
+    config.order  = mOrder;
     config.batPercentRemaining.SetNonNull(200); // 100% (doubled percentage)
     // BatVoltage is expressed in millivolts (see Matter spec 11.7.7.13).
     // Start at 3.0V, a typical nominal voltage for a fresh CR2032 / 2xAA cell.
@@ -50,7 +70,9 @@ CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));
     ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void BatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)

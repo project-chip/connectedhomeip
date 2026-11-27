@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -34,8 +34,8 @@
 #     factory-reset: true
 #     quiet: true
 #   run2:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -46,8 +46,8 @@
 #     factory-reset: true
 #     quiet: true
 #   run3:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -114,7 +114,7 @@ class TC_DA_1_1(MatterTestCommissionedDevice):
     def steps_TC_DA_1_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("precondition", "DUT is commissioned to TH1's fabric", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned to TH1's fabric"),
             TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1"),
             TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that TH1's fabric is present in the list

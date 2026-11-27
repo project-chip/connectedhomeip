@@ -89,7 +89,7 @@ class TC_COMPRO_2_1(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads FeatureMap attribute",
                      "DUT returns a valid FeatureMap bitmap"),
             TestStep(3, "TH reads Transport attribute",

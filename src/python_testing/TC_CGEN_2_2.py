@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -228,7 +228,7 @@ class TC_CGEN_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, 'Commissioning, already done', is_commissioning=True),
+            TestStep(0, 'Commissioning, already done'),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
             TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute
@@ -484,14 +484,11 @@ class TC_CGEN_2_2(MatterTestCommissionedDevice):
         log.info('Step #20 - TH1 Original size of the trusted_root list: %s', trusted_roots_list_size)
 
         self.step(21)
-        # Commissioning stage numbers - we should find a better way to match these to the C++ code
-        # CommissioningDelegate.h
-        # TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-        kFindOperationalForCommissioningComplete = 32
+        stage = ChipDeviceCtrl.CommissioningStage.FindOperationalForCommissioningComplete
         log.info(
-            'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', kFindOperationalForCommissioningComplete)
+            'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', stage)
 
-        resp = TH2.SetTestCommissionerPrematureCompleteAfter(kFindOperationalForCommissioningComplete)
+        resp = TH2.SetTestCommissionerPrematureCompleteAfter(stage)
         log.info('Step #21 - TH2 Commissioning DOES NOT send the CommissioningComplete command')
 
         # TH2.SetSkipCommissioningComplete(True)

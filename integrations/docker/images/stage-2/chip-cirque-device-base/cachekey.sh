@@ -37,4 +37,4 @@ filehash() {
     shasum "$1" | awk '{ print $1 }'
 }
 
-echo "ot-br-posix.$OT_BR_POSIX_CHECKOUT.dockerfile.$(filehash ./Dockerfile)"
+echo "ot-br-posix.$OT_BR_POSIX_CHECKOUT.dockerfile.$(filehash ./Dockerfile).daemon.$(filehash ./CHIPCirqueDaemon.py).entrypoint.$(filehash ./entrypoint.sh).version.$(filehash ./version)"

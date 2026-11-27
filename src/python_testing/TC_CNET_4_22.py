@@ -49,7 +49,7 @@ class TC_CNET_4_22(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_22(self):
         return [
-            TestStep('Precondition', 'TH is commissioned', is_commissioning=True),
+            TestStep('Precondition', 'TH is commissioned'),
             TestStep(1, 'TH sends ScanNetworks command to the DUT with the SSID field omitted and the Breadcrumb field set to 1'),
             TestStep(2, 'TH reads Breadcrumb attribute from the General Commissioning Cluster'),
             TestStep(3, 'TH sends ScanNetworks command to the DUT with the SSID field set to null and the Breadcrumb field set to 2'),

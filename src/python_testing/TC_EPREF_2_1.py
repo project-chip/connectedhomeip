@@ -52,7 +52,7 @@ class TC_EPREF_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute",
                      "Execute steps 3 to 5 if BALA feature is set to 1 and execute steps 6 to 7b if LPMS feature is set to 1"),
             TestStep("3", "TH reads from the DUT the EnergyBalances attribute."),

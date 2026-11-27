@@ -49,7 +49,7 @@ class TC_TMP_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_TMP_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "Set default bounds `min_bound` = -27315, `max_bound` = 32767"),
             TestStep(3, "TH reads the MinMeasuredValue attribute from the DUT and saves as `min_measured_value`. If `min_measured_value` is not null, set `min_bound` to `min_measured_value`"),

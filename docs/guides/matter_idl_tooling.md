@@ -82,5 +82,5 @@ The rules generally are:
 Usage:
 
 ```sh
-matter-idl-lint examples/window-app/common/window-app.matter
+matter-idl-lint examples/all-clusters-app/all-clusters-common/all-clusters-app.matter
 ```

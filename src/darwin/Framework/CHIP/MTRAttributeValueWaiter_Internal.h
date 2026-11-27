@@ -40,9 +40,6 @@ MTR_DIRECT_MEMBERS
 
 @property (nonatomic, readonly) NSArray<MTRAttributePath *> * attributePaths;
 
-// Protected by the MTRDevice's lock.
-@property (nonatomic, assign) BOOL registeredWithDevice;
-
 - (instancetype)initWithDevice:(MTRDevice *)device values:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion;
 
 // Returns YES if after this report the waiter might be done waiting, NO otherwise.

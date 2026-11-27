@@ -46,39 +46,39 @@ namespace Attributes {
 namespace SupportedModes {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::Humidistat::ModeEnum>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::Humidistat::HumidistatModeEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::HumidistatModeEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::HumidistatModeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedModes
-namespace Mode {
+namespace HumidistatMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Humidistat::ModeEnum;
-    using DecodableType    = chip::app::Clusters::Humidistat::ModeEnum;
-    using DecodableArgType = chip::app::Clusters::Humidistat::ModeEnum;
+    using Type             = chip::app::Clusters::Humidistat::HumidistatModeEnum;
+    using DecodableType    = chip::app::Clusters::Humidistat::HumidistatModeEnum;
+    using DecodableArgType = chip::app::Clusters::Humidistat::HumidistatModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HumidistatMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace Mode
-namespace SystemState {
+} // namespace HumidistatMode
+namespace HumidistatSystemState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Humidistat::SystemStateEnum;
-    using DecodableType    = chip::app::Clusters::Humidistat::SystemStateEnum;
-    using DecodableArgType = chip::app::Clusters::Humidistat::SystemStateEnum;
+    using Type             = chip::app::Clusters::Humidistat::HumidistatSystemStateEnum;
+    using DecodableType    = chip::app::Clusters::Humidistat::HumidistatSystemStateEnum;
+    using DecodableArgType = chip::app::Clusters::Humidistat::HumidistatSystemStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SystemState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HumidistatSystemState::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SystemState
+} // namespace HumidistatSystemState
 namespace UserSetpoint {
 struct TypeInfo
 {
@@ -251,9 +251,10 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::app::Clusters::Humidistat::ModeEnum>(0);
-        Attributes::SystemState::TypeInfo::DecodableType systemState =
-            static_cast<chip::app::Clusters::Humidistat::SystemStateEnum>(0);
+        Attributes::HumidistatMode::TypeInfo::DecodableType humidistatMode =
+            static_cast<chip::app::Clusters::Humidistat::HumidistatModeEnum>(0);
+        Attributes::HumidistatSystemState::TypeInfo::DecodableType humidistatSystemState =
+            static_cast<chip::app::Clusters::Humidistat::HumidistatSystemStateEnum>(0);
         Attributes::UserSetpoint::TypeInfo::DecodableType userSetpoint     = static_cast<chip::Percent>(0);
         Attributes::MinSetpoint::TypeInfo::DecodableType minSetpoint       = static_cast<chip::Percent>(0);
         Attributes::MaxSetpoint::TypeInfo::DecodableType maxSetpoint       = static_cast<chip::Percent>(0);

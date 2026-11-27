@@ -27,7 +27,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AvAnalysis;
-using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::AmbientContextSensing;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
@@ -43,9 +43,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 {
     mEndpoint     = aClustersEndpoint;
     mCameraDevice = aCameraDevice;
-
-    // Instantiate Chime Server
-    mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
@@ -141,6 +138,35 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to register AVAnalysis on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint, err.Format());
+    }
+
+    // Fetch all initialization parameters for the AmbientContextSensing Server
+    BitMask<AmbientContextSensing::Feature> ambientContextFeatures(AmbientContextSensing::Feature::kHumanActivity,
+                                                                   AmbientContextSensing::Feature::kObjectIdentification);
+
+    // Instantiate the AmbientContextSensing Server
+    AmbientContextSensingCluster::Config ambientContextConfig(mAmbientContextSensingTimerDelegate);
+    ambientContextConfig.WithFeatures(ambientContextFeatures);
+
+    mAmbientContextSensingServer.Create(mEndpoint, ambientContextConfig);
+
+    // The delegate must be set before registering the server
+    mAmbientContextSensingServer.Cluster().SetDelegate(&mCameraDevice->GetAmbientContextSensingDelegate());
+
+    std::vector<SemanticTagType> supportedAmbientContexts(appSupportedAmbientContexts.begin(), appSupportedAmbientContexts.end());
+    err = mAmbientContextSensingServer.Cluster().SetAmbientContextTypeSupported(
+        Span<SemanticTagType>(supportedAmbientContexts.data(), supportedAmbientContexts.size()));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to set supported ambient contexts on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
+
+    err = CodegenDataModelProvider::Instance().Registry().Register(mAmbientContextSensingServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register AmbientContextSensing on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
     }
 }
 
@@ -359,7 +385,8 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
+    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate(),
+                                          Server::GetInstance().GetFabricTable());
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCTransportProviderServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
@@ -380,8 +407,6 @@ void CameraApp::InitCameraDeviceClusters()
 
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
-
-    TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
 
@@ -420,6 +445,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "AVAnalysis Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mAVAnalysisServer.Destroy();
+
+    err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAmbientContextSensingServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "AmbientContextSensing Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mAmbientContextSensingServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

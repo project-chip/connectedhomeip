@@ -392,6 +392,26 @@ TEST_F(TestAdvertiser, OperationalAdverts)
     EXPECT_EQ(mdnsAdvertiser->Advertise(operationalParams5), CHIP_NO_ERROR);
 }
 
+TEST_F(TestAdvertiser, AnnouncesOnAnEndpointAddedLater)
+{
+    EXPECT_EQ(mdnsAdvertiser->RemoveServices(), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsAdvertiser->Advertise(operationalParams1), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsAdvertiser->FinalizeServiceUpdate(), CHIP_NO_ERROR);
+    server.Reset();
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    static struct netif sAddedNetif = {};
+    const chip::Inet::InterfaceId added(&sAddedNetif);
+#else
+    const chip::Inet::InterfaceId added(static_cast<chip::Inet::InterfaceId::PlatformType>(1234));
+#endif
+    ASSERT_NE(GlobalMinimalMdnsServer::Instance().GetListenDelegate(), nullptr);
+    GlobalMinimalMdnsServer::Instance().GetListenDelegate()->OnEndpointAdded(added, chip::Inet::IPAddressType::kIPv6);
+
+    EXPECT_GT(server.GetBroadcastCount(), 0u);
+    EXPECT_TRUE(server.GetLastBroadcastInterface() == added);
+}
+
 TEST_F(TestAdvertiser, CommissionableAdverts)
 {
     EXPECT_EQ(mdnsAdvertiser->RemoveServices(), CHIP_NO_ERROR);

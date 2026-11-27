@@ -169,7 +169,8 @@ public:
                                                 System::Clock::Seconds16 timeout) override;
 
     // Forward a Matter packet; deliver the reply via
-    // mHost->Sessions().DispatchMessageResponse().
+    // mHost->Sessions().DispatchMessageResponse(), having first checked it
+    // with ValidateCommissioneeMessage() (see below).
     CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && buf) override;
 
     // Report foreground-scan results to mHost->ScanAggregator().Contribute();
@@ -270,6 +271,14 @@ Note there is **no** `ProxyScanRequest`/`ProxyMessageRequest`/etc. delegate
 hook: those commands' spec logic, session tracking, message routing, and scan
 aggregation live in the cluster and its subsystems; the driver only exposes the
 transport primitives above.
+
+**Every message from the commissionee must be checked before it is forwarded.**
+Call `CommissioningProxySessionManager::ValidateCommissioneeMessage()` on it. If
+that returns an error, the message must not be forwarded, and the driver must
+terminate the transport connection and remove the session. The spec requires
+both, so this is a conformance requirement, not an option.
+`DispatchMessageResponse()` repeats the check and drops invalid data, but it
+cannot tear the session down: that part is the driver's.
 
 ## Background scanning
 
@@ -420,7 +429,8 @@ without pulling in `src/ble`. It drives a BTP connection through
 
 Incoming BTP messages are routed back to the cluster via a `ProxyBleDelegate`
 (`chip::Ble::BleLayerDelegate`) that wraps the original `BleLayer` transport,
-matches the connection against the active session slots, and calls
+matches the connection against the active session slots, checks the message with
+`ValidateCommissioneeMessage()` (closing the endpoint if it fails), and calls
 `host->Sessions().DispatchMessageResponse()`.
 
 ### The platform adapter
@@ -464,7 +474,9 @@ and PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
 
 Incoming PAF messages are routed back to the cluster via a `ProxyPafDelegate`
 (`chip::WiFiPAF::WiFiPAFLayerDelegate`) that wraps the original transport,
-matches the peer against the active session slots, and calls
+matches the peer against the active session slots, checks the message with
+`ValidateCommissioneeMessage()` (returning the error if it fails, which makes
+the PAFTP endpoint close itself), and calls
 `host->Sessions().DispatchMessageResponse()`.
 
 ### The platform adapter

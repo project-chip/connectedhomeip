@@ -71,6 +71,7 @@ from pyasn1.type import univ
 from pyasn1_modules import rfc5652
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.credentials import CredentialSource, get_cd_certs
 from matter.tlv import TLVReader
 
@@ -79,13 +80,11 @@ logger = logging.getLogger(__name__)
 AttestationCryptoProfile = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
 AttestationCryptoProfileBitmap = Clusters.OperationalCredentials.Bitmaps.AttestationCryptoProfileBitmap
 CertificateChainType = Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum
+CryptoProfileChain = Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct
 CertificateChainResponse = Clusters.OperationalCredentials.Commands.CertificateChainResponse
 OperationalCredentialsFeature = Clusters.OperationalCredentials.Bitmaps.Feature
 
-# The DUT slices every profile-selected document on a fixed 600 byte boundary and derives the
-# read offset as SegmentID * 600, independently of the requested MaxSegmentSize. 600 is also the
-# smallest MaxSegmentSize the spec permits, because it is the payload a Matter transport is
-# always guaranteed to carry.
+# Minimum MaxSegmentSize permitted by CertificateChainRequest, in bytes.
 kCertificateSegmentSize = 600
 kMaxCertificateDocumentSize = 10240
 kMaxCertificateSegmentId = 100
@@ -186,18 +185,25 @@ def assert_profile_supported_by_test_harness(profile: AttestationCryptoProfile) 
                         "cryptography build providing hazmat.primitives.asymmetric.mldsa (48.0.0 or newer).")
 
 
-def select_strongest_profile(supported_profiles: int, chain_element: str) -> AttestationCryptoProfile:
-    """Pick the highest-security attestation profile advertised for one chain element.
+def candidate_attestation_chains(paa_profiles: int, pai_profiles: int) -> list[CryptoProfileChain]:
+    """Return every advertised PAA/PAI pairing the TH may request, highest security first.
 
-    Both TC-DA-1.10 and TC-DA-1.12 require the TH to negotiate the highest-security profile the
-    DUT advertises: MlDsa65 when advertised, otherwise MlDsa44, otherwise EcdsaMatterLegacy.
+    PAASupportedProfiles and PAISupportedProfiles are independent bitmaps, so advertising both
+    bits does not mean the DUT holds a chain pairing them. The order matches the commissioner's
+    SelectAttestationCertificateChain: strongest PAA first, then strongest PAI under it. A PAI
+    stronger than its PAA is skipped because no valid chain can contain it. DACCrypto is always
+    EcdsaMatterLegacy during PQC Phase 1.
     """
-    for profile in _kProfilesByDescendingStrength:
-        if supported_profiles & profile_mask(profile):
-            logger.info("Selected %s profile %s from bitmap 0x%04X", chain_element, profile.name, supported_profiles)
-            return profile
-
-    raise signals.TestFailure(f"{chain_element}SupportedProfiles (0x{supported_profiles:04X}) advertises no known profile")
+    candidates = [
+        CryptoProfileChain(PAACrypto=paa, PAICrypto=pai, DACCrypto=AttestationCryptoProfile.kEcdsaMatterLegacy)
+        for paa in _kProfilesByDescendingStrength if paa_profiles & profile_mask(paa)
+        for pai in _kProfilesByDescendingStrength
+        if pai_profiles & profile_mask(pai) and _kProfileStrength[pai] <= _kProfileStrength[paa]
+    ]
+    asserts.assert_greater(len(candidates), 0,
+                           f"PAASupportedProfiles (0x{paa_profiles:04X}) and PAISupportedProfiles "
+                           f"(0x{pai_profiles:04X}) advertise no valid PAA/PAI pairing")
+    return candidates
 
 
 def assert_profile_advertised(supported_profiles: int, profile: AttestationCryptoProfile, document_name: str,
@@ -575,7 +581,34 @@ class SegmentedDocument:
 
 # A callable that issues one CertificateChainRequest and returns the CertificateChainResponse.
 SendCertificateChainRequest = Callable[
-    [CertificateChainType, AttestationCryptoProfile, int, int], Awaitable[CertificateChainResponse]]
+    [CertificateChainType, CryptoProfileChain, int, int], Awaitable[CertificateChainResponse]]
+
+
+async def request_first_available_pai(send_request: SendCertificateChainRequest,
+                                      candidates: list[CryptoProfileChain],
+                                      max_segment_size: int) -> tuple[CryptoProfileChain, CertificateChainResponse]:
+    """Request PAI segment 0 for each candidate chain, in order, until the DUT serves one.
+
+    The DUT answers INVALID_COMMAND for an advertised pairing it does not hold, so only that status
+    moves on to the next candidate; any other failure propagates. The caller must reuse the
+    returned chain for the remaining PAI segments and for the DAC.
+    """
+    for chain in candidates:
+        chain_name = f"{chain.PAACrypto.name}/{chain.PAICrypto.name}"
+        assert_profile_supported_by_test_harness(chain.PAACrypto)
+        assert_profile_supported_by_test_harness(chain.PAICrypto)
+        try:
+            response = await send_request(CertificateChainType.kPAICertificate, chain, 0, max_segment_size)
+        except InteractionModelError as e:
+            if e.status != Status.InvalidCommand:
+                raise
+            logger.info("DUT does not hold a %s PAA/PAI chain; trying the next advertised pairing", chain_name)
+            continue
+        logger.info("Selected the %s PAA/PAI chain", chain_name)
+        return chain, response
+
+    raise signals.TestFailure("DUT rejected the PAI request for every advertised PAA/PAI pairing: "
+                              + ", ".join(f"{chain.PAACrypto.name}/{chain.PAICrypto.name}" for chain in candidates))
 
 
 def assert_initial_certificate_segment(response: CertificateChainResponse, document_name: str,
@@ -603,7 +636,7 @@ def assert_initial_certificate_segment(response: CertificateChainResponse, docum
 
 async def retrieve_segmented_document(send_request: SendCertificateChainRequest,
                                       certificate_type: CertificateChainType,
-                                      crypto_profile: AttestationCryptoProfile,
+                                      crypto_profile: CryptoProfileChain,
                                       document_name: str,
                                       max_segment_size: int = kCertificateSegmentSize,
                                       first_response: CertificateChainResponse | None = None) -> SegmentedDocument:

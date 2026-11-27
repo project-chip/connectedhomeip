@@ -19,12 +19,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
-#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <provision/ProvisionStorageWriter.h>
 #include <silabs_creds.h>
 
 #include <cstring>
+
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif
 
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 

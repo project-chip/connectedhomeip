@@ -268,6 +268,11 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
     mApplicationDelegate = appDelegate;
     mSystemLayer         = systemLayer;
 
+    mConnectionPending  = false;
+    mConnectionAppState = nullptr;
+    mConnectionComplete = nullptr;
+    mConnectionError    = nullptr;
+
     memset(&sBLEEndPointPool, 0, sizeof(sBLEEndPointPool));
 
     mState = kState_Initialized;
@@ -348,15 +353,33 @@ void BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 
 CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
 {
+    return CancelIncompleteConnection(false);
+}
+
+CHIP_ERROR BleLayer::CancelIncompleteConnection(bool pendingOnly)
+{
+    mConnectionAppState = nullptr;
+    mConnectionComplete = nullptr;
+    mConnectionError    = nullptr;
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err = mConnectionDelegate->CancelConnection();
+    CHIP_ERROR err = pendingOnly ? mConnectionDelegate->CancelPendingConnection() : mConnectionDelegate->CancelConnection();
+    if (err == CHIP_NO_ERROR)
+    {
+        mConnectionPending = false;
+    }
     if (err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
         ChipLogError(Ble, "BleConnectionDelegate::CancelConnection is not implemented.");
     }
     return err;
+}
+
+CHIP_ERROR BleLayer::CancelBleIncompleteConnection(void * appState)
+{
+    VerifyOrReturnError(mConnectionAppState == (appState == nullptr ? this : appState), CHIP_NO_ERROR);
+    return CancelIncompleteConnection(true);
 }
 
 CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,
@@ -367,10 +390,14 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & 
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = onSuccess;
-    mConnectionDelegate->OnConnectionError    = onError;
-
-    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connDiscriminator);
+    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
+    mConnectionPending                        = true;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
+    mConnectionComplete                       = onSuccess;
+    mConnectionError                          = onError;
+    mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
+    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
 
     return CHIP_NO_ERROR;
 }
@@ -383,10 +410,14 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, voi
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = onSuccess;
-    mConnectionDelegate->OnConnectionError    = onError;
-
-    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connObj);
+    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
+    mConnectionPending                        = true;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
+    mConnectionComplete                       = onSuccess;
+    mConnectionError                          = onError;
+    mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
+    mConnectionDelegate->NewConnection(this, this, connObj);
 
     return CHIP_NO_ERROR;
 }
@@ -409,7 +440,42 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminators(const Span<const SetupDisc
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
     return mConnectionDelegate->NewConnection(this, appState, discriminators, onSuccess, onError);
+}
+
+void BleLayer::OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    auto * layer               = static_cast<BleLayer *>(appState);
+    auto callback              = layer->mConnectionComplete;
+    void * context             = layer->mConnectionAppState;
+    layer->mConnectionPending  = false;
+    layer->mConnectionAppState = nullptr;
+    layer->mConnectionComplete = nullptr;
+    layer->mConnectionError    = nullptr;
+    if (callback != nullptr)
+    {
+        callback(context, connObj);
+    }
+    else
+    {
+        LogErrorOnFailure(layer->CloseUnclaimedConnection(connObj));
+    }
+}
+
+void BleLayer::OnNewConnectionError(void * appState, CHIP_ERROR err)
+{
+    auto * layer               = static_cast<BleLayer *>(appState);
+    auto callback              = layer->mConnectionError;
+    void * context             = layer->mConnectionAppState;
+    layer->mConnectionPending  = false;
+    layer->mConnectionAppState = nullptr;
+    layer->mConnectionComplete = nullptr;
+    layer->mConnectionError    = nullptr;
+    if (callback != nullptr)
+    {
+        callback(context, err);
+    }
 }
 
 CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
@@ -436,6 +502,14 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 
     *retEndPoint = endPoint;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BleLayer::CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj)
+{
+    VerifyOrReturnError(mState == kState_Initialized || mState == kState_Disconnecting, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPlatformDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return mPlatformDelegate->CloseConnection(connObj);
 }
 
 // Handle remote central's initiation of CHIP over BLE protocol handshake.

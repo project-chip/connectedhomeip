@@ -42,6 +42,7 @@ source_set("tv-common-sources") {
   ]
   public_configs = [ ":config" ]
   sources = [
+    "clusters/MediaContentCatalog.h",
     "clusters/account-login/AccountLoginManager.cpp",
     "clusters/account-login/AccountLoginManager.h",
     "clusters/account-login/OAuthAccountLoginManager.cpp",

@@ -33,6 +33,7 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -87,6 +88,11 @@ static const char TAG[] = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
+
+// Registers the Identify cluster for endpoint 1; without this instance the
+// cluster declared in the ZAP config has no implementation and reads fail.
+static Identify gIdentify1 = { chip::EndpointId{ 1 }, nullptr, nullptr,
+                               chip::app::Clusters::Identify::IdentifyTypeEnum::kLightOutput };
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER

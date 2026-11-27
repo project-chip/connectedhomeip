@@ -20,6 +20,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstring>
+
 #define CHIPoBLE_SERVICE_UUID 0xFFF6
 
 namespace chip {
@@ -27,26 +29,27 @@ namespace DeviceLayer {
 namespace Internal {
 namespace {
 
-/// Retrieve CHIP device identification info from the device advertising data
-bool BluedroidGetChipDeviceInfo(esp_ble_gap_cb_param_t & scan_result, chip::Ble::ChipBLEDeviceIdentificationInfo & deviceInfo)
+/// Retrieve CHIP device identification info from BLE advertising data.
+bool BluedroidGetChipDeviceInfo(const uint8_t * data, size_t dataLength, chip::Ble::ChipBLEDeviceIdentificationInfo & deviceInfo)
 {
-    // Check for CHIP Service UUID
-    if (scan_result.scan_rst.ble_adv != NULL)
+    while (data != nullptr && dataLength > 1)
     {
-        if (scan_result.scan_rst.adv_data_len > 14 && scan_result.scan_rst.ble_adv[5] == 0xf6 &&
-            scan_result.scan_rst.ble_adv[6] == 0xff)
+        const size_t fieldLength = data[0];
+        if (fieldLength == 0 || fieldLength + 1 > dataLength)
         {
-            deviceInfo.OpCode                              = scan_result.scan_rst.ble_adv[7];
-            deviceInfo.DeviceDiscriminatorAndAdvVersion[0] = scan_result.scan_rst.ble_adv[8];
-            deviceInfo.DeviceDiscriminatorAndAdvVersion[1] = scan_result.scan_rst.ble_adv[9];
-            // vendor and product Id from adv
-            deviceInfo.DeviceVendorId[0]  = scan_result.scan_rst.ble_adv[10];
-            deviceInfo.DeviceVendorId[1]  = scan_result.scan_rst.ble_adv[11];
-            deviceInfo.DeviceProductId[0] = scan_result.scan_rst.ble_adv[12];
-            deviceInfo.DeviceProductId[1] = scan_result.scan_rst.ble_adv[13];
-            deviceInfo.AdditionalDataFlag = scan_result.scan_rst.ble_adv[14];
+            return false;
+        }
+
+        constexpr size_t kServiceDataHeaderSize = 3; // AD type and 16-bit UUID
+        if (data[1] == ESP_BLE_AD_TYPE_SERVICE_DATA && fieldLength >= kServiceDataHeaderSize + sizeof(deviceInfo) &&
+            data[2] == 0xf6 && data[3] == 0xff)
+        {
+            std::memcpy(&deviceInfo, data + 4, sizeof(deviceInfo));
             return true;
         }
+
+        data += fieldLength + 1;
+        dataLength -= fieldLength + 1;
     }
     return false;
 }
@@ -56,7 +59,11 @@ bool BluedroidGetChipDeviceInfo(esp_ble_gap_cb_param_t & scan_result, chip::Ble:
 void ChipDeviceScanner::ReportDevice(esp_ble_gap_cb_param_t & scan_result, esp_bd_addr_t & addr)
 {
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
-    if (BluedroidGetChipDeviceInfo(scan_result, deviceInfo) == false)
+    const uint8_t * data              = scan_result.scan_rst.ble_adv;
+    const bool foundInAdvertisingData = BluedroidGetChipDeviceInfo(data, scan_result.scan_rst.adv_data_len, deviceInfo);
+    const bool foundInScanResponse    = !foundInAdvertisingData && data != nullptr &&
+        BluedroidGetChipDeviceInfo(data + scan_result.scan_rst.adv_data_len, scan_result.scan_rst.scan_rsp_len, deviceInfo);
+    if (!foundInAdvertisingData && !foundInScanResponse)
     {
         return;
     }
@@ -72,7 +79,12 @@ CHIP_ERROR ChipDeviceScanner::StartScan(uint16_t timeout)
 {
     VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
-    static esp_ble_scan_params_t ble_scan_params = { .scan_type          = BLE_SCAN_TYPE_PASSIVE,
+#ifdef CONFIG_ESP32_BLE_COMMISSIONER_ACTIVE_SCAN
+    constexpr esp_ble_scan_type_t kScanType = BLE_SCAN_TYPE_ACTIVE;
+#else
+    constexpr esp_ble_scan_type_t kScanType = BLE_SCAN_TYPE_PASSIVE;
+#endif
+    static esp_ble_scan_params_t ble_scan_params = { .scan_type          = kScanType,
                                                      .own_addr_type      = BLE_ADDR_TYPE_RANDOM,
                                                      .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
                                                      .scan_interval      = 0x00,

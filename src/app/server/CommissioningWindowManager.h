@@ -17,18 +17,28 @@
 
 #pragma once
 
+#include <optional>
+
+#include <app/FailSafeContext.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <app/server/Dnssd.h>
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/Ble.h>
+#endif
+#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -43,8 +53,6 @@ enum class CommissioningWindowAdvertisement
     kDnssdOnly,
 };
 
-class Server;
-
 class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
                                    public SessionEstablishmentDelegate,
                                    public app::CommissioningModeProvider,
@@ -53,17 +61,21 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
     friend class Testing::CommissioningWindowManagerTestAccess;
 
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+        SessionManager & sessionManager;
+        Messaging::ExchangeManager & exchangeManager;
+        app::FailSafeContext & failSafeContext;
+        app::DnssdServer & dnssdServer = app::DnssdServer::Instance();
+#if CONFIG_NETWORK_LAYER_BLE
+        Ble::BleLayer & bleLayer;
+#endif
+    };
+
     CommissioningWindowManager() : mPASESession(*this) {}
 
-    CHIP_ERROR Init(Server * server)
-    {
-        if (server == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mServer = server;
-        return CHIP_NO_ERROR;
-    }
+    void Init(const Context & context) { mContext.emplace(context); }
 
     System::Clock::Seconds32 MaxCommissioningTimeout() const;
 
@@ -230,7 +242,7 @@ private:
     void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
 
     AppDelegate * mAppDelegate = nullptr;
-    Server * mServer           = nullptr;
+    std::optional<Context> mContext;
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum mWindowStatus =
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;

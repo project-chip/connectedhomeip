@@ -56,7 +56,7 @@ class TC_WebRTCP_2_6(MatterTestCommissionedDevice, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH reads the descriptor cluster on the endpoint containing the WebRTC Transport Provider cluster"),
             TestStep(2, "TH verifies CameraAVStreamManagement cluster (ID 0x0551) is present in the server cluster list"),
         ]

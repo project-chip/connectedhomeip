@@ -225,6 +225,7 @@ template("siwx917_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
+      "SL_NET_NETWORK_MANAGER_THREAD_STACK_SIZE=1024",
       "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT=1",
       "SL_MATTER_SIWX_WIFI_ENABLE=1",
@@ -297,12 +298,16 @@ template("siwx917_sdk") {
     ]
 
     # Defines for Si917Y MCU
-    if (is_si917y_mcu) {
-      defines += [
-        "SI91X_32kHz_EXTERNAL_OSCILLATOR=1",
-        "SL_SI91X_ACX_MODULE=1",
-        "SI917Y_DEVKIT=1",
-      ]
+    if (is_si917y_acx) {
+      defines += [ "SL_SI91X_ACX_MODULE=1" ]
+    }
+
+    if (is_si91x_32khz_xo) {
+      defines += [ "SI91X_32kHz_EXTERNAL_OSCILLATOR=1" ]
+    }
+
+    if (is_si917y_devkit) {
+      defines += [ "SI917Y_DEVKIT=1" ]
     }
 
     defines += [ "SL_MATTER_USE_SI70XX_SENSOR=${sl_enable_si70xx_sensor}" ]

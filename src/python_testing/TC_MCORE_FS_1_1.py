@@ -34,7 +34,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -49,7 +49,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -134,7 +134,7 @@ class TC_MCORE_FS_1_1(MatterTestCommissionedDevice):
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done."),
             TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),

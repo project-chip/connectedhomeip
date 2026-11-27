@@ -17,6 +17,11 @@
 #include <tinycrypt/ecc_dsa.h>
 #endif
 
+#if SL_MATTER_USE_FLASH_STORE
+#include <headers/ProvisionStorage.h>
+#include <provision/flash/ProvisionStorageFlash.h>
+#endif // SL_MATTER_USE_FLASH_STORE
+
 #include <cstdio>
 #include <cstring>
 
@@ -64,10 +69,27 @@ CHIP_ERROR FormatMatterOidUtf8DerHex(char * destination, size_t destinationSize,
 
 CHIP_ERROR ReadKey(MutableByteSpan & key)
 {
+#if SL_MATTER_USE_FLASH_STORE == 1
+    size_t size    = 0;
+    CHIP_ERROR err = Flash::Get(Parameters::ID::kDacKey, key.data(), key.size(), size);
+    ReturnErrorOnFailure(err);
+    key.reduce_size(size);
+    return err;
+#else
     size_t size = 0;
     ReturnErrorOnFailure(SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, key.data(), key.size(), size));
     key.reduce_size(size);
     return CHIP_NO_ERROR;
+#endif // SL_MATTER_USE_FLASH_STORE
+}
+
+CHIP_ERROR WriteKey(ByteSpan key)
+{
+#if SL_MATTER_USE_FLASH_STORE == 1
+    return Flash::Set(Parameters::ID::kDacKey, key.data(), key.size());
+#else
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, key.data(), key.size());
+#endif // SL_MATTER_USE_FLASH_STORE
 }
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && defined(SL_MBEDTLS_USE_TINYCRYPT) && SL_MBEDTLS_USE_TINYCRYPT
@@ -146,7 +168,7 @@ CHIP_ERROR ProvisionCrypto::Hash256(const ByteSpan & input, MutableByteSpan & ou
 CHIP_ERROR ProvisionCrypto::ImportDeviceAttestationKey(const ByteSpan & key)
 {
     VerifyOrReturnError(!key.empty() && key.size() <= kDeviceAttestationKeySizeMax, CHIP_ERROR_INVALID_ARGUMENT);
-    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, key.data(), key.size());
+    return WriteKey(key);
 }
 
 CHIP_ERROR ProvisionCrypto::GenerateDeviceAttestationCSR(uint16_t vid, uint16_t pid, const CharSpan & commonName,
@@ -201,8 +223,7 @@ CHIP_ERROR ProvisionCrypto::GenerateDeviceAttestationCSR(uint16_t vid, uint16_t 
     uint8_t encodedKey[kDeviceAttestationKeySizeMax] = { 0 };
     const int encodedSize                            = mbedtls_pk_write_key_der(&key.context, encodedKey, sizeof(encodedKey));
     VerifyOrReturnError(encodedSize > 0 && static_cast<size_t>(encodedSize) <= sizeof(encodedKey), CHIP_ERROR_INTERNAL);
-    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, encodedKey + sizeof(encodedKey) - encodedSize,
-                                             encodedSize);
+    return WriteKey(ByteSpan(encodedKey + sizeof(encodedKey) - encodedSize, static_cast<size_t>(encodedSize)));
 #endif
 }
 

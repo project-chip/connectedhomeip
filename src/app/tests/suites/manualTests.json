@@ -5,7 +5,6 @@
         "Test_TC_DD_1_8",
         "Test_TC_DD_1_9",
         "Test_TC_DD_1_10",
-        "Test_TC_DD_1_11",
         "Test_TC_DD_2_1",
         "Test_TC_DD_2_2",
         "Test_TC_DD_3_3",
@@ -74,7 +73,7 @@
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21"
     ],
-    "DiagnosticsLogs": ["Test_TC_DLOG_2_1"],
+    "DiagnosticsLogs": [],
     "Descriptor": ["Test_TC_DESC_2_1"],
     "DeviceEnergyManagementMode": [],
     "EnergyEVSEMode": [],
@@ -173,9 +172,9 @@
         "Test_TC_SC_5_3",
         "Test_TC_SC_6_1"
     ],
-    "SoftwareDiagnostics": ["Test_TC_DGSW_2_3"],
+    "SoftwareDiagnostics": [],
     "EthernetNetworkDiagnostics": [],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
+    "WiFiNetworkDiagnostics": [],
     "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_5_4"],

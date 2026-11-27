@@ -129,7 +129,6 @@ void MediaFileManagementBdxProvider::HandleTransferSessionOutput(TransferSession
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
         acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-        acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "MediaFileManagementBdxProvider: AcceptTransfer failed"));
@@ -208,10 +207,23 @@ void MediaFileManagementBdxProvider::HandleTransferSessionOutput(TransferSession
     }
     case TransferSession::OutputEventType::kAckReceived:
         break;
-    case TransferSession::OutputEventType::kAckEOFReceived:
+    case TransferSession::OutputEventType::kAckEOFReceived: {
         ChipLogProgress(BDX, "MediaFileManagementBdxProvider: transfer complete");
+        // Report before Reset(), which clears the active designator.
+        const auto grant = mGrants.find(mFileDesignator);
+        if (grant != mGrants.end())
+        {
+            if (mRetrievalObserver != nullptr)
+            {
+                mRetrievalObserver->OnSharedFileRetrieved(grant->second.peer, mFileDesignator);
+            }
+            // The bytes are delivered, so this grant has served its purpose. Grants for failed
+            // and timed out transfers are left in place so the client can retry.
+            mGrants.erase(grant);
+        }
         Reset();
         break;
+    }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "MediaFileManagementBdxProvider: StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         Reset();

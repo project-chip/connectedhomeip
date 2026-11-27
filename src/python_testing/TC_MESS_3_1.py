@@ -21,18 +21,21 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
+from mobly import asserts
 from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
@@ -50,6 +53,13 @@ _MESSAGE_TEXT = "Hello from Matter"
 # have it in SupportedLanguageCodes.
 _UNSUPPORTED_LANGUAGE_CODE = "xx-XX"
 
+# A null Duration means "until changed", so the message would stay presented and never
+# complete. The spoken-only carve-out that lets the text-to-speech engine decide the length
+# only applies when the DUT does not support MultiModalMessages, so a finite Duration is what
+# makes step 5 reachable on any DUT: MMSG devices complete on it, and spoken-only devices
+# ignore it and complete when speech ends.
+_SPOKEN_MESSAGE_DURATION_MS = 2000
+
 
 class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
@@ -61,14 +71,14 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
     def steps_TC_MESS_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT.",
-                     is_commissioning=True),
+            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT."),
             TestStep(1, "TH reads the SupportedLanguageCodes attribute.",
                      "Verify that at least one language tag is returned. Record the first supported language tag as "
                      "supportedLangCode."),
             TestStep(2, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "AABBCCDDEEFF00112233445566778899, Priority=Low (0), MessageControl with the SpokenMessage bit "
-                     "(bit 5) set, MessageText='Hello from Matter' and LanguageCode=supportedLangCode.",
+                     "(bit 5) set, StartTime=null, Duration=2000 (2 seconds), MessageText='Hello from Matter' and "
+                     "LanguageCode=supportedLangCode.",
                      "Verify that a successful (status 0) response is received."),
             TestStep(3, "TH waits for the DUT to queue the message.",
                      "Verify that a MessageQueued event is generated with MessageID="
@@ -81,8 +91,8 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
                      "AABBCCDDEEFF00112233445566778899."),
             TestStep(6, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "BBCCDDEE0011223344556677889900AA, Priority=Low (0), MessageControl with the SpokenMessage bit "
-                     "(bit 5) set, MessageText='Hello from Matter' and LanguageCode set to an unsupported language "
-                     "tag (xx-XX).",
+                     "(bit 5) set, StartTime=null, Duration=2000 (2 seconds), MessageText='Hello from Matter' and "
+                     "LanguageCode set to an unsupported language tag (xx-XX).",
                      "Verify that a successful (status 0) response is received and the DUT presents the message "
                      "using its default locale or a best-match language. Verify that MessagePresented and "
                      "MessageComplete events are generated."),
@@ -115,13 +125,23 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
         await self.send_present_message(
             endpoint, message_id=MESSAGE_ID_1, message_control=spoken_control,
             priority=cluster.Enums.MessagePriorityEnum.kLow,
-            message_text=_MESSAGE_TEXT, language_code=supported_lang_code)
+            message_text=_MESSAGE_TEXT, language_code=supported_lang_code,
+            duration_ms=_SPOKEN_MESSAGE_DURATION_MS)
 
         self.step(3)
         self.wait_for_message_event(event_handler, events.MessageQueued, MESSAGE_ID_1, timeout_sec=timeout_sec)
 
         self.step(4)
         self.wait_for_message_event(event_handler, events.MessagePresented, MESSAGE_ID_1, timeout_sec=timeout_sec)
+        if not self.is_pics_sdk_ci_only:
+            response = self.wait_for_user_input(
+                prompt_msg="Confirm the message was heard (or shown) on the DUT.\n"
+                           "Enter 'y' if it was, or 'n' if it was not.\n",
+                prompt_msg_placeholder="y", default_value="y")
+            asserts.assert_is_not_none(response, "No response to the message prompt, expected 'y' or 'n'")
+            response = response.lower()
+            asserts.assert_in(response, ["y", "n"], "Invalid response to the message prompt, expected 'y' or 'n'")
+            asserts.assert_equal(response, "y", "Operator reports the message was not heard or shown on the DUT")
 
         self.step(5)
         self.wait_for_message_event(event_handler, events.MessageComplete, MESSAGE_ID_1, timeout_sec=timeout_sec)
@@ -132,7 +152,8 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
         await self.send_present_message(
             endpoint, message_id=MESSAGE_ID_2, message_control=spoken_control,
             priority=cluster.Enums.MessagePriorityEnum.kLow,
-            message_text=_MESSAGE_TEXT, language_code=_UNSUPPORTED_LANGUAGE_CODE)
+            message_text=_MESSAGE_TEXT, language_code=_UNSUPPORTED_LANGUAGE_CODE,
+            duration_ms=_SPOKEN_MESSAGE_DURATION_MS)
         self.wait_for_message_event(event_handler, events.MessagePresented, MESSAGE_ID_2, timeout_sec=timeout_sec)
         self.wait_for_message_event(event_handler, events.MessageComplete, MESSAGE_ID_2, timeout_sec=timeout_sec)
 

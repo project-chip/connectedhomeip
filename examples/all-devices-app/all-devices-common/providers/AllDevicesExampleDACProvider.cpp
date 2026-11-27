@@ -71,6 +71,51 @@ CHIP_ERROR AllDevicesExampleDACProvider::GetProductAttestationIntermediateCert(M
     return mDelegate->GetProductAttestationIntermediateCert(out_pai_buffer);
 }
 
+CHIP_ERROR AllDevicesExampleDACProvider::GetDeviceAttestationCertForProfile(Credentials::DeviceAttestationCertProfile profile,
+                                                                            MutableByteSpan & out_dac_buffer)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDelegate->GetDeviceAttestationCertForProfile(profile, out_dac_buffer);
+}
+
+CHIP_ERROR
+AllDevicesExampleDACProvider::GetProductAttestationIntermediateCertForProfile(Credentials::DeviceAttestationCertProfile profile,
+                                                                              MutableByteSpan & out_pai_buffer)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDelegate->GetProductAttestationIntermediateCertForProfile(profile, out_pai_buffer);
+}
+
+Credentials::DeviceAttestationProfileSupport AllDevicesExampleDACProvider::GetDeviceAttestationProfileSupport() const
+{
+    return mDelegate != nullptr ? mDelegate->GetDeviceAttestationProfileSupport()
+                                : DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport();
+}
+
+Credentials::DeviceAttestationCertProfile AllDevicesExampleDACProvider::GetPreferredDeviceAttestationChainProfile() const
+{
+    return mDelegate != nullptr ? mDelegate->GetPreferredDeviceAttestationChainProfile()
+                                : DeviceAttestationCredentialsProvider::GetPreferredDeviceAttestationChainProfile();
+}
+
+CHIP_ERROR
+AllDevicesExampleDACProvider::GetDeviceAttestationDocumentSegment(Credentials::DeviceAttestationDocumentType documentType,
+                                                                  Credentials::DeviceAttestationCertProfile profile, size_t offset,
+                                                                  MutableByteSpan & out_document_buffer, size_t & out_document_size)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDelegate->GetDeviceAttestationDocumentSegment(documentType, profile, offset, out_document_buffer, out_document_size);
+}
+
+CHIP_ERROR AllDevicesExampleDACProvider::GetDeviceAttestationDocumentSegmentForChain(
+    Credentials::DeviceAttestationDocumentType documentType, const Credentials::DeviceAttestationChainProfile & chain,
+    size_t offset, MutableByteSpan & out_document_buffer, size_t & out_document_size)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDelegate->GetDeviceAttestationDocumentSegmentForChain(documentType, chain, offset, out_document_buffer,
+                                                                  out_document_size);
+}
+
 CHIP_ERROR AllDevicesExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                       MutableByteSpan & out_signature_buffer)
 {

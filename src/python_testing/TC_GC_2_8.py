@@ -57,7 +57,7 @@ class TC_GC_2_8(MatterTestCommissionedDevice):
 
     def steps_TC_GC_2_8(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "TH subscribes to FabricUnderTest attribute with min interval 0s and max interval 30s"),
             TestStep("1c", "TH reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute (stored as F1)"),
             TestStep("1d", "TH subscribes to the GroupcastTesting event with min interval 0s and max interval 30s"),

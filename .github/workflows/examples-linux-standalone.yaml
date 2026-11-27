@@ -61,7 +61,7 @@ jobs:
                 strip out/linux-x64-chip-tool/chip-tool
             - name: Upload tools as artifact
               if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v7.0.2
               with:
                 name: chip-tools-linux-x64
                 retention-days: 7
@@ -73,6 +73,9 @@ jobs:
               run: |
                   CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
                       python3 src/tools/chip-cert/tests/test_chip_cert.py
+            - name: Test PICS generator support
+              run: |
+                  python3 src/tools/PICS-generator/tests/test_pics_generator_support.py
 
             - name: Build minmdns example with platform dns
               run: |
@@ -91,6 +94,12 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-all-clusters-minimal \
+                        build" && rm -rf out
+            - name: Build example Standalone All Devices Server with OTNS
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-devices-no-wifi-openthread-endpoint-otns \
                         build" && rm -rf out
             - name: Build example Standalone TV Casting App
               run: |

@@ -92,7 +92,7 @@ class TC_ESALM_2_3(MatterTestCommissionedDevice):
         attrs = cluster.Attributes
         cmds = cluster.Commands
 
-        self.step(1, "Commission DUT to TH", is_commissioning=True)
+        self.step(1, "Commission DUT to TH")
 
         self.step(2, "TH reads from the DUT the AcceptedCommandList.",
                   expectation="Verify that the DUT response contains a list of accepted command IDs. Store the "

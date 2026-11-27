@@ -16,6 +16,11 @@ there are areas which the tool can not cover:
     other element) are marked as supported, since the global attribute with the
     list of events is obsolete/removed. Because of this, event PICS are marked
     purely from spec conformance and may not match the actual device.
+-   PICS codes use lowercase hex digits (see the PICS Guidelines in the test
+    plans), but some templates use uppercase hex in their itemNumbers. The tool
+    still marks those items when the device supports them, then lists them in a
+    warning at the end of the run. TC-IDM-10.4 compares PICS codes exactly, so
+    it fails on these items until the template is fixed.
 
 # Setup
 

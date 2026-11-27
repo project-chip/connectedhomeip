@@ -95,9 +95,65 @@ source_set("public_headers") {
 
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
+  import("${build_root}/config/sysroot.gni")
 
-  pkg_config("openssl_config") {
-    packages = [ "openssl" ]
+  declare_args() {
+    # Private OpenSSL installation. Empty uses the target's pkg-config defaults.
+    chip_openssl_root = ""
+    chip_openssl_static = false
+
+    # Image defaults apply only to native Linux targets, never a cross sysroot.
+    if (current_os == "linux" && current_os == host_os &&
+        current_cpu == host_cpu && sysroot == "") {
+      chip_openssl_root = getenv("CHIP_OPENSSL_ROOT")
+      chip_openssl_static = getenv("CHIP_OPENSSL_STATIC") == "true"
+    }
+  }
+
+  assert(!chip_openssl_static || chip_openssl_root != "",
+         "chip_openssl_static requires chip_openssl_root")
+
+  if (chip_openssl_root == "") {
+    pkg_config("openssl_config") {
+      packages = [ "openssl" ]
+    }
+  } else {
+    config("openssl_config") {
+      assert(current_os == "linux",
+             "chip_openssl_root currently requires a Linux linker")
+      include_dirs = [ "$chip_openssl_root/include" ]
+      openssl_extension = "so"
+      if (chip_openssl_static) {
+        openssl_extension = "a"
+      }
+      openssl_libdir = "$chip_openssl_root/lib"
+      if (!path_exists("$openssl_libdir/libcrypto.$openssl_extension")) {
+        openssl_libdir = "$chip_openssl_root/lib64"
+      }
+      libs = []
+      foreach(library,
+              [
+                "ssl",
+                "crypto",
+              ]) {
+        openssl_library = "$openssl_libdir/lib${library}.$openssl_extension"
+        assert(path_exists(openssl_library),
+               "Missing OpenSSL library: $openssl_library")
+        libs += [ openssl_library ]
+      }
+
+      if (chip_openssl_static) {
+        libs += [
+          "dl",
+          "pthread",
+        ]
+
+        # Hide archive symbols so Python's system OpenSSL stays isolated.
+        ldflags = [ "-Wl,--exclude-libs,libssl.a:libcrypto.a" ]
+      } else {
+        ldflags = [ "-Wl,-rpath,$openssl_libdir" ]
+      }
+    }
   }
 
   source_set("cryptopal_openssl") {

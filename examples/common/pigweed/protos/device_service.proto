@@ -23,7 +23,7 @@ message DeviceInfo {
   uint32 product_id = 2;
   uint32 software_version = 3;
   string serial_number = 4;
-  PairingInfo pairing_info = 5;
+  optional PairingInfo pairing_info = 5;
   string software_version_string = 6;
 }
 

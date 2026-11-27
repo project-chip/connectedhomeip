@@ -139,7 +139,7 @@ class TC_MCORE_FS_1_3(MatterTestCommissionedDevice):
 
     def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "TH commissions TH_SERVER_NO_UID to TH's fabric"),
             TestStep(2, "DUT_FSA commissions TH_SERVER_NO_UID to DUT_FSA's fabric and generates a UniqueID.",
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),

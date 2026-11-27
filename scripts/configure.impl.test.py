@@ -153,6 +153,30 @@ class TestProjectArgProcessor(unittest.TestCase):
         self.assertEqual(p.args['chip_crypto'], '"boringssl"')
         self.assertEqual(p.args['chip_log_message_max_size'], '512')
 
+    def test_cipd_package_tag(self):
+        cipd_fixture = {
+            "packages": [
+                {
+                    "path": "gn/gn/${platform}",
+                    "tags": ["git_revision:3fef1f00031be0d3505e5338ca671ea3752e6fd8"],
+                }
+            ]
+        }
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            json.dump(cipd_fixture, f)
+            f.flush()
+            try:
+                import contextlib
+                import io
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    impl.cipd_package_tag(f.name, "gn/gn/${platform}")
+                self.assertEqual(buf.getvalue().strip(), "git_revision:3fef1f00031be0d3505e5338ca671ea3752e6fd8")
+                with self.assertRaises(SystemExit):
+                    impl.cipd_package_tag(f.name, "nonexistent/pkg")
+            finally:
+                os.unlink(f.name)
+
 
 if __name__ == '__main__':
     unittest.main()

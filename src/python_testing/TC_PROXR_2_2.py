@@ -62,7 +62,7 @@ class TC_PROXR_2_2(MatterTestCommissionedDevice, ProximityRangingTestBase):
     def steps_TC_PROXR_2_2(self) -> list[TestStep]:
         reject = "Verify DUT responds with status RejectedInfeasibleRanging."
         return [
-            TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required()),
             TestStep(2, test_plan_support.read_attribute("RangingCapabilities"),
                      "Verify a list of RangingCapabilitiesStruct and save the elements."),
             TestStep(3, test_plan_support.read_attribute("WiFiDevIK"),

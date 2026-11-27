@@ -34,20 +34,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Occupancy
 namespace AbsMinHeatSetpointLimit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AbsMinHeatSetpointLimit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AbsMinHeatSetpointLimit::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace AbsMinHeatSetpointLimit
 namespace AbsMaxHeatSetpointLimit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AbsMaxHeatSetpointLimit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AbsMaxHeatSetpointLimit::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace AbsMaxHeatSetpointLimit
 namespace AbsMinCoolSetpointLimit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AbsMinCoolSetpointLimit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AbsMinCoolSetpointLimit::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace AbsMinCoolSetpointLimit
 namespace AbsMaxCoolSetpointLimit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AbsMaxCoolSetpointLimit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AbsMaxCoolSetpointLimit::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace AbsMaxCoolSetpointLimit
 namespace PICoolingDemand {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PICoolingDemand::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -123,18 +131,21 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatRunningMode:
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThermostatRunningMode
 namespace StartOfWeek {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(StartOfWeek::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(StartOfWeek::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace StartOfWeek
 namespace NumberOfWeeklyTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfWeeklyTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfWeeklyTransitions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfWeeklyTransitions
 namespace NumberOfDailyTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfDailyTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfDailyTransitions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfDailyTransitions
 namespace TemperatureSetpointHold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureSetpointHold::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -172,24 +183,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetback::Id, B
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace OccupiedSetback
 namespace OccupiedSetbackMin {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OccupiedSetbackMin
 namespace OccupiedSetbackMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetbackMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OccupiedSetbackMax::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OccupiedSetbackMax
 namespace UnoccupiedSetback {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UnoccupiedSetback::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace UnoccupiedSetback
 namespace UnoccupiedSetbackMin {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UnoccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UnoccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace UnoccupiedSetbackMin
 namespace UnoccupiedSetbackMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UnoccupiedSetbackMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UnoccupiedSetbackMax::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace UnoccupiedSetbackMax
 namespace EmergencyHeatDelta {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(EmergencyHeatDelta::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -229,31 +244,39 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ACCapacityformat::Id, 
 } // namespace ACCapacityformat
 namespace PresetTypes {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(PresetTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(PresetTypes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace PresetTypes
 namespace ScheduleTypes {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(ScheduleTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(ScheduleTypes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ScheduleTypes
 namespace NumberOfPresets {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPresets::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfPresets::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace NumberOfPresets
 namespace NumberOfSchedules {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSchedules::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfSchedules::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace NumberOfSchedules
 namespace NumberOfScheduleTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfScheduleTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfScheduleTransitions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfScheduleTransitions
 namespace NumberOfScheduleTransitionPerDay {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfScheduleTransitionPerDay::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfScheduleTransitionPerDay::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfScheduleTransitionPerDay
 namespace ActivePresetHandle {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ActivePresetHandle::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -279,9 +302,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetpointHoldExpiryTime
                                                           std::nullopt);
 } // namespace SetpointHoldExpiryTimestamp
 namespace MaxThermostatSuggestions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxThermostatSuggestions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxThermostatSuggestions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace MaxThermostatSuggestions
 namespace ThermostatSuggestions {
 inline constexpr DataModel::AttributeEntry
@@ -327,9 +351,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace EnabledSensorHandles
 namespace NumberOfSensorScheduleTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfSensorScheduleTransitions
 namespace SensorSchedule {
 inline constexpr DataModel::AttributeEntry

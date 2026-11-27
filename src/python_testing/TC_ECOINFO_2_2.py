@@ -31,7 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -48,7 +48,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --bool-arg unified_fabric_sync_app:true
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -136,7 +136,7 @@ class TC_ECOINFO_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_ECOINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "Prepare"),
             TestStep("1a", "Read root endpoint's PartsList"),
             TestStep("1b", "For each endpoint in 1a read DeviceType list confirming aggregator endpoint exists"),

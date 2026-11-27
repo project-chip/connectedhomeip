@@ -16,9 +16,8 @@ import os
 import shlex
 import subprocess
 import sys
-
-from pathlib import Path
 from enum import Enum, auto
+from pathlib import Path
 from platform import uname
 
 from runner.runner import Runner
@@ -524,9 +523,12 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
+                 enable_otns=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
+                 enable_tcp=True,
+                 packetbuffer_pool=False,
                  ):
         """
         Construct a host builder.
@@ -583,6 +585,13 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_thread=false')
+
+        if not enable_tcp:
+            self.extra_gn_options.append('chip_inet_config_enable_tcp_endpoint=false')
+
+        if packetbuffer_pool:
+            # 15 is the SDK default pool size (src/system/SystemConfig.h); a size above 0 selects the internal PacketBuffer pool.
+            self.extra_gn_options.append('target_defines=["CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE=15"]')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -758,6 +767,18 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+
+        if enable_otns:
+            if not openthread_endpoint:
+                raise Exception("OpenThread EndPoint mode is required")
+
+            # OTNS drives the node through the OpenThread CLI on stdin/stdout, so Matter logs go to syslog.
+            self.extra_gn_options.append('chip_logging_backend="syslog"')
+            self.extra_gn_options.append('chip_enable_otns=true')
+            self.extra_gn_options.append('openthread_config_otns_enable=true')
+            otns_core_config_file = os.path.join(
+                chip_root, 'third_party', 'ot-ns', 'repo', 'ot-rfsim', 'src', 'openthread-core-rfsim-config.h')
+            self.extra_gn_options.append(f'openthread_project_core_config_file="{otns_core_config_file}"')
 
         if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:

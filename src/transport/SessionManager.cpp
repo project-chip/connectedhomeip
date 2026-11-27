@@ -133,11 +133,27 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     // Ensure MessageStats struct is at default state on Init
     mMessageStats = MessageStats();
 
+    mRegisteredGroupProvider = nullptr;
+    EnsureGroupPeerTableListenerRegistered(Credentials::GetGroupDataProvider());
+
     return CHIP_NO_ERROR;
+}
+
+void SessionManager::EnsureGroupPeerTableListenerRegistered(Credentials::GroupDataProvider * groups)
+{
+    if (groups == nullptr || groups == mRegisteredGroupProvider)
+    {
+        return;
+    }
+
+    groups->SetListener(&gGroupPeerTable.get());
+    mRegisteredGroupProvider = groups;
 }
 
 void SessionManager::Shutdown()
 {
+    mRegisteredGroupProvider = nullptr;
+
     if (mFabricTable != nullptr)
     {
         mFabricTable->RemoveFabricDelegate(this);
@@ -317,6 +333,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         if (session == nullptr)
         {
             return CHIP_ERROR_NOT_CONNECTED;
+        }
+
+        if (sessionHandle->AllowsLargePayload())
+        {
+            // GetMaxAppMessageLen() returning 0 still admits an empty payload, whose headers and MIC can exceed
+            // the peer's limit, so check the whole encoded message.
+            uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+            size_t encodedSize =
+                packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + kMaxTagLen;
+            VerifyOrReturnError(peerMaxMessageSize == 0 || encodedSize <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
         }
 
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
@@ -956,22 +982,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
         auto sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn.IsNull())
+        if (!sessionConn.IsNull() && sessionConn != ctxt->conn)
         {
-            secureSession->SetTCPConnection(ctxt->conn);
-        }
-        else
-        {
-            if (sessionConn != ctxt->conn)
-            {
-                ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
-                             static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
-                return;
-            }
+            ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
+                         static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
+            return;
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1065,6 +1083,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             secureSession->SetPeerAddress(mutablePeerAddress);
         }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Associate the session with the TCP connection only AFTER the message authenticates, so that
+        // unvalidated messages cannot alter the transport settings of legitimate sessions.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (mCB != nullptr)
@@ -1283,10 +1310,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
     Transport::PeerMessageCounter * counter = nullptr;
+    EnsureGroupPeerTableListenerRegistered(groups);
 
     if (CHIP_NO_ERROR ==
-        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
-                                       packetHeaderCopy.IsSecureSessionControlMsg(), counter))
+        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, groupContext.keyset_id,
+                                       packetHeaderCopy.GetSourceNodeId().Value(), packetHeaderCopy.IsSecureSessionControlMsg(),
+                                       counter))
     {
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {

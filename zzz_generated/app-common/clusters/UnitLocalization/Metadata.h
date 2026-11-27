@@ -28,7 +28,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureUnit::Id, B
 namespace SupportedTemperatureUnits {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedTemperatureUnits::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedTemperatureUnits
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {

@@ -870,16 +870,18 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    MutableByteSpan mac(macBuffer);
-    char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
+    {
+        uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+        MutableByteSpan mac(macBuffer);
+        char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
 
-    err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-    SuccessOrExit(err);
-    err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
-    SuccessOrExit(err);
-    otErr = otMdnsSetLocalHostName(mOTInst, hostname);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+        err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+        SuccessOrExit(err);
+        err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
+        SuccessOrExit(err);
+        otErr = otMdnsSetLocalHostName(mOTInst, hostname);
+        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
@@ -1743,34 +1745,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
-    // Check if TXT record was included in DNS response.
-    if (serviceInfo.mTxtDataSize != 0)
-    {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
-
-        otDnsTxtEntry txtEntry;
-        FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
-    }
-
-    return CHIP_NO_ERROR;
+    return serviceTxtEntries.Parse(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), mdnsService);
 }
 
 template <class ImplClass>

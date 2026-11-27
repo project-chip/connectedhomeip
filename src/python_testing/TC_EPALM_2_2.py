@@ -137,7 +137,7 @@ class TC_EPALM_2_2(ElectricalProtectionAlarmTestBaseHelper):
         alarm_bits = cluster.Bitmaps.AlarmBitmap
         features = cluster.Bitmaps.Feature
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         self.step(2, "TH reads TestEventTriggersEnabled from General Diagnostics on endpoint 0",
                   expectation="Value has to be 1 (True). If 0, skip the remaining steps and end the test case.")

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <ble/Ble.h>
 #include <lib/support/Span.h>
 #include <platform/Darwin/BleScannerDelegate.h>
@@ -37,12 +39,19 @@ public:
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override;
     CHIP_ERROR CancelConnection() override;
+    CHIP_ERROR CancelPendingConnection() override;
 
 private:
+    uint64_t mCancellationGeneration = 0;
+    bool mConnectionErrorPending     = false;
+
     CHIP_ERROR DoCancel();
 
+    // BleLayer's single-request wrappers pass appState == bleLayer; only their errors own cancellation.
+    void QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error, bool ownsCancellation);
+
     // Caller should pass in only one of onConnectionComplete and onConnectionCompleteWithDiscriminator
-    void
+    CHIP_ERROR
     NewConnectionImpl(Ble::BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
                       Ble::BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                       Ble::BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator,

@@ -15,6 +15,30 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_1_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_1_admin_storage.json
+#       --commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import test_plan_support
@@ -50,7 +74,7 @@ class TC_CNET_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         return [
-            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
+            TestStep(0, test_plan_support.commission_if_required(), ""),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
             TestStep(2, "TH reads the SupportedWiFiBands attribute from the DUT",

@@ -58,6 +58,18 @@ public:
      */
     void GenerateSharedFilesAddedEvent(uint16_t requestID, uint16_t responseID);
 
+    /**
+     * @brief Notify subscribers that AvailableFiles and AvailableStorage have changed.
+     *
+     * Both attributes are derived from the set of stored files, so the application reports
+     * them together whenever that set changes.
+     */
+    void MarkStoredFilesDirty()
+    {
+        NotifyAttributeChanged(MediaFileManagement::Attributes::AvailableFiles::Id);
+        NotifyAttributeChanged(MediaFileManagement::Attributes::AvailableStorage::Id);
+    }
+
 private:
     MediaFileManagement::Delegate & mDelegate;
     const BitFlags<MediaFileManagement::Feature> mFeatures;
@@ -66,6 +78,9 @@ private:
 
     CHIP_ERROR ReadAvailableFiles(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadSupportedMimeTypes(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    // Sets `supported` to whether `mimeType` is in SupportedMimeTypes (always true when the
+    // list is empty). Returns the delegate's error if the list cannot be read.
+    CHIP_ERROR IsSupportedMimeType(CharSpan mimeType, bool & supported);
 };
 
 } // namespace Clusters
