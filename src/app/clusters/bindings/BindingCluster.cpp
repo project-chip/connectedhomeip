@@ -31,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -127,15 +128,50 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
     default:
         break;
     }
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    return Status::UnsupportedAttribute;
 }
 
 DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                              AttributeValueDecoder & decoder)
 {
+    class ScopedAttributeChangeNotifier
+    {
+    public:
+        ScopedAttributeChangeNotifier(BindingCluster & cluster, AttributeId attributeId) :
+            mCluster(cluster), mAttributeId(attributeId)
+        {}
+
+        ScopedAttributeChangeNotifier(const ScopedAttributeChangeNotifier &)             = delete;
+        ScopedAttributeChangeNotifier & operator=(const ScopedAttributeChangeNotifier &) = delete;
+
+        ~ScopedAttributeChangeNotifier()
+        {
+            if (mChanged)
+            {
+                mCluster.NotifyAttributeChanged(mAttributeId);
+            }
+        }
+
+        CHIP_ERROR MarkChangedOnSuccess(CHIP_ERROR err)
+        {
+            if (err == CHIP_NO_ERROR)
+            {
+                mChanged = true;
+            }
+            return err;
+        }
+
+    private:
+        BindingCluster & mCluster;
+        const AttributeId mAttributeId;
+        bool mChanged = false;
+    };
+
     switch (request.path.mAttributeId)
     {
     case Binding::Attributes::Binding::Id: {
+        ScopedAttributeChangeNotifier notifier(*this, Binding::Attributes::Binding::Id);
+
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             DecodableBindingListType newBindingList;
@@ -155,7 +191,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
                     {
                         TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
-                    ReturnErrorOnFailure(mClusterContext.bindingTable.RemoveAt(bindingTableIter));
+                    ReturnErrorOnFailure(notifier.MarkChangedOnSuccess(mClusterContext.bindingTable.RemoveAt(bindingTableIter)));
                 }
                 else
                 {
@@ -168,7 +204,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             CHIP_ERROR err = CHIP_NO_ERROR;
             while (iter.Next() && err == CHIP_NO_ERROR)
             {
-                err = CreateBindingEntry(iter.GetValue(), request.path.mEndpointId);
+                err = notifier.MarkChangedOnSuccess(CreateBindingEntry(iter.GetValue(), request.path.mEndpointId));
             }
 
             // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
@@ -186,17 +222,15 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             ReturnErrorOnFailure(decoder.Decode(target));
             if (!IsValidBinding(request.path.mEndpointId, target))
             {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                return Status::ConstraintError;
             }
-            return CreateBindingEntry(target, request.path.mEndpointId);
+            return notifier.MarkChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
         }
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
+        return Status::UnsupportedWrite;
     }
-    break;
     default:
-        break;
+        return Status::UnsupportedWrite;
     }
-    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,

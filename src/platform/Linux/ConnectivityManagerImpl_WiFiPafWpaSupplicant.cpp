@@ -865,7 +865,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
                     pPublishSSI->ProductId, pPublishSSI->VendorId);
     ChipLogProgress(DeviceLayer, "\tpeer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", peer_addr[0], peer_addr[1], peer_addr[2],
                     peer_addr[3], peer_addr[4], peer_addr[5]);
-    ChipLogProgress(DeviceLayer, "\tSSI Buffer Len:%lu", bufferLen);
+    ChipLogProgress(DeviceLayer, "\tSSI Buffer Len:%zu", bufferLen);
 
     if (peer.hasExtendedData && !peer.storage.empty())
     {

@@ -772,6 +772,15 @@ void BLEManagerImpl::DriveBLEState(void)
             // Start advertising.  This is also an asynchronous step.
             ESP_LOGD(TAG, "NimBLE start advertising...");
             err = StartAdvertising();
+            if (err == CHIP_ERROR_NO_MEMORY)
+            {
+                // NimBLE rejects connectable advertising with BLE_HS_ENOMEM if all
+                // connection slots are in use, so keep `kAdvertisingRefreshNeeded`
+                // flag set rather than disabling CHIPoBLE
+                ChipLogProgress(DeviceLayer, "No connection slot for connectable advertising; will retry");
+                mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+                ExitNow(err = CHIP_NO_ERROR);
+            }
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "Start advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1182,9 +1191,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         {
             /* Advertising is already active. Stop and restart with the new parameters */
             ChipLogProgress(DeviceLayer, "Device already advertising, stop active advertisement and restart");
-            err = MapBLEError(ble_gap_ext_adv_stop(kMatterAdvInstance));
-            if (err != CHIP_NO_ERROR)
+
+            // BLE_HS_EALREADY means advertising already stopped
+            int rc = ble_gap_ext_adv_stop(kMatterAdvInstance);
+            if (rc != 0 && rc != BLE_HS_EALREADY)
             {
+                err = MapBLEError(rc);
                 ChipLogError(DeviceLayer, "ble_gap_ext_adv_stop() failed: %" CHIP_ERROR_FORMAT ", cannot restart", err.Format());
                 return err;
             }
@@ -1391,9 +1403,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         {
             /* Advertising is already active. Stop and restart with the new parameters */
             ChipLogProgress(DeviceLayer, "Device already advertising, stop active advertisement and restart");
-            err = MapBLEError(ble_gap_adv_stop());
-            if (err != CHIP_NO_ERROR)
+
+            // BLE_HS_EALREADY means advertising already stopped
+            int rc = ble_gap_adv_stop();
+            if (rc != 0 && rc != BLE_HS_EALREADY)
             {
+                err = MapBLEError(rc);
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %" CHIP_ERROR_FORMAT ", cannot restart", err.Format());
                 return err;
             }
