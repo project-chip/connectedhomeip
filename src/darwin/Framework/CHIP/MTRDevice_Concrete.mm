@@ -4281,8 +4281,15 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
     MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
-    // Set by the caller-timeout timer before it cancels the item, so the cancel is reported as a timeout.
+    // Set before the queue timeout cancels the item, so the cancel is reported as a timeout.  The timeout is taken
+    // once, by whichever comes first: the timer, or the send point finding the deadline passed.  Only the one that
+    // took it cancels the item or clears this, so neither undoes the other.
     auto cancelledByTimeout = std::make_shared<std::atomic<bool>>(false);
+    auto timeoutTaken = std::make_shared<std::atomic<bool>>(false);
+    // The queue timeout's deadline, on a monotonic clock, checked again at the send point.
+    dispatch_time_t queueDeadline = (queueTimeoutMs != nil)
+        ? dispatch_time(DISPATCH_TIME_NOW, (int64_t) (queueTimeoutMs.doubleValue * NSEC_PER_MSEC))
+        : DISPATCH_TIME_FOREVER;
     if (userInvokeToken) {
         // A user command goes ahead of queued reads that have sent nothing yet, including reads waiting for a
         // session: not yet sent is queued, not running.  Reads that have sent finish first.
@@ -4341,6 +4348,17 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 mtr_strongify(self);
                 __block BOOL send = YES;
                 if ((userInvokeToken || boundedWithoutToken) && weakWorkItem) {
+                    // Past its queue deadline it is not sent, even if the timer has not run yet: take the timeout
+                    // here and cancel, so the caller hears it timed out.
+                    if (queueDeadline != DISPATCH_TIME_FOREVER && dispatch_time(DISPATCH_TIME_NOW, 0) >= queueDeadline
+                        && !timeoutTaken->exchange(true)) {
+                        cancelledByTimeout->store(true);
+                        if ([workQueue cancelWorkItemIfUnsent:weakWorkItem]) {
+                            MTR_LOG("Invoke work item [%llu] reached its send point after its queue deadline; not sent", workItemID);
+                            return NO;
+                        }
+                        cancelledByTimeout->store(false);
+                    }
                     // A command that has sent nothing can be cancelled up to here: if it was, send nothing.  Its
                     // caller has already been completed by the cancel.  From here on it is sent and completes.
                     send = [workQueue workItem:weakWorkItem readyToSend:^ {}];
@@ -4431,10 +4449,12 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     if (queueTimeoutMs != nil) {
         // The caller's timeout, or for an invoke with expected values and no token the default above, bounds the
         // command's wait in the queue: if it has sent nothing by then, it fails with a timeout and is never sent.
+        // The send point checks the same deadline, for a session that arrives while this timer is still waiting
+        // to run.
         MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (queueTimeoutMs.doubleValue * NSEC_PER_MSEC)), self.queue, ^{
+        dispatch_after(queueDeadline, self.queue, ^{
             MTRAsyncWorkItem * item = weakWorkItem;
-            if (!item) {
+            if (!item || timeoutTaken->exchange(true)) {
                 return;
             }
             cancelledByTimeout->store(true);

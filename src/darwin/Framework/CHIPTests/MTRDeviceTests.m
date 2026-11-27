@@ -9648,6 +9648,72 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
 }
 
+- (void)test069b_InvokeReachingSendPointAfterItsDeadlineTimesOut
+{
+    // A user command whose session arrives after its caller's timeout has elapsed, but before the timeout's timer
+    // has run on the busy device queue, is not sent: the send point checks the deadline, and the caller hears once
+    // that it timed out.  The timer then runs and does not turn that into a cancel.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRDevice unitTestSetUserInvokeMinimumTimeoutOverrideMs:500];
+    [self addTeardownBlock:^{
+        [MTRDevice unitTestSetUserInvokeMinimumTimeoutOverrideMs:0];
+    }];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    NSMutableArray<NSError *> * errors = [NSMutableArray array];
+    const NSTimeInterval timeoutSeconds = 1;
+
+    // The command's session request waits on the Matter queue.
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:@(timeoutSeconds * 1000)] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        @synchronized(errors) {
+            [errors addObject:error ?: (NSError *) NSNull.null];
+        }
+    }];
+    // The work item has run its ready handler, so its session request is queued behind the hold.
+    [self _waitForDeviceQueue:device];
+
+    // Keep the device queue busy past the deadline, so the timer cannot run before the session arrives.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    __block BOOL deviceQueueReleased = NO;
+    [self addTeardownBlock:^{
+        if (!deviceQueueReleased) {
+            dispatch_semaphore_signal(deviceQueueBlocker);
+        }
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+    XCTestExpectation * pastDeadline = [[XCTestExpectation alloc] initWithDescription:@"Deadline passed"];
+    pastDeadline.inverted = YES;
+    [self waitForExpectations:@[ pastDeadline ] timeout:(timeoutSeconds + 0.5)];
+
+    // The session arrives and the command reaches its send point; only then does the timer get to run.
+    releaseSession();
+    [sController syncRunOnWorkQueue:^{
+    } error:nil];
+    XCTestExpectation * sendPointReached = [[XCTestExpectation alloc] initWithDescription:@"Send point reached"];
+    sendPointReached.inverted = YES;
+    [self waitForExpectations:@[ sendPointReached ] timeout:1];
+    deviceQueueReleased = YES;
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Caller completed, nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:2];
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0, @"the command was sent after its deadline");
+    @synchronized(errors) {
+        XCTAssertEqual(errors.count, 1u);
+        id result = errors.firstObject;
+        XCTAssertTrue([result isKindOfClass:[NSError class]], @"the caller got %@, not a timeout", result);
+        if ([result isKindOfClass:[NSError class]]) {
+            NSError * error = result;
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeTimeout, @"the caller got %@", error);
+        }
+    }
+}
+
 - (void)test070_TimeoutBelowOneSessionAttemptRefused
 {
     // A caller timeout shorter than one session attempt is refused up front instead of being queued to fail.
