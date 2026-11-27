@@ -23,7 +23,11 @@
 #include "LedWidgetInterface.h"
 #include "UserInterfaceFeedback.h"
 
+#include <lib/core/CHIPConfig.h>
+
+#if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #include <app/util/attribute-storage.h>
+#endif
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::NXP::App;

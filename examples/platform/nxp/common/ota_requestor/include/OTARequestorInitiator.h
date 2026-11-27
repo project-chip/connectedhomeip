@@ -20,7 +20,9 @@
 #pragma once
 
 #include "app/clusters/ota-requestor/BDXDownloader.h"
+#if !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 #include "app/clusters/ota-requestor/CodegenIntegration.h"
+#endif
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
@@ -52,11 +54,26 @@ public:
     /* Handle update under test */
     static void HandleSelfTest();
 
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    /** Binds application-owned objects before InitOTA; both must outlive the requestor. */
+    void SetCodeDrivenContext(OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator)
+    {
+        mCodeDrivenAttributes     = &attributes;
+        mCodeDrivenEventGenerator = &eventGenerator;
+    }
+#endif
+
     /* OTA components */
     DefaultOTARequestor gRequestorCore;
     DefaultOTARequestorStorage gRequestorStorage;
     DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
     BDXDownloader gDownloader;
+
+private:
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    OTARequestorAttributes * mCodeDrivenAttributes                = nullptr;
+    DefaultOTARequestorEventGenerator * mCodeDrivenEventGenerator = nullptr;
+#endif
 };
 } // namespace App
 } // namespace NXP
