@@ -66,6 +66,7 @@ CIRQUE_TESTS=(
     "BleMobileDeviceTest:thread"
     "BleMobileDeviceTest:wifi"
     "TvCastingTest"
+    "WiFiSwitchNetworkTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -349,6 +350,7 @@ function cirquetest_bootstrap() {
     fi
 
     DOCKER_BUILD_VERSION="$build_version" "$cirque_base_dir/build.sh" "${build_args[@]}"
+    docker build -t mac80211_ap_image -f cirque/resources/Dockerfile.wifiap cirque/resources
 
     __cirquetest_build_ot_lazy
     pip3 install --break-system-packages -r requirements_nogrpc.txt

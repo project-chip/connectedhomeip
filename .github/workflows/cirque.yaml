@@ -114,20 +114,28 @@ jobs:
                        git config --global --add safe.directory '*' \
                        && scripts/build/gn_gen_cirque.sh \
                       "
+            - name: Prepare simulated Wi-Fi
+              run: |
+                  bash scripts/tests/setup_simulated_wifi.sh 16
+
             - name: Run Tests
+              # TODO(#75583): Add iw and kmod to chip-build-cirque/Dockerfile in a follow-up image bump and remove this apt-get install.
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
                      --env CLEANUP_DOCKER_FOR_CI=1 \
                      --env GITHUB_ACTION_RUN=1 \
                      --privileged \
+                     --network=host \
+                     --pid=host \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
+                       && apt-get update \
+                       && apt-get install -y --no-install-recommends iw kmod \
                        && scripts/tests/cirque_tests.sh run_all_tests \
                       "
-
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

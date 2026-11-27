@@ -160,6 +160,17 @@ def _make_handler(stop_event: threading.Event, state: dict):
                     return
                 return
 
+            if self.path.startswith("/device_cmd/"):
+                body = json.dumps(
+                    state.get("device_cmd_response", {"return_code": 0, "output": "ok\n"})
+                ).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
             self.send_response(404)
             self.send_header("Content-Length", "0")
             self.end_headers()
@@ -217,6 +228,10 @@ class TestCHIPTestBase(unittest.TestCase):
             {"id": f"dev-{i:08d}-xxxx", "type": "CHIPEndDevice"}
             for i in range(num_devices)
         ]
+        home.device_config = {
+            f"dev-{i:08d}-xxxx": {"type": "CHIPEndDevice", "base_image": "@default", "capability": []}
+            for i in range(num_devices)
+        }
         return home
 
     def test_wait_for_device_output_matches_fast_response(self):
@@ -398,6 +413,42 @@ class TestCHIPTestBase(unittest.TestCase):
             self.mod.CHIPVirtualHome._read_response_chunk(_BufferedRaw()),
             b"plain-65536",
         )
+
+    def test_execute_device_cmd_check_true_succeeds_on_zero_exit(self):
+        home = self._make_home()
+        self.state["device_cmd_response"] = {"return_code": 0, "output": "done\n"}
+        ret = home.execute_device_cmd("dev-00000000-xxxx", "echo ok", check=True)
+        self.assertEqual(ret, {"return_code": 0, "output": "done\n"})
+
+    def test_execute_device_cmd_check_true_fails_with_pretty_id(self):
+        home = self._make_home()
+        self.state["device_cmd_response"] = {"return_code": 2, "output": "boom"}
+        with self.assertLogs(home.logger, level="ERROR") as logs, self.assertRaises(AssertionError):
+            home.execute_device_cmd("dev-00000000-xxxx", "false", check=True)
+        msg = "\n".join(logs.output)
+        self.assertIn("CHIPEndDevice(dev-0000...)", msg)
+        self.assertIn("return_code=2", msg)
+        self.assertIn("boom", msg)
+
+    def test_execute_device_cmd_stream_and_check_raises_value_error(self):
+        home = self._make_home()
+        with self.assertRaises(ValueError):
+            home.execute_device_cmd("dev-00000000-xxxx", "echo ok", stream=True, check=True)
+        self.assertEqual(self.state["requests"], [])
+
+    def test_run_checked_device_cmd_delegates_and_formats_description(self):
+        home = self._make_home()
+        self.state["device_cmd_response"] = {"return_code": 0, "output": "ok"}
+        ret = home.run_checked_device_cmd("dev-00000000-xxxx", "true", "Setup step")
+        self.assertEqual(ret["return_code"], 0)
+
+        self.state["device_cmd_response"] = {"return_code": 1, "output": "bad"}
+        with self.assertLogs(home.logger, level="ERROR") as logs, self.assertRaises(AssertionError):
+            home.run_checked_device_cmd("dev-00000000-xxxx", "false", "App launch")
+        msg = "\n".join(logs.output)
+        self.assertIn("App launch failed on CHIPEndDevice(dev-0000...)", msg)
+        self.assertIn("return_code=1", msg)
+        self.assertIn("bad", msg)
 
 
 if __name__ == "__main__":
