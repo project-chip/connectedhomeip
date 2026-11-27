@@ -494,6 +494,7 @@ MTR_DIRECT_MEMBERS
     id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
+    NSUInteger concurrentWiFiSubscriptionPoolSize = kDefaultConcurrentWiFiSubscriptionPoolSize;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
     BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
@@ -504,6 +505,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegate = params.otaProviderDelegate;
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
+        concurrentWiFiSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnWiFi;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
         startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
@@ -568,6 +570,7 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+          concurrentWiFiSubscriptionPoolSize:concurrentWiFiSubscriptionPoolSize
                 storageBehaviorConfiguration:storageBehaviorConfiguration
                               startSuspended:startSuspended];
     if (controller == nil) {

@@ -37,7 +37,10 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic) BOOL forceAttributeReportsIfMatchingCache;
 @property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @property (atomic) BOOL pretendThreadEnabled;
+@property (atomic) BOOL pretendWiFiPoolEnabled;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolDequeue;
+// Called synchronously, under the device's lock, while the admitted work item still holds its pool slot.
+@property (atomic, copy, nullable) void (^onSubscriptionPoolAdmitted)(BOOL usesWiFiPool);
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;

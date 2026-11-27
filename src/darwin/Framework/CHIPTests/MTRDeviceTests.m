@@ -7492,7 +7492,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
 }
 
-- (void)test048m_MTRDeviceNonThreadReadClientResubscribesWithoutSubscriptionPool
+- (void)test048m_MTRDeviceNonThreadReadClientResubscribesThroughWiFiSubscriptionPool
 {
     dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
@@ -7501,18 +7501,48 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     delegate.subscriptionMaxIntervalOverride = @(2);
     MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
 
-    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+    NSUInteger baselineThreadPoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+    NSUInteger baselineWiFiPoolItemCount = sController.concurrentWiFiSubscriptionPool.itemCount;
 
+    // Delegate callbacks arrive in order, so counts taken when the subscription is established
+    // show how many slots were released before then.
     __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolDequeueCountWhenSubscribed = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
     __block NSUInteger subscriptionSetupCount = 0;
+    __block NSUInteger subscriptionResetCount = 0;
+    // The admission hook runs while the work item still holds its slot, so the pool counts read there
+    // show which pool admitted the resubscription; the asynchronous dequeue callback can run too late.
+    __block NSUInteger poolAdmissionCount = 0;
+    __block BOOL admittedByWiFiPool = NO;
+    __block NSUInteger wifiPoolItemCountAtAdmission = NSNotFound;
+    __block NSUInteger threadPoolItemCountAtAdmission = NSNotFound;
+    delegate.onSubscriptionPoolAdmitted = ^(BOOL usesWiFiPool) {
+        if (poolAdmissionCount == 0) {
+            admittedByWiFiPool = usesWiFiPool;
+            wifiPoolItemCountAtAdmission = sController.concurrentWiFiSubscriptionPool.itemCount;
+            threadPoolItemCountAtAdmission = sController.concurrentSubscriptionPool.itemCount;
+        }
+        poolAdmissionCount++;
+    };
     dispatch_sync(queue, ^{
         delegate.onSubscriptionPoolDequeue = ^{
             poolDequeueCount++;
         };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
     });
-    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device resubscribed after the subscription dropped" onEstablished:nil];
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device resubscribed after the subscription dropped" onEstablished:^{
+        poolDequeueCountWhenSubscribed = poolDequeueCount;
+        poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+    }];
     delegate.onSubscriptionSetupStarted = ^{
         subscriptionSetupCount++;
+    };
+    delegate.onSubscriptionReset = ^{
+        subscriptionResetCount++;
     };
 
     [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
@@ -7520,14 +7550,19 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
 
     [self _waitForSubscriptionWorkOfDevice:device controller:sController];
-    __block NSUInteger finalPoolDequeueCount = 0;
-    dispatch_sync(queue, ^{
-        finalPoolDequeueCount = poolDequeueCount;
-    });
-    XCTAssertEqual(finalPoolDequeueCount, 0);
+    // A device that is not on Thread resubscribes through the Wi-Fi subscription pool, holding its slot
+    // until the subscription is established, and never takes a slot in the Thread pool.
+    XCTAssertGreaterThanOrEqual(poolAdmissionCount, 1, @"ReadClient resubscription was never admitted by a subscription pool");
+    XCTAssertTrue(admittedByWiFiPool, @"ReadClient resubscription was admitted by the Thread subscription pool");
+    XCTAssertEqual(wifiPoolItemCountAtAdmission, baselineWiFiPoolItemCount + 1, @"ReadClient resubscription was not admitted by the Wi-Fi subscription pool");
+    XCTAssertEqual(threadPoolItemCountAtAdmission, baselineThreadPoolItemCount, @"ReadClient resubscription took a slot in the Thread subscription pool");
+    XCTAssertGreaterThanOrEqual(poolDequeueCountWhenSubscribed, 1, @"ReadClient resubscription did not go through the Wi-Fi subscription pool");
+    XCTAssertEqual(poolDequeueCountWhenSubscribed - poolSlotReleaseCountWhenSubscribed, 1, @"ReadClient resubscription did not hold its Wi-Fi pool slot until it was established");
     XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
+    XCTAssertEqual(subscriptionResetCount, 0);
     XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
-    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+    XCTAssertEqual(sController.concurrentWiFiSubscriptionPool.itemCount, baselineWiFiPoolItemCount);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselineThreadPoolItemCount);
 }
 
 - (void)test048n_MTRDeviceNonThreadStaleResubscriptionTriggerSkippedAfterReset

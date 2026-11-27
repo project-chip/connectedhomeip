@@ -296,6 +296,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
     _uniqueIdentifier = uniqueIdentifier;
 
     _concurrentSubscriptionEstablishmentsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
+    _concurrentSubscriptionEstablishmentsAllowedOnWiFi = kDefaultConcurrentWiFiSubscriptionPoolSize;
 
     return self;
 }

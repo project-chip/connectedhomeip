@@ -165,6 +165,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
+@synthesize concurrentWiFiSubscriptionPool = _concurrentWiFiSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 @synthesize controllerNodeID = _controllerNodeID;
 
@@ -197,6 +198,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
                 otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                         uniqueIdentifier:(NSUUID *)uniqueIdentifier
           concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      concurrentWiFiSubscriptionPoolSize:(NSUInteger)concurrentWiFiSubscriptionPoolSize
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended
 {
@@ -323,6 +325,26 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         MTR_LOG("%@ Setting up pool size of MTRDeviceController with: %lu", self, static_cast<unsigned long>(concurrentSubscriptionPoolSize));
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
+
+        // Provide a way to test different Wi-Fi subscription pool sizes without code change
+        if ([defaults objectForKey:kDefaultWiFiSubscriptionPoolSizeOverrideKey]) {
+            NSInteger wifiSubscriptionPoolSizeOverride = [defaults integerForKey:kDefaultWiFiSubscriptionPoolSizeOverrideKey];
+            if (wifiSubscriptionPoolSizeOverride < 1) {
+                concurrentWiFiSubscriptionPoolSize = 1;
+            } else {
+                concurrentWiFiSubscriptionPoolSize = static_cast<NSUInteger>(wifiSubscriptionPoolSizeOverride);
+            }
+
+            MTR_LOG(" *** Overriding Wi-Fi pool size of MTRDeviceController with: %lu", static_cast<unsigned long>(concurrentWiFiSubscriptionPoolSize));
+        }
+
+        if (!concurrentWiFiSubscriptionPoolSize) {
+            concurrentWiFiSubscriptionPoolSize = 1;
+        }
+
+        MTR_LOG("%@ Setting up Wi-Fi pool size of MTRDeviceController with: %lu", self, static_cast<unsigned long>(concurrentWiFiSubscriptionPoolSize));
+
+        _concurrentWiFiSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentWiFiSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
