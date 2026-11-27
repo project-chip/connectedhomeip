@@ -171,10 +171,7 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
 {
     EnsureInitialized();
 
-    // One byte upwards. That is small enough to drive every truncation path while
-    // staying within the lengths the builders are documented for; a zero-length
-    // destination is not a length any caller in the tree passes.
-    const size_t bufferLen = 1 + (bufferLenSel % kNameBufferSize);
+    const size_t bufferLen = bufferLenSel % (kNameBufferSize + 1);
 
     std::array<char, kNameBufferSize> buffer;
 
@@ -186,15 +183,7 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
 
     {
         buffer.fill('\xAB');
-        const CHIP_ERROR err = MakeHostName(buffer.data(), bufferLen, ByteSpan(mac.data(), mac.size()));
-        // MakeHostName writes one hex pair per input byte, so an empty span
-        // leaves the destination exactly as it found it. Empty spans are still
-        // passed through to cover that path, but the termination check only
-        // applies where the builder was asked to write something.
-        if (!mac.empty())
-        {
-            CheckBuilderResult(err, buffer.data(), bufferLen);
-        }
+        CheckBuilderResult(MakeHostName(buffer.data(), bufferLen, ByteSpan(mac.data(), mac.size())), buffer.data(), bufferLen);
     }
 
     // kCompressedFabricId is the last enumerator, so the count is one past it.
