@@ -36,14 +36,39 @@ namespace app {
 // The device is its own delegate: SmokeCoAlarm only stores the reference, so passing *this
 // (the not-yet-fully-constructed SmokeCoAlarmDelegate base) is safe as long as it is not used until
 // the cluster is registered.
-LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config) :
-    SmokeCoAlarm(timerDelegate, *this, config)
+LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config,
+                                                 Span<const EndpointComposition::SemanticTag> powerSourceTagList) :
+    SmokeCoAlarm(timerDelegate, *this, config),
+    mPowerSourceTagList(powerSourceTagList),
+    mPowerSource("Smoke CO Alarm Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
 {}
 
 LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
 {
     // Cancel any pending self-test timer before the delegate goes away.
     mTimerDelegate.CancelTimer(this);
+}
+
+CHIP_ERROR LoggingOnlySmokeCoAlarm::RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                        EndpointId parentId)
+{
+    EndpointComposition composition(parentId, DataModel::EndpointCompositionPattern::kTree, mPowerSourceTagList);
+
+    ReturnErrorOnFailure(mPowerSource.Register(allocator, provider, composition));
+    // Per the Power Source cluster spec, any non-empty EndpointList SHALL include the endpoint on which
+    // the Power Source cluster resides. SetEndpointList stores the Span by view; mPowerSourceEndpoints is
+    // declared before mPowerSource so it outlives the cluster.
+    mPowerSourceEndpoints = { mPowerSource.GetEndpointId(), mEndpointId };
+    return mPowerSource.BatteryPowerSourceCluster().SetEndpointList(Span<const EndpointId>(mPowerSourceEndpoints));
+}
+
+void LoggingOnlySmokeCoAlarm::UnregisterPowerSource(CodeDrivenDataModelProvider & provider)
+{
+    if (mPowerSource.GetEndpointId() != kInvalidEndpointId)
+    {
+        mPowerSource.Unregister(provider);
+    }
+    mPowerSourceEndpoints = { kInvalidEndpointId, kInvalidEndpointId };
 }
 
 void LoggingOnlySmokeCoAlarm::OnSelfTestRequested()

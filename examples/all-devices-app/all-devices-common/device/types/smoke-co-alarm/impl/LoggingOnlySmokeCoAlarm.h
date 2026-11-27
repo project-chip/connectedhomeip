@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
+#include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/smoke-co-alarm/SmokeCoAlarm.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -37,8 +38,12 @@ class LoggingOnlySmokeCoAlarm : public Clusters::SmokeCoAlarmDelegate, public Sm
 public:
     static constexpr uint16_t kSelfTestTimeoutSec = 10;
 
-    LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config);
+    /// If `powerSourceTagList` is non-empty, its underlying storage must remain valid while the device is registered.
+    LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config,
+                            Span<const EndpointComposition::SemanticTag> powerSourceTagList = {});
     ~LoggingOnlySmokeCoAlarm() override;
+
+    BatteryPowerSource & GetPowerSource() { return mPowerSource; }
 
     // SmokeCoAlarmDelegate
     void OnSelfTestRequested() override;
@@ -48,9 +53,19 @@ public:
     // TimerContext
     void TimerFired() override;
 
+protected:
+    CHIP_ERROR RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                   EndpointId parentId) override;
+    void UnregisterPowerSource(CodeDrivenDataModelProvider & provider) override;
+
 private:
     static const std::array<Clusters::SmokeCoAlarm::ExpressedStateEnum, Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
         sPriorityOrder;
+
+    Span<const EndpointComposition::SemanticTag> mPowerSourceTagList;
+    // Declared before mPowerSource so the backing storage outlives PowerSourceCluster's Span view.
+    std::array<EndpointId, 2> mPowerSourceEndpoints = { kInvalidEndpointId, kInvalidEndpointId };
+    BatteryPowerSource mPowerSource;
 };
 
 } // namespace app

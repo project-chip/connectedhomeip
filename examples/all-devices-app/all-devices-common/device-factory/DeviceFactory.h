@@ -1112,6 +1112,8 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
+            // Note: PositionTag::kMiddle is reserved below for smoke-co-alarm's sibling BatteryPowerSource
+            // so all top-level Power Source endpoints remain distinct under wildcard allocation (*).
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceTag = {
                 .mfgCode     = DataModel::NullNullable,
                 .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
@@ -1135,6 +1137,14 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {
+            // Disambiguates the sibling BatteryPowerSource endpoint from power-source (kTop) and
+            // power-source-simulated (kBottom) above under wildcard allocation (*).
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kSmokeCoPowerSourceTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle),
+            };
+
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
                 // Combined smoke + CO alarm exposing every optional attribute and both concentration measurement clusters,
@@ -1168,7 +1178,7 @@ private:
                         .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                         .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
                     });
-                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
+                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config, Span(&kSmokeCoPowerSourceTag, 1));
             });
         }
 
