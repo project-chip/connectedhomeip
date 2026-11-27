@@ -21,8 +21,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
-#include "matter_button.h"
 #include "RealtekObserver.h"
+#include "matter_button.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -30,18 +30,18 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
-#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <setup_payload/OnboardingCodesUtil.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
-#include <data-model-providers/codegen/Instance.h>
 #include <system/SystemClock.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -115,8 +115,7 @@ void UnlockOpenThreadTask(void)
 } // namespace
 
 #if CHIP_ENABLE_OPENTHREAD
-app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
-sThreadNetworkDriver(0);
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0);
 #endif // CHIP_ENABLE_OPENTHREAD
 
 namespace LedConsts {
@@ -184,8 +183,7 @@ CHIP_ERROR AppTask::Init()
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #elif CHIP_DEVICE_CONFIG_THREAD_SSED
-    err = ConnectivityMgr().SetThreadDeviceType(
-              ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
 #else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #endif
@@ -220,14 +218,12 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) ==
-                CHIP_NO_ERROR);
+    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(
-                                       initParams.persistentStorageDelegate);
+    initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     // Set up OpenThread configuration when OpenThread is included
@@ -245,8 +241,7 @@ CHIP_ERROR AppTask::Init()
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("The RealtekObserver could not be registered with the FabricTable: %" CHIP_ERROR_FORMAT,
-                err.Format());
+        LOG_ERR("The RealtekObserver could not be registered with the FabricTable: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     chip::app::SetAttributePersistenceProvider(&gSimpleAttributePersistence);
@@ -426,8 +421,7 @@ void AppTask::FunctionHandler(const AppEvent & event)
             {
                 LOG_INF("[BTN] Hold to select function:");
                 LOG_INF("[BTN] - Reset (release within %ums)", kResetTriggerTimeout);
-                LOG_INF("[BTN] - Start/Stop BLE advertising (release within %ums)",
-                        kResetTriggerTimeout + kBleAdvTriggerTimeout);
+                LOG_INF("[BTN] - Start/Stop BLE advertising (release within %ums)", kResetTriggerTimeout + kBleAdvTriggerTimeout);
                 LOG_INF("[BTN] - Factory Reset (release within a further %ums to cancel)", kFactoryResetCancelWindow);
 
                 Instance().StartTimer(kResetTriggerTimeout);
