@@ -134,7 +134,7 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
     fun toNumber(decimalString: String): UInt {
       var number: UInt = 0u
       for (c in decimalString) {
-        if (!c.isDigit()) {
+        if (c !in '0'..'9') {
           throw InvalidManualPairingCodeFormatException(
             "Failed decoding base10. Character was invalid $c"
           )
@@ -149,6 +149,12 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
       if (decimalString.length < 2) {
         throw InvalidManualPairingCodeFormatException(
           "Failed decoding base10. Input was empty. ${decimalString.length}"
+        )
+      }
+      val invalidCharacter = decimalString.firstOrNull { it !in '0'..'9' }
+      if (invalidCharacter != null) {
+        throw InvalidManualPairingCodeFormatException(
+          "Failed decoding base10. Character was invalid $invalidCharacter"
         )
       }
       val repWithoutCheckChar = decimalString.substring(0, decimalString.length - 1)
