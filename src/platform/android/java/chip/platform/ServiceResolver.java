@@ -17,6 +17,8 @@
  */
 package chip.platform;
 
+import androidx.annotation.Keep;
+
 /** Interface for resolving network services. */
 public interface ServiceResolver {
   /**
@@ -36,6 +38,9 @@ public interface ServiceResolver {
    *
    * <p>Calling the function again with the same service name, type, protocol, interface and port
    * but different text will update the text published.
+   *
+   * <p>This method may be invoked while the native Matter stack lock is held and must not
+   * synchronously re-enter CHIP JNI.
    */
   void publish(
       String serviceName,
@@ -46,7 +51,12 @@ public interface ServiceResolver {
       byte[][] textEntriesDatas,
       String[] subTypes);
 
-  /** Removes or marks all services being advertised for removal. */
+  /**
+   * Removes or marks all services being advertised for removal.
+   *
+   * <p>This method may be invoked while the native Matter stack lock is held and must not
+   * synchronously re-enter CHIP JNI.
+   */
   void removeServices();
 
   /**
@@ -54,6 +64,10 @@ public interface ServiceResolver {
    *
    * <p>Called after {@link #removeServices()} and {@link #publish} calls to apply pending changes,
    * such as unregistering services still marked for removal.
+   *
+   * <p>This method may be invoked while the native Matter stack lock is held and must not
+   * synchronously re-enter CHIP JNI.
    */
+  @Keep
   default void finalizeServiceUpdate() {}
 }

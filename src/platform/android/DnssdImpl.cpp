@@ -83,10 +83,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
                         ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdRemoveServices"));
 
-    {
-        DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject.ObjectRef(), sRemoveServicesMethod);
-    }
+    env->CallVoidMethod(sResolverObject.ObjectRef(), sRemoveServicesMethod);
 
     if (env->ExceptionCheck())
     {
@@ -142,11 +139,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         env->SetObjectArrayElement(subTypes, i, jniSubType.jniValue());
     }
 
-    {
-        DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject.ObjectRef(), sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
-                            jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
-    }
+    env->CallVoidMethod(sResolverObject.ObjectRef(), sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
+                        jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
 
     if (env->ExceptionCheck())
     {
@@ -161,15 +155,13 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-    VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sFinalizeServiceUpdateMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sResolverObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sFinalizeServiceUpdateMethod != nullptr, CHIP_NO_ERROR);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
                         ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdFinalizeServiceUpdate"));
 
-    {
-        DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject.ObjectRef(), sFinalizeServiceUpdateMethod);
-    }
+    env->CallVoidMethod(sResolverObject.ObjectRef(), sFinalizeServiceUpdateMethod);
 
     if (env->ExceptionCheck())
     {
