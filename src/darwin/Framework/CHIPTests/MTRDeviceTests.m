@@ -8635,6 +8635,421 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual(linesMatching(defaultLines, reportLineWithDescription).count, 0);
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)_attributeErrorReportForPath:(MTRAttributePath *)path code:(NSInteger)code
+{
+    return @[ @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRInteractionErrorDomain code:code userInfo:nil],
+    } ];
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_attributeValueReportForPath:(MTRAttributePath *)path value:(NSUInteger)value
+{
+    return @[ @{
+        MTRAttributePathKey : path,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(value) },
+    } ];
+}
+
+// A new error for a path logs at error level. The same error again logs at detail level and is counted in the report
+// summary, unless something has ended the episode since: a data value for the path, a subscription boundary, or a purge
+// of a cached or expected value.
+- (void)test049g_RepeatedAttributeErrorLogsAtErrorLevelOncePerEpisode
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4001)];
+    __auto_type * otherPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4002)];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    // The report summary line names the device by node ID rather than by its description.
+    NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", device.nodeID.unsignedLongLongValue];
+    NSString * errorLineTag = [NSString stringWithFormat:@"report %@ error", path];
+    NSString * otherErrorLineTag = [NSString stringWithFormat:@"report %@ error", otherPath];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * errorLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * otherLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (![message containsString:deviceTag] && ![message containsString:nodeTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeError ? errorLines : otherLines) addObject:message];
+        if (type == MTRLogTypeDetail) {
+            [detailLines addObject:message];
+        }
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    __block NSUInteger deliveredErrors = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if (item[MTRErrorKey] != nil) {
+                deliveredErrors++;
+            }
+        }
+    };
+
+    NSUInteger (^count)(NSArray<NSString *> *, NSString *) = ^(NSArray<NSString *> * lines, NSString * text) {
+        os_unfair_lock_lock(&linesLock);
+        NSUInteger matching = [lines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text]].count;
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    void (^clearLines)(void) = ^{
+        os_unfair_lock_lock(&linesLock);
+        [errorLines removeAllObjects];
+        [otherLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+        deliveredErrors = 0;
+    };
+    void (^inject)(NSArray<NSDictionary<NSString *, id> *> *, BOOL) = ^(NSArray<NSDictionary<NSString *, id> *> * report, BOOL fromSubscription) {
+        XCTestExpectation * reportEnd = [self expectationWithDescription:@"report end"];
+        delegate.onReportEnd = ^{
+            [reportEnd fulfill];
+        };
+        [device unitTestInjectAttributeReport:report fromSubscription:fromSubscription];
+        [self waitForExpectations:@[ reportEnd ] timeout:kTimeoutInSeconds];
+        delegate.onReportEnd = ^{
+        };
+    };
+    void (^expectLevel)(NSString *, NSUInteger, NSUInteger) = ^(NSString * step, NSUInteger errorLevel, NSUInteger detailLevel) {
+        XCTAssertEqual(count(errorLines, errorLineTag), errorLevel, @"%@: error-level lines", step);
+        XCTAssertEqual(count(detailLines, errorLineTag), detailLevel, @"%@: detail-level lines", step);
+        // An unchanged repeat is neither logged at error level nor delivered.
+        XCTAssertEqual(deliveredErrors, errorLevel, @"%@: errors delivered to the delegate", step);
+    };
+
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeUnsupportedAttribute], YES);
+    expectLevel(@"first error", 1, 0);
+
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeUnsupportedAttribute], YES);
+    expectLevel(@"identical repeat", 0, 1);
+    XCTAssertEqual(count(otherLines, @"0 values, 1 errors, 0 same as read cache, 0 expected value still present, 0 no data, 1 unchanged errors"), 1);
+
+    // A read shares the record with the subscription.
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeUnsupportedAttribute], NO);
+    expectLevel(@"identical repeat from a read", 0, 1);
+
+    clearLines();
+    inject([self _attributeErrorReportForPath:otherPath code:MTRInteractionErrorCodeUnsupportedAttribute], YES);
+    XCTAssertEqual(count(errorLines, otherErrorLineTag), 1, @"another path keeps its own record");
+    XCTAssertEqual(count(errorLines, errorLineTag), 0);
+
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+    expectLevel(@"changed error code", 1, 0);
+
+    // The same code in another domain is a different error.
+    clearLines();
+    inject(@[ @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRInteractionErrorCodeFailure userInfo:nil],
+    } ],
+        YES);
+    expectLevel(@"changed error domain", 1, 0);
+
+    // The record now holds the new domain, so the same error again is a repeat.
+    clearLines();
+    inject(@[ @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRInteractionErrorCodeFailure userInfo:nil],
+    } ],
+        YES);
+    expectLevel(@"repeat after changed error domain", 0, 1);
+    XCTAssertTrue([device unitTestHasLastLoggedErrorForPath:path], @"the path has an error record before the data value");
+
+    // A data value ends the episode; check the record directly, since the value it caches makes the next error purge
+    // something and log at error level whether or not the record was cleared.
+    inject([self _attributeValueReportForPath:path value:5], YES);
+    XCTAssertFalse([device unitTestHasLastLoggedErrorForPath:path], @"a data value clears the path's error record");
+
+    // A data value ends only its own path's episode.
+    clearLines();
+    inject([self _attributeErrorReportForPath:otherPath code:MTRInteractionErrorCodeUnsupportedAttribute], YES);
+    XCTAssertEqual(count(errorLines, otherErrorLineTag), 0, @"another path's repeat after a data value: error-level lines");
+    XCTAssertEqual(count(detailLines, otherErrorLineTag), 1, @"another path's repeat after a data value: detail-level lines");
+
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+    expectLevel(@"after a data value", 1, 0);
+
+    // Repeat once more so the record holds this error, then make the next repeat purge an expected value.
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+    uint64_t expectedValueID = 0;
+    [device setExpectedValues:@[ @{
+        MTRAttributePathKey : path,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(7) },
+    } ]
+        expectedValueInterval:@(60000)
+              expectedValueID:&expectedValueID];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+    clearLines();
+    inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+    XCTAssertEqual(count(errorLines, errorLineTag), 1, @"repeat that purges an expected value");
+    XCTAssertEqual(count(otherLines, errorLineTag), 0, @"repeat that purges an expected value");
+
+    void (^expectErrorAfterBoundary)(NSString *, dispatch_block_t) = ^(NSString * step, dispatch_block_t boundary) {
+        inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+        [sController syncRunOnWorkQueue:boundary error:nil];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        clearLines();
+        inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
+        expectLevel(step, 1, 0);
+    };
+    expectErrorAfterBoundary(@"after a resubscription", ^{
+        [device _handleResubscriptionNeededWithDelay:@(60000)];
+    });
+    expectErrorAfterBoundary(@"after a subscription error", ^{
+        [device _handleSubscriptionError:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil]];
+    });
+    expectErrorAfterBoundary(@"after a subscription reset", ^{
+        // Already reattempting, so the reset schedules no retry of its own.
+        device.reattemptingSubscription = YES;
+        [device _handleSubscriptionReset:nil];
+    });
+}
+
+// A report that reached the device queue before a subscription boundary must not carry its error into the next episode.
+- (void)test049h_AttributeErrorQueuedBeforeBoundaryDoesNotSuppressNextEpisode
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.onReportEnd = ^{
+    };
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4003)];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    NSString * errorLineTag = [NSString stringWithFormat:@"report %@ error", path];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * errorLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (type != MTRLogTypeError || ![message containsString:deviceTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [errorLines addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+    NSUInteger (^errorLineCount)(void) = ^{
+        os_unfair_lock_lock(&linesLock);
+        NSUInteger matching = [errorLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", errorLineTag]].count;
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+
+    NSArray * report = [self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeUnsupportedAttribute];
+
+    // Hold the device queue, queue an old-episode error report from the Matter queue the way a subscription report
+    // arrives, and cross the boundary before the device queue runs it.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+    [sController syncRunOnWorkQueue:^{
+        [device _handleReportBegin];
+        dispatch_async(device.queue, ^{
+            [device _handleAttributeReport:report fromSubscription:YES];
+            [device _handleReportEnd];
+        });
+        [device _handleResubscriptionNeededWithDelay:@(60000)];
+    } error:nil];
+    // Report end reaches the delegate asynchronously on its queue, so wait for the old episode's
+    // report end before installing the next handler; otherwise it would fulfill the new expectation.
+    XCTestExpectation * oldEpisodeReportEnd = [self expectationWithDescription:@"old episode report end"];
+    delegate.onReportEnd = ^{
+        [oldEpisodeReportEnd fulfill];
+    };
+    dispatch_semaphore_signal(deviceQueueBlocker);
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+    [self waitForExpectations:@[ oldEpisodeReportEnd ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(errorLineCount(), 1, @"old-episode error");
+
+    XCTestExpectation * reportEnd = [self expectationWithDescription:@"new episode report end"];
+    delegate.onReportEnd = ^{
+        [reportEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:report fromSubscription:YES];
+    [self waitForExpectations:@[ reportEnd ] timeout:kTimeoutInSeconds];
+    delegate.onReportEnd = ^{
+    };
+    XCTAssertEqual(errorLineCount(), 2, @"first error of the new episode");
+}
+
+// An attribute error equal to the last one delivered for its path in this subscription episode is not delivered again;
+// a changed error, a data value and each subscription boundary let it through.
+- (void)test049i_RepeatedAttributeErrorIsDeliveredOncePerEpisode
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4004)];
+
+    __block NSUInteger deliveredErrors = 0;
+    __block NSUInteger deliveredValues = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if (![item[MTRAttributePathKey] isEqual:path]) {
+                continue;
+            }
+            if (item[MTRErrorKey] != nil) {
+                deliveredErrors++;
+            } else {
+                deliveredValues++;
+            }
+        }
+    };
+    void (^inject)(NSArray<NSDictionary<NSString *, id> *> *) = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        XCTestExpectation * reportEnd = [self expectationWithDescription:@"report end"];
+        delegate.onReportEnd = ^{
+            [reportEnd fulfill];
+        };
+        [device unitTestInjectAttributeReport:report fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnd ] timeout:kTimeoutInSeconds];
+        delegate.onReportEnd = ^{
+        };
+    };
+    void (^expectDelivered)(NSString *, NSArray<NSDictionary<NSString *, id> *> *, NSUInteger) = ^(NSString * step, NSArray<NSDictionary<NSString *, id> *> * report, NSUInteger expected) {
+        deliveredErrors = 0;
+        inject(report);
+        XCTAssertEqual(deliveredErrors, expected, @"%@: errors delivered to the delegate", step);
+    };
+
+    NSArray * unsupported = [self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeUnsupportedAttribute];
+    NSArray * failure = [self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure];
+
+    expectDelivered(@"first error", unsupported, 1);
+    expectDelivered(@"same error again", unsupported, 0);
+    expectDelivered(@"changed error", failure, 1);
+    expectDelivered(@"changed error again", failure, 0);
+
+    deliveredValues = 0;
+    inject([self _attributeValueReportForPath:path value:5]);
+    XCTAssertEqual(deliveredValues, 1, @"a data value is delivered");
+    expectDelivered(@"same error after a data value", failure, 1);
+
+    void (^expectDeliveredAfterBoundary)(NSString *, dispatch_block_t) = ^(NSString * step, dispatch_block_t boundary) {
+        inject(failure);
+        [sController syncRunOnWorkQueue:boundary error:nil];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        expectDelivered(step, failure, 1);
+    };
+    expectDeliveredAfterBoundary(@"after a resubscription", ^{
+        [device _handleResubscriptionNeededWithDelay:@(60000)];
+    });
+    expectDeliveredAfterBoundary(@"after a subscription error", ^{
+        [device _handleSubscriptionError:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil]];
+    });
+    expectDeliveredAfterBoundary(@"after a subscription reset", ^{
+        // Already reattempting, so the reset schedules no retry of its own.
+        device.reattemptingSubscription = YES;
+        [device _handleSubscriptionReset:nil];
+    });
+}
+
+// A delivered expected value starts a new episode, so after it expires with nothing in the read cache, the error it
+// replaced is delivered again.
+- (void)test049j_AttributeErrorIsDeliveredAgainAfterAnExpectedValueExpires
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4005)];
+
+    __block NSUInteger deliveredErrors = 0;
+    __block NSUInteger deliveredValues = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if (![item[MTRAttributePathKey] isEqual:path]) {
+                continue;
+            }
+            if (item[MTRErrorKey] != nil) {
+                deliveredErrors++;
+            } else {
+                deliveredValues++;
+            }
+        }
+    };
+    void (^inject)(NSArray<NSDictionary<NSString *, id> *> *) = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        XCTestExpectation * reportEnd = [self expectationWithDescription:@"report end"];
+        delegate.onReportEnd = ^{
+            [reportEnd fulfill];
+        };
+        [device unitTestInjectAttributeReport:report fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnd ] timeout:kTimeoutInSeconds];
+        delegate.onReportEnd = ^{
+        };
+    };
+    void (^flushDelegateQueue)(void) = ^{
+        XCTestExpectation * flushed = [self expectationWithDescription:@"delegate queue flushed"];
+        dispatch_async(queue, ^{
+            [flushed fulfill];
+        });
+        [self waitForExpectations:@[ flushed ] timeout:kTimeoutInSeconds];
+    };
+
+    NSArray * failure = [self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure];
+
+    inject(failure);
+    XCTAssertEqual(deliveredErrors, 1, @"first error");
+
+    // The expected value is delivered and expires with nothing in the read cache, so no value replaces it.
+    uint64_t expectedValueID = 0;
+    [device setExpectedValues:@[ @{
+        MTRAttributePathKey : path,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(7) },
+    } ]
+        expectedValueInterval:@(100)
+              expectedValueID:&expectedValueID];
+    flushDelegateQueue();
+    XCTAssertEqual(deliveredValues, 1, @"the expected value is delivered");
+
+    XCTestExpectation * expired = [self expectationWithDescription:@"expected value expired"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1 * NSEC_PER_SEC)), queue, ^{
+        [expired fulfill];
+    });
+    [self waitForExpectations:@[ expired ] timeout:kTimeoutInSeconds];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+    flushDelegateQueue();
+    XCTAssertEqual(deliveredValues, 1, @"expiry with an empty read cache delivers no value");
+
+    deliveredErrors = 0;
+    inject(failure);
+    XCTAssertEqual(deliveredErrors, 1, @"the error after the expected value is delivered");
+}
+
 - (void)test050_readAttributePaths_withWildCardPath
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
