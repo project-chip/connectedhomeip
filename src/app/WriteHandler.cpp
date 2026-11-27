@@ -624,7 +624,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 <<<<<<< HEAD
     err       = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
 =======
-    err       = writeRequestParser.GetSuppressResponse(&boolValue);
+    err = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
@@ -637,7 +637,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 <<<<<<< HEAD
     err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
 =======
-    err       = writeRequestParser.GetTimedRequest(&boolValue);
+    err = writeRequestParser.GetTimedRequest(&boolValue);
 >>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
