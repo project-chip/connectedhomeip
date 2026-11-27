@@ -55,12 +55,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -102,12 +104,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -149,12 +153,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -240,12 +246,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -333,12 +341,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -414,12 +424,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -503,12 +515,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -550,12 +564,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -598,12 +614,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -641,12 +659,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -684,12 +704,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -731,12 +753,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -779,12 +803,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -828,12 +854,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -879,12 +907,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -930,12 +960,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -983,12 +1015,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1030,12 +1064,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1081,12 +1117,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1132,12 +1170,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1185,12 +1225,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1232,12 +1274,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1277,12 +1321,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1322,12 +1368,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1388,12 +1436,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1437,12 +1487,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1484,12 +1536,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1533,12 +1587,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1580,12 +1636,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1627,12 +1685,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1676,12 +1736,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1723,12 +1785,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1770,12 +1834,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1819,12 +1885,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1866,12 +1934,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1915,12 +1985,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -1958,12 +2030,14 @@ MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2017,12 +2091,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2072,12 +2148,14 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams",
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2209,12 +2287,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2256,12 +2336,14 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequest
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2362,12 +2444,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2409,12 +2493,14 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateApplie
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2462,12 +2548,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2511,12 +2599,14 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProvid
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2565,12 +2655,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2650,12 +2742,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2729,12 +2823,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2812,12 +2908,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2878,12 +2976,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -2973,12 +3073,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3020,12 +3122,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3067,12 +3171,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3156,12 +3262,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3243,12 +3351,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3290,12 +3400,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3360,12 +3472,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3454,12 +3568,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3497,12 +3613,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3567,12 +3685,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3629,12 +3749,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3672,12 +3794,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3715,12 +3839,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3758,12 +3884,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3807,12 +3935,14 @@ MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3856,12 +3986,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3901,12 +4033,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -3946,12 +4080,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4010,12 +4146,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4055,12 +4193,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4102,12 +4242,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4155,12 +4297,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4205,12 +4349,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4248,12 +4394,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4293,12 +4441,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4385,12 +4535,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4470,12 +4622,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4559,12 +4713,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4606,12 +4762,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4689,12 +4847,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4734,12 +4894,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4779,12 +4941,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4833,12 +4997,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4880,12 +5046,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4948,12 +5116,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -4993,12 +5163,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5072,12 +5244,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5115,12 +5289,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5202,12 +5378,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5268,12 +5446,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5313,12 +5493,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5375,12 +5557,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5418,12 +5602,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5482,12 +5668,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5548,12 +5736,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5593,12 +5783,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5638,12 +5830,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5704,12 +5898,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5749,12 +5945,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5815,12 +6013,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5860,12 +6060,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5926,12 +6128,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -5971,12 +6175,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6037,12 +6243,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6084,12 +6292,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6129,12 +6339,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6195,12 +6407,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6238,12 +6452,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6283,12 +6499,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6328,12 +6546,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6381,12 +6601,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6426,12 +6648,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6469,12 +6693,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6512,12 +6738,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6555,12 +6783,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6598,12 +6828,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6660,12 +6892,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6703,12 +6937,14 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6765,12 +7001,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6818,12 +7056,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6888,12 +7128,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -6964,12 +7206,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7032,12 +7276,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7100,12 +7346,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7172,12 +7420,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7217,12 +7467,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7295,12 +7547,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7363,12 +7617,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7429,12 +7685,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7486,12 +7744,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7533,12 +7793,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7603,12 +7865,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7650,12 +7914,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7697,12 +7963,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7740,12 +8008,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7783,12 +8053,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7826,12 +8098,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7871,12 +8145,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7916,12 +8192,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -7963,12 +8241,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8006,12 +8286,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8051,12 +8333,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8094,12 +8378,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8139,12 +8425,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8203,12 +8491,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8283,12 +8573,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8328,12 +8620,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8377,12 +8671,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8420,12 +8716,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8467,12 +8765,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8514,12 +8814,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8557,12 +8859,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8606,12 +8910,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8653,12 +8959,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8696,12 +9004,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8747,12 +9057,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8790,12 +9102,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8852,12 +9166,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8901,12 +9217,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8948,12 +9266,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -8991,12 +9311,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9036,12 +9358,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9079,12 +9403,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9122,12 +9448,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9167,12 +9495,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9233,12 +9563,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9278,12 +9610,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9344,12 +9678,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9389,12 +9725,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9455,12 +9793,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9500,12 +9840,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9545,12 +9887,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9608,12 +9952,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9653,12 +9999,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9698,12 +10046,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9743,12 +10093,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9790,12 +10142,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9847,12 +10201,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9894,12 +10250,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -9989,12 +10347,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10040,12 +10400,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10087,12 +10449,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10176,12 +10540,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10227,12 +10593,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10272,12 +10640,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10359,12 +10729,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10416,12 +10788,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10466,12 +10840,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10568,12 +10944,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10623,12 +11001,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10706,12 +11086,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10795,12 +11177,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10840,12 +11224,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10891,12 +11277,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10934,12 +11322,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -10977,12 +11367,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11020,12 +11412,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11063,12 +11457,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11108,12 +11504,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11153,12 +11551,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11198,12 +11598,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11243,12 +11645,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11286,12 +11690,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11335,12 +11741,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11378,12 +11786,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11427,12 +11837,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11476,12 +11888,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11525,12 +11939,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11574,12 +11990,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11623,12 +12041,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11668,12 +12088,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11734,12 +12156,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11802,12 +12226,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11893,12 +12319,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -11940,12 +12368,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12002,12 +12432,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12047,12 +12479,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12092,12 +12526,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12141,12 +12577,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12186,12 +12624,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12258,12 +12698,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12307,12 +12749,14 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12362,12 +12806,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12415,12 +12861,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12466,12 +12914,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12519,12 +12969,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12570,12 +13022,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12621,12 +13075,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12674,12 +13130,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12727,12 +13185,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12780,12 +13240,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12831,12 +13293,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12884,12 +13348,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12935,12 +13401,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -12993,12 +13461,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13044,12 +13514,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13097,12 +13569,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13150,12 +13624,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13207,12 +13683,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13254,12 +13732,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13309,12 +13789,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13366,12 +13848,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13417,12 +13901,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13460,12 +13946,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13519,12 +14007,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13583,12 +14073,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13628,12 +14120,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13694,12 +14188,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13745,12 +14241,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13809,12 +14307,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13852,12 +14352,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13914,12 +14416,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -13976,12 +14480,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14019,12 +14525,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14085,12 +14593,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14130,12 +14640,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14175,12 +14687,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14220,12 +14734,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14265,12 +14781,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14341,12 +14859,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14405,12 +14925,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14452,12 +14974,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14522,12 +15046,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14569,12 +15095,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14618,12 +15146,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14684,12 +15214,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14767,12 +15299,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14812,12 +15346,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14869,12 +15405,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14941,12 +15479,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -14992,12 +15532,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15039,12 +15581,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15118,12 +15662,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15161,12 +15707,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15204,12 +15752,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15247,12 +15797,14 @@ MTR_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), 
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15290,12 +15842,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15333,12 +15887,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15376,12 +15932,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15421,12 +15979,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15466,12 +16026,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15511,12 +16073,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15556,12 +16120,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15637,12 +16203,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15684,12 +16252,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15729,12 +16299,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15772,12 +16344,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15817,12 +16391,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15860,12 +16436,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15903,12 +16481,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15950,12 +16530,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -15993,12 +16575,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16038,12 +16622,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16129,12 +16715,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16190,12 +16778,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16292,12 +16882,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16358,12 +16950,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16403,12 +16997,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16450,12 +17046,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16497,12 +17095,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16542,12 +17142,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16587,12 +17189,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16668,12 +17272,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16751,12 +17357,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16796,12 +17404,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16839,12 +17449,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16913,12 +17525,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -16956,12 +17570,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17018,12 +17634,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17061,12 +17679,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17108,12 +17728,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17153,12 +17775,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17196,12 +17820,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17239,12 +17865,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17284,12 +17912,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17329,12 +17959,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17374,12 +18006,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17419,12 +18053,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17464,12 +18100,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17509,12 +18147,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17554,12 +18194,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17599,12 +18241,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17646,12 +18290,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17720,12 +18366,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17786,12 +18434,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17835,12 +18485,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17880,12 +18532,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17954,12 +18608,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -17997,12 +18653,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18040,12 +18698,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18083,12 +18743,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18130,12 +18792,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18179,12 +18843,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18226,12 +18892,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18275,12 +18943,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18345,12 +19015,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18390,12 +19062,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18435,12 +19109,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18480,12 +19156,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18535,12 +19213,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18599,12 +19279,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18664,12 +19346,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18732,12 +19416,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18777,12 +19463,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18834,12 +19522,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18902,12 +19592,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18947,12 +19639,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -18992,12 +19686,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19039,12 +19735,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19111,12 +19809,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19160,12 +19860,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19205,12 +19907,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19252,12 +19956,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19297,12 +20003,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19344,12 +20052,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19395,12 +20105,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19458,12 +20170,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19550,12 +20264,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19620,12 +20336,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19667,12 +20385,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19714,12 +20434,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19765,12 +20487,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19812,12 +20536,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19859,12 +20585,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19906,12 +20634,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -19951,12 +20681,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20015,12 +20747,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20062,12 +20796,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20109,12 +20845,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20160,12 +20898,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20205,12 +20945,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20273,12 +21015,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20318,12 +21062,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20363,12 +21109,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20408,12 +21156,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20453,12 +21203,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20521,12 +21273,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20566,12 +21320,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20611,12 +21367,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20656,12 +21414,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20724,12 +21484,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20794,12 +21556,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20841,12 +21605,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20913,12 +21679,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -20958,12 +21726,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21003,12 +21773,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21058,12 +21830,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21113,12 +21887,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21158,12 +21934,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21209,12 +21987,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21258,12 +22038,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21303,12 +22085,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21350,12 +22134,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21395,12 +22181,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21442,12 +22230,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21487,12 +22277,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21536,12 +22328,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21585,12 +22379,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21634,12 +22430,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21683,12 +22481,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21732,12 +22532,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21779,12 +22581,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21826,12 +22630,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21869,12 +22675,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -21935,12 +22743,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22007,12 +22817,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22050,12 +22862,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22112,12 +22926,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22157,12 +22973,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22204,12 +23022,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22268,12 +23088,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22332,12 +23154,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22396,12 +23220,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22443,12 +23269,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22515,12 +23343,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22560,12 +23390,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22624,12 +23456,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22688,12 +23522,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22741,12 +23577,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22805,12 +23643,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22869,12 +23709,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22912,12 +23754,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -22955,12 +23799,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), ma
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23053,12 +23899,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23096,12 +23944,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1,
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23194,12 +24044,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23237,12 +24089,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 1
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23335,12 +24189,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23378,12 +24234,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(1
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23500,12 +24358,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23547,12 +24407,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23647,12 +24509,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23692,12 +24556,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams"
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23806,12 +24672,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23861,12 +24729,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestPa
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -23973,12 +24843,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24018,12 +24890,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams"
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24226,12 +25100,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24271,12 +25147,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestP
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24371,12 +25249,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24416,12 +25296,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestPar
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24516,12 +25398,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24561,12 +25445,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestPara
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24661,12 +25547,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24706,12 +25594,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequ
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24806,12 +25696,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24851,12 +25743,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgument
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24915,12 +25809,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -24960,12 +25856,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParam
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25026,12 +25924,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25073,12 +25973,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25139,12 +26041,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25184,12 +26088,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParam
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25251,12 +26157,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25318,12 +26226,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalReque
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25363,12 +26273,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25408,12 +26320,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", 
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25451,12 +26365,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25494,12 +26410,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(1
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25539,12 +26457,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25584,12 +26504,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentReques
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25633,12 +26555,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25682,12 +26606,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams",
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25727,12 +26653,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25772,12 +26700,14 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25821,12 +26751,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25870,12 +26802,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25915,12 +26849,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -25962,12 +26898,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -26005,12 +26943,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -26050,12 +26990,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -26114,12 +27056,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */
@@ -26180,12 +27124,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * Marks the command as a user command and lets its caller cancel it while it is still queued.
  *
  * If nil (the default value), the command is queued in order with other work.  A command with expected values and
- * no token still has its wait in the queue bounded, by the default timed-interaction timeout.
+ * no token still has its wait in the device's own queue bounded, by the default timed-interaction timeout; that
+ * bound does not apply over XPC.
  *
  * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  For an MTRCluster
  * backed by an XPC connection, only cancelling applies, and only until the command is submitted: after that cancel
- * returns NO and the command still runs.  The token's timeout and its place ahead of queued reads do not apply
- * over XPC.  Copies of this object share the token rather than copying it, since cancelling is shared state.
+ * returns NO, and the completion reports how the invoke went.  The token's timeout and its place ahead of queued
+ * reads do not apply over XPC.  Copies of this object share the token rather than copying it, since cancelling is
+ * shared state.
  *
  * @see MTRUserInvokeToken
  */

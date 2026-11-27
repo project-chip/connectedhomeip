@@ -196,8 +196,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * written, counted from when the write request is sent to the device.  For a timed write, it is counted from when the
  * Timed Request that precedes the write is sent.  For a controller from +sharedControllerWithID:xpcConnectBlock:, it is
  * counted from when the write is passed to the XPC service.  While the write is still waiting to be sent (for example
- * behind other work for the device, or for a session), reads also return the value being written.  If the write fails,
- * the expected value is removed.  This value must be within [1, UINT32_MAX], and will be clamped to this range.
+ * behind other work for the device, or for a session), reads also return the value being written, for at most 10
+ * seconds: a write still unsent then has its expected value removed, and stays queued and is still sent.  If the write
+ * fails, the expected value is removed.  This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
