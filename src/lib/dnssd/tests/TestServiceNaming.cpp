@@ -23,6 +23,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -243,7 +244,7 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
 
     // Test buffer just under the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
-    EXPECT_EQ(MakeServiceTypeName(buffer, 8, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 8, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
@@ -254,5 +255,77 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
     filter.type = DiscoveryFilterType::kCommissioningMode;
     EXPECT_EQ(MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
+}
+
+TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
+{
+    char buffer[64];
+    char untouched[sizeof(buffer)];
+    memset(buffer, 'x', sizeof(buffer));
+    memset(untouched, 'x', sizeof(untouched));
+
+    EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(memcmp(buffer, untouched, sizeof(buffer)), 0);
+
+    const uint8_t mac[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
+    EXPECT_SUCCESS(MakeHostName(buffer, sizeof(buffer), ByteSpan(mac)));
+    EXPECT_STREQ(buffer, "001122334455");
+}
+
+TEST(TestServiceNaming, TestMakeServiceSubtypeEmptyInstanceName)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+    filter.type = DiscoveryFilterType::kInstanceName;
+
+    filter.instanceName = nullptr;
+    EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_ERROR_INVALID_ARGUMENT);
+
+    filter.instanceName = "";
+    EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestServiceNaming, TestMakeServiceTypeNameRejectsInstanceName)
+{
+    char buffer[kMaxOperationalServiceNameSize];
+    DiscoveryFilter filter(DiscoveryFilterType::kInstanceName, "2906C908D115D362-8FC7772401CD0696");
+
+    EXPECT_EQ(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+    filter.type = DiscoveryFilterType::kCommissioningMode;
+
+    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18.
+    constexpr size_t kRequired = 18;
+    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired - 1, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    EXPECT_SUCCESS(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode));
+    EXPECT_STREQ(buffer, "_CM._sub._matterc");
+}
+
+TEST(TestServiceNaming, TestZeroLengthDestination)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+
+    // bufferLen == 0 leaves no room even for the null terminator.
+    filter.type = DiscoveryFilterType::kNone;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    filter.type = DiscoveryFilterType::kCommissioningMode;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    filter.type = DiscoveryFilterType::kLongDiscriminator;
+    filter.code = 0xFFF;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    EXPECT_EQ(MakeHostName(buffer, 0, ByteSpan()), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 } // namespace

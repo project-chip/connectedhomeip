@@ -22,6 +22,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <inttypes.h>
 #include <string.h>
@@ -89,6 +90,7 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64)
 {
     VerifyOrReturnError(bufferLen >= macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(!macOrEui64.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     int idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)
@@ -98,112 +100,96 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
+namespace {
+
+CHIP_ERROR AddServiceSubtype(StringBuilderBase & builder, const DiscoveryFilter & filter)
 {
-    int requiredSize;
-    switch (subtype.type)
+    switch (filter.type)
     {
     case DiscoveryFilterType::kShortDiscriminator:
         // 4-bit number
-        if (subtype.code >= 1 << 4)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_S%u", static_cast<uint16_t>(subtype.code));
+        VerifyOrReturnError(filter.code < (1 << 4), CHIP_ERROR_INVALID_ARGUMENT);
+        builder.AddFormat("_S%u", static_cast<uint16_t>(filter.code));
         break;
     case DiscoveryFilterType::kLongDiscriminator:
         // 12-bit number
-        if (subtype.code >= 1 << 12)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_L%u", static_cast<uint16_t>(subtype.code));
+        VerifyOrReturnError(filter.code < (1 << 12), CHIP_ERROR_INVALID_ARGUMENT);
+        builder.AddFormat("_L%u", static_cast<uint16_t>(filter.code));
         break;
     case DiscoveryFilterType::kVendorId:
-        if (subtype.code >= 1 << 16)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_V%u", static_cast<uint16_t>(subtype.code));
+        VerifyOrReturnError(filter.code < (1 << 16), CHIP_ERROR_INVALID_ARGUMENT);
+        builder.AddFormat("_V%u", static_cast<uint16_t>(filter.code));
         break;
     case DiscoveryFilterType::kDeviceType:
-        requiredSize = snprintf(buffer, bufferLen, "_T%" PRIu32, static_cast<uint32_t>(subtype.code));
+        builder.AddFormat("_T%" PRIu32, static_cast<uint32_t>(filter.code));
         break;
     case DiscoveryFilterType::kCommissioningMode:
-        requiredSize = snprintf(buffer, bufferLen, "_CM");
+        builder.Add("_CM");
         break;
     case DiscoveryFilterType::kCommissioner:
-        if (subtype.code > 1)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_D%u", static_cast<uint16_t>(subtype.code));
+        VerifyOrReturnError(filter.code <= 1, CHIP_ERROR_INVALID_ARGUMENT);
+        builder.AddFormat("_D%u", static_cast<uint16_t>(filter.code));
         break;
     case DiscoveryFilterType::kCompressedFabricId:
-        // Make sure the "_I" prefix (2 chars + null) fits before writing it and offsetting past it;
-        // Uint64ToHex validates that the remaining space holds the hex-encoded fabric id.
-        VerifyOrReturnError(bufferLen >= 3, CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buffer, "_I");
-        return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2, Encoding::HexFlags::kUppercaseAndNullTerminate);
+        builder.AddFormat("_I%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(filter.code >> 32),
+                          static_cast<uint32_t>(filter.code));
+        break;
     case DiscoveryFilterType::kInstanceName:
-        requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
+        VerifyOrReturnError(filter.instanceName != nullptr && filter.instanceName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
+        builder.Add(filter.instanceName);
         break;
     case DiscoveryFilterType::kNone:
-        requiredSize = 0;
-        buffer[0]    = '\0';
         break;
     }
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
+CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
+{
+    // StringBuilderBase requires a non-empty buffer.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    StringBuilderBase builder(buffer, bufferLen);
+    ReturnErrorOnFailure(AddServiceSubtype(builder, subtype));
+
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
-    int requiredSize;
-    if (nameDesc.type == DiscoveryFilterType::kNone)
+    // StringBuilderBase requires a non-empty buffer.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(nameDesc.type != DiscoveryFilterType::kInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const char * serviceName;
+    switch (type)
     {
-        if (type == DiscoveryType::kCommissionableNode)
-        {
-            requiredSize = snprintf(buffer, bufferLen, kCommissionableServiceName);
-        }
-        else if (type == DiscoveryType::kCommissionerNode)
-        {
-            requiredSize = snprintf(buffer, bufferLen, kCommissionerServiceName);
-        }
-        else if (type == DiscoveryType::kOperational)
-        {
-            requiredSize = snprintf(buffer, bufferLen, kOperationalServiceName);
-        }
-        else
-        {
-            return CHIP_ERROR_NOT_IMPLEMENTED;
-        }
-    }
-    else
-    {
-        ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
-        size_t subtypeLen = strlen(buffer);
-        if (type == DiscoveryType::kCommissionableNode)
-        {
-            requiredSize = snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart,
-                                    kCommissionableServiceName);
-        }
-        else if (type == DiscoveryType::kCommissionerNode)
-        {
-            requiredSize =
-                snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionerServiceName);
-        }
-        else if (type == DiscoveryType::kOperational)
-        {
-            requiredSize =
-                snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kOperationalServiceName);
-        }
-        else
-        {
-            return CHIP_ERROR_NOT_IMPLEMENTED;
-        }
+    case DiscoveryType::kCommissionableNode:
+        serviceName = kCommissionableServiceName;
+        break;
+    case DiscoveryType::kCommissionerNode:
+        serviceName = kCommissionerServiceName;
+        break;
+    case DiscoveryType::kOperational:
+        serviceName = kOperationalServiceName;
+        break;
+    default:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    StringBuilderBase builder(buffer, bufferLen);
+    if (nameDesc.type != DiscoveryFilterType::kNone)
+    {
+        ReturnErrorOnFailure(AddServiceSubtype(builder, nameDesc));
+        builder.Add(".").Add(kSubtypeServiceNamePart).Add(".");
+    }
+    builder.Add(serviceName);
+
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Dnssd

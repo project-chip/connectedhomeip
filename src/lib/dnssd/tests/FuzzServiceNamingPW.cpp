@@ -37,9 +37,9 @@
  *          it with MakeInstanceName and extracting again yields the same PeerId.
  */
 
-#include <array>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -69,8 +69,6 @@ void EnsureInitialized()
     (void) sInitialized;
 }
 
-// Buffers are deliberately larger than the documented maxima so an overrun would
-// land in the guard area rather than in an adjacent object.
 constexpr size_t kNameBufferSize = 128;
 
 // Instance labels. The accepted form is <compressedFabricId>-<nodeId>, both as
@@ -171,30 +169,20 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
 {
     EnsureInitialized();
 
-    // One byte upwards. That is small enough to drive every truncation path while
-    // staying within the lengths the builders are documented for; a zero-length
-    // destination is not a length any caller in the tree passes.
-    const size_t bufferLen = 1 + (bufferLenSel % kNameBufferSize);
+    const size_t bufferLen = bufferLenSel % (kNameBufferSize + 1);
 
-    std::array<char, kNameBufferSize> buffer;
+    // Exactly bufferLen bytes, so ASan reports any write past the length the builder was given.
+    const std::unique_ptr<char[]> buffer(new char[bufferLen]);
 
     {
-        buffer.fill('\xAB');
+        memset(buffer.get(), 0xAB, bufferLen);
         const PeerId peerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
-        CheckBuilderResult(MakeInstanceName(buffer.data(), bufferLen, peerId), buffer.data(), bufferLen);
+        CheckBuilderResult(MakeInstanceName(buffer.get(), bufferLen, peerId), buffer.get(), bufferLen);
     }
 
     {
-        buffer.fill('\xAB');
-        const CHIP_ERROR err = MakeHostName(buffer.data(), bufferLen, ByteSpan(mac.data(), mac.size()));
-        // MakeHostName writes one hex pair per input byte, so an empty span
-        // leaves the destination exactly as it found it. Empty spans are still
-        // passed through to cover that path, but the termination check only
-        // applies where the builder was asked to write something.
-        if (!mac.empty())
-        {
-            CheckBuilderResult(err, buffer.data(), bufferLen);
-        }
+        memset(buffer.get(), 0xAB, bufferLen);
+        CheckBuilderResult(MakeHostName(buffer.get(), bufferLen, ByteSpan(mac.data(), mac.size())), buffer.get(), bufferLen);
     }
 
     // kCompressedFabricId is the last enumerator, so the count is one past it.
@@ -208,14 +196,14 @@ void BuildNamesNoCorruption(uint64_t compressedFabricId, uint64_t nodeId, const 
     filter.instanceName = (filter.type == DiscoveryFilterType::kInstanceName) ? filterInstanceName.c_str() : nullptr;
 
     {
-        buffer.fill('\xAB');
-        CheckBuilderResult(MakeServiceSubtype(buffer.data(), bufferLen, filter), buffer.data(), bufferLen);
+        memset(buffer.get(), 0xAB, bufferLen);
+        CheckBuilderResult(MakeServiceSubtype(buffer.get(), bufferLen, filter), buffer.get(), bufferLen);
     }
 
     {
-        buffer.fill('\xAB');
+        memset(buffer.get(), 0xAB, bufferLen);
         const DiscoveryType type = static_cast<DiscoveryType>(discoveryTypeSel % kDiscoveryTypeCount);
-        CheckBuilderResult(MakeServiceTypeName(buffer.data(), bufferLen, filter, type), buffer.data(), bufferLen);
+        CheckBuilderResult(MakeServiceTypeName(buffer.get(), bufferLen, filter, type), buffer.get(), bufferLen);
     }
 }
 
