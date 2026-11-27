@@ -155,7 +155,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
-    async def _wait_for_idle_after_software_update(self, controller:ChipDeviceCtrl.ChipDeviceController, requestor_node_id:int, step_number:str):
+    async def _wait_for_idle_after_software_update(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, step_number: str):
         """Waits for DUT UpdateState reach kIdle after the DUT is on kApplying state.
         Fails if is not able to reach the state in the exected timeout.
 
@@ -176,7 +176,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                     controller,
                     requestor_node_id,
                     self.get_endpoint(),
-                    Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,    
+                    Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
                 )
                 if update_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
                     logger.info("%s - kIdle value found for UpdteState.")
