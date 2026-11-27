@@ -78,8 +78,8 @@
 #endif
 #endif // CONFIG_ENABLE_PW_RPC
 
-#if defined(CONFIG_NXP_USE_LOW_POWER) && CONFIG_NXP_USE_LOW_POWER && \
-    (defined(RW612_SERIES) || defined(RW610_SERIES)) && !STREAMER_UART_USE_DMA
+#if defined(CONFIG_NXP_USE_LOW_POWER) && CONFIG_NXP_USE_LOW_POWER && (defined(RW612_SERIES) || defined(RW610_SERIES)) &&           \
+    !STREAMER_UART_USE_DMA
 #define STREAMER_UART_LOW_POWER 1
 #include "fsl_pm_core.h"
 #include "fsl_usart.h"
@@ -143,11 +143,10 @@ static const serial_manager_config_t s_serialManagerConfig = {
 OSA_MUTEX_HANDLE_DEFINE(streamerMutex);
 
 #if STREAMER_UART_LOW_POWER
-static bool s_streamerLowPowerEntered   = false;
+static bool s_streamerLowPowerEntered            = false;
 static USART_Type * const s_streamerUsartBases[] = USART_BASE_PTRS;
 
-static status_t StreamerLowPowerCallback(pm_event_type_t eventType,
-                                        uint8_t powerState, void * data)
+static status_t StreamerLowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data)
 {
     (void) data;
 
@@ -164,34 +163,30 @@ static status_t StreamerLowPowerCallback(pm_event_type_t eventType,
          * is still active; the idle path can retry after TX completes.
          */
         if ((txCount != 0) ||
-            ((USART_GetStatusFlags(s_streamerUsartBases[uartConfig.instance]) &
-              static_cast<uint32_t>(kUSART_TxIdleFlag)) == 0U))
+            ((USART_GetStatusFlags(s_streamerUsartBases[uartConfig.instance]) & static_cast<uint32_t>(kUSART_TxIdleFlag)) == 0U))
         {
             return kStatus_Fail;
         }
 
-        if (SerialManager_EnterLowpower(streamerSerialHandle) !=
-            kStatus_SerialManager_Success)
+        if (SerialManager_EnterLowpower(streamerSerialHandle) != kStatus_SerialManager_Success)
         {
             return kStatus_Fail;
         }
 
         s_streamerLowPowerEntered = true;
     }
-    else if ((eventType == kPM_EventExitingSleep) &&
-             s_streamerLowPowerEntered)
+    else if ((eventType == kPM_EventExitingSleep) && s_streamerLowPowerEntered)
     {
         /*
          * Group2 has already restored board clocks and pins.
          * Restore the CLI-specific clock before restoring its UART.
          */
 #if defined(RW612_SERIES) || defined(RW610_SERIES)
-    /* attach FRG3 clock to FLEXCOMM3 */
+        /* attach FRG3 clock to FLEXCOMM3 */
         BOARD_CLIAttachClk();
 #endif
 
-        serial_manager_status_t status =
-            SerialManager_ExitLowpower(streamerSerialHandle);
+        serial_manager_status_t status = SerialManager_ExitLowpower(streamerSerialHandle);
 
         assert(status == kStatus_SerialManager_Success);
         if (status != kStatus_SerialManager_Success)

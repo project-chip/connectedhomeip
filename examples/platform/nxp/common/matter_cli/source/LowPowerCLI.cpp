@@ -20,10 +20,10 @@
 
 #include <cstdint>
 #include <cstring>
-#include <limits>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
+#include <limits>
 
 namespace chip::NXP::App {
 
@@ -35,14 +35,15 @@ constexpr uint32_t kDefaultDurationMs = std::numeric_limits<uint32_t>::max();
 
 void PrintLowPowerUsage()
 {
-    streamer_printf(streamer_get(), "Usage:\r\n"
-                                    "  lowpower help\r\n"
-                                    "  lowpower enable <mode> [duration_ms]\r\n"
-                                    "Modes depend on the platform backend. RW61x supports 1..3:\r\n"
-                                    "  1: Sleep, 2: DeepSleep, 3: PowerDown\r\n"
-                                    "Duration is in milliseconds (default: 4294967295 ms).\r\n"
-                                    "Minimum duration: one OS tick.\r\n"
-                                    "Example: lowpower enable 2 5000\r\n");
+    streamer_printf(streamer_get(),
+                    "Usage:\r\n"
+                    "  lowpower help\r\n"
+                    "  lowpower enable <mode> [duration_ms]\r\n"
+                    "Modes depend on the platform backend. RW61x supports 1..3:\r\n"
+                    "  1: Sleep, 2: DeepSleep, 3: PowerDown\r\n"
+                    "Duration is in milliseconds (default: 4294967295 ms).\r\n"
+                    "Minimum duration: one OS tick.\r\n"
+                    "Example: lowpower enable 2 5000\r\n");
 }
 
 CHIP_ERROR LowPowerCommand(int argc, char * argv[])
@@ -61,11 +62,10 @@ CHIP_ERROR LowPowerCommand(int argc, char * argv[])
 
     uint32_t mode       = 0;
     uint32_t durationMs = kDefaultDurationMs;
-    if (argv[1] == nullptr || argv[1][0] < '0' || argv[1][0] > '9' ||
-        !ArgParser::ParseInt(argv[1], mode, 10) || mode > std::numeric_limits<uint8_t>::max() ||
+    if (argv[1] == nullptr || argv[1][0] < '0' || argv[1][0] > '9' || !ArgParser::ParseInt(argv[1], mode, 10) ||
+        mode > std::numeric_limits<uint8_t>::max() ||
         (argc == 3 &&
-         (argv[2] == nullptr || argv[2][0] < '0' || argv[2][0] > '9' ||
-          !ArgParser::ParseInt(argv[2], durationMs, 10))))
+         (argv[2] == nullptr || argv[2][0] < '0' || argv[2][0] > '9' || !ArgParser::ParseInt(argv[2], durationMs, 10))))
     {
         PrintLowPowerUsage();
         return CHIP_ERROR_INVALID_ARGUMENT;

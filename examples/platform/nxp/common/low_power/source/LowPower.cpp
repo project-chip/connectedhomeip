@@ -31,9 +31,9 @@ extern "C" {
 
 #if CONFIG_APP_FREERTOS_OS && CONFIG_CHIP_NXP_PLATFORM_RW61X && CONFIG_NXP_USE_LOW_POWER
 #include "FreeRTOS.h"
+#include "PWR_Interface.h"
 #include "task.h"
 #include "timers.h"
-#include "PWR_Interface.h"
 
 #endif
 
@@ -86,8 +86,8 @@ constexpr uint32_t kDefaultEnableDurationMs = 10000U;
 // Matches the default constraint established by APP_InitServices()
 // during HardwareInit(), before the scheduler starts.
 PWR_LowpowerMode_t sCurrentMode = PWR_WFI;
-bool sTimedModeActive          = false;
-TimerHandle_t sLpTimer         = nullptr;
+bool sTimedModeActive           = false;
+TimerHandle_t sLpTimer          = nullptr;
 
 // Callers must hold a FreeRTOS task critical section.
 CHIP_ERROR ConfigureNextLowPowerMode(PWR_LowpowerMode_t nextMode, uint32_t timeMs)
@@ -98,9 +98,8 @@ CHIP_ERROR ConfigureNextLowPowerMode(PWR_LowpowerMode_t nextMode, uint32_t timeM
 
         // A successful period change also starts the timer. Queue the recovery
         // timer before releasing the current constraint.
-        VerifyOrReturnError(
-            xTimerChangePeriod(sLpTimer, static_cast<TickType_t>(timeMs / portTICK_PERIOD_MS), 0) == pdPASS,
-            CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(xTimerChangePeriod(sLpTimer, static_cast<TickType_t>(timeMs / portTICK_PERIOD_MS), 0) == pdPASS,
+                            CHIP_ERROR_INTERNAL);
     }
 
     (void) PWR_ReleaseLowPowerModeConstraint(sCurrentMode);
@@ -123,9 +122,8 @@ CHIP_ERROR CreateLowPowerTimer()
 {
     if (!sLpTimer)
     {
-        sLpTimer = xTimerCreate("LP timer",
-                               static_cast<TickType_t>(kDefaultEnableDurationMs / portTICK_PERIOD_MS),
-                               pdFALSE, nullptr, &LowPowerTimerCallback);
+        sLpTimer = xTimerCreate("LP timer", static_cast<TickType_t>(kDefaultEnableDurationMs / portTICK_PERIOD_MS), pdFALSE,
+                                nullptr, &LowPowerTimerCallback);
         if (!sLpTimer)
         {
             ChipLogError(AppServer, "Failed to create low-power timer");
@@ -155,8 +153,7 @@ CHIP_ERROR Init()
 CHIP_ERROR StartTimedMode(uint8_t mode, uint32_t durationMs)
 {
     // WFI is restored by the timer; DeepPowerDown powers off the radio firmwares.
-    VerifyOrReturnError(mode >= PWR_Sleep && mode <= PWR_PowerDown &&
-                            durationMs >= portTICK_PERIOD_MS,
+    VerifyOrReturnError(mode >= PWR_Sleep && mode <= PWR_PowerDown && durationMs >= portTICK_PERIOD_MS,
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sLpTimer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -171,7 +168,7 @@ CHIP_ERROR StartTimedMode(uint8_t mode, uint32_t durationMs)
         // Publish the state before arming the timer. Keep the timer callback
         // from running until the constraint transition is complete.
         sTimedModeActive = true;
-        err = ConfigureNextLowPowerMode(static_cast<PWR_LowpowerMode_t>(mode), durationMs);
+        err              = ConfigureNextLowPowerMode(static_cast<PWR_LowpowerMode_t>(mode), durationMs);
         if (err != CHIP_NO_ERROR)
         {
             // The current constraint is unchanged if timer submission fails.
