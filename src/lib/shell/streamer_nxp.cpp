@@ -78,6 +78,16 @@
 #endif
 #endif // CONFIG_ENABLE_PW_RPC
 
+#if defined(CONFIG_NXP_USE_LOW_POWER) && CONFIG_NXP_USE_LOW_POWER && \
+    (defined(RW612_SERIES) || defined(RW610_SERIES)) && !STREAMER_UART_USE_DMA
+#define STREAMER_UART_LOW_POWER 1
+#include "fsl_pm_core.h"
+#include "fsl_usart.h"
+#include "fwk_platform_lowpower.h"
+#else
+#define STREAMER_UART_LOW_POWER 0
+#endif
+
 #if STREAMER_UART_USE_DMA
 typedef serial_port_uart_dma_config_t streamer_serial_port_uart_config_t;
 #else
@@ -131,6 +141,76 @@ static const serial_manager_config_t s_serialManagerConfig = {
 };
 
 OSA_MUTEX_HANDLE_DEFINE(streamerMutex);
+
+#if STREAMER_UART_LOW_POWER
+static bool s_streamerLowPowerEntered   = false;
+static USART_Type * const s_streamerUsartBases[] = USART_BASE_PTRS;
+
+static status_t StreamerLowPowerCallback(pm_event_type_t eventType,
+                                        uint8_t powerState, void * data)
+{
+    (void) data;
+
+    if (powerState < PLATFORM_DEEP_SLEEP_STATE)
+    {
+        return kStatus_Success;
+    }
+
+    if (eventType == kPM_EventEnteringSleep)
+    {
+        /*
+         * Do not wait for task/IRQ-driven TX completion from a PM callback.
+         * Veto this sleep attempt while a write or the UART transmitter
+         * is still active; the idle path can retry after TX completes.
+         */
+        if ((txCount != 0) ||
+            ((USART_GetStatusFlags(s_streamerUsartBases[uartConfig.instance]) &
+              static_cast<uint32_t>(kUSART_TxIdleFlag)) == 0U))
+        {
+            return kStatus_Fail;
+        }
+
+        if (SerialManager_EnterLowpower(streamerSerialHandle) !=
+            kStatus_SerialManager_Success)
+        {
+            return kStatus_Fail;
+        }
+
+        s_streamerLowPowerEntered = true;
+    }
+    else if ((eventType == kPM_EventExitingSleep) &&
+             s_streamerLowPowerEntered)
+    {
+        /*
+         * Group2 has already restored board clocks and pins.
+         * Restore the CLI-specific clock before restoring its UART.
+         */
+#if defined(RW612_SERIES) || defined(RW610_SERIES)
+    /* attach FRG3 clock to FLEXCOMM3 */
+        BOARD_CLIAttachClk();
+#endif
+
+        serial_manager_status_t status =
+            SerialManager_ExitLowpower(streamerSerialHandle);
+
+        assert(status == kStatus_SerialManager_Success);
+        if (status != kStatus_SerialManager_Success)
+        {
+            return kStatus_Fail;
+        }
+
+        s_streamerLowPowerEntered = false;
+    }
+
+    return kStatus_Success;
+}
+
+static pm_notify_element_t s_streamerPmNotify = {
+    .link           = {},
+    .notifyCallback = StreamerLowPowerCallback,
+    .data           = nullptr,
+};
+#endif
 
 /* -------------------------------------------------------------------------- */
 /*                              Public functions                              */
@@ -187,6 +267,28 @@ int streamer_nxp_init(streamer_t * streamer)
 
     osa_status_t status_osa = OSA_MutexCreate((osa_mutex_handle_t) streamerMutex);
     assert(status_osa == KOSA_StatusSuccess);
+
+#if STREAMER_UART_LOW_POWER
+    if ((status == kStatus_SerialManager_Success) && (status_osa == KOSA_StatusSuccess))
+    {
+        status_t pmStatus = kStatus_Success;
+
+        OSA_InterruptDisable();
+
+        /*
+         * Entry: Group1 runs before the board Group2 callback.
+         * Exit:  Group1 runs after the board Group2 callback.
+         */
+        pmStatus = PM_RegisterNotify(kPM_NotifyGroup1, &s_streamerPmNotify);
+
+        OSA_InterruptEnable();
+
+        if (pmStatus != kStatus_Success)
+        {
+            return kStatus_SerialManager_Error;
+        }
+    }
+#endif
 
     return status;
 }

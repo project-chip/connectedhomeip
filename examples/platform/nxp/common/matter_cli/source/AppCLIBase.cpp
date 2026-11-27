@@ -18,6 +18,9 @@
 
 #include "AppCLIBase.h"
 #include "AppTaskBase.h"
+#if CONFIG_APP_FREERTOS_OS && CONFIG_CHIP_NXP_PLATFORM_RW61X && CONFIG_NXP_USE_LOW_POWER
+#include "LowPowerCLI.h"
+#endif
 #include <ChipShellCollection.h>
 #include <app/server/Server.h>
 #include <cstring>
@@ -84,6 +87,9 @@ void chip::NXP::App::AppCLIBase::RegisterDefaultCommands(void)
     /* Register common shell commands */
     cmd_misc_init();
     cmd_otcli_init();
+#if CONFIG_APP_FREERTOS_OS && CONFIG_CHIP_NXP_PLATFORM_RW61X && CONFIG_NXP_USE_LOW_POWER
+    cmd_lowpower_init();
+#endif
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif /* CHIP_SHELL_ENABLE_CMD_SERVER */

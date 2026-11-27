@@ -26,6 +26,7 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_USE_ZEPHYR_BLE
 #include <sys/atomic.h>
+#include <system/SystemPacketBuffer.h>
 #include <toolchain.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #endif
