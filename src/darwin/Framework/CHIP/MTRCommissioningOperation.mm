@@ -43,6 +43,13 @@ using namespace chip::Tracing::DarwinFramework;
 @interface MTRCommissioningOperation () <MTRDeviceControllerDelegate_Internal>
 @end
 
+#ifdef DEBUG
+// Declaring the selector so the compiler doesn't complain about testing for and calling it.
+@protocol MTRCommissioningOperationUnitTestDelegate <MTRCommissioningDelegate>
+- (void)unitTestCommissioningOperationWillEndWithError:(MTRCommissioningOperation *)commissioning;
+@end
+#endif
+
 @implementation MTRCommissioningOperation {
     MTRCommissioningParameters * _parameters;
     NSNumber * _commissioningID;
@@ -213,6 +220,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     MTR_LOG("%@ Device commissioning failed with controller %@ metrics %@", self, strongController, metrics);
 
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
+
+#ifdef DEBUG
+    if ([strongDelegate respondsToSelector:@selector(unitTestCommissioningOperationWillEndWithError:)]) {
+        [static_cast<id>(strongDelegate) unitTestCommissioningOperationWillEndWithError:self];
+    }
+#endif
 
     // Null out the delegate, so we don't notify based on any internal cleanups
     // we happen to do.
