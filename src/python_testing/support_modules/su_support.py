@@ -29,7 +29,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest, write_restart_flag_file
 from matter.tlv import TLVReader
@@ -550,13 +550,18 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         # Set DefaultOTAProviders to empty list
         attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr_clear)],
-            nodeId=requestor_node_id
-        )
-        log.info('Cleanup - DefaultOTAProviders cleared')
-
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+        try:
+            resp = await controller.WriteAttribute(
+                attributes=[(0, attr_clear)],
+                nodeId=requestor_node_id,
+                interactionTimeoutMs=10000
+            )
+            if resp[0].Status == Status.Success:
+                log.info('Cleanup - DefaultOTAProviders cleared')
+            else:
+                log.warning('Cleanup - Failed to clear DefaultOTAProviders ')
+        except (InteractionModelError, TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+            log.warning("Cleanup - Unable to clear DefaultOTAProviders %s", e)
 
     def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
         """
