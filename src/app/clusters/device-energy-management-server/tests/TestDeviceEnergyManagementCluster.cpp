@@ -460,6 +460,11 @@ TEST_F(TestDeviceEnergyManagementCluster, TestGeneratePowerAdjustEvents)
     EXPECT_EQ(decoded.energyUse, 1234);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // No event is generated after Shutdown.
+    cluster.GenerateEvent(Events::PowerAdjustStart::Type{});
+    cluster.GenerateEvent(endEvent);
+    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
 }
 
 // =============================================================================
