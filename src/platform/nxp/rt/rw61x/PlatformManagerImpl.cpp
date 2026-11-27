@@ -35,6 +35,10 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <stdlib.h>
 
+#if CONFIG_NXP_USE_LOW_POWER && CONFIG_CHIP_NXP_PLATFORM_RW61X
+extern "C" void APP_InitServices(void);
+#endif
+
 #include <lwip/tcpip.h>
 
 #if CONFIG_CHIP_CRYPTO_PSA
@@ -125,6 +129,11 @@ void PlatformManagerImpl::HardwareInit(void)
 {
     BOARD_InitHardware();
     SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
+
+#if CONFIG_NXP_USE_LOW_POWER && CONFIG_CHIP_NXP_PLATFORM_RW61X
+    // Establish the default WFI constraint before the scheduler starts.
+    APP_InitServices();
+#endif
 }
 
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)

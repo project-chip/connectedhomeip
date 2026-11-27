@@ -426,6 +426,17 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     switch (wlanEvent)
     {
     case WLAN_REASON_SUCCESS:
+#if CONFIG_CHIP_NXP_PLATFORM_RW61X && CONFIG_NXP_USE_LOW_POWER
+    {
+        constexpr t_u32 kDefaultWakeupConditions = WAKE_ON_UNICAST | WAKE_ON_MAC_EVENT | WAKE_ON_MULTICAST | WAKE_ON_ARP_BROADCAST;
+
+        const int status = wlan_wowlan_config(kDefaultWakeupConditions);
+        if (status != WM_SUCCESS)
+        {
+            ChipLogError(DeviceLayer, "Failed to configure Matter Wi-Fi wakeup conditions: %d", status);
+        }
+    }
+#endif
         ChipLogProgress(DeviceLayer, "Connected to WLAN network = %d", is_sta_ipv6_connected());
         if (sInstance._GetWiFiStationState() != kWiFiStationState_Connected)
         {

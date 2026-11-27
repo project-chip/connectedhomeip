@@ -153,6 +153,22 @@ if (CONFIG_CHIP_APP_LOW_POWER)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/low_power/include
     )
+    if (CONFIG_APP_FREERTOS_OS)
+        if (CONFIG_CHIP_NXP_PLATFORM_RW61X AND CONFIG_NXP_USE_LOW_POWER)
+            # FreeRTOS tickless idle hook (vPortSuppressTicksAndSleep). Added as an app
+            # source (standalone object) so that it overrides the weak default provided by
+            # the FreeRTOS port, which is archived in the same static library otherwise.
+            target_sources(app PRIVATE
+                ${NXP_MATTER_SUPPORT_DIR}/examples/platform/common/low_power/freertos_lp_hooks.c
+            )
+
+            # Link the strong PWR systick implementations directly into the app
+            # to override the weak defaults without relying on SDK archive order.
+            target_sources(app PRIVATE
+                ${SdkRootDirPath}/middleware/wireless/framework/services/LowPower/PWR_systicks.c
+            )
+        endif()
+    endif()
 endif()
 
 # Button module empty would be chosen in case the app does not support button.
@@ -219,6 +235,13 @@ if (CONFIG_CHIP_APP_CLI)
     else()
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIZephyr.cpp
+        )
+    endif()
+
+    if (CONFIG_APP_FREERTOS_OS AND CONFIG_CHIP_NXP_PLATFORM_RW61X AND CONFIG_NXP_USE_LOW_POWER)
+        # Native Matter shell command backed by the common application LowPower module.
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/LowPowerCLI.cpp
         )
     endif()
 endif()
