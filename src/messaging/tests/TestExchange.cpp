@@ -286,6 +286,41 @@ TEST_F(TestExchange, LateAckForGivenUpMessageIsRecognized)
     EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
 }
 
+TEST_F(TestExchange, LateAckAfterRetransmitSendFailureIsRecognized)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    // Retransmit quickly.
+    ec->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+        SessionParameters(ReliableMessageProtocolConfig(System::Clock::Milliseconds32(50), System::Clock::Milliseconds32(50))));
+
+    // The first transmission goes out (and is lost); the retransmission then
+    // fails with an error that is not transient, so MRP stops retransmitting.
+    auto & loopback                         = GetLoopback();
+    loopback.mNumMessagesToDrop             = 1;
+    loopback.mNumMessagesToAllowBeforeError = 1;
+    loopback.mMessageSendError              = CHIP_ERROR_INTERNAL;
+    auto resetLoopback                      = ScopeExit([&]() { loopback.Reset(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    auto * mrpMgr = GetExchangeManager().GetReliableMessageMgr();
+    uint32_t messageCounter;
+    ASSERT_TRUE(mrpMgr->TestGetRetransMessageCounter(ec->GetReliableMessageContext(), messageCounter));
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return mrpMgr->TestGetCountRetransTable() == 0; });
+    ASSERT_EQ(mrpMgr->TestGetCountRetransTable(), 0);
+    ASSERT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    // The first transmission did reach the peer after all; its ack arrives late.
+    Testing::ReliableMessageContextTestAccess(ec->GetReliableMessageContext()).ReceiveAck(messageCounter);
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
 TEST_F(TestExchange, LateAckForOtherMessageIsIgnored)
 {
     MockExchangeDelegate delegate;

@@ -422,6 +422,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
                      err.Format(), entry->retainedBuf.GetMessageCounter(), ChipLogValueExchange(&entry->ec.Get()),
                      entry->sendCount);
 
+        entry->ec->NoteGivenUpMessage(entry->retainedBuf.GetMessageCounter());
         ClearRetransTable(*entry);
     }
     return err;
