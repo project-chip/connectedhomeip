@@ -26,6 +26,14 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <limits>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+
+#if CHIP_CRYPTO_KEYSTORE_PSA
+#include <psa/crypto.h>
+#endif
+
 namespace {
 // FabricIndex is uint8_t, the tlv size with anonymous tag is 1(control bytes) + 1(value) = 2
 constexpr size_t kFabricIndexTlvSize = 2;
@@ -285,6 +293,36 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         VerifyOrReturnError(hmacBuf.size() == Crypto::Hmac128KeyHandle::Size(), CHIP_ERROR_INTERNAL);
         memcpy(clientInfo.hmac_key_handle.OpaqueBytes().data(), hmacBuf.data(), Crypto::Hmac128KeyHandle::Size());
 
+#if CHIP_CRYPTO_KEYSTORE_PSA
+        {
+            auto validateKey = [](Crypto::Symmetric128BitsKeyHandle & handle, psa_key_type_t expectedType) -> CHIP_ERROR {
+                psa_key_id_t id = handle.As<psa_key_id_t>();
+                if (id == PSA_KEY_ID_NULL)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
+                psa_status_t status        = psa_get_key_attributes(id, &attrs);
+                if (status == PSA_ERROR_INVALID_HANDLE || status == PSA_ERROR_DOES_NOT_EXIST)
+                {
+                    handle.AsMutable<psa_key_id_t>() = PSA_KEY_ID_NULL;
+                    return CHIP_NO_ERROR;
+                }
+                VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+                bool valid =
+                    !PSA_KEY_LIFETIME_IS_VOLATILE(psa_get_key_lifetime(&attrs)) && (psa_get_key_type(&attrs) == expectedType);
+                psa_reset_key_attributes(&attrs);
+                if (!valid)
+                {
+                    handle.AsMutable<psa_key_id_t>() = PSA_KEY_ID_NULL;
+                }
+                return CHIP_NO_ERROR;
+            };
+            ReturnErrorOnFailure(validateKey(clientInfo.aes_key_handle, PSA_KEY_TYPE_AES));
+            ReturnErrorOnFailure(validateKey(clientInfo.hmac_key_handle, PSA_KEY_TYPE_HMAC));
+        }
+#endif
+
         // ClientType
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kClientType)));
         ReturnErrorOnFailure(reader.Get(clientInfo.client_type));
@@ -309,14 +347,29 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    // TODO : Update key lifetime once creaKey method supports it.
     ReturnErrorOnFailure(mpKeyStore->CreateKey(keyMaterial, clientInfo.aes_key_handle));
     CHIP_ERROR err = mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
     if (err != CHIP_NO_ERROR)
     {
         mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+        return err;
     }
-    return err;
+
+    err = mpKeyStore->PersistICDKey(clientInfo.aes_key_handle);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpKeyStore->DestroyKey(clientInfo.hmac_key_handle);
+        return err;
+    }
+
+    err = mpKeyStore->PersistICDKey(clientInfo.hmac_key_handle);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
@@ -366,11 +419,15 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
     size_t clientInfoSize = MaxICDClientInfoSize();
     ReturnErrorOnFailure(Load(clientInfo.peer_node.GetFabricIndex(), clientInfoVector, clientInfoSize));
 
+    bool replacedEntry = false;
+    ICDClientInfo oldEntry;
+
     for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
         if (clientInfo.peer_node.GetNodeId() == it->peer_node.GetNodeId())
         {
-            ReturnErrorOnFailure(DecreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex()));
+            oldEntry      = *it;
+            replacedEntry = true;
             clientInfoVector.erase(it);
             break;
         }
@@ -387,11 +444,38 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     ReturnErrorOnFailure(writer.Finalize(backingBuffer));
-    ReturnErrorOnFailure(mpClientInfoStore->SyncSetKeyValue(
-        DefaultStorageKeyAllocator::ICDClientInfoKey(clientInfo.peer_node.GetFabricIndex()).KeyName(), backingBuffer.Get(),
-        static_cast<uint16_t>(len)));
 
-    ReturnErrorOnFailure(IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex()));
+    if (!replacedEntry)
+    {
+        ReturnErrorOnFailure(IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex()));
+    }
+
+    CHIP_ERROR err = mpClientInfoStore->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::ICDClientInfoKey(clientInfo.peer_node.GetFabricIndex()).KeyName(), backingBuffer.Get(),
+        static_cast<uint16_t>(len));
+    if (err != CHIP_NO_ERROR)
+    {
+        if (!replacedEntry)
+        {
+            (void) DecreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex());
+        }
+        return err;
+    }
+
+    if (replacedEntry)
+    {
+        if (memcmp(oldEntry.aes_key_handle.OpaqueBytes().data(), clientInfo.aes_key_handle.OpaqueBytes().data(),
+                   Crypto::Aes128KeyHandle::Size()) != 0)
+        {
+            mpKeyStore->DestroyKey(oldEntry.aes_key_handle);
+        }
+        if (memcmp(oldEntry.hmac_key_handle.OpaqueBytes().data(), clientInfo.hmac_key_handle.OpaqueBytes().data(),
+                   Crypto::Hmac128KeyHandle::Size()) != 0)
+        {
+            mpKeyStore->DestroyKey(oldEntry.hmac_key_handle);
+        }
+    }
+
     ChipLogProgress(ICD,
                     "Store ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId
                     " and checkin nodeId " ChipLogFormatScopedNodeId,
@@ -450,18 +534,20 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
     VerifyOrReturnError(clientInfoVector.size() > 0, CHIP_NO_ERROR);
 
+    bool found = false;
+    ICDClientInfo removedEntry;
     for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
         if (peerNode.GetNodeId() == it->peer_node.GetNodeId())
         {
-            RemoveKey(*it);
-            it = clientInfoVector.erase(it);
+            removedEntry = *it;
+            found        = true;
+            clientInfoVector.erase(it);
             break;
         }
     }
+    VerifyOrReturnError(found, CHIP_NO_ERROR);
 
-    ReturnErrorOnFailure(
-        mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName()));
     size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     VerifyOrReturnError(backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
@@ -477,6 +563,8 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
         mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(peerNode.GetFabricIndex()).KeyName(),
                                            backingBuffer.Get(), static_cast<uint16_t>(len)));
 
+    RemoveKey(removedEntry);
+
     ReturnErrorOnFailure(DecreaseEntryCountForFabric(peerNode.GetFabricIndex()));
     ChipLogProgress(ICD, "Remove ICD entry successfully with peer nodeId " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(peerNode));
@@ -491,12 +579,12 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     std::vector<ICDClientInfo> clientInfoVector;
     ReturnErrorOnFailure(Load(fabricIndex, clientInfoVector, clientInfoSize));
     IgnoreUnusedVariable(clientInfoSize);
+    ReturnErrorOnFailure(
+        mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
     for (auto & clientInfo : clientInfoVector)
     {
         RemoveKey(clientInfo);
     }
-    ReturnErrorOnFailure(
-        mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName()));
 

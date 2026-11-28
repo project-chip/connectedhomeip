@@ -263,10 +263,7 @@ chip_test_suite("tests") {
     ]
   }
 
-  # DefaultICDClientStorage assumes that raw AES key is used by the application
-  if (chip_crypto != "psa") {
-    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
-  }
+  test_sources += [ "TestDefaultICDClientStorage.cpp" ]
 
   if (chip_persist_subscriptions) {
     test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]

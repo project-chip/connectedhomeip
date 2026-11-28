@@ -47,11 +47,17 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
         ChipLogProgress(ICD, "RegisterClient command succeeded");
         CHIP_ERROR error;
 
-        // Update the ICDClientInfo with new key and start counter and store it to persistence
-        mICDClientInfo.start_icd_counter = dataResponse.ICDCounter;
-        mICDClientInfo.offset            = 0;
-        mpICDClientStorage->RemoveKey(mICDClientInfo);
-        error = mpICDClientStorage->SetKey(mICDClientInfo, mNewKey.Span());
+        // Stage the new key on a fresh ICDClientInfo so a SetKey/StoreEntry failure preserves the
+        // currently stored entry and keys; StoreEntry retires the replaced keys on commit.
+        ICDClientInfo updatedClientInfo;
+        updatedClientInfo.peer_node         = mICDClientInfo.peer_node;
+        updatedClientInfo.check_in_node     = mICDClientInfo.check_in_node;
+        updatedClientInfo.start_icd_counter = dataResponse.ICDCounter;
+        updatedClientInfo.offset            = 0;
+        updatedClientInfo.monitored_subject = mICDClientInfo.monitored_subject;
+        updatedClientInfo.client_type       = mICDClientInfo.client_type;
+
+        error = mpICDClientStorage->SetKey(updatedClientInfo, mNewKey.Span());
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(ICD, "Failed to set the new key after re-registration: %" CHIP_ERROR_FORMAT, error.Format());
@@ -59,13 +65,16 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
             return;
         }
 
-        error = mpICDClientStorage->StoreEntry(mICDClientInfo);
+        error = mpICDClientStorage->StoreEntry(updatedClientInfo);
         if (error != CHIP_NO_ERROR)
         {
+            mpICDClientStorage->RemoveKey(updatedClientInfo);
             ChipLogError(ICD, "Failed to store the new key after re-registration: %" CHIP_ERROR_FORMAT, error.Format());
             mpCheckInDelegate->OnKeyRefreshDone(this, error);
             return;
         }
+
+        mICDClientInfo = updatedClientInfo;
 
         mpCheckInDelegate->OnCheckInComplete(mICDClientInfo);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
