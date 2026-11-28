@@ -23,6 +23,7 @@
 
 #include "NetworkTestHelpers.h"
 
+#include <algorithm>
 #include <errno.h>
 
 #include <pw_unit_test/framework.h>
@@ -71,6 +72,29 @@ public:
         ReceiveHandlerCallCount++;
     }
 };
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+class PortUnreachableDelegate : public TransportMgrDelegate
+{
+public:
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * transCtxt = nullptr) override
+    {}
+
+    void OnPortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload) override
+    {
+        mCount++;
+        mPeer      = peer;
+        mQuotedLen = std::min(quotedPayload.size(), sizeof(mQuoted));
+        memcpy(mQuoted, quotedPayload.data(), mQuotedLen);
+    }
+
+    int mCount = 0;
+    Transport::PeerAddress mPeer;
+    uint8_t mQuoted[sizeof(PAYLOAD)];
+    size_t mQuotedLen = 0;
+};
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 } // namespace
 
@@ -177,3 +201,33 @@ TEST_F(TestUDP, CheckMessageTest6)
     IPAddress::FromString("::1", addr);
     CheckMessageTest(addr);
 }
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+TEST_F(TestUDP, PortUnreachableReachesTransportMgrDelegate)
+{
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+    auto params = Transport::UdpListenParameters(mIOContext->GetUDPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(0);
+
+    Transport::UDP closed;
+    ASSERT_EQ(closed.Init(params), CHIP_NO_ERROR);
+    const uint16_t closedPort = closed.GetBoundPort();
+    closed.Close();
+
+    Transport::UDP udp;
+    ASSERT_EQ(udp.Init(params), CHIP_NO_ERROR);
+    PortUnreachableDelegate delegate;
+    TransportMgrBase transportMgr;
+    transportMgr.SetSessionManager(&delegate);
+    ASSERT_SUCCESS(transportMgr.Init(&udp));
+
+    const auto peer = Transport::PeerAddress::UDP(addr, closedPort);
+    EXPECT_EQ(udp.SendMessage(peer, System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD))), CHIP_NO_ERROR);
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return delegate.mCount != 0; });
+
+    EXPECT_EQ(delegate.mCount, 1);
+    EXPECT_TRUE(delegate.mPeer == peer);
+    ASSERT_EQ(delegate.mQuotedLen, sizeof(PAYLOAD));
+    EXPECT_EQ(memcmp(delegate.mQuoted, PAYLOAD, sizeof(PAYLOAD)), 0);
+}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE

@@ -27,6 +27,7 @@
 #include <inet/TCPEndPoint.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -50,6 +51,12 @@ public:
     virtual ~RawTransportDelegate() {}
     virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                        MessageTransportContext * ctxt = nullptr) = 0;
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    /// @p peer reported its port unreachable. @p quotedPayload is the start of the UDP payload we sent it, valid only
+    /// during the call; the report is not authenticated.
+    virtual void HandlePortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload) {}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
@@ -126,6 +133,16 @@ protected:
     {
         mDelegate->HandleMessageReceived(source, std::move(buffer), ctxt);
     }
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    void HandlePortUnreachable(const PeerAddress & peer, ByteSpan quotedPayload)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->HandlePortUnreachable(peer, quotedPayload);
+        }
+    }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Handle an incoming connection request from a peer.
