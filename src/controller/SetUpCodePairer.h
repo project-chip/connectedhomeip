@@ -167,6 +167,7 @@ private:
                            const std::optional<SetupPayload> & setupPayload) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioneeReleased(NodeId deviceId, CHIP_ERROR reason) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     // Nfc::NFCReaderTransportDelegate implementation
