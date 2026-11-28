@@ -66,7 +66,10 @@ ALL_PLATFORMS = {
     'webos',
     'genio',
     'silabs_docker',
-    'unit_tests'
+    'unit_tests',
+    'cirque',
+    'imx',
+    'otns',
 }
 
 Module = namedtuple('Module', 'name path platforms recursive')
