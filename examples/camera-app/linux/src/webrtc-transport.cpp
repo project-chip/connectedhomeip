@@ -18,25 +18,7 @@
 
 #include "webrtc-abstract.h"
 #include <lib/support/logging/CHIPLogging.h>
-#include <rtc/rtc.hpp>
 #include <webrtc-transport.h>
-
-SDPType RtcTypeToSDPType(rtc::Description::Type type)
-{
-    switch (type)
-    {
-    case rtc::Description::Type::Offer:
-        return SDPType::Offer;
-    case rtc::Description::Type::Answer:
-        return SDPType::Answer;
-    case rtc::Description::Type::Pranswer:
-        return SDPType::Pranswer;
-    case rtc::Description::Type::Rollback:
-        return SDPType::Rollback;
-    default:
-        return SDPType::Offer;
-    }
-}
 
 WebrtcTransport::WebrtcTransport()
 {
