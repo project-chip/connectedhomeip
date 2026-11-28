@@ -186,12 +186,12 @@ exit:
             Platform::Delete(readClient);
             readClient = nullptr;
         }
-        callback->OnError(err);
         // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
         // (deleteCallback), so deleting it here would free it twice. Release our global reference to
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
+            callback->OnError(err);
             callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
@@ -255,7 +255,6 @@ exit:
             env->ExceptionDescribe();
             env->ExceptionClear();
         }
-        callback->OnError(err);
         if (readClient != nullptr)
         {
             Platform::Delete(readClient);
@@ -266,6 +265,7 @@ exit:
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
+            callback->OnError(err);
             callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
@@ -431,7 +431,6 @@ exit:
             env->ExceptionDescribe();
             env->ExceptionClear();
         }
-        callback->OnError(writeClient, err);
         if (writeClient != nullptr)
         {
             Platform::Delete(writeClient);
@@ -442,6 +441,7 @@ exit:
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
+            callback->OnError(nullptr, err);
             callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
@@ -630,9 +630,6 @@ exit:
             env->ExceptionDescribe();
             env->ExceptionClear();
         }
-        app::CommandSender::ErrorData errorData;
-        errorData.error = err;
-        callback->OnError(nullptr, errorData);
         if (commandSender != nullptr)
         {
             Platform::Delete(commandSender);
@@ -643,6 +640,9 @@ exit:
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
+            app::CommandSender::ErrorData errorData;
+            errorData.error = err;
+            callback->OnError(nullptr, errorData);
             callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
@@ -811,7 +811,6 @@ exit:
             env->ExceptionDescribe();
             env->ExceptionClear();
         }
-        callback->OnError(nullptr, err);
         if (commandSender != nullptr)
         {
             Platform::Delete(commandSender);
@@ -822,6 +821,7 @@ exit:
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
+            callback->OnError(nullptr, err);
             callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
