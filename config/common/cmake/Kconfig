@@ -755,6 +755,15 @@ config CHIP_ENABLE_READ_CLIENT
 	  This config can be disabled for device types that do not require Read Client functionality.
 	  Disabling this config can save flash and RAM space.
 
+config CHIP_BUILD_CONTROLLER
+	bool "Build the controller (commissioner) part of the SDK"
+	select CHIP_ENABLE_READ_CLIENT
+	help
+	  Builds the controller library (GN argument chip_build_controller) for
+	  applications that commission other Matter nodes and control them.
+	  Requires the Interaction Model read client. Embedded builds leave it
+	  out by default.
+
 # Build system options
 
 config CHIP_WITH_LWIP
