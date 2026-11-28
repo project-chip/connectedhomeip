@@ -30,6 +30,9 @@ MTR_DIRECT_MEMBERS
 @interface MTRError ()
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id _Nullable)contextToLog;
++ (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                                  logContext:(id _Nullable)contextToLog
+                          additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> * _Nullable)additionalUserInfo;
 + (NSError * _Nullable)errorForIMStatus:(const chip::app::StatusIB &)status;
 + (NSError * _Nullable)errorForIMStatusCode:(chip::Protocols::InteractionModel::Status)status;
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;

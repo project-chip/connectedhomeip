@@ -17,7 +17,6 @@
 
 #import "MTRManualSetupPayloadParser.h"
 
-#import "MTRError_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
 @implementation MTRManualSetupPayloadParser {
@@ -33,11 +32,7 @@
 
 - (MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:_decimalStringRepresentation];
-    if (!payload && error) {
-        *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
-    }
-    return payload;
+    return [[MTRSetupPayload alloc] initWithManualPairingCode:_decimalStringRepresentation error:error];
 }
 
 @end
