@@ -174,7 +174,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         {
             uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
             chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
-            chip::ByteSpan defaultIpk;
 
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
@@ -200,8 +199,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
                             static_cast<unsigned>(result->GetFabricIndex()));
             ChipLogByteSpan(Support, compressedFabricIdSpan);
 
-            defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            SuccessOrExit(err = chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(), defaultIpk,
+            SuccessOrExit(err = chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(),
+                                                                        gOperationalCredentialsIssuer.GetIpkEpochKey(),
                                                                         compressedFabricIdSpan));
         }
     exit:

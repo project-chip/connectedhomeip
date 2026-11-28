@@ -245,8 +245,9 @@ class VolatileTemporaryPersistentStorage(PersistentStorageBase):
         pass
 
 
-# Regular expression to match CA keys.
-_caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
+# Regular expression to match CA keys. The SDK writes the CA index suffix in lowercase hexadecimal.
+_caKeyMatch = re.compile(
+    r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey|ExampleOpCredsIPK)([0-9a-f]+)')
 
 
 class PersistentStorageJSON(PersistentStorageBase):
@@ -262,7 +263,7 @@ class PersistentStorageJSON(PersistentStorageBase):
         caKeys = {}
         for key in sdkData:
             if match := _caKeyMatch.fullmatch(key):
-                caKeys[key] = (match.group(1), int(match.group(2)))
+                caKeys[key] = (match.group(1), int(match.group(2), 16))
 
         if not caKeys or min([v[1] for v in caKeys.values()]) == 0:
             # No CA keys found or they are 0-based indexed - nothing to rewrite.
@@ -272,7 +273,7 @@ class PersistentStorageJSON(PersistentStorageBase):
 
         caKeysRewritten = {}
         for key, (prefix, index) in caKeys.items():
-            caKeysRewritten[f"{prefix}{index - 1}"] = sdkData.pop(key)
+            caKeysRewritten[f"{prefix}{index - 1:x}"] = sdkData.pop(key)
         sdkData.update(caKeysRewritten)
 
         caListRewritten = {}

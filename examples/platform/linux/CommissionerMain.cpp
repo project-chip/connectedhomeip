@@ -199,6 +199,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
         params.fabricIndex.SetValue(commissionerFabricIndex);
         params.removeFromFabricTableOnShutdown = false;
 
+        // TODO(#75560): Use the fabric IPK from the Joint Fabric Datastore GroupKeySetList (key set 0) instead of the default IPK.
+        gOpCredsIssuer.SetIpkEpochKey(Crypto::IdentityProtectionKeySpan(GroupTesting::DefaultIpkValue::GetDefaultIpk().data()));
+
         ChipLogProgress(Support, " ----- Commissioner reusing existing fabric index %u",
                         static_cast<unsigned>(commissionerFabricIndex));
     }
@@ -243,11 +246,12 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
                     "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricIndex));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
-    // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
-    // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
-    ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    ReturnLogErrorOnFailure(
-        chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk, compressedFabricIdSpan));
+    // A reused fabric already has its key set 0.
+    if (commissionerFabricIndex == kUndefinedFabricIndex)
+    {
+        ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex,
+                                                                        gOpCredsIssuer.GetIpkEpochKey(), compressedFabricIdSpan));
+    }
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);

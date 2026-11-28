@@ -50,6 +50,7 @@ public:
     }
 
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
+    chip::Crypto::IdentityProtectionKeySpan GetIpkEpochKey() override { return mOpCredsIssuer.GetIpkEpochKey(); }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
                                           chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,

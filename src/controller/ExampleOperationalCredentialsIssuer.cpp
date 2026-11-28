@@ -34,6 +34,7 @@ constexpr char kOperationalCredentialsIssuerKeypairStorage[]             = "Exam
 constexpr char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
 constexpr char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
 constexpr char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
+constexpr char kOperationalCredentialsIpkEpochKeyStorage[]               = "ExampleOpCredsIPK";
 
 using namespace Credentials;
 using namespace Crypto;
@@ -178,6 +179,13 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(serializedKey.SetLength(keySize));
     }
 
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+    const bool rootKeypairWasStored = (err == CHIP_NO_ERROR);
+
+    // Must run before a new root keypair is saved; otherwise a failed first Initialize() leaves a root keypair
+    // without an IPK, and the next Initialize() selects the default IPK.
+    ReturnErrorOnFailure(LoadOrCreateIpkEpochKey(storage, rootKeypairWasStored));
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %" CHIP_ERROR_FORMAT,
@@ -225,6 +233,38 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
     mStorage     = &storage;
     mInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::LoadOrCreateIpkEpochKey(PersistentStorageDelegate & storage,
+                                                                        bool rootKeypairWasStored)
+{
+    CHIP_ERROR err;
+    uint16_t size = sizeof(mIpkEpochKey);
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      err = storage.SyncGetKeyValue(key, mIpkEpochKey, size));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(size == sizeof(mIpkEpochKey), CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+
+    if (rootKeypairWasStored)
+    {
+        ChipLogProgress(Controller, "No %s in storage that holds a root keypair; using the default IPK epoch key",
+                        kOperationalCredentialsIpkEpochKeyStorage);
+        ByteSpan defaultIpk = GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        VerifyOrReturnError(defaultIpk.size() == sizeof(mIpkEpochKey), CHIP_ERROR_INTERNAL);
+        memcpy(mIpkEpochKey, defaultIpk.data(), sizeof(mIpkEpochKey));
+    }
+    else
+    {
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mIpkEpochKey, sizeof(mIpkEpochKey)));
+    }
+
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIpkEpochKeyStorage, key,
+                      ReturnErrorOnFailure(storage.SyncSetKeyValue(key, mIpkEpochKey, sizeof(mIpkEpochKey))));
     return CHIP_NO_ERROR;
 }
 
@@ -390,24 +430,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(
         GenerateNOCChainAfterValidation(assignedId, mNextFabricId, mNextCATs, pubkey, rcacSpan, icacSpan, nocSpan));
 
-    // TODO(#13825): Should always generate some IPK. Using a temporary fixed value until APIs are plumbed in to set it end-to-end
-    // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.
-    ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-
     // The below static assert validates a key assumption in types used (needed for public API conformance)
     static_assert(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == kAES_CCM128_Key_Length, "IPK span sizing must match");
 
-    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
-    // would obtain a suitable key per fabric.
-    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    Crypto::IdentityProtectionKeySpan ipkSpan(ipkValue);
-
-    VerifyOrReturnError(defaultIpkSpan.size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL);
-    memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
-
     // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, MakeOptional(ipkSpan),
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, MakeOptional(GetIpkEpochKey()),
                         Optional<NodeId>());
     return CHIP_NO_ERROR;
 }

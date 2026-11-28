@@ -103,6 +103,8 @@ public:
 
     void SetCertificateValidityPeriod(uint32_t validity) { mExampleOpCredsIssuer.SetCertificateValidityPeriod(validity); }
 
+    Crypto::IdentityProtectionKeySpan GetIpkEpochKey() const { return mExampleOpCredsIssuer.GetIpkEpochKey(); }
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -643,9 +645,8 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
                     static_cast<unsigned>(devCtrl->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
-    chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    err =
-        chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
+    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(),
+                                                  context->mAdapter->GetIpkEpochKey(), compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     TEMPORARY_RETURN_IGNORED sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
