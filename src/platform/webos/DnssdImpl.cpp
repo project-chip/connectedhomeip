@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -761,12 +761,14 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            context->mServices.erase(std::remove_if(context->mServices.begin(), context->mServices.end(),
-                                                    [name, type](const DnssdService & service) {
-                                                        return strcmp(name, service.mName) == 0 &&
-                                                            type == GetFullType(service.mType, service.mProtocol);
-                                                    }),
-                                     context->mServices.end());
+            // don't attempt to erase if vector has been cleared
+            if (context->mServices.size())
+            {
+                context->mServices.erase(std::remove_if(
+                    context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+                    }));
+            }
 
             if (context->mReceivedAllCached)
             {
