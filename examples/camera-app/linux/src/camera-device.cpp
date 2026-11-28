@@ -22,7 +22,6 @@
 #include <app/clusters/zone-management-server/zone-geometry.h>
 #include <atomic>
 #include <chrono>
-#include <fcntl.h> // For file descriptor operations
 #include <filesystem>
 #include <fstream>
 #include <gst/app/gstappsink.h>
@@ -30,10 +29,9 @@
 #include <gst/video/video.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-#include <limits.h>          // For PATH_MAX
-#include <linux/videodev2.h> // For V4L2 definitions
+#include <limits.h> // For PATH_MAX
 #include <memory>
-#include <sys/ioctl.h>
+#include <unistd.h> // For readlink
 
 // File used to store snapshot from stream and return for CaptureSnapshot
 // command.
@@ -692,13 +690,7 @@ CameraDevice::CameraDevice()
     mAVAnalysisManager.SetCameraDevice(this);
 }
 
-CameraDevice::~CameraDevice()
-{
-    if (videoDeviceFd != -1)
-    {
-        close(videoDeviceFd);
-    }
-}
+CameraDevice::~CameraDevice() = default;
 
 void CameraDevice::Init()
 {
@@ -737,21 +729,6 @@ CameraError CameraDevice::InitializeCameraDevice()
     {
         gst_init(nullptr, nullptr);
         gstreamerInitialized = true;
-    }
-
-    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
-    {
-        ChipLogProgress(Camera, "Using test video source, skipping physical camera initialization");
-        return CameraError::SUCCESS;
-    }
-
-    ChipLogDetail(Camera, "InitializeCameraDevice: %s", mVideoDevicePath.c_str());
-
-    videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
-    if (videoDeviceFd == -1)
-    {
-        ChipLogError(Camera, "Error opening video device: %s at %s", strerror(errno), mVideoDevicePath.c_str());
-        return CameraError::ERROR_INIT_FAILED;
     }
 
     return CameraError::SUCCESS;
@@ -1040,28 +1017,6 @@ GstElement * CameraDevice::CreateAudioPlaybackPipeline(CameraError & error)
     }
 
     return pipeline;
-}
-
-// Helper function to set V4L2 control
-CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
-{
-    if (videoDeviceFd == -1)
-    {
-        return CameraError::ERROR_INIT_FAILED;
-    }
-
-    v4l2_control control;
-    control.id    = controlId;
-    control.value = value;
-
-    if (ioctl(videoDeviceFd, VIDIOC_S_CTRL, &control) == -1)
-    {
-        ChipLogError(Camera, "Error setting V4L2 control: %s", strerror(errno));
-
-        return CameraError::ERROR_CONFIG_FAILED;
-    }
-
-    return CameraError::SUCCESS;
 }
 
 // Find the closest allocated snapshot stream with resolution >= requested, or closest possible
