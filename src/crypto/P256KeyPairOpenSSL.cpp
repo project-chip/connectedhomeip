@@ -64,38 +64,6 @@ static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
     return *SafePointerCast<const EC_KEY * const *>(context);
 }
 
-// helper function to populate an octet key into out_evp_pkey. Anything out_evp_pkey already held is
-// released; on failure it is left empty.
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const P256PublicKey & key, ScopedEvpPkey & out_evp_pkey)
-{
-    out_evp_pkey.reset();
-
-    int nid = GetNidForCurve(MapECName(key.Type()));
-    VerifyOrReturnError(nid != NID_undef, CHIP_ERROR_INTERNAL);
-
-    // EVP_PKEY_set1_EC_KEY takes its own reference to ec_key, so this one is dropped on the way out.
-    ScopedEcKey ec_key(EC_KEY_new_by_curve_name(nid));
-    VerifyOrReturnError(ec_key, CHIP_ERROR_INTERNAL);
-
-    ScopedEcGroup group(EC_GROUP_new_by_curve_name(nid));
-    VerifyOrReturnError(group, CHIP_ERROR_INTERNAL);
-
-    ScopedEcPoint point(EC_POINT_new(group.get()));
-    VerifyOrReturnError(point, CHIP_ERROR_INTERNAL);
-
-    VerifyOrReturnError(EC_POINT_oct2point(group.get(), point.get(), Uint8::to_const_uchar(key), key.Length(), nullptr) == 1,
-                        CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(EC_KEY_set_public_key(ec_key.get(), point.get()) == 1, CHIP_ERROR_INTERNAL);
-
-    ScopedEvpPkey evp_pkey(EVP_PKEY_new());
-    VerifyOrReturnError(evp_pkey, CHIP_ERROR_INTERNAL);
-
-    VerifyOrReturnError(EVP_PKEY_set1_EC_KEY(evp_pkey.get(), ec_key.get()) == 1, CHIP_ERROR_INTERNAL);
-
-    out_evp_pkey = std::move(evp_pkey);
-    return CHIP_NO_ERROR;
-}
-
 // Encode an ECDSA_SIG (r, s) pair as a raw P256ECDSASignature (r || s, each zero-padded to kP256_FE_Length).
 static CHIP_ERROR encode_signature(const ECDSA_SIG * sig, P256ECDSASignature & out_signature)
 {
@@ -455,7 +423,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     result = EVP_PKEY_set1_EC_KEY(local_key.get(), ec_key.get());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    error = _create_evp_key_from_binary_p256_key(remote_public_key, remote_key);
+    error = CreateEvpPkeyFromP256PublicKey(remote_public_key, remote_key);
     SuccessOrExit(error);
 
     context.reset(EVP_PKEY_CTX_new(local_key.get(), nullptr));
