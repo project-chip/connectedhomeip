@@ -181,6 +181,46 @@ public:
 
 namespace Clusters {
 namespace CommodityTariff {
+
+inline const Structs::DayEntryStruct::Type *
+FindDayEntryById(const DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>> & aEntries, uint32_t aId)
+{
+    if (aEntries.IsNull())
+    {
+        return nullptr;
+    }
+
+    for (const auto & entry : aEntries.Value())
+    {
+        if (entry.dayEntryID == aId)
+        {
+            return &entry;
+        }
+    }
+
+    return nullptr;
+}
+
+inline const Structs::TariffComponentStruct::Type *
+FindTariffComponentById(const DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>> & aComponents,
+                        uint32_t aId)
+{
+    if (aComponents.IsNull())
+    {
+        return nullptr;
+    }
+
+    for (const auto & component : aComponents.Value())
+    {
+        if (component.tariffComponentID == aId)
+        {
+            return &component;
+        }
+    }
+
+    return nullptr;
+}
+
 /**
  * @struct TariffUpdateCtx
  * @brief Context for validating tariff attribute updates and maintaining referential integrity
