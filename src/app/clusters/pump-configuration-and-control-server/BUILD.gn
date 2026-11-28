@@ -11,5 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("pump-configuration-and-control-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("pump-configuration-and-control-server") {
+  sources = [
+    "PumpConfigurationAndControlCluster.cpp",
+    "PumpConfigurationAndControlCluster.h",
+    "PumpConfigurationAndControlDelegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/cluster-building-blocks",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/PumpConfigurationAndControl",
+  ]
 }

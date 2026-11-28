@@ -17,27 +17,16 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  import(
-      "${chip_root}/src/app/clusters/pump-configuration-and-control-server/app_config_dependent_sources.gni")
-
   output_name = "libTestPumpConfigurationAndControlCluster"
 
   test_sources = [ "TestPumpConfigurationAndControlCluster.cpp" ]
 
-  sources = []
-  foreach(file, app_config_dependent_sources) {
-    sources += [ "../" + file ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/clusters/pump-configuration-and-control-server",
     "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/app/tests:app-test-stubs",
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]
 }

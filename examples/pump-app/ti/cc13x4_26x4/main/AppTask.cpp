@@ -45,6 +45,7 @@
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/pump-configuration-and-control-server/CodegenIntegration.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -659,97 +660,6 @@ void AppTask::UpdateCluster(intptr_t context)
     {
         ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", to_underlying(status));
     }
-
-    int16_t maxPressure = PumpMgr().GetMaxPressure();
-    status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(PCC_CLUSTER_ENDPOINT, maxPressure);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", to_underlying(status));
-    }
-
-    uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
-    status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(PCC_CLUSTER_ENDPOINT, maxSpeed);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", to_underlying(status));
-    }
-
-    uint16_t maxFlow = PumpMgr().GetMaxFlow();
-    status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(PCC_CLUSTER_ENDPOINT, maxFlow);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", to_underlying(status));
-    }
-
-    int16_t minConstPress = PumpMgr().GetMinConstPressure();
-    status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(PCC_CLUSTER_ENDPOINT, minConstPress);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", to_underlying(status));
-    }
-
-    int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
-    status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(PCC_CLUSTER_ENDPOINT, maxConstPress);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", to_underlying(status));
-    }
-
-    int16_t minCompPress = PumpMgr().GetMinCompPressure();
-    status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(PCC_CLUSTER_ENDPOINT, minCompPress);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", to_underlying(status));
-    }
-
-    int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
-    status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(PCC_CLUSTER_ENDPOINT, maxCompPress);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", to_underlying(status));
-    }
-
-    uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
-    status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(PCC_CLUSTER_ENDPOINT, minConstSpeed);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", to_underlying(status));
-    }
-
-    uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
-    status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(PCC_CLUSTER_ENDPOINT, maxConstSpeed);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", to_underlying(status));
-    }
-
-    uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
-    status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(PCC_CLUSTER_ENDPOINT, minConstFlow);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", to_underlying(status));
-    }
-
-    uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
-    status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(PCC_CLUSTER_ENDPOINT, maxConstFlow);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", to_underlying(status));
-    }
-
-    int16_t minConstTemp = PumpMgr().GetMinConstTemp();
-    status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(PCC_CLUSTER_ENDPOINT, minConstTemp);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", to_underlying(status));
-    }
-
-    int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
-    status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(PCC_CLUSTER_ENDPOINT, maxConstTemp);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", to_underlying(status));
-    }
 }
 
 void AppTask::PostEvents(intptr_t context)
@@ -757,12 +667,9 @@ void AppTask::PostEvents(intptr_t context)
     // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
     for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
     {
-        PumpConfigurationAndControl::Events::GeneralFault::Type event;
-        EventNumber eventNumber;
-
         ChipLogProgress(Zcl, "AppTask: Post PCC GeneralFault event");
-        // Using default priority for the event
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        PumpConfigurationAndControlCluster * pump = PumpConfigurationAndControl::FindClusterOnEndpoint(endpoint);
+        if (pump == nullptr || !pump->GenerateAlarmEvent(PumpConfigurationAndControl::Events::GeneralFault::Type{}).has_value())
         {
             ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
         }

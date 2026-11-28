@@ -2031,6 +2031,84 @@
             },
             "ClusterRevision"
         ],
+        "Pump Configuration and Control": [
+            {
+                "name": "MaxPressure",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxSpeed",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxFlow",
+                "keepDefault": true
+            },
+            {
+                "name": "MinConstPressure",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxConstPressure",
+                "keepDefault": true
+            },
+            {
+                "name": "MinCompPressure",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxCompPressure",
+                "keepDefault": true
+            },
+            {
+                "name": "MinConstSpeed",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxConstSpeed",
+                "keepDefault": true
+            },
+            {
+                "name": "MinConstFlow",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxConstFlow",
+                "keepDefault": true
+            },
+            {
+                "name": "MinConstTemp",
+                "keepDefault": true
+            },
+            {
+                "name": "MaxConstTemp",
+                "keepDefault": true
+            },
+            "PumpStatus",
+            "EffectiveOperationMode",
+            {
+                "name": "EffectiveControlMode",
+                "keepDefault": true
+            },
+            "Capacity",
+            "Speed",
+            "LifetimeRunningHours",
+            "Power",
+            "LifetimeEnergyConsumed",
+            {
+                "name": "OperationMode",
+                "keepDefault": true
+            },
+            {
+                "name": "ControlMode",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
+            "ClusterRevision"
+        ],
         "Push AV Stream Transport": [
             "MaxZones",
             {

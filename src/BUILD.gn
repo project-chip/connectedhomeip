@@ -128,6 +128,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/power-topology-server/tests",
       "${chip_root}/src/app/clusters/proximity-ranging-server/tests",
       "${chip_root}/src/app/clusters/power-source-server/tests",
+      "${chip_root}/src/app/clusters/pump-configuration-and-control-server/tests",
       "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/clusters/scenes-server/tests",
       "${chip_root}/src/app/clusters/service-area-server/tests",
@@ -224,7 +225,6 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/messages-server/tests",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
-        "${chip_root}/src/app/clusters/pump-configuration-and-control-server/tests",
         "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
 
