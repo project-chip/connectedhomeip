@@ -294,6 +294,13 @@ public:
     // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
 
+    // JointFabricDatastoreNodeEntry is only used by JointFabricDatastore
+    // Stores one Joint Fabric Datastore node information entry; stored indices are contiguous from 0
+    static StorageKeyName JointFabricDatastoreNodeEntry(size_t index)
+    {
+        return StorageKeyName::Formatted("g/jfds/n/%x", static_cast<unsigned>(index));
+    }
+
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }

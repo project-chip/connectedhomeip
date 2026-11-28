@@ -1,6 +1,8 @@
 #include "app/server/JointFabricDatastore.h"
 
 #include <lib/core/CASEAuthTag.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
@@ -4654,6 +4656,58 @@ TEST(ApplyBindingEditTest, RemoveOfAbsentEntryIsNoOp)
 
     ASSERT_EQ(result.size(), 1u);
     EXPECT_TRUE(chip::app::detail::BindingEntryValueEquals(result[0], MakeBindingEntry(1, 10)));
+}
+
+std::string NodeEntryKey(size_t index)
+{
+    return DefaultStorageKeyAllocator::JointFabricDatastoreNodeEntry(index).KeyName();
+}
+
+TEST(JointFabricDatastorePersistenceTest, NodeListSurvivesReload)
+{
+    chip::TestPersistentStorageDelegate storage;
+    {
+        JointFabricDatastore store;
+        ASSERT_EQ(store.Init(&storage), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(0x10, "first"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(0x20, "second"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.UpdateNode(0x20, "renamed"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.SetNode(0x10, State::kCommitted), CHIP_NO_ERROR);
+    }
+
+    JointFabricDatastore reloaded;
+    ASSERT_EQ(reloaded.Init(&storage), CHIP_NO_ERROR);
+    const auto & nodes = reloaded.GetNodeInformationEntries();
+    ASSERT_EQ(nodes.size(), 2u);
+    EXPECT_EQ(nodes[0].nodeID, 0x10u);
+    EXPECT_EQ(nodes[0].commissioningStatusEntry.state, State::kCommitted);
+    ExpectCharSpanEquals(nodes[0].friendlyName, "first");
+    EXPECT_EQ(nodes[1].nodeID, 0x20u);
+    EXPECT_EQ(nodes[1].commissioningStatusEntry.state, State::kPending);
+    ExpectCharSpanEquals(nodes[1].friendlyName, "renamed");
+}
+
+TEST(JointFabricDatastorePersistenceTest, RemoveNodeKeepsStoredKeysContiguous)
+{
+    chip::TestPersistentStorageDelegate storage;
+    {
+        JointFabricDatastore store;
+        ASSERT_EQ(store.Init(&storage), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(0x10, "a"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(0x20, "b"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(0x30, "c"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.RemoveNode(0x20), CHIP_NO_ERROR);
+    }
+    EXPECT_TRUE(storage.HasKey(NodeEntryKey(0)));
+    EXPECT_TRUE(storage.HasKey(NodeEntryKey(1)));
+    EXPECT_FALSE(storage.HasKey(NodeEntryKey(2)));
+
+    JointFabricDatastore reloaded;
+    ASSERT_EQ(reloaded.Init(&storage), CHIP_NO_ERROR);
+    const auto & nodes = reloaded.GetNodeInformationEntries();
+    ASSERT_EQ(nodes.size(), 2u);
+    EXPECT_EQ(nodes[0].nodeID, 0x10u);
+    EXPECT_EQ(nodes[1].nodeID, 0x30u);
 }
 
 } // namespace

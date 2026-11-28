@@ -440,6 +440,11 @@ public:
         }
     };
 
+    /**
+     * Binds the datastore to persistent storage and loads the stored node list.
+     */
+    CHIP_ERROR Init(PersistentStorageDelegate * storageDelegate);
+
     CHIP_ERROR SetAnchorRootCA(const ByteSpan & anchorRootCA)
     {
         if (anchorRootCA.size() >= sizeof(mAnchorRootCA))
@@ -671,6 +676,33 @@ private:
     VendorId mAnchorVendorId                              = VendorId::NotSpecified;
     FabricIndex mAnchorFabricIndex                        = kUndefinedFabricIndex;
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type mDatastoreStatusEntry;
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
+
+    static constexpr size_t kMaxNodeEntryTlvSize =
+        TLV::EstimateStructOverhead(sizeof(NodeId), kMaxFriendlyNameSize,
+                                    TLV::EstimateStructOverhead(sizeof(uint8_t) /*state*/, sizeof(uint32_t) /*updateTimestamp*/,
+                                                                sizeof(uint8_t) /*failureCode*/));
+
+    static_assert(kMaxNodeEntryTlvSize <= UINT16_MAX, "Node entry TLV does not fit in a single storage value");
+
+    // Number of node entry keys present in storage, at indices [0, mStoredNodeCount).
+    size_t mStoredNodeCount = 0;
+
+    // Persistent record for the node entry stored under JointFabricDatastoreNodeEntry(index).
+    struct NodeEntryRecord;
+
+    // Each node is stored under its own key, indexed by its position in mNodeInformationEntries.
+    // Stored keys are kept contiguous from index 0, because LoadNodeList stops at the first missing key.
+
+    // Writes entry `index`. If entries below `index` are not stored yet, writes every entry from the first unstored
+    // one to the end of the list instead, so no gap is created.
+    CHIP_ERROR StoreNodeEntry(size_t index);
+    // Writes entries [firstIndex, mNodeInformationEntries.size()).
+    CHIP_ERROR StoreNodeEntriesFrom(size_t firstIndex);
+    // Deletes stored keys [firstIndex, mStoredNodeCount), highest index first.
+    CHIP_ERROR DeleteStoredNodeEntriesFrom(size_t firstIndex);
+    // Loads entries.
+    CHIP_ERROR LoadNodeList();
 
     /**
      * Clears all stored records and resets anchor identity. Used by OnFabricRemoved() when the joint fabric is removed.
@@ -713,10 +745,12 @@ private:
         mAnchorVendorId           = VendorId::NotSpecified;
         mAnchorFabricIndex        = kUndefinedFabricIndex;
         mDatastoreStatusEntry     = Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type{};
+
+        (void) DeleteStoredNodeEntriesFrom(0);
     }
 
-    // TODO: Persist these members to local storage
     std::vector<GenericDatastoreNodeInformationEntry> mNodeInformationEntries;
+    // TODO: Persist these members to local storage
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> mGroupKeySetList;
     std::unordered_map<uint16_t, GroupKeySetStorage> mGroupKeySetStorage;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type> mAdminEntries;

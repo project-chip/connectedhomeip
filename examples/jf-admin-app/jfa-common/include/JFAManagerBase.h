@@ -129,6 +129,9 @@ protected:
                                 const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
     static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
 
+    // Removes the Pending Datastore entry added by FinalizeCommissioning when the standard commissioning flow fails.
+    static void RemovePendingNodeOnFailure(OnConnectedAction action, NodeId nodeId);
+
     void ReleaseSession();
 };
 

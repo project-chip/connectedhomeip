@@ -18,6 +18,9 @@
 #include <app/server/JointFabricDatastore.h>
 
 #include <lib/core/CASEAuthTag.h>
+#include <lib/core/TLV.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/PersistentData.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
@@ -249,7 +252,7 @@ CHIP_ERROR JointFabricDatastore::AddPendingNode(NodeId nodeId, const CharSpan & 
         listener->MarkNodeListChanged();
     }
 
-    return CHIP_NO_ERROR;
+    return StoreNodeEntry(mNodeInformationEntries.size() - 1);
 }
 
 CHIP_ERROR JointFabricDatastore::UpdateNode(NodeId nodeId, const CharSpan & friendlyName)
@@ -265,7 +268,7 @@ CHIP_ERROR JointFabricDatastore::UpdateNode(NodeId nodeId, const CharSpan & frie
                 listener->MarkNodeListChanged();
             }
 
-            return CHIP_NO_ERROR;
+            return StoreNodeEntry(static_cast<size_t>(&entry - mNodeInformationEntries.data()));
         }
     }
 
@@ -278,6 +281,7 @@ CHIP_ERROR JointFabricDatastore::RemoveNode(NodeId nodeId)
     {
         if (it->nodeID == nodeId)
         {
+            const size_t index = static_cast<size_t>(it - mNodeInformationEntries.begin());
             mNodeInformationEntries.erase(it);
 
             for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
@@ -285,7 +289,8 @@ CHIP_ERROR JointFabricDatastore::RemoveNode(NodeId nodeId)
                 listener->MarkNodeListChanged();
             }
 
-            return CHIP_NO_ERROR;
+            ReturnErrorOnFailure(StoreNodeEntriesFrom(index));
+            return DeleteStoredNodeEntriesFrom(mNodeInformationEntries.size());
         }
     }
 
@@ -1548,7 +1553,7 @@ CHIP_ERROR JointFabricDatastore::SetNode(NodeId nodeId, Clusters::JointFabricDat
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIDInDatastore(nodeId, index));
     mNodeInformationEntries[index].commissioningStatusEntry.state = state;
-    return CHIP_NO_ERROR;
+    return StoreNodeEntry(index);
 }
 
 CHIP_ERROR JointFabricDatastore::IsNodeIDInDatastore(NodeId nodeId, size_t & index)
@@ -3162,6 +3167,172 @@ CHIP_ERROR JointFabricDatastore::ForceAddNodeKeySetEntry(uint16_t groupKeySetId,
     newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
 
     mNodeKeySetEntries.push_back(newEntry);
+    return CHIP_NO_ERROR;
+}
+
+// The decoded entry's friendlyName points into the record's buffer, so it is valid only while the record exists.
+struct JointFabricDatastore::NodeEntryRecord : public PersistableData<JointFabricDatastore::kMaxNodeEntryTlvSize>
+{
+    explicit NodeEntryRecord(size_t entryIndex) : index(entryIndex) {}
+
+    size_t index;
+    Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntryStruct::Type entry;
+
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
+    {
+        key = DefaultStorageKeyAllocator::JointFabricDatastoreNodeEntry(index);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override { return entry.Encode(writer, TLV::AnonymousTag()); }
+
+    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
+    {
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        return entry.Decode(reader);
+    }
+
+    void Clear() override { entry = {}; }
+};
+
+CHIP_ERROR JointFabricDatastore::Init(PersistentStorageDelegate * storageDelegate)
+{
+    VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mStorageDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mStorageDelegate = storageDelegate;
+    CHIP_ERROR err   = LoadNodeList();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "Failed to load the node list: %" CHIP_ERROR_FORMAT "; node list persistence disabled",
+                     err.Format());
+        mStorageDelegate = nullptr;
+        mStoredNodeCount = 0;
+    }
+    return err;
+}
+
+CHIP_ERROR JointFabricDatastore::StoreNodeEntry(size_t index)
+{
+    VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_NO_ERROR);
+    VerifyOrReturnError(index < mNodeInformationEntries.size(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (index > mStoredNodeCount)
+    {
+        return StoreNodeEntriesFrom(mStoredNodeCount);
+    }
+
+    NodeEntryRecord record(index);
+    record.entry   = mNodeInformationEntries[index];
+    CHIP_ERROR err = record.Save(mStorageDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "Failed to store node entry %u: %" CHIP_ERROR_FORMAT, static_cast<unsigned>(index), err.Format());
+        return err;
+    }
+
+    if (index == mStoredNodeCount)
+    {
+        ++mStoredNodeCount;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JointFabricDatastore::StoreNodeEntriesFrom(size_t firstIndex)
+{
+    VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_NO_ERROR);
+
+    for (size_t index = std::min(firstIndex, mStoredNodeCount); index < mNodeInformationEntries.size(); ++index)
+    {
+        ReturnErrorOnFailure(StoreNodeEntry(index));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JointFabricDatastore::DeleteStoredNodeEntriesFrom(size_t firstIndex)
+{
+    VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_NO_ERROR);
+
+    while (mStoredNodeCount > firstIndex)
+    {
+        const size_t index = mStoredNodeCount - 1;
+        CHIP_ERROR err     = NodeEntryRecord(index).Delete(mStorageDelegate);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(JointFabric, "Failed to delete node entry %u: %" CHIP_ERROR_FORMAT, static_cast<unsigned>(index),
+                         err.Format());
+            return err;
+        }
+        mStoredNodeCount = index;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JointFabricDatastore::LoadNodeList()
+{
+    VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_NO_ERROR);
+
+    // Decoded into a separate list so that a failure leaves the in-memory list unchanged.
+    std::vector<GenericDatastoreNodeInformationEntry> loadedEntries;
+    std::optional<size_t> firstSkippedIndex;
+    size_t storedCount = 0;
+    for (; storedCount < kMaxNodes; ++storedCount)
+    {
+        NodeEntryRecord record(storedCount);
+        CHIP_ERROR err = record.Load(mStorageDelegate);
+        if (err == CHIP_ERROR_NOT_FOUND)
+        {
+            break;
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "Failed to load node entry %u: %" CHIP_ERROR_FORMAT, static_cast<unsigned>(storedCount),
+                         err.Format());
+            return err;
+        }
+        const auto & decoded = record.entry;
+
+        // RemoveNode shifts the entries after the removed one down by one key. If that is interrupted, a node is
+        // stored under two consecutive keys.
+        const bool duplicate = std::any_of(loadedEntries.begin(), loadedEntries.end(),
+                                           [&decoded](const auto & entry) { return entry.nodeID == decoded.nodeID; });
+        if (duplicate)
+        {
+            ChipLogProgress(JointFabric, "Skipping duplicate node entry %u for node 0x" ChipLogFormatX64,
+                            static_cast<unsigned>(storedCount), ChipLogValueX64(decoded.nodeID));
+            if (!firstSkippedIndex.has_value())
+            {
+                firstSkippedIndex = loadedEntries.size();
+            }
+            continue;
+        }
+        loadedEntries.emplace_back(decoded.nodeID, decoded.commissioningStatusEntry.state, MakeOptional(decoded.friendlyName));
+    }
+
+    if (storedCount == 0)
+    {
+        ChipLogDetail(JointFabric, "No stored node entries");
+        return CHIP_NO_ERROR;
+    }
+
+    mNodeInformationEntries.swap(loadedEntries);
+    mStoredNodeCount = storedCount;
+    ChipLogProgress(JointFabric, "Loaded %u node entries from %u stored keys",
+                    static_cast<unsigned>(mNodeInformationEntries.size()), static_cast<unsigned>(storedCount));
+
+    if (firstSkippedIndex.has_value())
+    {
+        // Rewrite the keys from the first duplicate on so that they match the loaded list again.
+        CHIP_ERROR err = StoreNodeEntriesFrom(*firstSkippedIndex);
+        if (err == CHIP_NO_ERROR)
+        {
+            err = DeleteStoredNodeEntriesFrom(mNodeInformationEntries.size());
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "Failed to remove duplicate node entries: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
