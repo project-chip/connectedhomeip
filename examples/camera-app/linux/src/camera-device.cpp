@@ -826,7 +826,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 // the camera, converts them to I420 format, encodes to H.264, and sends the encoded
 // stream to the media controller via app sink.
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
-                                               CameraError & error)
+                                               uint32_t maxBitRate, uint16_t keyFrameIntervalMs, CameraError & error)
 {
     GstElement * pipeline     = gst_pipeline_new("video-pipeline");
     GstElement * capsfilter1  = gst_element_factory_make("capsfilter", "filter1");
@@ -882,8 +882,12 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter2, "caps", caps2, nullptr);
     gst_caps_unref(caps2);
 
-    // Configure encoder for low-latency (0x4 = zerolatency) and force IDR at start
-    g_object_set(x264enc, "tune", 0x00000004, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
+    // Configure encoder for low-latency (0x4 = zerolatency) using allocated bitrate (kbps) and keyframe interval (frames)
+    const guint bitrateKbps = std::clamp<guint>(static_cast<guint>(maxBitRate / 1000), 1u, 2048000u);
+    const guint keyIntMax =
+        std::max<guint>(1u, static_cast<guint>((static_cast<uint64_t>(std::max(1, framerate)) * keyFrameIntervalMs) / 1000));
+    g_object_set(x264enc, "tune", 0x00000004, "speed-preset", 1, "bitrate", bitrateKbps, "key-int-max", keyIntMax, "insert-vui",
+                 TRUE, nullptr);
 
     // Configure appsink for receiving H.264 buffers data
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
@@ -1299,9 +1303,10 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     mCurrentVideoFrameRate = framerate;
 
     // Create Gstreamer video pipeline using the final allocated stream parameters
-    CameraError error          = CameraError::SUCCESS;
-    GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, framerate, error);
+    CameraError error = CameraError::SUCCESS;
+    GstElement * videoPipeline =
+        CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width, allocatedStream.minResolution.height, framerate,
+                            allocatedStream.maxBitRate, allocatedStream.keyFrameInterval, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -1795,7 +1800,7 @@ VideoResolutionStruct & CameraDevice::GetMinViewport()
 std::vector<RateDistortionTradeOffStruct> & CameraDevice::GetRateDistortionTradeOffPoints()
 {
     static std::vector<RateDistortionTradeOffStruct> rateDistTradeOffs = {
-        { VideoCodecEnum::kH264, { kMinResolutionWidth, kMinResolutionHeight }, 10000 /* bitrate */ }
+        { VideoCodecEnum::kH264, { kMinResolutionWidth, kMinResolutionHeight }, kMinBitRateBps }
     };
     return rateDistTradeOffs;
 }
