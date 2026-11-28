@@ -71,10 +71,17 @@ class TestRestartFlagReader(unittest.TestCase):
         self.monitor.start([mock.Mock()], threading.Lock(), self.config)
 
     def _wait_consumed(self):
+        """Waits until the monitor has finished with the request at the flag path.
+
+        The monitor takes the flag file by renaming it to a claim and removes the claim only after acting on the request,
+        so the flag path is gone before the request is done with; the claim has to be gone too.
+        """
+        claim = self.flag + ".claim"
         deadline = time.monotonic() + 10
-        while os.path.exists(self.flag) and time.monotonic() < deadline:
+        while (os.path.exists(self.flag) or os.path.exists(claim)) and time.monotonic() < deadline:
             time.sleep(0.05)
         self.assertFalse(os.path.exists(self.flag), "monitor did not consume the flag file")
+        self.assertFalse(os.path.exists(claim), "monitor did not remove its claim on the flag file")
 
     def test_factory_reset_written_after_file_creation(self):
         # The file exists empty across several monitor polls (0.5 s) before the request text lands.
