@@ -119,6 +119,27 @@ if (CONFIG_HAVE_SPEAKER)
     endif()
 endif()
 
+# The commissioning-proxy device is not in ALL_DEVICES_DEVICE_SOURCES: it is registered
+# only by a platform that supplies a transport adapter, and the ESP32 adapter needs the
+# BLE hooks that CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY enables.
+set(COMMISSIONING_PROXY_SRCS)
+if (CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY)
+    if (NOT ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
+        message(FATAL_ERROR "CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY is set but commissioning-proxy is not in "
+                            "ALL_DEVICES_ENABLED_DEVICES")
+    endif()
+    set(COMMISSIONING_PROXY_SERVER_DIR "${CHIP_ROOT}/src/app/clusters/commissioning-proxy-server")
+    list(APPEND COMMISSIONING_PROXY_SRCS
+        "${ALL_DEVICES_COMMON_DIR}/device/types/commissioning-proxy/CommissioningProxy.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxyBgScanRegistry.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxyBleTransport.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxyCluster.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxyScanAggregator.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxyScanCache.cpp"
+        "${COMMISSIONING_PROXY_SERVER_DIR}/CommissioningProxySessionManager.cpp"
+    )
+endif()
+
 set(BOARD_REQUIRES)
 if (CONFIG_DEVICE_TYPE_ESP_MOSAICO)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/board")
@@ -135,7 +156,7 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        PRIV_REQUIRES ${BOARD_REQUIRES})
 
 target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_DEVICE_SOURCES} ${ALL_DEVICES_CLUSTER_SOURCES}
-               ${BOARD_SRCS})
+               ${COMMISSIONING_PROXY_SRCS} ${BOARD_SRCS})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC

@@ -39,6 +39,10 @@
 #include <freertos/task.h>
 #include <nvs_flash.h>
 #include <platform/DiagnosticDataProvider.h>
+#if CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/internal/BLEManager.h>
+#endif
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -48,6 +52,7 @@
 #include <app_config/enabled_devices.h>
 
 #include <cctype>
+#include <cstring>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -95,6 +100,15 @@ static const char TAG[] = "all-devices-app";
 
 // NVS key for storing the device type across reboots
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY && ALL_DEVICES_ENABLE_COMMISSIONING_PROXY
+// A commissioning proxy advertises as a BLE peripheral so it can be commissioned, then
+// needs the central role to reach the devices it proxies for. The ESP32 BLE role is
+// fixed when the host starts, so the switch is this stored flag plus a restart. A factory
+// reset clears the namespace, so the proxy advertises again afterwards.
+static const ESP32Config::Key kConfigKey_ProxyBleCentral{ ESP32Config::kConfigNamespace_ChipConfig, "cp-central" };
+static constexpr const char kCommissioningProxyDeviceType[] = "commissioning-proxy";
+#endif
 // The device type this boot runs as. Written on the CHIP thread (the stored type, then any
 // fallback InitServer settles on) and read by the display task, so every write goes through
 // SetActiveDeviceType and every cross-thread read through GetActiveDeviceType.
@@ -159,6 +173,46 @@ std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
 DefaultTimerDelegate gTimerDelegate;
 
+#if CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY && ALL_DEVICES_ENABLE_COMMISSIONING_PROXY
+bool StoredDeviceTypeIsCommissioningProxy()
+{
+    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
+    size_t storedLen                            = 0;
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
+    return err == CHIP_NO_ERROR && strcmp(storedDeviceType, kCommissioningProxyDeviceType) == 0;
+}
+
+/// Whether this boot has to bring BLE up as a central: the proxy was commissioned on an
+/// earlier boot and asked for the switch. Only honoured while the stored device type is
+/// still the proxy, so switching to another device type restores advertising.
+bool ProxyBleCentralRequested()
+{
+    bool central = false;
+    VerifyOrReturnValue(ESP32Config::ReadConfigValue(kConfigKey_ProxyBleCentral, central) == CHIP_NO_ERROR, false);
+    return central && StoredDeviceTypeIsCommissioningProxy();
+}
+
+void RestartProxyAsBleCentral(System::Layer *, void *)
+{
+    ESP_LOGI(TAG, "Restarting the commissioning proxy in BLE central mode");
+    esp_restart();
+}
+
+void RestartProxyAsBleCentralIfNeeded()
+{
+    VerifyOrReturn(GetActiveDeviceType() == kCommissioningProxyDeviceType);
+    VerifyOrReturn(!DeviceLayer::Internal::BLEMgrImpl().IsCentral());
+
+    CHIP_ERROR err = ESP32Config::WriteConfigValue(kConfigKey_ProxyBleCentral, true);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ESP_LOGE(TAG, "Failed to store the BLE central request: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // The commissioner still has to receive the CommissioningComplete response and close
+    // its session before the proxy goes away.
+    LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(5), RestartProxyAsBleCentral, nullptr));
+}
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY && ALL_DEVICES_ENABLE_COMMISSIONING_PROXY
+
 void DeInitBLEIfCommissioned()
 {
 #ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
@@ -217,6 +271,9 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     case DeviceLayer::DeviceEventType::kCommissioningComplete:
         ESP_LOGI(TAG, "Commissioning complete");
         DeInitBLEIfCommissioned();
+#if CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY && ALL_DEVICES_ENABLE_COMMISSIONING_PROXY
+        RestartProxyAsBleCentralIfNeeded();
+#endif
         break;
 
     case DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
@@ -656,6 +713,15 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "Platform::MemoryInit() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONING_PROXY && ALL_DEVICES_ENABLE_COMMISSIONING_PROXY
+    // Has to precede InitChipStack(), which starts the BLE host with the role fixed.
+    if (ProxyBleCentralRequested())
+    {
+        ESP_LOGI(TAG, "Starting BLE as a central for the commissioning proxy");
+        SuccessOrDie(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, /* aIsCentral = */ true));
+    }
+#endif
 
     error = PlatformMgr().InitChipStack();
     if (error != CHIP_NO_ERROR)

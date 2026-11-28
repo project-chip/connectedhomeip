@@ -1250,6 +1250,14 @@ menu "CHIP Device Layer"
                 Advertising Data, so passive scanning remains the default. Enable this only for
                 interoperability with devices that require Scan Response Data.
 
+        config ENABLE_ESP32_COMMISSIONING_PROXY
+            bool "Enable Commissioning Proxy BLE scan hooks"
+            depends on ENABLE_ESP32_BLE_CONTROLLER && BT_NIMBLE_ENABLED
+            default n
+            help
+                An application hosting the Commissioning Proxy cluster server can 
+                scan for commissionable devices on a Commissioner's behalf.
+
     endmenu
 
     menu "Enable BLE Extended Announcement"
