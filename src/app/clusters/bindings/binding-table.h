@@ -24,6 +24,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/IntrusiveList.h>
 #include <optional>
 
 namespace chip {
@@ -133,7 +134,21 @@ class Table
 public:
     static constexpr size_t kMaxBindingEntries =
         static_cast<size_t>(CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC) * CHIP_CONFIG_MAX_FABRICS;
+
+    class Listener : public IntrusiveListNodeBase<IntrusiveMode::AutoUnlink>
+    {
+    public:
+        virtual ~Listener() = default;
+
+        /// Called after a binding entry for @p endpointId is added to or removed from the table.
+        virtual void OnBindingsChanged(EndpointId endpointId) = 0;
+    };
+
     Table();
+    ~Table();
+
+    void AddListener(Listener & listener);
+    void RemoveListener(Listener & listener);
 
     class Iterator
     {
@@ -207,6 +222,8 @@ private:
 
     CHIP_ERROR LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex);
 
+    void NotifyBindingsChanged(EndpointId endpointId);
+
     TableEntry mBindingTable[kMaxBindingEntries];
     uint8_t mNextIndex[kMaxBindingEntries];
 
@@ -215,6 +232,7 @@ private:
     uint8_t mSize = 0;
 
     PersistentStorageDelegate * mStorage;
+    IntrusiveList<Listener, IntrusiveMode::AutoUnlink> mListeners;
 };
 
 } // namespace Binding

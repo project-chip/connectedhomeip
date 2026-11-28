@@ -18,10 +18,13 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/bindings/BindingManager.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
 
@@ -219,6 +222,56 @@ TEST_F(TestBindingManager, SessionSetupFailureDoesNotSkipLaterBindings)
     EXPECT_EQ(mManager.UnicastBindingRemoved(secondUnicastIndex), CHIP_NO_ERROR);
     EXPECT_EQ(gRecord.releaseCount, 1);
     EXPECT_EQ(gRecord.lastReleased, &mContext);
+}
+
+TEST_F(TestBindingManager, OnFabricRemovedNotifiesBindingClustersForAffectedEndpoints)
+{
+    constexpr EndpointId kOtherEndpoint = 2;
+    const ConcreteClusterPath path1(kLocalEndpoint, Binding::Id);
+    const ConcreteClusterPath path2(kOtherEndpoint, Binding::Id);
+
+    Binding::Table & table = mManager.GetBindingTable();
+    BindingCluster cluster1(
+        BindingCluster::Context{ .bindingTable = table, .bindingManager = mManager, .platformManager = DeviceLayer::PlatformMgr() },
+        kLocalEndpoint);
+    BindingCluster cluster2(
+        BindingCluster::Context{ .bindingTable = table, .bindingManager = mManager, .platformManager = DeviceLayer::PlatformMgr() },
+        kOtherEndpoint);
+
+    chip::Testing::ClusterTester tester1(cluster1);
+    chip::Testing::ClusterTester tester2(cluster2);
+    ASSERT_SUCCESS(cluster1.Startup(tester1.GetServerClusterContext()));
+    ASSERT_SUCCESS(cluster2.Startup(tester2.GetServerClusterContext()));
+
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0101, kLocalEndpoint, kTestClusterId)));
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(GetBobFabricIndex(), 0x0102, kOtherEndpoint, kTestClusterId)));
+
+    FabricTable::Delegate & fabricDelegate = mManager;
+
+    // Removing a fabric with no bindings must not notify any cluster.
+    tester1.GetDirtyList().clear();
+    tester2.GetDirtyList().clear();
+    DataVersion version1Before = cluster1.GetDataVersion(path1);
+    DataVersion version2Before = cluster2.GetDataVersion(path2);
+
+    fabricDelegate.OnFabricRemoved(GetFabricTable(), kUnknownFabric);
+    EXPECT_TRUE(tester1.GetDirtyList().empty());
+    EXPECT_EQ(cluster1.GetDataVersion(path1), version1Before);
+    EXPECT_TRUE(tester2.GetDirtyList().empty());
+    EXPECT_EQ(cluster2.GetDataVersion(path2), version2Before);
+    EXPECT_EQ(table.Size(), 2u);
+
+    // Removing Alice's fabric removes only Alice's entry and notifies only endpoint 1.
+    fabricDelegate.OnFabricRemoved(GetFabricTable(), GetAliceFabricIndex());
+    EXPECT_TRUE(tester1.IsAttributeDirty(Binding::Attributes::Binding::Id));
+    EXPECT_NE(cluster1.GetDataVersion(path1), version1Before);
+    EXPECT_TRUE(tester2.GetDirtyList().empty());
+    EXPECT_EQ(cluster2.GetDataVersion(path2), version2Before);
+    ASSERT_EQ(table.Size(), 1u);
+    EXPECT_EQ(table.begin()->fabricIndex, GetBobFabricIndex());
+
+    cluster1.Shutdown(ClusterShutdownType::kClusterShutdown);
+    cluster2.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

@@ -37,6 +37,37 @@ Table::Table()
     memset(mNextIndex, kNextNullIndex, sizeof(mNextIndex));
 }
 
+Table::~Table()
+{
+    mListeners.Clear();
+}
+
+void Table::AddListener(Listener & listener)
+{
+    if (!mListeners.Contains(&listener))
+    {
+        mListeners.PushBack(&listener);
+    }
+}
+
+void Table::RemoveListener(Listener & listener)
+{
+    if (mListeners.Contains(&listener))
+    {
+        mListeners.Remove(&listener);
+    }
+}
+
+void Table::NotifyBindingsChanged(EndpointId endpointId)
+{
+    for (auto it = mListeners.begin(); it != mListeners.end();)
+    {
+        Listener & listener = *it;
+        ++it;
+        listener.OnBindingsChanged(endpointId);
+    }
+}
+
 CHIP_ERROR Table::Add(const TableEntry & entry)
 {
     if (entry.type == MATTER_UNUSED_BINDING)
@@ -86,6 +117,7 @@ CHIP_ERROR Table::Add(const TableEntry & entry)
     }
 
     mSize++;
+    NotifyBindingsChanged(entry.local);
     return CHIP_NO_ERROR;
 }
 
@@ -269,6 +301,7 @@ CHIP_ERROR Table::RemoveAt(Iterator & iter)
             mHead = next;
         }
     }
+    const EndpointId localEndpoint = mBindingTable[iter.mIndex].local;
     if (error == CHIP_NO_ERROR)
     {
         // The remove is considered "submitted" once the change on prev node takes effect
@@ -281,6 +314,10 @@ CHIP_ERROR Table::RemoveAt(Iterator & iter)
         mSize--;
     }
     iter.mIndex = next;
+    if (error == CHIP_NO_ERROR)
+    {
+        NotifyBindingsChanged(localEndpoint);
+    }
     return error;
 }
 

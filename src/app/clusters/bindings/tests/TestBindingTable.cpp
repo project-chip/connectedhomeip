@@ -22,6 +22,9 @@
 #include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+
+#include <vector>
 
 using namespace chip::app::Clusters;
 
@@ -231,6 +234,156 @@ TEST(TestBindingTable, TestLoadRejectsOutOfRangeIndex)
     table.SetPersistentStorage(&testStorage);
     EXPECT_NE(table.LoadFromStorage(), CHIP_NO_ERROR);
     EXPECT_EQ(table.Size(), 0u);
+}
+
+class RecordingListener : public Binding::Table::Listener
+{
+public:
+    void OnBindingsChanged(chip::EndpointId endpointId) override { endpoints.push_back(endpointId); }
+
+    std::vector<chip::EndpointId> endpoints;
+};
+
+class SelfRemovingListener : public Binding::Table::Listener
+{
+public:
+    explicit SelfRemovingListener(Binding::Table & table) : mTable(table) {}
+
+    void OnBindingsChanged(chip::EndpointId endpointId) override
+    {
+        endpoints.push_back(endpointId);
+        mTable.RemoveListener(*this);
+    }
+
+    std::vector<chip::EndpointId> endpoints;
+
+private:
+    Binding::Table & mTable;
+};
+
+TEST(TestBindingTable, TestListenerNotifications)
+{
+    chip::TestPersistentStorageDelegate storage;
+    Binding::Table table;
+    table.SetPersistentStorage(&storage);
+
+    RecordingListener listener;
+    table.AddListener(listener);
+
+    // Invalid entry must not notify.
+    Binding::TableEntry unusedEntry;
+    unusedEntry.type = Binding::MATTER_UNUSED_BINDING;
+    EXPECT_EQ(table.Add(unusedEntry), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_TRUE(listener.endpoints.empty());
+
+    // Successful Add notifies with the entry's local endpoint.
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForNode(1, 0x10, /* localEndpoint = */ 3, 1, std::nullopt)));
+    ASSERT_EQ(listener.endpoints.size(), 1u);
+    EXPECT_EQ(listener.endpoints[0], 3u);
+    listener.endpoints.clear();
+
+    // Storage failure on Add must not notify.
+    storage.SetRejectWrites(true);
+    EXPECT_NE(table.Add(Binding::TableEntry::ForNode(1, 0x20, /* localEndpoint = */ 4, 1, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_TRUE(listener.endpoints.empty());
+
+    // Storage failure on RemoveAt must not notify.
+    auto iter = table.begin();
+    EXPECT_NE(table.RemoveAt(iter), CHIP_NO_ERROR);
+    EXPECT_TRUE(listener.endpoints.empty());
+    storage.SetRejectWrites(false);
+
+    // Successful RemoveAt notifies with the removed entry's local endpoint.
+    iter = table.begin();
+    ASSERT_SUCCESS(table.RemoveAt(iter));
+    ASSERT_EQ(listener.endpoints.size(), 1u);
+    EXPECT_EQ(listener.endpoints[0], 3u);
+    listener.endpoints.clear();
+
+    // Full table Add must not notify.
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
+    {
+        ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForNode(1, i, /* localEndpoint = */ 5, 1, std::nullopt)));
+    }
+    listener.endpoints.clear();
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(1, 99, /* localEndpoint = */ 6, 1, std::nullopt)), CHIP_ERROR_NO_MEMORY);
+    EXPECT_TRUE(listener.endpoints.empty());
+
+    // LoadFromStorage restores persisted entries without firing mutation notifications.
+    Binding::Table restoredTable;
+    restoredTable.SetPersistentStorage(&storage);
+    RecordingListener restoredListener;
+    restoredTable.AddListener(restoredListener);
+    ASSERT_SUCCESS(restoredTable.LoadFromStorage());
+    EXPECT_EQ(restoredTable.Size(), Binding::Table::kMaxBindingEntries);
+    EXPECT_TRUE(restoredListener.endpoints.empty());
+}
+
+TEST(TestBindingTable, TestListenerLifecycle)
+{
+    chip::TestPersistentStorageDelegate storage;
+    Binding::Table table;
+    table.SetPersistentStorage(&storage);
+
+    RecordingListener listenerA;
+    RecordingListener listenerB;
+
+    // Duplicate AddListener is a no-op; removing an unregistered listener is a no-op.
+    table.RemoveListener(listenerA);
+    table.AddListener(listenerA);
+    table.AddListener(listenerA);
+    table.AddListener(listenerB);
+
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(1, 0x0101, /* localEndpoint = */ 7, std::nullopt)));
+    ASSERT_EQ(listenerA.endpoints.size(), 1u);
+    EXPECT_EQ(listenerA.endpoints[0], 7u);
+    ASSERT_EQ(listenerB.endpoints.size(), 1u);
+    EXPECT_EQ(listenerB.endpoints[0], 7u);
+    listenerA.endpoints.clear();
+    listenerB.endpoints.clear();
+
+    // RemoveListener is idempotent and stops further notifications for that listener.
+    table.RemoveListener(listenerA);
+    table.RemoveListener(listenerA);
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(1, 0x0102, /* localEndpoint = */ 8, std::nullopt)));
+    EXPECT_TRUE(listenerA.endpoints.empty());
+    ASSERT_EQ(listenerB.endpoints.size(), 1u);
+    EXPECT_EQ(listenerB.endpoints[0], 8u);
+    listenerB.endpoints.clear();
+
+    // A listener that removes itself inside OnBindingsChanged does not skip subsequent listeners.
+    table.RemoveListener(listenerB);
+    SelfRemovingListener selfRemover(table);
+    table.AddListener(selfRemover);
+    table.AddListener(listenerB);
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(1, 0x0103, /* localEndpoint = */ 9, std::nullopt)));
+    ASSERT_EQ(selfRemover.endpoints.size(), 1u);
+    EXPECT_EQ(selfRemover.endpoints[0], 9u);
+    ASSERT_EQ(listenerB.endpoints.size(), 1u);
+    EXPECT_EQ(listenerB.endpoints[0], 9u);
+    selfRemover.endpoints.clear();
+    listenerB.endpoints.clear();
+
+    // Listener destroyed while still registered auto-unlinks cleanly.
+    {
+        RecordingListener scopedListener;
+        table.AddListener(scopedListener);
+        ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(1, 0x0104, /* localEndpoint = */ 10, std::nullopt)));
+        ASSERT_EQ(scopedListener.endpoints.size(), 1u);
+    }
+    listenerB.endpoints.clear();
+    ASSERT_SUCCESS(table.Add(Binding::TableEntry::ForGroup(1, 0x0105, /* localEndpoint = */ 11, std::nullopt)));
+    ASSERT_EQ(listenerB.endpoints.size(), 1u);
+    EXPECT_EQ(listenerB.endpoints[0], 11u);
+
+    // Table destroyed while a listener is still registered clears the list cleanly.
+    RecordingListener longLivedListener;
+    {
+        Binding::Table shortLivedTable;
+        shortLivedTable.SetPersistentStorage(&storage);
+        shortLivedTable.AddListener(longLivedListener);
+    }
+    EXPECT_TRUE(longLivedListener.endpoints.empty());
 }
 
 } // namespace

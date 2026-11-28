@@ -37,6 +37,27 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+CHIP_ERROR BindingCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    mClusterContext.bindingTable.AddListener(*this);
+    return CHIP_NO_ERROR;
+}
+
+void BindingCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mClusterContext.bindingTable.RemoveListener(*this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void BindingCluster::OnBindingsChanged(EndpointId endpointId)
+{
+    if (endpointId == mPath.mEndpointId)
+    {
+        NotifyAttributeChanged(Binding::Attributes::Binding::Id);
+    }
+}
+
 bool BindingCluster::IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry)
 {
     // Entry has endpoint, node id and no group id
@@ -134,44 +155,9 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
 DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                              AttributeValueDecoder & decoder)
 {
-    class ScopedAttributeChangeNotifier
-    {
-    public:
-        ScopedAttributeChangeNotifier(BindingCluster & cluster, AttributeId attributeId) :
-            mCluster(cluster), mAttributeId(attributeId)
-        {}
-
-        ScopedAttributeChangeNotifier(const ScopedAttributeChangeNotifier &)             = delete;
-        ScopedAttributeChangeNotifier & operator=(const ScopedAttributeChangeNotifier &) = delete;
-
-        ~ScopedAttributeChangeNotifier()
-        {
-            if (mChanged)
-            {
-                mCluster.NotifyAttributeChanged(mAttributeId);
-            }
-        }
-
-        CHIP_ERROR MarkChangedOnSuccess(CHIP_ERROR err)
-        {
-            if (err == CHIP_NO_ERROR)
-            {
-                mChanged = true;
-            }
-            return err;
-        }
-
-    private:
-        BindingCluster & mCluster;
-        const AttributeId mAttributeId;
-        bool mChanged = false;
-    };
-
     switch (request.path.mAttributeId)
     {
     case Binding::Attributes::Binding::Id: {
-        ScopedAttributeChangeNotifier notifier(*this, Binding::Attributes::Binding::Id);
-
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             DecodableBindingListType newBindingList;
@@ -191,7 +177,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
                     {
                         TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
-                    ReturnErrorOnFailure(notifier.MarkChangedOnSuccess(mClusterContext.bindingTable.RemoveAt(bindingTableIter)));
+                    ReturnErrorOnFailure(mClusterContext.bindingTable.RemoveAt(bindingTableIter));
                 }
                 else
                 {
@@ -204,7 +190,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             CHIP_ERROR err = CHIP_NO_ERROR;
             while (iter.Next() && err == CHIP_NO_ERROR)
             {
-                err = notifier.MarkChangedOnSuccess(CreateBindingEntry(iter.GetValue(), request.path.mEndpointId));
+                err = CreateBindingEntry(iter.GetValue(), request.path.mEndpointId);
             }
 
             // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
@@ -224,7 +210,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             {
                 return Status::ConstraintError;
             }
-            return notifier.MarkChangedOnSuccess(CreateBindingEntry(target, request.path.mEndpointId));
+            return CreateBindingEntry(target, request.path.mEndpointId);
         }
         return Status::UnsupportedWrite;
     }
