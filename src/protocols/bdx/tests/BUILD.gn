@@ -40,6 +40,7 @@ chip_test_suite("tests") {
   # see src/test_driver/esp32/CMakeLists.txt.
   if (chip_device_platform != "esp32") {
     test_sources += [
+      "TestAsyncResponderTimeout.cpp",
       "TestAsyncTransferFacilitator.cpp",
       "TestBusyResponder.cpp",
     ]

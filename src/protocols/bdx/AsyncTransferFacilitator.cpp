@@ -83,7 +83,11 @@ void AsyncTransferFacilitator::ProcessOutputEvents()
             // message!) but eventually they will time out.
             if (err != CHIP_NO_ERROR)
             {
-                mTransferEndError = err;
+                // After a response timeout, the timeout ended the transfer, not the failed StatusReport send.
+                if (!mResponseTimedOut)
+                {
+                    mTransferEndError = err;
+                }
                 DestroySelf();
                 return;
             }
@@ -167,6 +171,17 @@ void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec
 {
     ChipLogDetail(BDX, "OnResponseTimeout, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
     mTransferEndError = CHIP_ERROR_TIMEOUT;
+    mResponseTimedOut = true;
+
+    // Tell a receiver still waiting for a Block that the transfer is over, so it doesn't wait for its own timeout. The
+    // exchange is still open here. The send can fail (the session was released, or our last message is still awaiting an
+    // ack).
+    if (mTransfer.AbortTransfer(StatusCode::kTransferFailedUnknownError) == CHIP_NO_ERROR)
+    {
+        ProcessOutputEvents();
+        return;
+    }
+
     DestroySelf();
 }
 
