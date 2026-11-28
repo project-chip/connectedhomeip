@@ -37,7 +37,13 @@
 namespace pw::rpc::system_server {
 namespace {
 
-constexpr size_t kMaxTransmissionUnit = 512;
+// The HDLC decode buffer must hold a complete HDLC-framed RPC packet. The Joint
+// Fabric Response message (ResponseStream carrying a cross-signed ICAC or device
+// NOC in CHIP TLV form) can reach ~605 bytes (nanopb Response_size=605) before
+// HDLC byte-stuffing, which exceeds the previous 512-byte buffer and would make
+// pw::hdlc::Decoder return RESOURCE_EXHAUSTED and silently drop the frame. Size
+// the buffer above the largest frame exchanged on this socket.
+constexpr size_t kMaxTransmissionUnit = 2048;
 uint16_t socket_port                  = 33000;
 
 stream::ServerSocket server_socket;

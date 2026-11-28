@@ -62,6 +62,33 @@ public:
 
     CHIP_ERROR GenerateIcacCsr(chip::MutableByteSpan & generatedIcacCsr) { return mOpCredsIssuer.ObtainICACSR(generatedIcacCsr); }
 
+    // Store the cross-signed anchor ICAC, Fabric-A RCAC, and Fabric-A IPK so the next commissioning uses them.
+    void SetJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk)
+    {
+        mOpCredsIssuer.SetJFMaterials(icac, rcac, ipk);
+    }
+    // Discard any previously stored JF materials (e.g. on fail-safe expiry or commissioning abort).
+    void ClearJFMaterials() { mOpCredsIssuer.ClearJFMaterials(); }
+
+    // Accessors for the JF materials, so the RPC layer can return them to JFA-B alongside the device NOC.
+    bool HasJFMaterials() const { return mOpCredsIssuer.HasJFMaterials(); }
+    chip::ByteSpan GetJFMaterialsICAC() const { return mOpCredsIssuer.GetJFMaterialsICAC(); }
+    chip::ByteSpan GetJFMaterialsRCAC() const { return mOpCredsIssuer.GetJFMaterialsRCAC(); }
+    chip::ByteSpan GetJFMaterialsIPK() const { return mOpCredsIssuer.GetJFMaterialsIPK(); }
+
+    // Cross-sign an ICAC CSR received from a commissionee using the anchor fabric PKI.
+    CHIP_ERROR SignICAC(chip::ByteSpan csr, chip::FabricId anchorFabricId, chip::MutableByteSpan & icac)
+    {
+        return mOpCredsIssuer.SignICAC(csr, anchorFabricId, icac);
+    }
+
+    // Issue a Fabric-A NOC for a device being migrated from Fabric B into Fabric A (JCM AddNOC step).
+    CHIP_ERROR SignDeviceNOC(chip::ByteSpan nocCsr, chip::FabricId anchorFabricId, chip::NodeId deviceNodeId,
+                             chip::MutableByteSpan & noc)
+    {
+        return mOpCredsIssuer.SignDeviceNOC(nocCsr, anchorFabricId, deviceNodeId, noc);
+    }
+
     CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) override
     {
         VerifyOrReturnError(mDacVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);

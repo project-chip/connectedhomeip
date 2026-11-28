@@ -58,6 +58,16 @@ constexpr chip::FabricId kIdentityOtherFabricId = 4;
 constexpr char kPAATrustStorePathVariable[]     = "CHIPTOOL_PAA_TRUST_STORE_PATH";
 constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH";
 
+// Dedicated identity used to transparently route every JFC-B CLI command onto the Joint Fabric
+// (Fabric A) once the JF materials have been received from the anchor administrator (that is, after
+// JCM and after node migration). JFC-B's original operational identity (alpha/beta) is bound to
+// Fabric B, so operational discovery for Fabric-A nodes fails on that commissioner. When the JF
+// materials are present, the credential issuer binds any newly created commissioner to Fabric A, so
+// routing the active identity to this dedicated identity makes all operational discovery and command
+// invocation target the Joint Fabric without the user passing any flag.
+constexpr char kIdentityJointFabric[]           = "jf-fabric-a";
+constexpr chip::FabricId kIdentityJointFabricId = 0xA;
+
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore                 = nullptr;
 chip::Credentials::DeviceAttestationRevocationDelegate * CHIPCommand::sRevocationDelegate = nullptr;
 
@@ -113,10 +123,24 @@ CHIP_ERROR GetAttestationRevocationDelegate(const char * revocationSetPath,
     return CHIP_NO_ERROR;
 }
 
+// Returns true once JFC-B has received the Joint Fabric materials from the anchor administrator
+// (i.e. after JCM and after node migration). The materials are stored in, and restored on startup
+// by, the ExampleOperationalCredentialsIssuer, so this reflects the persisted post-migration state.
+// While true, every CLI command is transparently routed onto Fabric A (see GetIdentity()).
+static bool JointFabricMaterialsPresent(CredentialIssuerCommands * credIssuerCmds)
+{
+    if (credIssuerCmds == nullptr)
+    {
+        return false;
+    }
+    return static_cast<ExampleCredentialIssuerCommands *>(credIssuerCmds)->HasJFMaterials();
+}
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 {
+
     if (IsInteractive())
     {
         return CHIP_NO_ERROR;
@@ -261,9 +285,15 @@ CHIP_ERROR CHIPCommand::EnsureCommissionerForIdentity(std::string identity)
     {
         fabricId = kIdentityGammaFabricId;
     }
+    else if (identity == kIdentityJointFabric)
+    {
+        // Dedicated Fabric-A identity used after JCM / node migration (see GetIdentity()).
+        fabricId = kIdentityJointFabricId;
+    }
     else
     {
         fabricId = strtoull(identity.c_str(), nullptr, 0);
+
         if (fabricId < kIdentityOtherFabricId)
         {
             ChipLogError(chipTool, "Invalid identity: %s", identity.c_str());
@@ -357,8 +387,24 @@ void CHIPCommand::SetIdentity(const char * identity)
 
 std::string CHIPCommand::GetIdentity()
 {
+    // Post-JCM / post-migration auto-redirect: once the Joint Fabric materials are present, JFC-B's
+    // original operational identity is bound to Fabric B and cannot discover or reach the Fabric-A
+    // nodes. Transparently resolve every CLI command to a dedicated Fabric-A commissioner (built from
+    // the JF materials) so the command runs on the Joint Fabric without any user-supplied flag.
+    // The null-fabric-commissioner identity is intentionally never redirected: it is used only for
+    // the pre-fabric commissioning flow and must retain its own (non-operational) identity.
+    if (JointFabricMaterialsPresent(mCredIssuerCmds))
+    {
+        std::string requested = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
+        if (requested.compare(kIdentityNull) != 0)
+        {
+            return kIdentityJointFabric;
+        }
+    }
+
     std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
+
         name.compare(kIdentityNull) != 0)
     {
         chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
@@ -440,7 +486,13 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     {
         id = kIdentityNullFabricId;
     }
+    else if (name.compare(kIdentityJointFabric) == 0)
+    {
+        // Dedicated Fabric-A identity used after JCM / node migration (see GetIdentity()).
+        id = kIdentityJointFabricId;
+    }
     else if ((id = strtoull(name.c_str(), nullptr, 0)) < kIdentityOtherFabricId)
+
     {
         VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]",
                            name.c_str(), kIdentityAlpha, kIdentityBeta, kIdentityGamma);
@@ -552,9 +604,22 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
         // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
         // key is the same, but the derived keys will be different for each fabric.
-        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        // For the dedicated Fabric-A commissioner (jf-fabric-a), the group IPK must match the one used
+        // on Fabric A so that CASE can be established with migrated Fabric-A nodes. Use the Fabric-A IPK
+        // received from JFA-A via the JF materials when operating on that fabric; otherwise fall back to
+        // the default test IPK.
+        chip::ByteSpan ipk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        if (fabricId == kIdentityJointFabricId && JointFabricMaterialsPresent(mCredIssuerCmds))
+        {
+            chip::ByteSpan jfIpk = static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds)->GetJFMaterialsIPK();
+            if (jfIpk.size() == ipk.size())
+            {
+                ipk = jfIpk;
+                ChipLogProgress(chipTool, "Using Fabric-A IPK from JF materials for jf-fabric-a commissioner");
+            }
+        }
         ReturnLogErrorOnFailure(
-            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
+            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, ipk, compressed_fabric_id_span));
     }
 
     ReturnLogErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(deviceCommissioner->GetFabricIndex()));

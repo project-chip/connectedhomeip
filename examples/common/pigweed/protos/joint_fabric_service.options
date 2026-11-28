@@ -1,2 +1,9 @@
 OwnershipContext.trustedIcacPublicKeyB max_size:65    // Maximum size of trustedIcacPublicKeyB
 Response.response_bytes max_size:600                  // Maximum size of ICACCSR
+Response.icac_bytes max_size:600                      // DEVICE_NOC: cross-signed ICAC (CHIP TLV)
+Response.rcac_bytes max_size:600                      // DEVICE_NOC: Fabric-A root CA (CHIP TLV)
+Response.ipk_bytes max_size:16                        // DEVICE_NOC: Fabric-A IPK epoch key 0
+RequestOptions.csr_bytes max_size:600                 // Maximum size of commissionee CSR
+RequestOptions.icac_bytes max_size:600                // Maximum size of cross-signed ICAC (JF_MATERIALS)
+RequestOptions.rcac_bytes max_size:600                // Maximum size of Fabric-A root CA (JF_MATERIALS)
+RequestOptions.ipk_bytes max_size:16                  // Maximum size of Fabric-A IPK epoch key 0 (JF_MATERIALS)

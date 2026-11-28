@@ -559,11 +559,28 @@ constexpr uint32_t kDefaultChannelId = 1;
 struct RequestOptionsContext
 {
     RequestOptionsContext(uint64_t fabricId, TransactionType transactionType) :
-        mAnchorFabricId(fabricId), mTransactionType(transactionType)
-    {}
+        mAnchorFabricId(fabricId), mTransactionType(transactionType), mNodeId(chip::kUndefinedNodeId), mCsrLen(0)
+    {
+        memset(mCsrBytes, 0, sizeof(mCsrBytes));
+    }
+
+    RequestOptionsContext(uint64_t fabricId, TransactionType transactionType, const uint8_t * csrData, size_t csrLen,
+                          uint64_t nodeId = chip::kUndefinedNodeId) :
+        mAnchorFabricId(fabricId),
+        mTransactionType(transactionType), mNodeId(nodeId), mCsrLen(csrLen)
+    {
+        memset(mCsrBytes, 0, sizeof(mCsrBytes));
+        if (csrData && csrLen > 0 && csrLen <= sizeof(mCsrBytes))
+        {
+            memcpy(mCsrBytes, csrData, csrLen);
+        }
+    }
 
     uint64_t mAnchorFabricId;
     TransactionType mTransactionType;
+    uint64_t mNodeId;
+    uint8_t mCsrBytes[chip::Crypto::kMIN_CSR_Buffer_Size];
+    size_t mCsrLen;
 };
 
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
@@ -616,8 +633,19 @@ static void GenerateReplyWork(intptr_t arg)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     uint8_t buf[kMaxDERCertLength];
     MutableByteSpan generatedCertificate(buf, kMaxDERCertLength);
-    Response rsp;
-    ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
+    Response rsp = Response_init_zero;
+
+    // The pigweed client call object must outlive its completion callback. If it is a stack local,
+    // it is destroyed at scope exit right after WaitForResponse() returns; because OnRPCTransferDone
+    // signals the condition variable from inside the pw_rpc callback (while pw_rpc still counts the
+    // callback as executing), WaitForResponse() wakes and the local is torn down while its own
+    // callback is still in flight. That trips the pw_rpc "a callback attempted to destroy its own
+    // call object" deadlock guard (pw_rpc/call.cc:136) -> chipDie -> abort.
+    //
+    // Give the call static storage so it is never destroyed at scope exit. WaitForResponse() already
+    // serializes these RPCs (only one is ever in flight), so the next transaction simply reassigns
+    // this inactive object via a clean MoveFrom instead of destroying it mid-callback.
+    static ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
 
     RequestOptionsContext * request = reinterpret_cast<RequestOptionsContext *>(arg);
     VerifyOrExit(request, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
@@ -633,19 +661,81 @@ static void GenerateReplyWork(intptr_t arg)
         }
         break;
     }
+    case TransactionType::TransactionType_CROSS_SIGNED_ICAC: {
+        chip::ByteSpan csrSpan(request->mCsrBytes, request->mCsrLen);
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                  ->SignICAC(csrSpan, request->mAnchorFabricId, generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "SignICAC failed");
+        }
+        break;
+    }
+    case TransactionType::TransactionType_DEVICE_NOC: {
+        chip::ByteSpan csrSpan(request->mCsrBytes, request->mCsrLen);
+        ChipLogProgress(JointFabric,
+                        "GenerateReplyWork: DEVICE_NOC anchorFabricId=0x%016" PRIx64 " nodeId=0x%016" PRIx64 " csrLen=%u",
+                        request->mAnchorFabricId, request->mNodeId, static_cast<unsigned>(request->mCsrLen));
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                  ->SignDeviceNOC(csrSpan, request->mAnchorFabricId, request->mNodeId, generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "SignDeviceNOC failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        break;
+    }
+
     default: {
+
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;
     }
     }
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
 
+    rsp.transaction_type = request->mTransactionType;
     memcpy(rsp.response_bytes.bytes, generatedCertificate.data(), generatedCertificate.size());
     rsp.response_bytes.size = (short unsigned int) generatedCertificate.size();
 
+    // For DEVICE_NOC, also return the cross-signed ICAC, Fabric-A RCAC and Fabric-A IPK that were
+    // saved when the JF materials were pushed. JFA-B uses these to populate AddNOC/AddTrustedRoot.
+    if (request->mTransactionType == TransactionType::TransactionType_DEVICE_NOC)
+    {
+        ExampleCredentialIssuerCommands * issuer = static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer);
+        if (issuer->HasJFMaterials())
+        {
+            chip::ByteSpan icac = issuer->GetJFMaterialsICAC();
+            chip::ByteSpan rcac = issuer->GetJFMaterialsRCAC();
+            chip::ByteSpan ipk  = issuer->GetJFMaterialsIPK();
+
+            if (icac.size() <= sizeof(rsp.icac_bytes.bytes))
+            {
+                memcpy(rsp.icac_bytes.bytes, icac.data(), icac.size());
+                rsp.icac_bytes.size = (short unsigned int) icac.size();
+            }
+            if (rcac.size() <= sizeof(rsp.rcac_bytes.bytes))
+            {
+                memcpy(rsp.rcac_bytes.bytes, rcac.data(), rcac.size());
+                rsp.rcac_bytes.size = (short unsigned int) rcac.size();
+            }
+            if (ipk.size() <= sizeof(rsp.ipk_bytes.bytes))
+            {
+                memcpy(rsp.ipk_bytes.bytes, ipk.data(), ipk.size());
+                rsp.ipk_bytes.size = (short unsigned int) ipk.size();
+            }
+            ChipLogProgress(JointFabric, "GenerateReplyWork: DEVICE_NOC returning ICAC=%u, RCAC=%u, IPK=%u bytes",
+                            static_cast<unsigned>(icac.size()), static_cast<unsigned>(rcac.size()),
+                            static_cast<unsigned>(ipk.size()));
+        }
+        else
+        {
+            ChipLogError(JointFabric, "GenerateReplyWork: DEVICE_NOC but no JF materials available");
+        }
+    }
+
     call = rpcClient.ResponseStream(rsp, OnRPCTransferDone);
-    VerifyOrExit(rpcClient.ResponseStream(rsp, OnRPCTransferDone).active(),
-                 ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
+
+    VerifyOrExit(call.active(), ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
     VerifyOrExit(CHIP_NO_ERROR == WaitForResponse(call), ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
 
 exit:
@@ -657,10 +747,54 @@ exit:
 
 void OnGetStreamOnNext(const RequestOptions & requestOptions)
 {
-    ChipLogProgress(JointFabric, "OnGetStreamOnNext, fabricId: %ld", requestOptions.anchor_fabric_id);
+    ChipLogProgress(JointFabric, "OnGetStreamOnNext, fabricId: %ld, transaction_type=%d, csr_bytes.size=%u, node_id=0x%016" PRIx64,
+                    requestOptions.anchor_fabric_id, requestOptions.transaction_type,
+                    static_cast<unsigned>(requestOptions.csr_bytes.size), requestOptions.node_id);
 
-    RequestOptionsContext * options =
-        Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
+    RequestOptionsContext * options = nullptr;
+
+    if (requestOptions.transaction_type == TransactionType_JF_MATERIALS)
+    {
+
+        // Store JF materials in the credential issuer so GenerateNOCChain uses them for
+        // the next Fabric-B device migration commissioning.
+        if (pkiProviderCredentialIssuer != nullptr)
+        {
+            chip::ByteSpan icacSpan(requestOptions.icac_bytes.bytes, requestOptions.icac_bytes.size);
+            chip::ByteSpan rcacSpan(requestOptions.rcac_bytes.bytes, requestOptions.rcac_bytes.size);
+            chip::ByteSpan ipkSpan(requestOptions.ipk_bytes.bytes, requestOptions.ipk_bytes.size);
+            (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                ->SetJFMaterials(icacSpan, rcacSpan, ipkSpan);
+        }
+        return;
+    }
+
+    if (requestOptions.transaction_type == TransactionType_CLEAR_JF_MATERIALS)
+    {
+        // Discard any JF materials stored in the credential issuer so stale credentials
+        // cannot be used after a commissioning attempt that was aborted or failed its fail-safe.
+        if (pkiProviderCredentialIssuer != nullptr)
+        {
+            (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))->ClearJFMaterials();
+        }
+        return;
+    }
+
+    if (requestOptions.transaction_type == TransactionType_CROSS_SIGNED_ICAC && requestOptions.csr_bytes.size > 0)
+    {
+        options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type,
+                                                       requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size);
+    }
+    else if (requestOptions.transaction_type == TransactionType_DEVICE_NOC && requestOptions.csr_bytes.size > 0)
+    {
+        options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type,
+                                                       requestOptions.csr_bytes.bytes, requestOptions.csr_bytes.size,
+                                                       requestOptions.node_id);
+    }
+    else
+    {
+        options = Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
+    }
 
     if (options)
     {
@@ -735,9 +869,14 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
             request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
 
-            auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
+            // Static storage so the call object is not destroyed at scope exit while its own
+            // OnRPCTransferDone callback is still executing (same pw_rpc call.cc:136 deadlock-guard
+            // crash as in GenerateReplyWork). WaitForResponse() serializes the single in-flight call.
+            static ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
+            call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
             {
+
                 // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle as an error.
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
                 SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);

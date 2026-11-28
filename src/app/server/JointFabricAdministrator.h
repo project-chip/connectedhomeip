@@ -38,6 +38,28 @@ public:
         virtual ~Delegate() {}
 
         virtual CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) { return CHIP_NO_ERROR; }
+        virtual CHIP_ERROR StoreCrossSignedICAC(chip::ByteSpan icac) { return CHIP_NO_ERROR; }
+        // Called after AddICAC succeeds so the device can forward the JF materials
+        // (cross-signed ICAC, anchor RCAC, anchor IPK) to its paired commissioner
+        // via the local RPC channel.
+        virtual CHIP_ERROR PushJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk) { return CHIP_NO_ERROR; }
+        // Called on fail-safe expiry or commissioning abort so the device can
+        // tell its paired commissioner (JFC-B) to discard any JF materials it
+        // received earlier in this attempt.
+        virtual CHIP_ERROR ClearJFMaterials() { return CHIP_NO_ERROR; }
+
+        // Called after AnnounceJointFabricAdministrator succeeds so the device
+        // can record the NodeId of the peer JFA (JFA-A) that initiated JCM, along
+        // with the fabric index on which JFA-A invoked the command (the joint
+        // fabric). The device must reach JFA-A on that same fabric index, not on
+        // its own locally-commissioned fabric index.
+        // Cleared when the fail-safe timer expires or commissioning is aborted.
+        virtual void SetPeerJFANodeId(chip::NodeId nodeId, chip::FabricIndex fabricIndex)
+        {
+            (void) nodeId;
+            (void) fabricIndex;
+        }
+        virtual void ClearPeerJFANodeId() {}
     };
 
     static JointFabricAdministrator & GetInstance()

@@ -63,7 +63,27 @@ public:
 
     CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc);
 
+    // Issue a Fabric-A NOC for a device being migrated from Fabric B into Fabric A (JCM device
+    // onboarding / AddNOC step). The NOC is signed with the anchor intermediate key whose public key
+    // is embedded in the cross-signed JF-materials ICAC, embeds the given deviceNodeId and the
+    // Administrator CAT, and is returned in CHIP TLV form.
+    CHIP_ERROR SignDeviceNOC(const ByteSpan & nocCsr, FabricId anchorFabricId, NodeId deviceNodeId, MutableByteSpan & noc);
+
     CHIP_ERROR ObtainICACSR(MutableByteSpan & icaCsr);
+
+    // Store the cross-signed anchor ICAC and Fabric-A RCAC received from JFA-A.
+    // After this call, the next GenerateNOCChain invocation will produce a NOC
+    // signed by the anchor ICAC key (mAnchorIntermediateIssuer) and return the
+    // Fabric-A RCAC, enabling devices originally on Fabric B to join Fabric A.
+    void SetJFMaterials(chip::ByteSpan icac, chip::ByteSpan rcac, chip::ByteSpan ipk);
+    bool HasJFMaterials() const { return mHasJFMaterials; }
+    void ClearJFMaterials();
+
+    // Accessors for the JF materials, so the RPC layer can return them to JFA-B alongside the
+    // device NOC during Fabric-B device migration (DEVICE_NOC transaction).
+    chip::ByteSpan GetJFMaterialsICAC() const { return chip::ByteSpan(mJFMaterialsICAC, mJFMaterialsICACLen); }
+    chip::ByteSpan GetJFMaterialsRCAC() const { return chip::ByteSpan(mJFMaterialsRCAC, mJFMaterialsRCACLen); }
+    chip::ByteSpan GetJFMaterialsIPK() const { return chip::ByteSpan(mJFMaterialsIPK, mJFMaterialsIPKLen); }
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
@@ -120,8 +140,16 @@ private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     Crypto::P256Keypair mAnchorIntermediateIssuer;
-    bool mInitialized                    = false;
-    uint32_t mIssuerId                   = 1;
+    bool mInitialized = false;
+    // Set once the three issuer keypairs (mIssuer / mIntermediateIssuer / mAnchorIntermediateIssuer)
+    // have been loaded or generated at least once in this process. Used so that a subsequent
+    // Initialize() under a different per-identity storage namespace reuses the already-loaded keys
+    // (and writes them through to that storage) instead of regenerating fresh keys. This keeps the
+    // anchor intermediate key stable across identities, which is required post-JCM because the
+    // cross-signed ICAC embeds that key and the Fabric-A controller NOC must be signed with it.
+    bool mKeypairsInitialized = false;
+    uint32_t mIssuerId        = 1;
+
     uint32_t mIntermediateIssuerId       = 2;
     uint32_t mAnchorIntermediateIssuerId = 3;
     uint32_t mNow                        = 0;
@@ -139,6 +167,15 @@ private:
     NodeId mNextCaseAdminSubject = kUndefinedNodeId;
     bool mNodeIdRequested        = false;
     uint64_t mIndex              = 0;
+
+    // JF materials received from JFA-A for Fabric-B device migration.
+    bool mHasJFMaterials = false;
+    uint8_t mJFMaterialsICAC[Credentials::kMaxDERCertLength];
+    size_t mJFMaterialsICACLen = 0;
+    uint8_t mJFMaterialsRCAC[Credentials::kMaxDERCertLength];
+    size_t mJFMaterialsRCACLen = 0;
+    uint8_t mJFMaterialsIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    size_t mJFMaterialsIPKLen = 0;
 };
 
 } // namespace CustomCredentialsIssuer
