@@ -94,6 +94,11 @@ def get_xml_path(filename, output_dir):
     return os.path.abspath(os.path.join(output_dir, xml))
 
 
+def included_spec_files(make_output: str) -> set[str]:
+    """Return exact basenames from the specification's printed include records."""
+    return {Path(line.strip()).name for line in make_output.splitlines() if line.strip().endswith('.adoc')}
+
+
 def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run: bool) -> str:
     cmd = ['make', 'PRINT_FILENAMES=1']
     if include_in_progress == 'All':
@@ -214,14 +219,23 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre
 
     log.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    log.info("Generating cluster spec to get file include list - this may take a few minutes")
-    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating device type library to get file include list - this may take a few minutes")
-    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating namespaces to get file include list - this may take a few minutes")
-    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
-
-    cluster_files = main_out + cluster_out
+    main_includes = included_spec_files(main_out)
+    combined_books = {'appclusters.adoc', 'device_library.adoc', 'standard_namespaces.adoc'}
+    if combined_books <= main_includes:
+        log.info('Using combined main book include list for clusters, device types, and namespaces')
+        # Each output directory contains only its own model type, so the main book's full include set is intentional.
+        cluster_files = device_type_files = namespace_files = main_includes
+    else:
+        log.info('Using legacy specification books; combined-book includes found: %s; missing: %s',
+                 ', '.join(sorted(combined_books & main_includes)) or '(none)',
+                 ', '.join(sorted(combined_books - main_includes)))
+        log.info("Generating cluster spec to get file include list - this may take a few minutes")
+        cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+        log.info("Generating device type library to get file include list - this may take a few minutes")
+        device_type_files = included_spec_files(make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run))
+        log.info("Generating namespaces to get file include list - this may take a few minutes")
+        namespace_files = included_spec_files(make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run))
+        cluster_files = main_includes | included_spec_files(cluster_out)
 
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
