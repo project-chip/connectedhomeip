@@ -911,20 +911,30 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate,
                                                CameraError & error)
 {
-    // Pipeline: source → capsfilter → audioconvert → audioresample → opusenc → appsink
+    // Pipeline: source -> audioconvert -> audioresample -> capsfilter -> opusenc -> appsink
     GstElement * pipeline = gst_pipeline_new("audio-pipeline");
     GstElement * source   = nullptr;
 
     if (LinuxDeviceOptions::GetInstance().cameraTestAudiosrc)
     {
         source = gst_element_factory_make("audiotestsrc", "source");
-        g_object_set(source, "wave", 0, "is-live", TRUE, nullptr); // beep 0
-        ChipLogProgress(Camera, "Audio piepline: using test audio source");
+        if (source != nullptr)
+        {
+            g_object_set(source, "wave", 0, "is-live", TRUE, nullptr); // beep 0
+        }
+        ChipLogProgress(Camera, "Audio pipeline: using test audio source");
     }
     else
     {
-        source = gst_element_factory_make("pulsesrc", "source");
-        // g_object_set(source, "device", device.c_str(), nullptr);
+        source = gst_element_factory_make("autoaudiosrc", "source");
+        if (source == nullptr)
+        {
+            source = gst_element_factory_make("pulsesrc", "source");
+        }
+        if (source == nullptr)
+        {
+            source = gst_element_factory_make("alsasrc", "source");
+        }
     }
 
     GstElement * acaps   = gst_element_factory_make("capsfilter", "acaps");
@@ -953,7 +963,7 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
         return nullptr;
     }
 
-    // Create GstCaps for the audio source
+    // Create GstCaps for the audio format expected by opusenc (placed after audioconvert/audioresample)
     GstCaps * caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE", "rate", G_TYPE_INT, sampleRate,
                                          "channels", G_TYPE_INT, channels, nullptr);
     g_object_set(acaps, "caps", caps, nullptr);
@@ -964,13 +974,17 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
 
     // Emit samples to your appsink callback (DistributeAudio → packetizer)
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
-    g_object_set(source, "do-timestamp", TRUE, nullptr);
+    if (g_object_class_find_property(G_OBJECT_GET_CLASS(source), "do-timestamp") != nullptr)
+    {
+        g_object_set(source, "do-timestamp", TRUE, nullptr);
+    }
 
     // Build and link
-    gst_bin_add_many(GST_BIN(pipeline), source, acaps, aconv, ares, opusenc, appsink, nullptr);
-    if (!gst_element_link_many(source, acaps, aconv, ares, opusenc, appsink, nullptr))
+    gst_bin_add_many(GST_BIN(pipeline), source, aconv, ares, acaps, opusenc, appsink, nullptr);
+    if (!gst_element_link_many(source, aconv, ares, acaps, opusenc, appsink, nullptr))
     {
         ChipLogError(Camera, "CreateAudioPipeline: link failed");
+        gst_object_unref(pipeline);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
