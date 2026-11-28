@@ -16,9 +16,16 @@
 
 #import "MTRDeviceController_XPC.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MTRDeviceController_XPC (Internal)
 
-- (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options;
+- (id)initWithMachServiceName:(NSString * _Null_unspecified)machServiceName options:(NSXPCConnectionOptions)options;
 - (void)_updateRegistrationInfo;
 
+// The current connection, if its server has said it implements the endpoint layout methods.
+@property (nonatomic, readonly, nullable) NSXPCConnection * endpointLayoutConnection;
+
 @end
+
+NS_ASSUME_NONNULL_END

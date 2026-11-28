@@ -441,6 +441,24 @@ MTR_DIRECT_MEMBERS
     return [NSArray array];
 }
 
+- (nullable NSDictionary<NSNumber *, MTREndpointInfo *> *)endpointsById
+{
+    MTR_ABSTRACT_METHOD();
+    return nil;
+}
+
+- (nullable NSArray<MTRAttributePath *> *)attributePathsForEndpointID:(NSNumber *)endpointID
+{
+    MTR_ABSTRACT_METHOD();
+    return nil;
+}
+
+- (nullable NSArray<MTRCommandPath *> *)acceptedCommandPathsForEndpointID:(NSNumber *)endpointID
+{
+    MTR_ABSTRACT_METHOD();
+    return nil;
+}
+
 - (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters
 {
     @autoreleasepool {
