@@ -192,6 +192,7 @@ config MAIN_STACK_SIZE
 	default 5120 if SOC_MCXW70AC
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 6144 if OPENTHREAD
+	default 6144 if NXP_FACTORY_DAC_BLOB_GENERATION
 	default 3072
 	  
 # AEAD ITS transform module encryption key provider
