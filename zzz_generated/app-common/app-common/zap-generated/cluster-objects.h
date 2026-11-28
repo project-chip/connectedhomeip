@@ -567,6 +567,10 @@
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Structs.h>
+#include <clusters/ThreadBorderRouterDiagnostics/Attributes.h>
+#include <clusters/ThreadBorderRouterDiagnostics/Commands.h>
+#include <clusters/ThreadBorderRouterDiagnostics/Events.h>
+#include <clusters/ThreadBorderRouterDiagnostics/Structs.h>
 #include <clusters/ThreadBorderRouterManagement/Attributes.h>
 #include <clusters/ThreadBorderRouterManagement/Commands.h>
 #include <clusters/ThreadBorderRouterManagement/Events.h>

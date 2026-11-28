@@ -156,6 +156,7 @@
 #include <clusters/Thermostat/CommandIds.h>
 #include <clusters/ThermostatMode/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
+#include <clusters/ThreadBorderRouterDiagnostics/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>
 #include <clusters/ThreadNetworkDiagnostics/CommandIds.h>
 #include <clusters/ThreadNetworkDirectory/CommandIds.h>
