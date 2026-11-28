@@ -43,6 +43,10 @@ public:
     NodeId GetRemoteId() const { return mPairer->mRemoteId; }
     void SetRemoteId(NodeId id) { mPairer->mRemoteId = id; }
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    bool HasThreadMeshcopCommissionParams() const { return mPairer->mThreadMeshcopCommissionParams.HasValue(); }
+#endif
+
     CHIP_ERROR GetLastPASEError() const { return mPairer->mLastPASEError; }
 
     size_t GetDiscoveredParametersCount() const { return mPairer->mDiscoveredParameters.size(); }

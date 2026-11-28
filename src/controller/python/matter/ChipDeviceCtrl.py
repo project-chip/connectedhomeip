@@ -565,6 +565,7 @@ class ChipDeviceControllerBase:
         self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]
         self._dmLib: typing.Any = None
         self._isActive = False
+        self._defaultThreadMeshCoPConfig: tuple[tuple[str, int], bytes] | None = None
 
         self._InitLib()
 
@@ -1126,7 +1127,8 @@ class ChipDeviceControllerBase:
             nodeId
         )
 
-    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int) -> None:
+    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int,
+                                                *, threadOperationalDataset: bytes | bytearray | None = None) -> None:
         '''
         Establish a PASE session over Thread MeshCoP.
 
@@ -1138,13 +1140,17 @@ class ChipDeviceControllerBase:
             setupCode (str): The setup code of the device.
             nodeId (int): The node ID of the device.
             baPort (int): IP port of BorderAgent.
+            threadOperationalDataset: Dataset containing the Border Agent PSKc for this request.
+                If omitted, uses the dataset set by SetThreadOperationalDataset.
 
         Returns:
             None
         '''
+        dataset = None if threadOperationalDataset is None else bytes(threadOperationalDataset)
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
-                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId),
+                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId,
+                dataset, 0 if dataset is None else len(dataset)),
             nodeId
         )
 
@@ -1598,7 +1604,66 @@ class ChipDeviceControllerBase:
 
         return self._Cluster
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> DeviceProxyWrapper | None:
+    def SetThreadOperationalDataset(self, threadOperationalDataset: bytes) -> None:
+        '''
+        Set the Thread operational dataset for PASE over Thread MeshCoP and commissioning.
+
+        Args:
+            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
+                threadOperationalDataset, len(threadOperationalDataset))
+        ).raise_on_error()
+
+    def SetDefaultThreadMeshCoPConfig(self, threadMeshCoPConfig: tuple[str, int] | None,
+                                      threadOperationalDataset: bytes | bytearray | None = None) -> None:
+        """Set controller defaults for PASE establishment over Thread MeshCoP.
+
+        Args:
+            threadMeshCoPConfig: Border Agent host and port, or None to clear the defaults.
+            threadOperationalDataset: Dataset containing the PSKc for the Border Agent.
+                Required when configuring defaults. Applied when a new PASE session uses them.
+
+        Explicit threadMeshCoPConfig arguments to FindOrEstablishPASESession take precedence
+        and continue to use the dataset set by the caller.
+        """
+        self.CheckIsActive()
+        if threadMeshCoPConfig is None:
+            self._defaultThreadMeshCoPConfig = None
+            return
+
+        host, port = threadMeshCoPConfig
+        if not isinstance(host, str) or not host.strip() or isinstance(port, bool) or not isinstance(port, int) or not 1 <= port <= 65535:
+            raise ValueError("Thread MeshCoP requires a border agent host and a port in the range 1..65535")
+        if not threadOperationalDataset:
+            raise ValueError("Thread MeshCoP requires a Thread operational dataset")
+
+        self._defaultThreadMeshCoPConfig = ((host.strip(), port), bytes(threadOperationalDataset))
+
+    @property
+    def hasDefaultThreadMeshCoPConfig(self) -> bool:
+        """Whether this controller has a default Border Agent and Thread dataset for PASE."""
+        return self._defaultThreadMeshCoPConfig is not None
+
+    async def FindPASESession(self, nodeId: int, timeoutMs: int | None = None) -> DeviceProxyWrapper | None:
+        """Look up the node's commissionee proxy without starting session establishment."""
+        self.CheckIsActive()
+        device = c_void_p(None)
+        result = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeId, byref(device)), timeoutMs)
+        if result.is_success:
+            return DeviceProxyWrapper(device, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+        return None
+
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None,
+                                         threadMeshCoPConfig: tuple[str, int] | None = None,
+                                         *, useThreadMeshCoPDefaults: bool = True) -> DeviceProxyWrapper | None:
         '''
         Find or establish a PASE session.
 
@@ -1607,29 +1672,25 @@ class ChipDeviceControllerBase:
             nodeId (int): The node ID of the device.
             timeoutMs (Optional[int]): Optional timeout in milliseconds.
             threadMeshCoPConfig (Optional[tuple[str, int]]): Optional Border Agent host and port for Thread MeshCoP PASE.
+            useThreadMeshCoPDefaults: Whether to use the controller's MeshCoP defaults when no Border Agent is provided.
 
         Returns:
             DeviceProxyWrapper on success, if not is None.
         '''
-        self.CheckIsActive()
-        returnDevice = c_void_p(None)
-        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-        if res.is_success:
-            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+        session = await self.FindPASESession(nodeId, timeoutMs)
+        if session is not None:
+            return session
 
-        if threadMeshCoPConfig is None:
-            await self.EstablishPASESession(setupCode, nodeId)
+        if threadMeshCoPConfig is not None:
+            host, port = threadMeshCoPConfig
+            await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port)
+        elif useThreadMeshCoPDefaults and self._defaultThreadMeshCoPConfig is not None:
+            (host, port), dataset = self._defaultThreadMeshCoPConfig
+            await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port, threadOperationalDataset=dataset)
         else:
-            threadBorderAgentHost, threadBorderAgentPort = threadMeshCoPConfig
-            await self.EstablishPASESessionThreadMeshcop(threadBorderAgentHost, setupCode, nodeId, threadBorderAgentPort)
+            await self.EstablishPASESession(setupCode, nodeId)
 
-        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-        if res.is_success:
-            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
-
-        return None
+        return await self.FindPASESession(nodeId, timeoutMs)
 
     def GetConnectedDeviceSync(self, nodeId: int, allowPASE=True, timeoutMs: int | None = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
@@ -1717,15 +1778,13 @@ class ChipDeviceControllerBase:
         Returns:
             DeviceProxyWrapper on success.
         '''
-        self.CheckIsActive()
-
         if allowPASE:
-            returnDevice = c_void_p(None)
-            res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-                self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-            if res.is_success:
+            session = await self.FindPASESession(nodeId, timeoutMs)
+            if session is not None:
                 LOGGER.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+                return session
+        else:
+            self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -2908,7 +2967,7 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
-                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
+                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.argtypes = [
@@ -3345,23 +3404,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid.encode("utf-8"), credentials.encode("utf-8"))
-        ).raise_on_error()
-
-    def SetThreadOperationalDataset(self, threadOperationalDataset):
-        '''
-        Set the Thread operational dataset to set during commissioning.
-
-        Args:
-            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
-
-        Raises:
-            ChipStackError: On failure.
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
-                threadOperationalDataset, len(threadOperationalDataset))
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):

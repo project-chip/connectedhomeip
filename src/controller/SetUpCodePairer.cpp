@@ -150,7 +150,8 @@ CHIP_ERROR SetUpCodePairer::Connect()
                              err.Format());
             }
         }
-        if (ShouldDiscoverUsing(RendezvousInformationFlag::kThread))
+#if CHIP_SUPPORT_THREAD_MESHCOP
+        if (mThreadMeshcopCommissionParams.HasValue() && ShouldDiscoverUsing(RendezvousInformationFlag::kThread))
         {
             CHIP_ERROR err = StartDiscoveryOverThreadMeshcop();
             if ((CHIP_ERROR_NOT_IMPLEMENTED == err) || (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err))
@@ -164,6 +165,7 @@ CHIP_ERROR SetUpCodePairer::Connect()
                              err.Format());
             }
         }
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
     }
 
     // We always want to search on network because any node that has already been commissioned will use on-network regardless of the

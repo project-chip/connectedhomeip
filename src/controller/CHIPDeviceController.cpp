@@ -702,13 +702,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                           Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
-#if CHIP_SUPPORT_THREAD_MESHCOP
-    if (meshcopCommissionParams.HasValue())
-    {
-        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
-    }
-#endif
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams, &mThreadMeshcopCommissionProxy);
+#endif
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
                                        resolutionData);
@@ -732,6 +729,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                           Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(NullOptional, nullptr);
+#endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
                                        resolutionData);
 }
@@ -808,10 +808,7 @@ DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * 
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
 #if CHIP_SUPPORT_THREAD_MESHCOP
-    if (meshcopCommissionParams.HasValue())
-    {
-        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
-    }
+    mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams, &mThreadMeshcopCommissionProxy);
 #endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);

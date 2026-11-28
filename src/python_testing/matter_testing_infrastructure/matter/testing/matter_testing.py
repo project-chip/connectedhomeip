@@ -628,6 +628,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         super().setup_class()
 
+        self._configure_pase_session(self.default_controller)
+
         # Set a hook on FabricAdmin so every NewController() call during this test automatically
         # populates self._extra_controllers. This is used during cleanup in teardown_class.
         matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
@@ -679,10 +681,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().teardown_class()
         is called after any custom teardown code.
         """
-        self.event_loop.run_until_complete(self._run_framework_cleanup())
-
-        # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
-        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+        try:
+            self.event_loop.run_until_complete(self._run_framework_cleanup())
+        finally:
+            matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+            controller = self.default_controller
+            if controller is not None and controller.isActive:
+                controller.SetDefaultThreadMeshCoPConfig(None)
 
         if len(self.problems) > 0:
             # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
@@ -999,6 +1004,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.cleanup_config.shutdown_extra_controllers:
             self._shutdown_extra_controllers()
 
+    def _configure_pase_session(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
+        """Apply this test's default PASE transport to a controller."""
+        config = self.matter_test_config
+        method = config.commissioning_method
+        if not self.is_commissioning:
+            method = config.in_test_commissioning_method or method
+        if method == "thread-meshcop":
+            if not config.thread_ba_host or config.thread_ba_port is None:
+                raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
+            controller.SetDefaultThreadMeshCoPConfig(
+                (config.thread_ba_host, config.thread_ba_port), config.thread_operational_dataset)
+        else:
+            controller.SetDefaultThreadMeshCoPConfig(None)
+
     def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
         """Hook set and fired by FabricAdmin for every NewController() call.
 
@@ -1021,6 +1040,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 ca = fa.certificateAuthority
                 if ca not in self._extra_cas:
                     self._extra_cas.append(ca)
+
+        self._configure_pase_session(controller)
 
     def _shutdown_extra_controllers(self) -> None:
         """Shuts down all extra controllers created during the test run and
@@ -2519,7 +2540,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Setup a PASE only session over NTL
         return await self.default_controller.FindOrEstablishPASESession(
             setupCode=ntl_onboarding_data,
-            nodeId=node_id
+            nodeId=node_id,
+            useThreadMeshCoPDefaults=False,
         )
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:

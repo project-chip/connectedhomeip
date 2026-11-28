@@ -59,6 +59,7 @@ class MockDeviceController:
 
     def __init__(self, compressed_fabric_id: int = TEST_COMPRESSED_FABRIC_ID):
         self._compressed_fabric_id = compressed_fabric_id
+        self.hasDefaultThreadMeshCoPConfig = False
         # Mock methods that will be configured per-test
         self.EstablishPASESession = AsyncMock()
         self.GetConnectedDevice = AsyncMock()
@@ -374,7 +375,7 @@ async def test_parallel_session_pase_wins():
 
     # PASE succeeds immediately
     async def pase_success(*args, **kwargs):
-        return None
+        return MagicMock()
 
     # CASE fails after a delay (simulating real network behavior)
     async def case_fail_slow(*args, **kwargs):
@@ -454,7 +455,7 @@ async def test_parallel_session_first_fails_second_succeeds():
     async def pase_success(*args, **kwargs):
         call_order.append('pase')
         await asyncio.sleep(0.1)  # Slight delay
-        return
+        return MagicMock()
 
     async def case_fail(*args, **kwargs):
         call_order.append('case')

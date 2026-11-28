@@ -20,7 +20,6 @@ This module contains classes and functions designed to handle the commissioning 
 """
 
 import asyncio
-import contextlib
 import logging
 from dataclasses import dataclass
 from enum import StrEnum
@@ -198,7 +197,8 @@ class Commission:
         else:
             commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
                 setupCode=setup_code,
-                nodeId=self.node_id
+                nodeId=self.node_id,
+                useThreadMeshCoPDefaults=False,
             )
 
         if commissionee is None:
@@ -503,14 +503,16 @@ async def _establish_pase_or_case_session(
     pase_params: PaseParams | None = None
 ) -> EstablishedSessionKind:
     """
-    Establish a session to the device by trying PASE and CASE in parallel.
+    Establish a session to the device using CASE or PASE.
 
     This is used as a fallback when DNS-SD check doesn't find the device operational.
     The device might be:
     - Not commissioned (PASE will succeed if pase_params provided)
     - Commissioned but DNS-SD failed for some reason (CASE will succeed)
 
-    Whichever connection succeeds first is used; the other is cancelled.
+    With Thread MeshCoP defaults, reuse any existing PASE session, then try a bounded
+    CASE probe before starting synchronous MeshCoP discovery on the stack thread.
+    Otherwise use the first successful connection and cancel any pending attempt.
 
     Args:
         dev_ctrl: The chip device controller instance
@@ -525,74 +527,57 @@ async def _establish_pase_or_case_session(
     Raises:
         RuntimeError: If both connection attempts fail
     """
-    task_list = []
+    setup_code = pase_params.resolve_setup_code(dev_ctrl) if pase_params is not None else None
+    if not setup_code:
+        await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+        return EstablishedSessionKind.CASE
 
-    # Add PASE task if we have parameters
-    if pase_params is not None:
-        setup_code = pase_params.resolve_setup_code(dev_ctrl)
+    async def establish_pase(code: str) -> EstablishedSessionKind:
+        if await dev_ctrl.FindOrEstablishPASESession(code, node_id) is None:
+            raise RuntimeError(f"Failed to establish a PASE session for node {node_id}")
+        return EstablishedSessionKind.PASE
 
-        if setup_code:
-            LOGGER.info("Creating PASE task for node %s", node_id)
-            pase_future = dev_ctrl.FindOrEstablishPASESession(setup_code, node_id)
-            task_list.append(asyncio.create_task(pase_future, name="pase"))
+    def session_error(pase_error: Exception, case_error: Exception) -> RuntimeError:
+        return RuntimeError(
+            f"Both PASE and CASE connection attempts failed for node {node_id}. "
+            f"PASE error: {pase_error}, CASE error: {case_error}"
+        )
 
-    # Always add CASE task (allowPASE=False to force CASE)
-    LOGGER.info("Creating CASE task for node %s", node_id)
-    case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-    task_list.append(asyncio.create_task(case_future, name="case"))
+    if getattr(dev_ctrl, "hasDefaultThreadMeshCoPConfig", False) is True:
+        if await dev_ctrl.FindPASESession(node_id) is not None:
+            return EstablishedSessionKind.PASE
 
-    LOGGER.info("Attempting parallel PASE/CASE connection to node %s", node_id)
-
-    # Wait for first successful completion
-    done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
-
-    # Check if the completed task succeeded or raised an exception
-    completed_task = done.pop()
-    completed_name = completed_task.get_name()
-
-    def _session_kind_from_task_name(name: str) -> EstablishedSessionKind:
-        return EstablishedSessionKind.PASE if name == "pase" else EstablishedSessionKind.CASE
-
-    try:
-        # This will raise if the task failed
-        completed_task.result()
-        LOGGER.info("Successfully established %s session to node %s", completed_name.upper(), node_id)
-    except (ChipStackError, RuntimeError, OSError) as e:
-        # First task failed, wait for the other if there is one
-        if pending:
-            LOGGER.info("%s failed (%s), waiting for other connection attempt", completed_name.upper(), e)
-            done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
-            completed_task2 = done2.pop()
-            completed_name2 = completed_task2.get_name()
+        # A pending CASE attempt cannot complete while MeshCoP discovery occupies the CHIP stack thread.
+        try:
+            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False, timeoutMs=10_000)
+        except (ChipStackError, RuntimeError, OSError) as case_error:
+            LOGGER.info("CASE failed for node %s (%s), trying PASE with Thread MeshCoP defaults", node_id, case_error)
             try:
-                completed_task2.result()
-                LOGGER.info("Successfully established %s session to node %s", completed_name2.upper(), node_id)
-                # Cancel any remaining
-                for task in pending2:
-                    task.cancel()
-                    with contextlib.suppress(asyncio.CancelledError):
-                        await task
-                return _session_kind_from_task_name(completed_name2)
-            except (ChipStackError, RuntimeError, OSError) as e2:
-                # Use task names to correctly label which error came from which connection type
-                if completed_name == "pase":
-                    pase_error, case_error = e, e2
+                return await establish_pase(setup_code)
+            except (ChipStackError, RuntimeError, OSError) as pase_error:
+                raise session_error(pase_error, case_error) from pase_error
+        return EstablishedSessionKind.CASE
+
+    case_task = asyncio.create_task(dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False), name="CASE")
+    pase_task = asyncio.create_task(establish_pase(setup_code), name="PASE")
+    pending = {case_task, pase_task}
+    errors = {}
+    try:
+        while pending:
+            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            for task in done:
+                try:
+                    task.result()
+                except (ChipStackError, RuntimeError, OSError) as err:
+                    errors[task.get_name()] = err
                 else:
-                    pase_error, case_error = e2, e
-                raise RuntimeError(
-                    f"Both PASE and CASE connection attempts failed for node {node_id}. "
-                    f"PASE error: {pase_error}, CASE error: {case_error}"
-                ) from e2
-        else:
-            raise
+                    return EstablishedSessionKind.PASE if task is pase_task else EstablishedSessionKind.CASE
+    finally:
+        for task in pending:
+            task.cancel()
+        await asyncio.gather(case_task, pase_task, return_exceptions=True)
 
-    # Cancel pending tasks
-    for task in pending:
-        task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await task
-
-    return _session_kind_from_task_name(completed_name)
+    raise session_error(errors["PASE"], errors["CASE"]) from errors["CASE"]
 
 
 async def is_commissioned(
@@ -687,8 +672,7 @@ async def get_commissioned_fabric_count(
             # Device not operational on this fabric via DNS-SD - could be:
             # 1. Not commissioned at all (factory fresh) - PASE will work
             # 2. Commissioned but DNS-SD failed - CASE will work
-            # Try both in parallel for fastest response
-            LOGGER.info("Device %s not found via DNS-SD, trying parallel PASE/CASE connection", node_id)
+            LOGGER.info("Device %s not found via DNS-SD, trying CASE and PASE", node_id)
             await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
             result = await dev_ctrl.ReadAttribute(
                 nodeId=node_id,

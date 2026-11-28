@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/SetUpCodePairer.h>
+#include <controller/tests/DeviceCommissionerTestAccess.h>
 #include <controller/tests/SetUpCodePairerTestAccess.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
@@ -112,12 +113,31 @@ public:
 
 protected:
     PairerAccess & Access() { return *mAccess; }
+    DeviceCommissioner & Commissioner() { return *mCommissioner; }
 
 private:
     std::unique_ptr<DeviceCommissioner> mCommissioner;
     std::unique_ptr<SetUpCodePairer> mPairer;
     std::unique_ptr<PairerAccess> mAccess;
 };
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+TEST_F(TestSetUpCodePairer, GenericPASEClearsPreviousThreadMeshcopParameters)
+{
+    auto & commissioner = Commissioner();
+    PairerAccess access(&Testing::DeviceCommissionerTestAccess(&commissioner).GetSetUpCodePairer());
+    constexpr char kSetupCode[] = "34970112332";
+
+    // The commissioner has no system layer in this fixture, so discovery cannot start.
+    ASSERT_EQ(commissioner.EstablishPASEConnection(1, kSetupCode, DiscoveryType::kAll, NullOptional,
+                                                   MakeOptional(SetUpCodePairer::ThreadMeshcopCommissionParameters{})),
+              CHIP_ERROR_INCORRECT_STATE);
+    ASSERT_TRUE(access.HasThreadMeshcopCommissionParams());
+
+    ASSERT_EQ(commissioner.EstablishPASEConnection(1, kSetupCode), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(access.HasThreadMeshcopCommissionParams());
+}
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 
 // When the discovery timeout fires while a PASE attempt is in progress,
 // DNS-SD should be stopped (it runs indefinitely) but other transports
