@@ -674,6 +674,34 @@ TEST_F(TestAccessRestriction, AttributeStorageSeperationTest)
     EXPECT_FALSE(commissioningEntriesFetched[0] == arlEntriesFetched[0]);
 }
 
+TEST_F(TestAccessRestriction, RemoveFabricTest)
+{
+    AccessRestrictionProvider::Entry entry;
+    entry.endpointNumber = 1;
+    entry.clusterId      = kWiFiNetworkManagementCluster;
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
+    entry.restrictions[0].id.SetValue(1);
+
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, { entry }), CHIP_NO_ERROR);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(2, { entry }), CHIP_NO_ERROR);
+    EXPECT_EQ(accessRestrictionProvider.SetCommissioningEntries({ entry }), CHIP_NO_ERROR);
+
+    accessRestrictionProvider.RemoveFabric(1);
+
+    std::vector<AccessRestrictionProvider::Entry> fetched;
+    EXPECT_EQ(accessRestrictionProvider.GetEntries(1, fetched), CHIP_ERROR_NOT_FOUND);
+    EXPECT_TRUE(fetched.empty());
+
+    // Other fabrics and the (non fabric-scoped) commissioning entries are untouched.
+    EXPECT_EQ(accessRestrictionProvider.GetEntries(2, fetched), CHIP_NO_ERROR);
+    EXPECT_EQ(fetched.size(), static_cast<size_t>(1));
+    EXPECT_EQ(accessRestrictionProvider.GetCommissioningEntries().size(), static_cast<size_t>(1));
+
+    // Removing a fabric without entries is a no-op.
+    accessRestrictionProvider.RemoveFabric(3);
+    EXPECT_EQ(accessRestrictionProvider.GetEntries(3, fetched), CHIP_ERROR_NOT_FOUND);
+}
+
 constexpr CheckData listSelectionDuringCommissioningData[] = {
     { .subjectDescriptor = { .fabricIndex     = 1,
                              .authMode        = AuthMode::kCase,
