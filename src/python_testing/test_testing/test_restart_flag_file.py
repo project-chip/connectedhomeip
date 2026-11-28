@@ -71,10 +71,17 @@ class TestRestartFlagReader(unittest.TestCase):
         self.monitor.start([mock.Mock()], threading.Lock(), self.config)
 
     def _wait_consumed(self):
+        """Waits until the monitor has finished with the request at the flag path.
+
+        The monitor takes the flag file by renaming it to a claim and removes the claim only after acting on the request,
+        so the flag path is gone before the request is done with; the claim has to be gone too.
+        """
+        claim = self.flag + ".claim"
         deadline = time.monotonic() + 10
-        while os.path.exists(self.flag) and time.monotonic() < deadline:
+        while (os.path.exists(self.flag) or os.path.exists(claim)) and time.monotonic() < deadline:
             time.sleep(0.05)
         self.assertFalse(os.path.exists(self.flag), "monitor did not consume the flag file")
+        self.assertFalse(os.path.exists(claim), "monitor did not remove its claim on the flag file")
 
     def test_factory_reset_written_after_file_creation(self):
         # The file exists empty across several monitor polls (0.5 s) before the request text lands.
@@ -160,6 +167,24 @@ class TestRestartFlagReader(unittest.TestCase):
         self._wait_consumed()
         self.app_manager.assert_called_once_with(self.config)
         self.assertEqual(os.listdir(self.dir.name), [])
+
+    def test_consumed_request_leaves_no_claim(self):
+        # The monitor takes the flag file by renaming it to a claim and removes the claim once it has acted on it, so the
+        # flag path is gone before the claim is. A slow claim removal must not leave a claim behind once a consumed
+        # request is reported.
+        real_unlink = os.unlink
+
+        def slow_claim_unlink(path):
+            if str(path).endswith(".claim"):
+                time.sleep(0.5)
+            return real_unlink(path)
+
+        with mock.patch.object(run_python_test.os, "unlink", slow_claim_unlink):
+            self._start_monitor()
+            matter_testing.write_restart_flag_file(self.flag, "restart")
+            self._wait_consumed()
+            self.assertEqual(os.listdir(self.dir.name), [])
+        self.app_manager.assert_called_once_with(self.config)
 
     def test_rejection_under_ascii_locale(self):
         def ascii_default(real_open):
