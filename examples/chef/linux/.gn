@@ -22,4 +22,5 @@ check_system_includes = true
 
 default_args = {
   import("//args.gni")
+  cpp_standard = "gnu++17"
 }
