@@ -38,6 +38,35 @@ using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /**
+ * A WebRTCSessionStruct that owns the storage for its VideoStreams and AudioStreams lists, so that it stays valid after
+ * the lists it was copied from are gone.
+ */
+class WebRTCSessionStorage : public WebRTCSessionStruct
+{
+public:
+    explicit WebRTCSessionStorage(const WebRTCSessionStruct & session) { Assign(session); }
+    WebRTCSessionStorage(const WebRTCSessionStorage & other) : WebRTCSessionStruct() { Assign(other); }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStorage & other)
+    {
+        Assign(other);
+        return *this;
+    }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStruct & session)
+    {
+        Assign(session);
+        return *this;
+    }
+
+private:
+    void Assign(const WebRTCSessionStruct & session);
+
+    std::vector<uint16_t> mVideoStreams;
+    std::vector<uint16_t> mAudioStreams;
+};
+
+/**
  * @brief
  *   A delegate interface for the WebRTC Transport Provider cluster, allowing
  *   OEM or application-specific logic to be implemented outside of the cluster
@@ -90,6 +119,8 @@ public:
      *
      * @param[out] outSession
      *     On success (`CHIP_NO_ERROR`), must be populated with the new session's details.
+     *     The server copies `videoStreams` and `audioStreams` immediately after this method returns;
+     *     those buffers must remain valid across the return and may be freed or overwritten afterwards.
      *
      * @param[out] outDeferredOffer
      *     On success (`CHIP_NO_ERROR`), set to `true` if the device is in standby
@@ -128,8 +159,10 @@ public:
      *
      * @param[out] outSession
      *   Must be populated with the final session details (session ID, stream IDs, etc.) when this
-     *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
-     *   set to an invalid state.
+     *   method returns `CHIP_NO_ERROR`. The server copies `videoStreams` and `audioStreams`
+     *   immediately after this method returns; those buffers must remain valid across the return
+     *   and may be freed or overwritten afterwards.
+     *   If an error is returned, `outSession` is left unmodified or set to an invalid state.
      *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
@@ -414,14 +447,12 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
-     * @brief Get a reference to the current WebRTC sessions.
+     * @brief Get a copy of the current WebRTC sessions.
      *
-     * This method provides read-only access to the current list of active WebRTC sessions
-     * managed by this server instance.
-     *
-     * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
+     * Each returned session owns its VideoStreams and AudioStreams lists, so the copy stays valid
+     * when the cluster's sessions change afterwards.
      */
-    const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
+    std::vector<WebRTCSessionStorage> GetCurrentSessions() const { return mCurrentSessions; }
 
     /**
      * @brief Removes a WebRTC session given a session ID.
@@ -447,7 +478,7 @@ private:
 
     WebRTCTransportProvider::Delegate & mDelegate;
     FabricTable & mFabricTable;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    std::vector<WebRTCSessionStorage> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
