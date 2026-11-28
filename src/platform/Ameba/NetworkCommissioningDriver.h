@@ -17,6 +17,7 @@
 
 #pragma once
 #include "chip_porting.h"
+#include <algorithm>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -43,7 +44,7 @@ public:
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security.SetRaw(mpScanResults[mIternum].security);
-        item.ssidLen         = mpScanResults[mIternum].SSID.len;
+        item.ssidLen         = static_cast<uint8_t>(std::min<size_t>(mpScanResults[mIternum].SSID.len, sizeof(item.ssid)));
         item.channel         = mpScanResults[mIternum].channel;
         item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
