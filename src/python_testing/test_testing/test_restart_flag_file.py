@@ -161,6 +161,24 @@ class TestRestartFlagReader(unittest.TestCase):
         self.app_manager.assert_called_once_with(self.config)
         self.assertEqual(os.listdir(self.dir.name), [])
 
+    def test_consumed_request_leaves_no_claim(self):
+        # The monitor takes the flag file by renaming it to a claim and removes the claim once it has acted on it, so the
+        # flag path is gone before the claim is. A slow claim removal must not leave a claim behind once a consumed
+        # request is reported.
+        real_unlink = os.unlink
+
+        def slow_claim_unlink(path):
+            if str(path).endswith(".claim"):
+                time.sleep(0.5)
+            return real_unlink(path)
+
+        with mock.patch.object(run_python_test.os, "unlink", slow_claim_unlink):
+            self._start_monitor()
+            matter_testing.write_restart_flag_file(self.flag, "restart")
+            self._wait_consumed()
+            self.assertEqual(os.listdir(self.dir.name), [])
+        self.app_manager.assert_called_once_with(self.config)
+
     def test_rejection_under_ascii_locale(self):
         def ascii_default(real_open):
             def ascii_open(file, mode="r", *args, encoding=None, **kwargs):
