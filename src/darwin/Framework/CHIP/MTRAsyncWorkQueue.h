@@ -132,6 +132,11 @@ MTR_TESTABLE
 /// The work item may or may not have been started already.
 @property (nonatomic, strong, nullable) void (^cancelHandler)(void);
 
+/// Why the item was cancelled, as given to the -cancelWorkItemIfUnsent:reason: call that cancelled it; 0 when it
+/// was cancelled any other way (including when the queue is invalidated) or not at all.  Set, under the queue's
+/// lock, before the cancelHandler is dispatched, by the one cancel that succeeds; a later cancel changes nothing.
+@property (nonatomic, readonly) NSUInteger cancelReason;
+
 @property (nonatomic, readonly) NSUInteger batchingID;
 @property (nonatomic, readonly, nullable) id batchableData;
 @property (nonatomic, readonly, nullable) MTRAsyncWorkBatchingHandler batchingHandler;
@@ -165,6 +170,14 @@ MTR_TESTABLE
 /// @see MTRAsyncWorkDuplicateCheckHandler
 - (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID
                    handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler;
+
+/// A user command: queued ahead of items that track their send and have not sent anything yet, and allowed to
+/// start beside them.  Set before the item is enqueued.
+@property (nonatomic) BOOL jumpsUnsentWork;
+
+/// The item reports, through -[MTRAsyncWorkQueue workItem:readyToSend:], when it is about to send something.
+/// Until then it is "not yet sent", which counts as queued, not running.  Set before the item is enqueued.
+@property (nonatomic) BOOL tracksSend;
 
 @end
 
@@ -233,6 +246,22 @@ MTR_TESTABLE
 
 /// Cancels and removes all work items.
 - (void)invalidate;
+
+/// Called by a running work item right before it sends anything.  Marks the item as sent and calls `send`, and
+/// returns YES.  Returns NO without calling `send` if the item was cancelled (cancelWorkItemIfUnsent:) first.
+/// Must be called at most once per item.
+- (BOOL)workItem:(MTRAsyncWorkItem<ContextType> *)workItem readyToSend:(dispatch_block_t)send;
+
+/// Cancels and removes the work item if it has not sent anything yet: it is still queued, or it is running but
+/// has not called workItem:readyToSend:.  Its readyHandler then never runs (or, if running, its completion
+/// returns NO) and its cancelHandler is called.  An item not yet enqueued counts as unsent: this returns YES, and
+/// enqueueing it later cancels it instead.  Returns NO, and changes nothing, if the item has sent or is no
+/// longer in the queue.
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem;
+
+/// As -cancelWorkItemIfUnsent:, and when it returns YES, records `reason` as the item's cancelReason in the same
+/// step, so the cancelHandler can tell which cancel won.  `reason` is the caller's own non-zero code.
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem reason:(NSUInteger)reason;
 @end
 
 NS_ASSUME_NONNULL_END

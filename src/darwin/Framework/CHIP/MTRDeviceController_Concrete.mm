@@ -1816,8 +1816,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
         // Ensure the work item is queued only once, since this handler could be called multiple times in a row
         if (workItem) {
-            if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
-                MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
+            // A session to the node can appear while the request waits, set up by another request or by the peer.
+            // Check for one whenever the wait ends, whether the monitor reported or the wait timed out, before
+            // queueing a new session attempt in the subscription pool.
+            if ([self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
+                if (timedOut) {
+                    MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
+                } else {
+                    MTR_LOG("%@ connectivity monitor reported for node 0x%016llX, used existing session", self, nodeID);
+                }
             } else {
                 if (timedOut) {
                     MTR_LOG_ERROR("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, proceeding with connection attempt", self, nodeID, monitorWaitSeconds);

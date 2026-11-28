@@ -5,6 +5,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRUserInvokeToken;
+
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
