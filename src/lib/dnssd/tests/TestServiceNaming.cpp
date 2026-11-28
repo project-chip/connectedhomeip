@@ -255,4 +255,32 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
     EXPECT_EQ(MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
 }
+
+const char * SkipSubtype(const char * name)
+{
+    SkipServiceSubtypeLabels(name);
+    return name;
+}
+
+TEST(TestServiceNaming, TestSkipServiceSubtypeLabels)
+{
+    // No subtype: unchanged.
+    EXPECT_STREQ(SkipSubtype("_matterc._udp.default.service.arpa."), "_matterc._udp.default.service.arpa.");
+    EXPECT_STREQ(SkipSubtype("_matter._tcp.default.service.arpa."), "_matter._tcp.default.service.arpa.");
+
+    // Subtypes are skipped, even long ones.
+    EXPECT_STREQ(SkipSubtype("_S15._sub._matterc._udp.default.service.arpa."), "_matterc._udp.default.service.arpa.");
+    EXPECT_STREQ(SkipSubtype("_L3840._sub._matterc._udp.default.service.arpa."), "_matterc._udp.default.service.arpa.");
+    EXPECT_STREQ(SkipSubtype("_I0123456789ABCDEF._sub._matter._tcp.default.service.arpa."), "_matter._tcp.default.service.arpa.");
+
+    // "_sub" must be the whole second label.
+    EXPECT_STREQ(SkipSubtype("_S15._subtype._matterc._udp."), "_S15._subtype._matterc._udp.");
+    EXPECT_STREQ(SkipSubtype("_S15._su._matterc._udp."), "_S15._su._matterc._udp.");
+    EXPECT_STREQ(SkipSubtype("_matterc._udp._sub.default.service.arpa."), "_matterc._udp._sub.default.service.arpa.");
+
+    // Too short to hold a subtype.
+    EXPECT_STREQ(SkipSubtype("_S15._sub"), "_S15._sub");
+    EXPECT_STREQ(SkipSubtype("_matterc"), "_matterc");
+    EXPECT_STREQ(SkipSubtype(""), "");
+}
 } // namespace
