@@ -22,7 +22,8 @@
 using chip::Protocols::InteractionModel::Status;
 
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
-                                uint8_t * buffer, uint16_t readLength, bool write)
+                                uint8_t * buffer, uint16_t readLength, bool write,
+                                const chip::Access::SubjectDescriptor * subjectDescriptor)
 {
     if (!write)
     {
