@@ -47,8 +47,8 @@ namespace Messaging {
  *   2. If you send a message successfully that doesn't require a response, invoking Get() on the holder there-after will return
  *      nullptr.
  *
- *   3. If you send a message successfully that does require a response, invoking Get() on the holder will return a valid
- *      pointer until the response is received or times out.
+ *   3. If you send a message successfully that does require a response, or with kNotifyOnAck, invoking Get() on the holder will
+ *      return a valid pointer until the response (or ack) is received or times out.
  *
  *   4. On reception of a message on an exchange, if you return from OnMessageReceived() and no messages were sent on that exchange,
  *      invoking Get() on the holder will return a nullptr.
@@ -130,7 +130,7 @@ public:
              * interest in it. Since we don't have a pending message at this point, calling Abort is OK here as well.
              *
              */
-            if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected())
+            if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected() || mpExchangeCtx->IsAckNotificationPending())
             {
 #if CHIP_EXCHANGE_HOLDER_DETAIL_LOGGING
                 ChipLogDetail(ExchangeManager, "[%p] ExchangeHolder::Release: Aborting!", this);
@@ -159,6 +159,8 @@ private:
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override { return mpExchangeDelegate.OnResponseTimeout(ec); }
+
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override { return mpExchangeDelegate.OnAckOutcome(ec, aError); }
 
     void OnExchangeClosing(ExchangeContext * ec) override
     {
