@@ -820,9 +820,9 @@ menu "CHIP Device Layer"
         config CHIP_DEVICE_ENABLE_THREAD_MESHCOP
             bool "Enable Thread MeshCoP"
             default n
-            depends on ENABLE_MATTER_OVER_THREAD && !ENABLE_CONCURRENT_CONNECTION
+            depends on ENABLE_MATTER_OVER_THREAD
             help
-                Enable Matter commissioning over Thread MeshCoP
+                Enable Matter commissioning over Thread MeshCoP.
 
     endmenu
 
