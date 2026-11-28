@@ -86,11 +86,23 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
  *
  *  @param[in]    ackMessageCounter         The acknowledged message counter of the incoming message.
  */
+void ReliableMessageContext::NoteGivenUpMessage(uint32_t messageCounter)
+{
+    mGivenUpMessageCounter = messageCounter;
+    mFlags.Set(Flags::kFlagGivenUpMessageCounterIsValid);
+}
+
 void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 {
     // Msg is an Ack; Check Retrans Table and remove message context
     if (GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
     {
+        SetWaitingForResponseOrAck(false);
+    }
+    else if (mFlags.Has(Flags::kFlagGivenUpMessageCounterIsValid) && ackMessageCounter == mGivenUpMessageCounter)
+    {
+        // The peer did receive the message we stopped retransmitting.
+        mFlags.Clear(Flags::kFlagGivenUpMessageCounterIsValid);
         SetWaitingForResponseOrAck(false);
     }
     else

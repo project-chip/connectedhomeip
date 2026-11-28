@@ -41,6 +41,9 @@ class TestCommandInteraction;
 class TestReadInteraction;
 class TestWriteInteraction;
 } // namespace app
+namespace Testing {
+class ReliableMessageContextTestAccess;
+} // namespace Testing
 namespace Messaging {
 
 class ChipMessageInfo;
@@ -184,11 +187,21 @@ protected:
         ///     IsResponseExpected() is true).
         /// (2) We have received neither a response nor an ack for that message.
         kFlagWaitingForResponseOrAck = (1u << 11),
+
+        /// When set, mGivenUpMessageCounter holds the counter of the last
+        /// message on this exchange that the reliable messaging layer stopped
+        /// retransmitting without receiving an ack.
+        kFlagGivenUpMessageCounterIsValid = (1u << 12),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
 
 private:
+    // Records that the reliable messaging layer stopped retransmitting the
+    // message with this counter, so an ack that arrives for it afterwards is
+    // still recognized.
+    void NoteGivenUpMessage(uint32_t messageCounter);
+
     void HandleRcvdAck(uint32_t ackMessageCounter);
     CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
     CHIP_ERROR HandleNeedsAckInner(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
@@ -213,9 +226,11 @@ private:
     friend class ::chip::app::TestCommandInteraction;
     friend class ::chip::app::TestReadInteraction;
     friend class ::chip::app::TestWriteInteraction;
+    friend class ::chip::Testing::ReliableMessageContextTestAccess;
 
     System::Clock::Timestamp mNextAckTime; // Next time for triggering Solo Ack
     uint32_t mPendingPeerAckMessageCounter;
+    uint32_t mGivenUpMessageCounter = 0;
 };
 
 inline bool ReliableMessageContext::AutoRequestAck() const

@@ -1393,11 +1393,16 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msgR2->Start(), msgR2->DataLength() }));
 
+    // The exchange arms its response timer before it dispatches the message,
+    // so take the timestamp first; the time the send takes then counts against
+    // the remaining wait instead of extending it.
+    System::Clock::Timestamp sendStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2)));
 
     mState                 = State::kSentSigma2;
-    mSigma2SentTime        = System::SystemClock().GetMonotonicTimestamp();
+    mSigma2SentTime        = sendStartTime;
     mSigma2ResponseTimeout = mExchangeCtxt->GetResponseTimeout();
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
