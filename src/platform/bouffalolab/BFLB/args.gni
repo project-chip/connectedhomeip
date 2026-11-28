@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# GN args for cmake-based bouffalo_sdk builds (BL616 today; BL616CL/BL618DG future).
-# Imported by the application's args.gni (e.g. lighting-app/bouffalolab/bl616/args.gni).
+# GN args for cmake-based bouffalo_sdk builds (BL616 today; BL616CL/BL618DG
+# future). Imported by the application's args.gni (e.g.
+# lighting-app/bouffalolab/bl616/args.gni).
 # Does NOT import bouffalolab_iot_sdk — cmake provides the SDK.
 
 import("//build_overrides/chip.gni")
@@ -31,20 +32,25 @@ chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
-# ── lwIP: compiled by bouffalo_sdk cmake, not GN ─────────────────────────────
+# ── lwIP: compiled by bouffalo_sdk cmake, not GN
+# ─────────────────────────────
 # "external" tells src/lwip/BUILD.gn to produce an empty stub rather than
-# compiling lwIP sources.  Headers are provided via MATTER_CFLAGS.
+# compiling lwIP sources. Headers are provided via MATTER_CFLAGS.
 lwip_platform = "external"
 
 default_configs_extra =
     [ "${chip_root}/src/platform/bouffalolab/BFLB:bflb_warnings" ]
 
-# ── mbedtls: compiled by bouffalo_sdk cmake, not GN ──────────────────────────
+# ── mbedtls: compiled by bouffalo_sdk cmake, not GN
+# ──────────────────────────
 mbedtls_target = "${chip_root}/src/platform/bouffalolab/common:mbedtls_stub"
 
-# ── OpenThread: compiled by bouffalo_sdk cmake, not GN ───────────────────────
-# Use the official chip_openthread_target escape hatch so GN does not
-# compile any OT code.  The actual OT headers and library come from
-# the SDK build (via MATTER_CFLAGS include paths and cmake link).
+# ── OpenThread: compiled by bouffalo_sdk cmake, not GN
+# ─────────────────────── Use the
+# official chip_openthread_target escape hatch so GN does not compile any OT
+# code. The actual OT headers and library come from the SDK build (via
+# MATTER_CFLAGS include paths and cmake link).
 chip_openthread_target =
     "${chip_root}/src/platform/bouffalolab/common:openthread_stub"
+
+pw_string_CONFIG = "${chip_root}/config/bouffalolab/pw_string:pw_string_config"

@@ -131,6 +131,10 @@ list(FILTER MATTER_CFLAGS    EXCLUDE REGEX "^-Wno-unknown-warning-option$")
 list(FILTER MATTER_CFLAGS_C  EXCLUDE REGEX "^-Wno-unknown-warning-option$")
 list(FILTER MATTER_CFLAGS_CC EXCLUDE REGEX "^-Wno-unknown-warning-option$")
 
+# bouffalo_sdk's cjson directory has a plain-text "version" file that shadows
+# C++ <version> (included via pw_span/span.h) when passed via -I.
+list(FILTER MATTER_CFLAGS EXCLUDE REGEX "/components/utils/cjson$")
+
 # =============================================================================
 # Matter Flags
 # =============================================================================

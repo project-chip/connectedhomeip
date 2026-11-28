@@ -348,6 +348,8 @@ static_library("support") {
 
   cflags = [ "-Wconversion" ]
 
+  deps = [ "$dir_pw_base64" ]
+
   public_deps = [
     ":assertions",
     ":attributes",

@@ -26,4 +26,5 @@ default_args = {
   target_os = "zephyr"
 
   import("${chip_root}/config/nxp/chip-gn/args.gni")
+  import("${chip_root}/config/pigweed_backends.gni")
 }

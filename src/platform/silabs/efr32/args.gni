@@ -53,6 +53,8 @@ openthread_core_config_deps = [ "${chip_root}/examples/platform/silabs/efr32:ope
 
 chip_config_memory_management = "platform"
 
+# Clear before reassigning because config/standalone/args.gni pre-populates this list.
+pw_build_LINK_DEPS = []
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",
   "$dir_pw_log:impl",

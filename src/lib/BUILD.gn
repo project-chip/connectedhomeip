@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/src/platform/device.gni")
 import("lib.gni")
 
@@ -20,7 +22,7 @@ source_set("without-logging") {
   public_deps = [
     # keep-sorted: start
     "${chip_root}/src/app",
-    "${chip_root}/src/app/clusters:clusters",
+    "${chip_root}/src/app/clusters",
     "${chip_root}/src/ble",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
@@ -55,8 +57,9 @@ source_set("without-logging") {
     public_deps += [ "${chip_root}/src/lib/shell" ]
   }
 
-  # This exists mainly for compatibility with CMAKE systems: need to ensure
-  # that the corresponding buildconfig header is generated (regardless if used or not)
+  # This exists mainly for compatibility with CMAKE systems: need to ensure that
+  # the corresponding buildconfig header is generated (regardless if used or
+  # not)
   if (chip_build_enable_codegen_configuration) {
     public_deps +=
         [ "${chip_root}/src/data-model-providers/codegen:processing-config" ]
@@ -77,6 +80,9 @@ static_library("lib") {
     ":without-logging",
     "${chip_root}/src/platform/logging:default",
   ]
+  if (chip_link_pw_build_deps) {
+    public_deps += pw_build_LINK_DEPS
+  }
 
   output_name = "libCHIP"
 
@@ -96,6 +102,9 @@ static_library("with-stdio-logging") {
     ":without-logging",
     "${chip_root}/src/platform/logging:stdio",
   ]
+  if (chip_link_pw_build_deps) {
+    public_deps += pw_build_LINK_DEPS
+  }
 
   output_name = "libCHIPWithStdioLogging"
 

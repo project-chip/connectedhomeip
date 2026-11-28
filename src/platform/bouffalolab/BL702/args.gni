@@ -40,3 +40,5 @@ openthread_core_config_platform_check_file =
 openthread_project_include_dirs = []
 openthread_external_platform =
     "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"
+
+pw_string_CONFIG = "${chip_root}/config/bouffalolab/pw_string:pw_string_config"
