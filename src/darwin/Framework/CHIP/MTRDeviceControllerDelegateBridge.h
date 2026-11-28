@@ -43,6 +43,8 @@ public:
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 
+    void OnCommissioneeReleased(chip::NodeId deviceId, CHIP_ERROR reason) override;
+
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
@@ -60,6 +62,13 @@ public:
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
 
     void SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters);
+
+#ifdef DEBUG
+    _Nullable id<MTRDeviceControllerDelegate> unitTestDelegate() const
+    {
+        return mDelegate;
+    }
+#endif
 
 private:
     MTRDeviceController * __weak mController;

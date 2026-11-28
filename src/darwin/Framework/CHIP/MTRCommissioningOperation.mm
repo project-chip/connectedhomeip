@@ -45,7 +45,6 @@ using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRCommissioningOperation {
     MTRCommissioningParameters * _parameters;
-    NSNumber * _commissioningID;
     id<MTRCommissioningDelegate> __weak _delegate;
     dispatch_queue_t _delegateQueue;
     MTRDeviceController_Concrete * __weak _controller;
@@ -93,7 +92,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     _parameters = [parameters copy];
     _setupPayload = payload;
-    _commissioningID = commissioningID;
+    _commissioningID = [commissioningID copy];
     _isInternallyCreated = isInternallyCreated;
     _delegate = delegate;
     _delegateQueue = queue;
@@ -206,7 +205,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     [self _dispatchCommissioningError:error forCommissioningID:_commissioningID withMetrics:metrics];
 }
 
-- (void)_dispatchCommissioningError:(NSError *)error forCommissioningID:(NSNumber *)commissioningID withMetrics:(MTRMetrics *)metrics
+- (void)_dispatchCommissioningError:(NSError *)error forCommissioningID:(NSNumber * _Nullable)commissioningID withMetrics:(MTRMetrics *)metrics
 {
     MTRDeviceController_Concrete * strongController = _controller;
 
@@ -262,8 +261,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.
     if ([strongDelegate respondsToSelector:@selector(commissioning:paseSessionEstablishmentComplete:)]) {
-        dispatch_async(_delegateQueue, ^{
+        // Set before any further dispatch: a release of the commissionee is queued on this same serial queue after us, so it
+        // must see the flag.
+        if (!error) {
             self.isWaitingAfterPASEEstablished = YES;
+        }
+        dispatch_async(_delegateQueue, ^{
             [strongDelegate commissioning:self paseSessionEstablishmentComplete:error];
         });
 
@@ -430,6 +433,21 @@ static inline void emitMetricForSetupPayload(NSString * payload)
             }
         }];
     });
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioneeReleasedForNodeID:(NSNumber *)nodeID error:(NSError *)error
+{
+    if (![nodeID isEqual:_commissioningID]) {
+        return;
+    }
+
+    // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
+    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self error:error]) {
+        // No node was commissioned, so report a nil node ID with the error.
+        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, [MTRError errorToCHIPErrorCode:error]);
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
+        [self _dispatchCommissioningError:error forCommissioningID:nil withMetrics:metrics];
+    }
 }
 
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller

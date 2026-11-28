@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
       failedWithError:(NSError *)error
-          forDeviceID:(NSNumber *)deviceID
+          forDeviceID:(NSNumber * _Nullable)deviceID
               metrics:(MTRMetrics *)metrics;
 
 @end

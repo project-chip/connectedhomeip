@@ -23,10 +23,10 @@
 #import <sys/socket.h>
 
 #import "MTRDeviceConnectivityMonitor.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestStorage.h"
