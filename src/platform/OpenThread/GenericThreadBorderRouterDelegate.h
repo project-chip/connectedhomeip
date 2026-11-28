@@ -47,6 +47,7 @@ public:
     }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
+    void Shutdown() override;
 
     bool GetPanChangeSupported() override { return true; }
 
@@ -63,8 +64,8 @@ public:
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
 
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override;
 
     CHIP_ERROR CommitActiveDataset() override;
 
@@ -102,8 +103,8 @@ public:
 
 private:
     CHIP_ERROR SaveActiveDatasetConfigured(bool configured);
-    ActivateDatasetCallback * mpActivateDatasetCallback = nullptr;
-    uint32_t mSequenceNum                               = 0;
+    ActivateDatasetCompleteCallback mActivateDatasetCallback = nullptr;
+    void * mActivateDatasetContext                           = nullptr;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
     PersistentStorageDelegate * mStorage;
     AttributeChangeCallback * mpAttributeChangeCallback = nullptr;
