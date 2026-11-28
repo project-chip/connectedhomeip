@@ -135,8 +135,8 @@ class PushAvServer:
                 raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
 
             file_path_with_ext = f"{file_path}.{ext}"
-            session = stream.last_in_progress_session()
             body = await req.body()
+            session = stream.last_in_progress_session()
 
             # Validate the incoming file upload
             errors, session = self.validator.validate_upload(
