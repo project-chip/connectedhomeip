@@ -4058,12 +4058,13 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }];
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-            dispatch_async(queue, ^{
-                completion(values, error);
-            });
+            // Remove a failed invoke's expected values first, so its completion sees the cached value.
             if (error && expectedValues) {
                 [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
             }
+            dispatch_async(queue, ^{
+                completion(values, error);
+            });
             workCompletion(MTRAsyncWorkComplete);
         };
 
@@ -5187,8 +5188,8 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                     *shouldReportValue = YES;
                     *attributeValueToReport = cachedValue;
                     *previousValue = previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex];
-                    _expectedValueCache[attributePath] = nil;
                 }
+                _expectedValueCache[attributePath] = nil;
             }
         }
     } else {
