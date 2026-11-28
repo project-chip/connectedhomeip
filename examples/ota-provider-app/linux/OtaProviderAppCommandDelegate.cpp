@@ -74,6 +74,14 @@ Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16
     return payload;
 }
 
+Json::Value OtaProviderAppCommandHandler::GetNotifyUpdateAppliedSnapshot(uint16_t endpoint)
+{
+    Json::Value payload(Json::objectValue);
+    payload["UpdateToken"]     = GetOtaProviderExample().GetNotifyUpdateAppliedToken();
+    payload["SoftwareVersion"] = GetOtaProviderExample().GetNotifyUpdateAppliedSoftwareVersion();
+    return payload;
+}
+
 Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -157,6 +165,21 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         out["Cluster"]  = cluster;
         out["Endpoint"] = endpoint;
         out["Payload"]  = self->BuildApplyUpdateRequestSnapshot(endpoint);
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
+        return;
+    }
+
+    if (name == "GetNotifyUpdateAppliedStatus")
+    {
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "NotifyUpdateAppliedResponse";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+        out["Payload"]  = self->GetNotifyUpdateAppliedSnapshot(endpoint);
 
         if (delegate && delegate->GetPipes())
         {
