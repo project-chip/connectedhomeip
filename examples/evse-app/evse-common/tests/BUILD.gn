@@ -72,6 +72,7 @@ chip_test_suite("tests-delegate") {
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/energy-evse-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
