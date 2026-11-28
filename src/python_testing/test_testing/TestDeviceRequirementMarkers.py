@@ -111,6 +111,7 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_DA_1_9.py",
         "TC_DD_3_23.py",
         "TC_DD_3_24.py",
+        "TC_IDM_10_7.py",
         "TC_SC_7_1.py",
         "TC_SC_TC_2_1.py",
         "TC_SC_TC_2_2.py",
