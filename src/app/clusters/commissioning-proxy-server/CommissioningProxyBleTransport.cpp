@@ -38,10 +38,16 @@ using chip::Ble::BLEEndPoint;
 using chip::Ble::BleLayer;
 using Protocols::InteractionModel::Status;
 
+namespace {
+
+constexpr System::Clock::Milliseconds32 kCentralRoleRetryInterval(500);
+
+} // namespace
+
 CommissioningProxyBleTransport::CommissioningProxyBleTransport(CommissioningProxyBleAdapter & adapter,
-                                                               TimerDelegate & timerDelegate) :
+                                                               TimerDelegate & timerDelegate, BleLayer * bleLayer) :
     mAdapter(adapter),
-    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate)
+    mTimerDelegate(timerDelegate), mBleLayer(bleLayer), mBgScan(mBgScanHardware, timerDelegate)
 {}
 
 CommissioningProxyBleTransport::~CommissioningProxyBleTransport()
@@ -57,6 +63,10 @@ CommissioningProxyBleTransport::~CommissioningProxyBleTransport()
 
 BleLayer * CommissioningProxyBleTransport::GetBleLayer() const
 {
+    if (mBleLayer != nullptr)
+    {
+        return mBleLayer;
+    }
     return DeviceLayer::ConnectivityMgr().GetBleLayer();
 }
 
@@ -135,6 +145,7 @@ void CommissioningProxyBleTransport::FailPendingConnect(Status status)
     VerifyOrReturn(mPendingConnect.has_value());
 
     mTimerDelegate.CancelTimer(&mConnectTimer);
+    mTimerDelegate.CancelTimer(&mCentralRoleRetryTimer);
 
     // Move out and reset before answering, so a re-entrant callback sees no pending
     // connect.
@@ -404,6 +415,9 @@ CHIP_ERROR CommissioningProxyBleTransport::ProxyBleDelegate::SetEndPoint(BLEEndP
 
 CHIP_ERROR CommissioningProxyBleTransport::BgScanHardware::StartHardwareScan()
 {
+    // A pending connect needs the single BLE scanner. On BUSY the registry keeps the
+    // request and starts the scan when the transport resumes background scanning.
+    VerifyOrReturnError(!mOwner.mPendingConnect.has_value(), CHIP_ERROR_BUSY);
     return mOwner.mAdapter.StartScan(HandleBackgroundScanResult, &mOwner);
 }
 
@@ -545,6 +559,8 @@ void CommissioningProxyBleTransport::OnConnectTimeout()
 
     ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for BLE connect");
 
+    mTimerDelegate.CancelTimer(&mCentralRoleRetryTimer);
+
     ConnectCtx ctx = std::move(*mPendingConnect);
     mPendingConnect.reset();
 
@@ -577,8 +593,82 @@ void CommissioningProxyBleTransport::OnConnectTimeout()
     ResumeBgScanIfNeeded();
 }
 
+void CommissioningProxyBleTransport::OnCentralRoleRetry()
+{
+    if (TryStartCentralConnect() != CHIP_NO_ERROR)
+    {
+        FailPendingConnect(Status::Failure);
+    }
+}
+
+CHIP_ERROR CommissioningProxyBleTransport::TryStartCentralConnect()
+{
+    VerifyOrReturnError(mPendingConnect.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    const uint16_t discriminator = mPendingConnect->discriminator;
+
+    auto * layer = GetBleLayer();
+    if (layer == nullptr)
+    {
+        ChipLogError(AppServer, "ProxyConnectRequest: BleLayer null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // The proxy starts as a BLE peripheral so it can be commissioned; EnableCentralRole()
+    // does nothing once BLE is in central role.
+    CHIP_ERROR err = mAdapter.EnableCentralRole();
+    if (err == CHIP_ERROR_BUSY)
+    {
+        // The spec lists no BUSY status for ProxyConnectRequest, so wait within the
+        // request's Timeout for the peripheral activity to end, for example the link this
+        // proxy was commissioned over still closing.
+        ChipLogDetail(AppServer, "ProxyConnectRequest: BLE peripheral activity still ending; waiting to switch to central");
+        err = mTimerDelegate.StartTimer(&mCentralRoleRetryTimer, kCentralRoleRetryInterval);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        return err;
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ProxyConnectRequest: EnableCentralRole failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    // Install our BleLayerDelegate wrapper; a second call does nothing.
+    mProxyDelegate.Install();
+
+    // The connect's NewBleConnectionByDiscriminator uses the single BLE scanner. Pause
+    // any running background scan so it does not contend for the scanner; it resumes
+    // once the session closes (OnAllSessionsClosed) or the connect fails.
+    PauseBgScan();
+
+    SetupDiscriminator setupDisc;
+    setupDisc.SetLongValue(discriminator);
+
+    err = layer->NewBleConnectionByDiscriminator(setupDisc, this, HandleConnectFound, HandleConnectError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ProxyConnectRequest: NewBleConnectionByDiscriminator failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    ChipLogProgress(AppServer, "ProxyConnectRequest: BLE scan/connect started for discriminator %u", discriminator);
+    return CHIP_NO_ERROR;
+}
+
 void CommissioningProxyBleTransport::OnScanWindowExpired()
 {
+    FinishForegroundScan();
+
+    // The foreground scan has released the BLE scanner; resume a background scan that
+    // was paused to make room for it.
+    ResumeBgScanIfNeeded();
+}
+
+void CommissioningProxyBleTransport::FinishForegroundScan()
+{
+    mTimerDelegate.CancelTimer(&mScanTimer);
     mAdapter.StopScan();
     mScanInProgress = false;
 
@@ -599,10 +689,6 @@ void CommissioningProxyBleTransport::OnScanWindowExpired()
         mHost->ScanAggregator().Contribute(Span<const ScanResultT>(out, count));
     }
     mScanResultCount = 0;
-
-    // The foreground scan has released the BLE scanner; resume a background scan that
-    // was paused to make room for it.
-    ResumeBgScanIfNeeded();
 }
 
 // ==================================================================
@@ -622,39 +708,6 @@ Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
         ChipLogError(AppServer, "ProxyConnectRequest: a BLE connect is already in progress");
         return Status::Busy;
     }
-
-    auto * layer = GetBleLayer();
-    if (layer == nullptr)
-    {
-        ChipLogError(AppServer, "ProxyConnectRequest: BleLayer null");
-        return Status::Failure;
-    }
-
-    // Sequential mode switch: the CP started in BLE peripheral mode so it could be
-    // commissioned onto the fabric (Step 1). The first BLE ProxyConnectRequest
-    // transitions BLE to central role so we can scan / connect to the commissionee
-    // (Step 2). Subsequent ProxyConnectRequest calls are no-ops.
-    {
-        CHIP_ERROR switchErr = mAdapter.EnableCentralRole();
-        if (switchErr == CHIP_ERROR_BUSY)
-        {
-            ChipLogError(AppServer, "ProxyConnectRequest: BLE busy with prior peripheral activity; retry shortly");
-            return Status::Busy;
-        }
-        if (switchErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "ProxyConnectRequest: EnableCentralRole failed: %" CHIP_ERROR_FORMAT, switchErr.Format());
-            return Status::Failure;
-        }
-    }
-
-    // Install our BleLayerDelegate wrapper; a second call does nothing.
-    mProxyDelegate.Install();
-
-    // The connect's NewBleConnectionByDiscriminator uses the single BLE scanner. Pause
-    // any running background scan so it does not contend for the scanner; it resumes
-    // once the session closes (OnAllSessionsClosed) or the connect fails below.
-    PauseBgScan();
 
     // Per spec a Timeout of 0 indicates no timeout: the connect runs until it succeeds,
     // fails, or is cancelled via ProxyDisconnectRequest(null).
@@ -679,33 +732,33 @@ Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
         exchange->SetResponseTimeout(hasTimeout ? System::Clock::Seconds16(responseSecs) : System::Clock::kZero);
     }
 
-    SetupDiscriminator setupDisc;
-    setupDisc.SetLongValue(discriminator);
-
-    CHIP_ERROR err = layer->NewBleConnectionByDiscriminator(setupDisc, this, HandleConnectFound, HandleConnectError);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "ProxyConnectRequest: NewBleConnectionByDiscriminator failed: %" CHIP_ERROR_FORMAT, err.Format());
-        mPendingConnect.reset();
-        ResumeBgScanIfNeeded();
-        return Status::Failure;
-    }
-
     if (hasTimeout)
     {
         CHIP_ERROR timerErr = mTimerDelegate.StartTimer(&mConnectTimer, timeout);
         if (timerErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-            // Cancel the BLE scan we just started so we don't leak it.
-            (void) layer->CancelBleIncompleteConnection();
             mPendingConnect.reset();
-            ResumeBgScanIfNeeded();
             return Status::Failure;
         }
     }
 
-    ChipLogProgress(AppServer, "ProxyConnectRequest: BLE scan/connect started for discriminator %u", discriminator);
+    // BLE cannot scan while it connects, so a ProxyConnectRequest ends a running
+    // ProxyScanRequest, which reports the results collected so far. The background scan
+    // stays paused until the connect fails or the session it opens closes.
+    if (mScanInProgress)
+    {
+        FinishForegroundScan();
+    }
+
+    if (TryStartCentralConnect() != CHIP_NO_ERROR)
+    {
+        mTimerDelegate.CancelTimer(&mConnectTimer);
+        mPendingConnect.reset();
+        ResumeBgScanIfNeeded();
+        return Status::Failure;
+    }
+
     return Status::Success;
 }
 
@@ -724,6 +777,7 @@ Status CommissioningProxyBleTransport::CancelPendingConnect(FabricIndex fabricIn
     }
 
     mTimerDelegate.CancelTimer(&mConnectTimer);
+    mTimerDelegate.CancelTimer(&mCentralRoleRetryTimer);
 
     ConnectCtx ctx = std::move(*mPendingConnect);
     mPendingConnect.reset();
@@ -808,6 +862,14 @@ Status CommissioningProxyBleTransport::Scan(System::Clock::Seconds16 scanMaxTime
         return Status::Busy;
     }
 
+    // A pending connect needs the single BLE scanner, from the central-role wait until the
+    // connect completes.
+    if (mPendingConnect.has_value())
+    {
+        ChipLogProgress(AppServer, "Ble::Scan: a BLE connect is pending — returning Busy");
+        return Status::Busy;
+    }
+
     // The foreground scan and the background scan share the single BLE scanner. Pause any
     // running background scan so StartScan below does not fail with BUSY; the scan window
     // expiry resumes it when the foreground scan completes.
@@ -841,8 +903,8 @@ Status CommissioningProxyBleTransport::BgScanStart(System::Clock::Seconds16 time
                                                    FabricIndex fabricIndex, NodeId nodeId)
 {
     // BLE has no Wi-Fi bands: register with the kBle transport and empty bands. The
-    // registry starts or defers the hardware scan (StartScan reports BUSY while a connect
-    // or foreground scan holds the single scanner).
+    // registry starts the hardware scan, or defers it while a BLE connect is pending or
+    // the scanner is held (StartScan reports BUSY).
     return mBgScan.Start(fabricIndex, nodeId, BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle), BitMask<WiFiBandBitmap>{},
                          timeout);
 }
@@ -916,6 +978,7 @@ void CommissioningProxyBleTransport::Shutdown()
     if (mPendingConnect.has_value())
     {
         mTimerDelegate.CancelTimer(&mConnectTimer);
+        mTimerDelegate.CancelTimer(&mCentralRoleRetryTimer);
 
         ConnectCtx ctx = std::move(*mPendingConnect);
         mPendingConnect.reset();

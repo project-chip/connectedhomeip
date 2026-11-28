@@ -66,10 +66,14 @@ class CommissioningProxyBleTransport : public CommissioningProxyTransport
 public:
     /**
      * @param adapter        platform BLE hooks; must outlive this transport.
-     * @param timerDelegate  drives the connect timeout and the foreground-scan window,
-     *                       and is handed to the background-scan registry.
+     * @param timerDelegate  drives the connect timeout, the central-role retry and the
+     *                       foreground-scan window, and is handed to the background-scan
+     *                       registry.
+     * @param bleLayer       the BleLayer to connect through; must outlive this transport.
+     *                       nullptr uses DeviceLayer::ConnectivityMgr().GetBleLayer().
      */
-    CommissioningProxyBleTransport(CommissioningProxyBleAdapter & adapter, TimerDelegate & timerDelegate);
+    CommissioningProxyBleTransport(CommissioningProxyBleAdapter & adapter, TimerDelegate & timerDelegate,
+                                   Ble::BleLayer * bleLayer = nullptr);
     ~CommissioningProxyBleTransport() override;
 
     CommissioningProxyBleTransport(const CommissioningProxyBleTransport &)             = delete;
@@ -171,12 +175,23 @@ private:
     };
 
     /// Separate TimerContexts because TimerDelegate keys a timer on its context, and the
-    /// connect timeout and the scan window can be armed at the same time.
+    /// connect timeout, the central-role retry and the scan window can run at the same
+    /// time.
     class ConnectTimeoutTimer : public TimerContext
     {
     public:
         explicit ConnectTimeoutTimer(CommissioningProxyBleTransport & owner) : mOwner(owner) {}
         void TimerFired() override { mOwner.OnConnectTimeout(); }
+
+    private:
+        CommissioningProxyBleTransport & mOwner;
+    };
+
+    class CentralRoleRetryTimer : public TimerContext
+    {
+    public:
+        explicit CentralRoleRetryTimer(CommissioningProxyBleTransport & owner) : mOwner(owner) {}
+        void TimerFired() override { mOwner.OnCentralRoleRetry(); }
 
     private:
         CommissioningProxyBleTransport & mOwner;
@@ -203,7 +218,16 @@ private:
                                            uint16_t productId);
 
     void OnConnectTimeout();
+    void OnCentralRoleRetry();
     void OnScanWindowExpired();
+
+    /// Stop the foreground scan and report its results to the scan aggregator. A paused
+    /// background scan stays paused.
+    void FinishForegroundScan();
+
+    /// Switch BLE to central role and start the scan/connect for mPendingConnect. If the
+    /// switch is refused, start mCentralRoleRetryTimer, which tries it again.
+    CHIP_ERROR TryStartCentralConnect();
 
     /// Build the kBle ScanResultStruct the cluster stores. Shared by the foreground and
     /// background paths so the field set cannot drift between them.
@@ -225,10 +249,12 @@ private:
 
     CommissioningProxyBleAdapter & mAdapter;
     TimerDelegate & mTimerDelegate;
+    Ble::BleLayer * mBleLayer;
 
     ProxyBleDelegate mProxyDelegate{ *this };
     BgScanHardware mBgScanHardware{ *this };
     ConnectTimeoutTimer mConnectTimer{ *this };
+    CentralRoleRetryTimer mCentralRoleRetryTimer{ *this };
     ScanWindowTimer mScanTimer{ *this };
 
     /// Declared after mBgScanHardware so the registry is destroyed first: its destructor

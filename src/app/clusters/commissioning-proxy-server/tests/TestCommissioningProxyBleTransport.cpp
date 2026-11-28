@@ -23,10 +23,14 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <ble/Ble.h>
 #include <clusters/CommissioningProxy/Attributes.h>
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 
@@ -38,6 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommissioningProxy;
 using namespace chip::app::Clusters::CommissioningProxy::Commands;
 using namespace chip::Testing;
+using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
@@ -53,7 +58,7 @@ public:
     CHIP_ERROR EnableCentralRole() override
     {
         enableCentralRoleCalls++;
-        return CHIP_NO_ERROR;
+        return enableCentralRoleResult;
     }
 
     CHIP_ERROR StartScan(DiscoveryCallback cb, void * context) override
@@ -137,16 +142,61 @@ public:
     bool IsScanning() const { return scanning; }
     void SetStartScanResult(CHIP_ERROR err) { mStartScanResult = err; }
 
-    unsigned enableCentralRoleCalls = 0;
-    unsigned startScanCalls         = 0;
-    unsigned stopScanCalls          = 0;
-    bool scanning                   = false;
+    /// CHIP_ERROR_BUSY means peripheral activity has not ended yet (see
+    /// CommissioningProxyBleAdapter::EnableCentralRole()).
+    CHIP_ERROR enableCentralRoleResult = CHIP_NO_ERROR;
+    unsigned enableCentralRoleCalls    = 0;
+    unsigned startScanCalls            = 0;
+    unsigned stopScanCalls             = 0;
+    bool scanning                      = false;
 
 private:
     DiscoveryCallback mCallback = nullptr;
     void * mContext             = nullptr;
     CHIP_ERROR mStartScanResult = CHIP_NO_ERROR;
     uint32_t mScanGeneration    = 0;
+};
+
+/// Stands in for the delegates BLEManagerImpl gives BleLayer, so a connect gets past
+/// BleLayer's own checks. Records the connect the transport starts.
+class FakeBlePlatform : public Ble::BlePlatformDelegate, public Ble::BleApplicationDelegate, public Ble::BleConnectionDelegate
+{
+public:
+    CHIP_ERROR Install(Ble::BleLayer & layer) { return layer.Init(this, this, this, &DeviceLayer::SystemLayer()); }
+
+    void NewConnection(Ble::BleLayer *, void *, const SetupDiscriminator & discriminator) override
+    {
+        newConnectionCalls++;
+        requestedDiscriminator = discriminator.GetLongValue();
+    }
+    void NewConnection(Ble::BleLayer *, void *, BLE_CONNECTION_OBJECT) override {}
+    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+
+    unsigned newConnectionCalls     = 0;
+    uint16_t requestedDiscriminator = 0;
+
+private:
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT) override {}
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 0; }
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *,
+                              System::PacketBufferHandle) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *,
+                                System::PacketBufferHandle) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 struct TestCommissioningProxyBleTransport : public ::testing::Test
@@ -156,11 +206,15 @@ struct TestCommissioningProxyBleTransport : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    /// Declaration order matters: the transport is destroyed before the adapter and the
-    /// timer it holds references to.
+    void SetUp() override { ASSERT_SUCCESS(blePlatform.Install(bleLayer)); }
+
+    /// Declaration order matters: the transport is destroyed before the adapter, the timer
+    /// and the BleLayer it holds references to.
     CommissioningProxyMockTimer mockTimer;
     FakeBleProxyAdapter adapter;
-    CommissioningProxyBleTransport transport{ adapter, mockTimer };
+    FakeBlePlatform blePlatform;
+    Ble::BleLayer bleLayer;
+    CommissioningProxyBleTransport transport{ adapter, mockTimer, &bleLayer };
 };
 
 /// A cluster with the BLE transport registered, so command-driven paths run end to end.
@@ -174,6 +228,18 @@ struct HostedTransport
 
     CommissioningProxyCluster cluster;
 };
+
+ProxyConnectRequest::Type MakeBleConnectRequest(uint16_t timeoutSeconds)
+{
+    ProxyConnectRequest::Type request;
+    request.address.SetNull();
+    request.transport     = BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle);
+    request.discriminator = 3841;
+    request.vendorID      = VendorId::Common;
+    request.productID     = 0;
+    request.timeout       = timeoutSeconds;
+    return request;
+}
 
 } // namespace
 
@@ -450,6 +516,274 @@ TEST_F(TestCommissioningProxyBleTransport, LateBackgroundResultDoesNotEnterTheFo
     // A device the background scan discovered, before the foreground scan started, is not a
     // foreground scan result.
     EXPECT_EQ(response.numberOfResults, 0);
+}
+
+// ---------------------------------------------------------------------------
+// ProxyConnectRequest while the BLE stack cannot switch to central role yet
+// ---------------------------------------------------------------------------
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectWaitsWhileTheCentralRoleIsUnavailable)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/30));
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_TRUE(transport.IsConnectPending());
+
+    unsigned calls = adapter.enableCentralRoleCalls;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_GT(adapter.enableCentralRoleCalls, calls);
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+
+    // Once the switch succeeds the connect starts and the retry stops.
+    adapter.enableCentralRoleResult = CHIP_NO_ERROR;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_EQ(blePlatform.newConnectionCalls, 1u);
+    EXPECT_EQ(blePlatform.requestedDiscriminator, 3841u);
+    EXPECT_TRUE(transport.IsConnectPending());
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(mockTimer.ActiveCount(), 1u); // the connect timeout only
+
+    calls = adapter.enableCentralRoleCalls;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_EQ(adapter.enableCentralRoleCalls, calls);
+
+    ASSERT_EQ(transport.CancelPendingConnect(tester.GetCommandHandler().GetAccessingFabricIndex()), Status::Success);
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Failure));
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectFailsAtOnceWhenTheCentralRoleSwitchFails)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_INTERNAL;
+
+    auto result = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/30));
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u); // the connect timeout is cancelled too
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectFailsAtOnceWhenTheCentralRoleRetryTimerCannotBeStarted)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    // With no Timeout, the retry timer is the first timer the request starts.
+    mockTimer.FailNextStart();
+    auto result = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/0));
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectTimesOutWhileTheCentralRoleStaysUnavailable)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/5));
+    // The retry restarts at 4.75 s, so it is still due after the timeout unless the timeout
+    // cancels it.
+    mockTimer.AdvanceClock(System::Clock::Milliseconds32(4750));
+    mockTimer.AdvanceClock(System::Clock::Milliseconds32(250));
+
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Timeout));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectFailsWhenTheCentralRoleSwitchFailsWhileWaiting)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending   = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/30));
+    adapter.enableCentralRoleResult = CHIP_ERROR_INTERNAL;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Failure));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+}
+
+// A Timeout of 0 means no timeout, so only a cancel ends the wait.
+TEST_F(TestCommissioningProxyBleTransport, ConnectWithoutTimeoutWaitsForTheCentralRoleUntilCancelled)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/0));
+    mockTimer.AdvanceClock(System::Clock::Seconds16(600));
+
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_TRUE(transport.IsConnectPending());
+    EXPECT_EQ(mockTimer.ActiveCount(), 1u); // the retry only
+
+    ASSERT_EQ(transport.CancelPendingConnect(tester.GetCommandHandler().GetAccessingFabricIndex()), Status::Success);
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Failure));
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+
+    const unsigned callsAtCancel = adapter.enableCentralRoleCalls;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_EQ(adapter.enableCentralRoleCalls, callsAtCancel);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ShutdownAnswersAConnectWaitingForTheCentralRole)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/30));
+    transport.Shutdown();
+
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Failure));
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ScanIsBusyWhileAConnectIsPending)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    adapter.enableCentralRoleResult = CHIP_ERROR_BUSY;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/30));
+    ASSERT_TRUE(transport.IsConnectPending());
+    EXPECT_EQ(transport.Scan(System::Clock::Seconds16(10)), Status::Busy);
+
+    adapter.enableCentralRoleResult = CHIP_NO_ERROR;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    ASSERT_EQ(blePlatform.newConnectionCalls, 1u);
+    EXPECT_EQ(transport.Scan(System::Clock::Seconds16(10)), Status::Busy);
+
+    EXPECT_EQ(adapter.startScanCalls, 0u);
+
+    ASSERT_EQ(transport.CancelPendingConnect(tester.GetCommandHandler().GetAccessingFabricIndex()), Status::Success);
+    EXPECT_FALSE(transport.IsConnectPending());
+}
+
+// The background scan resumes when the connect times out, not when the foreground scan ends.
+TEST_F(TestCommissioningProxyBleTransport, ConnectEndsAForegroundScanAndKeepsTheBackgroundScanPaused)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+
+    ProxyScanRequest::Type scanRequest;
+    scanRequest.transport             = BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle);
+    [[maybe_unused]] auto pendingScan = tester.Invoke(scanRequest);
+    ASSERT_TRUE(adapter.IsScanning());
+    adapter.ReportDevice(0x123, 0xFFF1, 0x8000, 1);
+    const unsigned startsBeforeConnect = adapter.startScanCalls;
+    const unsigned stopsBeforeConnect  = adapter.stopScanCalls;
+
+    adapter.enableCentralRoleResult      = CHIP_ERROR_BUSY;
+    [[maybe_unused]] auto pendingConnect = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
+    ASSERT_TRUE(tester.GetCommandHandler().HasResponse());
+    EXPECT_EQ(tester.GetCommandHandler().GetResponseCommandId(), ProxyScanResponse::Id);
+    ProxyScanResponse::DecodableType response;
+    ASSERT_SUCCESS(tester.GetCommandHandler().DecodeResponse(response));
+    EXPECT_EQ(response.numberOfResults, 1);
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_TRUE(transport.IsConnectPending());
+    EXPECT_EQ(adapter.stopScanCalls, stopsBeforeConnect + 1);
+
+    // Neither the role switch nor the connect starting touches the scanner again, and the
+    // scan window timer was cancelled with the scan.
+    adapter.enableCentralRoleResult = CHIP_NO_ERROR;
+    mockTimer.AdvanceClock(System::Clock::Seconds16(1));
+    ASSERT_EQ(blePlatform.newConnectionCalls, 1u);
+    mockTimer.AdvanceClock(System::Clock::Seconds16(host.cluster.GetScanMaxTime()));
+    EXPECT_EQ(adapter.startScanCalls, startsBeforeConnect);
+    EXPECT_EQ(adapter.stopScanCalls, stopsBeforeConnect + 1);
+    EXPECT_FALSE(adapter.IsScanning());
+
+    // The connect times out and hands the scanner back to the background scan.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(20));
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Timeout));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(adapter.startScanCalls, startsBeforeConnect + 1);
+    EXPECT_TRUE(adapter.IsScanning());
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectPausesTheBackgroundScanUntilItTimesOut)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    ASSERT_TRUE(adapter.IsScanning());
+    const unsigned startsBeforeConnect = adapter.startScanCalls;
+    const unsigned stopsBeforeConnect  = adapter.stopScanCalls;
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
+    ASSERT_EQ(blePlatform.newConnectionCalls, 1u);
+    EXPECT_TRUE(transport.IsConnectPending());
+    EXPECT_EQ(adapter.stopScanCalls, stopsBeforeConnect + 1);
+    EXPECT_FALSE(adapter.IsScanning());
+
+    mockTimer.AdvanceClock(System::Clock::Seconds16(20));
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Timeout));
+    EXPECT_EQ(adapter.startScanCalls, startsBeforeConnect + 1);
+    EXPECT_TRUE(adapter.IsScanning());
+}
+
+TEST_F(TestCommissioningProxyBleTransport, ConnectRefusedByTheBleLayerFailsAndResumesTheBackgroundScan)
+{
+    // A BleLayer that is shut down refuses every connect.
+    bleLayer.Shutdown();
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    const unsigned startsBeforeConnect = adapter.startScanCalls;
+    const unsigned stopsBeforeConnect  = adapter.stopScanCalls;
+
+    auto result = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
+    EXPECT_FALSE(transport.IsConnectPending());
+    EXPECT_EQ(adapter.stopScanCalls, stopsBeforeConnect + 1);
+    EXPECT_EQ(adapter.startScanCalls, startsBeforeConnect + 1);
+    EXPECT_TRUE(adapter.IsScanning());
+}
+
+TEST_F(TestCommissioningProxyBleTransport, BackgroundScanRefreshWaitsForAPendingConnect)
+{
+    HostedTransport host{ mockTimer, transport };
+    ClusterTester tester(host.cluster);
+    ASSERT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+
+    [[maybe_unused]] auto pending = tester.Invoke(MakeBleConnectRequest(/*timeoutSeconds=*/20));
+    ASSERT_TRUE(transport.IsConnectPending());
+    ASSERT_FALSE(adapter.IsScanning());
+    const unsigned startsDuringConnect = adapter.startScanCalls;
+
+    EXPECT_EQ(transport.BgScanStart(System::Clock::Seconds16(60), BitMask<WiFiBandBitmap>{}, /*fabricIndex=*/1, /*nodeId=*/0x11),
+              Status::Success);
+    EXPECT_EQ(adapter.startScanCalls, startsDuringConnect);
+    EXPECT_FALSE(adapter.IsScanning());
+
+    mockTimer.AdvanceClock(System::Clock::Seconds16(20));
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Status::Timeout));
+    EXPECT_EQ(adapter.startScanCalls, startsDuringConnect + 1);
+    EXPECT_TRUE(adapter.IsScanning());
 }
 
 // ---------------------------------------------------------------------------
