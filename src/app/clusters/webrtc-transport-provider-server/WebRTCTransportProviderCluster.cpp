@@ -17,7 +17,6 @@
  */
 #include "WebRTCTransportProviderCluster.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/AttributeListBuilder.h>
