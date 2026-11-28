@@ -33,7 +33,7 @@ namespace chip::app {
 /// Encapsulates parent-child relationship, family composition pattern, and static semantic tags.
 struct EndpointComposition
 {
-    /// Namespace IDs (`Clusters::Globals::SemanticTagNamespaceId`) and tag values (e.g. `Clusters::Globals::ClosureTag`)
+    /// Namespace IDs (`Clusters::Globals::SemanticTagNamespaceID`) and tag values (e.g. `Clusters::Globals::ClosureTag`)
     /// are generated from semantic-tag-namespace-enums.xml into <clusters/shared/Enums.h>.
     /// To add a missing namespace ID or tag, edit that XML and run:
     ///     ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'

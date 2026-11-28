@@ -25,9 +25,9 @@ CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointCompo
     size_t panelTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosure),
+        VerifyOrReturnError(tag.namespaceID != chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceID::kClosure),
                             CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosurePanel))
+        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceID::kClosurePanel))
         {
             ++panelTagCount;
         }

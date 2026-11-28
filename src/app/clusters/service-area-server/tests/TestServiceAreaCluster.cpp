@@ -371,8 +371,8 @@ AreaStructureWrapper MakeNamedArea(uint32_t areaId, const char * name)
 }
 
 AreaStructureWrapper
-MakeLandmarkOnlyArea(uint32_t areaId, Globals::LandmarkTag landmark,
-                     const DataModel::Nullable<Globals::RelativePositionTag> & position = DataModel::NullNullable)
+MakeLandmarkOnlyArea(uint32_t areaId, Globals::CommonLandmarkTag landmark,
+                     const DataModel::Nullable<Globals::CommonRelativePositionTag> & position = DataModel::NullNullable)
 {
     AreaStructureWrapper area;
     area.SetAreaId(areaId).SetMapId(DataModel::NullNullable).SetLocationInfoNull().SetLandmarkInfo(landmark, position);
@@ -790,7 +790,7 @@ TEST_F(ServiceAreaClusterTest, MeaningfulAreaDescriptionsAppearInSupportedAreas)
 {
     ASSERT_TRUE(AddSupportedArea(*mCluster, MakeNamedArea(0, "blue room")));
     ASSERT_TRUE(AddSupportedArea(*mCluster, MakeFloorArea(1, 2)));
-    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeLandmarkOnlyArea(2, LandmarkTag::kTable)));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeLandmarkOnlyArea(2, CommonLandmarkTag::kTable)));
 
     EXPECT_EQ(CountSupportedAreas(*mTester), 3u);
 }

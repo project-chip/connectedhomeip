@@ -9156,10 +9156,9 @@
               - TestGlobalEnum
               # Not part of the Matter 1.4 specification.
               - FloorSurfaceTag
-              # The naming of AreaTypeTag does not match other namespace enum names,
-              # and the value set does not match the 1.4 specification.
-              # Those issues need to be sorted out.
-              - AreaTypeTag
+              # The value set of CommonAreaTag does not match the 1.4 specification.
+              # That issue needs to be sorted out.
+              - CommonAreaTag
               # Targeting Camera enablement, not part of Matter 1.4.
               - ThreeLevelAutoEnum
       enum values:
@@ -11836,7 +11835,7 @@
               - GroupKeyMulticastPolicyEnum
           Globals:
               # In-progress for maybe Matter 1.5
-              - LocationTag
+              - CommonLocationTag
               - MeasurementAccuracyStruct
               - MeasurementTypeEnum
               - PowerThresholdSourceEnum
@@ -12005,3 +12004,10 @@
           - ElectricalDistributionEnclosure
           - HumidifierDehumidifier
           - ProximityRanger
+  renames:
+      enums:
+          Globals:
+              # The XML names changed to the spec namespace names; keep our previous names.
+              CommonLandmarkTag: LandmarkTag
+              CommonPositionTag: PositionTag
+              CommonRelativePositionTag: RelativePositionTag

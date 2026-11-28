@@ -20117,100 +20117,10 @@ MTR_DEPRECATED("Please use MTRBaseClusterUnitTesting", ios(16.1, 16.4), macos(13
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
 
-typedef NS_ENUM(uint8_t, MTRDataTypeAreaTypeTag) {
-    MTRDataTypeAreaTypeTagAisle MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeAreaTypeTagAttic MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeAreaTypeTagBackDoor MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDataTypeAreaTypeTagBackYard MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRDataTypeAreaTypeTagBalcony MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRDataTypeAreaTypeTagBallroom MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRDataTypeAreaTypeTagBathroom MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDataTypeAreaTypeTagBedroom MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDataTypeAreaTypeTagBorder MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDataTypeAreaTypeTagBoxroom MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRDataTypeAreaTypeTagBreakfastRoom MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypeAreaTypeTagCarport MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDataTypeAreaTypeTagCellar MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRDataTypeAreaTypeTagCloakroom MTR_PROVISIONALLY_AVAILABLE = 0x0D,
-    MTRDataTypeAreaTypeTagCloset MTR_PROVISIONALLY_AVAILABLE = 0x0E,
-    MTRDataTypeAreaTypeTagConservatory MTR_PROVISIONALLY_AVAILABLE = 0x0F,
-    MTRDataTypeAreaTypeTagCorridor MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRDataTypeAreaTypeTagCraftRoom MTR_PROVISIONALLY_AVAILABLE = 0x11,
-    MTRDataTypeAreaTypeTagCupboard MTR_PROVISIONALLY_AVAILABLE = 0x12,
-    MTRDataTypeAreaTypeTagDeck MTR_PROVISIONALLY_AVAILABLE = 0x13,
-    MTRDataTypeAreaTypeTagDen MTR_PROVISIONALLY_AVAILABLE = 0x14,
-    MTRDataTypeAreaTypeTagDining MTR_PROVISIONALLY_AVAILABLE = 0x15,
-    MTRDataTypeAreaTypeTagDrawingRoom MTR_PROVISIONALLY_AVAILABLE = 0x16,
-    MTRDataTypeAreaTypeTagDressingRoom MTR_PROVISIONALLY_AVAILABLE = 0x17,
-    MTRDataTypeAreaTypeTagDriveway MTR_PROVISIONALLY_AVAILABLE = 0x18,
-    MTRDataTypeAreaTypeTagElevator MTR_PROVISIONALLY_AVAILABLE = 0x19,
-    MTRDataTypeAreaTypeTagEnsuite MTR_PROVISIONALLY_AVAILABLE = 0x1A,
-    MTRDataTypeAreaTypeTagEntrance MTR_PROVISIONALLY_AVAILABLE = 0x1B,
-    MTRDataTypeAreaTypeTagEntryway MTR_PROVISIONALLY_AVAILABLE = 0x1C,
-    MTRDataTypeAreaTypeTagFamilyRoom MTR_PROVISIONALLY_AVAILABLE = 0x1D,
-    MTRDataTypeAreaTypeTagFoyer MTR_PROVISIONALLY_AVAILABLE = 0x1E,
-    MTRDataTypeAreaTypeTagFrontDoor MTR_PROVISIONALLY_AVAILABLE = 0x1F,
-    MTRDataTypeAreaTypeTagFrontYard MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRDataTypeAreaTypeTagGameRoom MTR_PROVISIONALLY_AVAILABLE = 0x21,
-    MTRDataTypeAreaTypeTagGarage MTR_PROVISIONALLY_AVAILABLE = 0x22,
-    MTRDataTypeAreaTypeTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x23,
-    MTRDataTypeAreaTypeTagGarden MTR_PROVISIONALLY_AVAILABLE = 0x24,
-    MTRDataTypeAreaTypeTagGardenDoor MTR_PROVISIONALLY_AVAILABLE = 0x25,
-    MTRDataTypeAreaTypeTagGuestBathroom MTR_PROVISIONALLY_AVAILABLE = 0x26,
-    MTRDataTypeAreaTypeTagGuestBedroom MTR_PROVISIONALLY_AVAILABLE = 0x27,
-    MTRDataTypeAreaTypeTagGuestRoom MTR_PROVISIONALLY_AVAILABLE = 0x29,
-    MTRDataTypeAreaTypeTagGym MTR_PROVISIONALLY_AVAILABLE = 0x2A,
-    MTRDataTypeAreaTypeTagHallway MTR_PROVISIONALLY_AVAILABLE = 0x2B,
-    MTRDataTypeAreaTypeTagHearthRoom MTR_PROVISIONALLY_AVAILABLE = 0x2C,
-    MTRDataTypeAreaTypeTagKidsRoom MTR_PROVISIONALLY_AVAILABLE = 0x2D,
-    MTRDataTypeAreaTypeTagKidsBedroom MTR_PROVISIONALLY_AVAILABLE = 0x2E,
-    MTRDataTypeAreaTypeTagKitchen MTR_PROVISIONALLY_AVAILABLE = 0x2F,
-    MTRDataTypeAreaTypeTagLaundryRoom MTR_PROVISIONALLY_AVAILABLE = 0x31,
-    MTRDataTypeAreaTypeTagLawn MTR_PROVISIONALLY_AVAILABLE = 0x32,
-    MTRDataTypeAreaTypeTagLibrary MTR_PROVISIONALLY_AVAILABLE = 0x33,
-    MTRDataTypeAreaTypeTagLivingRoom MTR_PROVISIONALLY_AVAILABLE = 0x34,
-    MTRDataTypeAreaTypeTagLounge MTR_PROVISIONALLY_AVAILABLE = 0x35,
-    MTRDataTypeAreaTypeTagMediaTVRoom MTR_PROVISIONALLY_AVAILABLE = 0x36,
-    MTRDataTypeAreaTypeTagMudRoom MTR_PROVISIONALLY_AVAILABLE = 0x37,
-    MTRDataTypeAreaTypeTagMusicRoom MTR_PROVISIONALLY_AVAILABLE = 0x38,
-    MTRDataTypeAreaTypeTagNursery MTR_PROVISIONALLY_AVAILABLE = 0x39,
-    MTRDataTypeAreaTypeTagOffice MTR_PROVISIONALLY_AVAILABLE = 0x3A,
-    MTRDataTypeAreaTypeTagOutdoorKitchen MTR_PROVISIONALLY_AVAILABLE = 0x3B,
-    MTRDataTypeAreaTypeTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x3C,
-    MTRDataTypeAreaTypeTagPantry MTR_PROVISIONALLY_AVAILABLE = 0x3D,
-    MTRDataTypeAreaTypeTagParkingLot MTR_PROVISIONALLY_AVAILABLE = 0x3E,
-    MTRDataTypeAreaTypeTagParlor MTR_PROVISIONALLY_AVAILABLE = 0x3F,
-    MTRDataTypeAreaTypeTagPatio MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTRDataTypeAreaTypeTagPlayRoom MTR_PROVISIONALLY_AVAILABLE = 0x41,
-    MTRDataTypeAreaTypeTagPoolRoom MTR_PROVISIONALLY_AVAILABLE = 0x42,
-    MTRDataTypeAreaTypeTagPorch MTR_PROVISIONALLY_AVAILABLE = 0x43,
-    MTRDataTypeAreaTypeTagPrimaryBathroom MTR_PROVISIONALLY_AVAILABLE = 0x44,
-    MTRDataTypeAreaTypeTagPrimaryBedroom MTR_PROVISIONALLY_AVAILABLE = 0x45,
-    MTRDataTypeAreaTypeTagRamp MTR_PROVISIONALLY_AVAILABLE = 0x46,
-    MTRDataTypeAreaTypeTagReceptionRoom MTR_PROVISIONALLY_AVAILABLE = 0x47,
-    MTRDataTypeAreaTypeTagRecreationRoom MTR_PROVISIONALLY_AVAILABLE = 0x48,
-    MTRDataTypeAreaTypeTagRoof MTR_PROVISIONALLY_AVAILABLE = 0x4A,
-    MTRDataTypeAreaTypeTagSauna MTR_PROVISIONALLY_AVAILABLE = 0x4B,
-    MTRDataTypeAreaTypeTagScullery MTR_PROVISIONALLY_AVAILABLE = 0x4C,
-    MTRDataTypeAreaTypeTagSewingRoom MTR_PROVISIONALLY_AVAILABLE = 0x4D,
-    MTRDataTypeAreaTypeTagShed MTR_PROVISIONALLY_AVAILABLE = 0x4E,
-    MTRDataTypeAreaTypeTagSideDoor MTR_PROVISIONALLY_AVAILABLE = 0x4F,
-    MTRDataTypeAreaTypeTagSideYard MTR_PROVISIONALLY_AVAILABLE = 0x50,
-    MTRDataTypeAreaTypeTagSittingRoom MTR_PROVISIONALLY_AVAILABLE = 0x51,
-    MTRDataTypeAreaTypeTagSnug MTR_PROVISIONALLY_AVAILABLE = 0x52,
-    MTRDataTypeAreaTypeTagSpa MTR_PROVISIONALLY_AVAILABLE = 0x53,
-    MTRDataTypeAreaTypeTagStaircase MTR_PROVISIONALLY_AVAILABLE = 0x54,
-    MTRDataTypeAreaTypeTagSteamRoom MTR_PROVISIONALLY_AVAILABLE = 0x55,
-    MTRDataTypeAreaTypeTagStorageRoom MTR_PROVISIONALLY_AVAILABLE = 0x56,
-    MTRDataTypeAreaTypeTagStudio MTR_PROVISIONALLY_AVAILABLE = 0x57,
-    MTRDataTypeAreaTypeTagStudy MTR_PROVISIONALLY_AVAILABLE = 0x58,
-    MTRDataTypeAreaTypeTagSunRoom MTR_PROVISIONALLY_AVAILABLE = 0x59,
-    MTRDataTypeAreaTypeTagSwimmingPool MTR_PROVISIONALLY_AVAILABLE = 0x5A,
-    MTRDataTypeAreaTypeTagTerrace MTR_PROVISIONALLY_AVAILABLE = 0x5B,
-    MTRDataTypeAreaTypeTagUtilityRoom MTR_PROVISIONALLY_AVAILABLE = 0x5C,
-    MTRDataTypeAreaTypeTagWard MTR_PROVISIONALLY_AVAILABLE = 0x5D,
-    MTRDataTypeAreaTypeTagWorkshop MTR_PROVISIONALLY_AVAILABLE = 0x5E,
-    MTRDataTypeAreaTypeTagToilet MTR_PROVISIONALLY_AVAILABLE = 0x5F,
+typedef NS_ENUM(uint8_t, MTRDataTypeAlarmSeverityTag) {
+    MTRDataTypeAlarmSeverityTagCritical MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeAlarmSeverityTagMajor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeAlarmSeverityTagMinor MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeAtomicRequestTypeEnum) {
@@ -20223,6 +20133,20 @@ typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
     MTRDataTypeCertificationTypeEnumDeviceAttestationPKI MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeCertificationTypeEnumOperationalPKI MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureCabinetTag) {
+    MTRDataTypeClosureCabinetTagCabinetDoor MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureCabinetTagDrawer MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureCabinetTagFlap MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureCoveringTag) {
+    MTRDataTypeClosureCoveringTagBlind MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureCoveringTagAwning MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureCoveringTagShutter MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosureCoveringTagVenetian MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeClosureCoveringTagCurtain MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeClosurePanelTag) {
@@ -20240,6 +20164,207 @@ typedef NS_ENUM(uint8_t, MTRDataTypeClosureTag) {
     MTRDataTypeClosureTagGate MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRDataTypeClosureTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRDataTypeClosureTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureWindowTag) {
+    MTRDataTypeClosureWindowTagRoof MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureWindowTagFacade MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffChronologyTag) {
+    MTRDataTypeCommodityTariffChronologyTagCurrent MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommodityTariffChronologyTagPrevious MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommodityTariffChronologyTagUpcoming MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffCommodityTag) {
+    MTRDataTypeCommodityTariffCommodityTagElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x00,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffFlowTag) {
+    MTRDataTypeCommodityTariffFlowTagImport MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommodityTariffFlowTagExport MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonAreaTag) {
+    MTRDataTypeCommonAreaTagAisle MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonAreaTagAttic MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonAreaTagBackDoor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonAreaTagBackYard MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonAreaTagBalcony MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonAreaTagBallroom MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonAreaTagBathroom MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCommonAreaTagBedroom MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeCommonAreaTagBorder MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeCommonAreaTagBoxroom MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeCommonAreaTagBreakfastRoom MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeCommonAreaTagCarport MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeCommonAreaTagCellar MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeCommonAreaTagCloakroom MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeCommonAreaTagCloset MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeCommonAreaTagConservatory MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeCommonAreaTagCorridor MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeCommonAreaTagCraftRoom MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeCommonAreaTagCupboard MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeCommonAreaTagDeck MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeCommonAreaTagDen MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeCommonAreaTagDining MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRDataTypeCommonAreaTagDrawingRoom MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRDataTypeCommonAreaTagDressingRoom MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRDataTypeCommonAreaTagDriveway MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRDataTypeCommonAreaTagElevator MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRDataTypeCommonAreaTagEnsuite MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRDataTypeCommonAreaTagEntrance MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRDataTypeCommonAreaTagEntryway MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRDataTypeCommonAreaTagFamilyRoom MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRDataTypeCommonAreaTagFoyer MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+    MTRDataTypeCommonAreaTagFrontDoor MTR_PROVISIONALLY_AVAILABLE = 0x1F,
+    MTRDataTypeCommonAreaTagFrontYard MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRDataTypeCommonAreaTagGameRoom MTR_PROVISIONALLY_AVAILABLE = 0x21,
+    MTRDataTypeCommonAreaTagGarage MTR_PROVISIONALLY_AVAILABLE = 0x22,
+    MTRDataTypeCommonAreaTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x23,
+    MTRDataTypeCommonAreaTagGarden MTR_PROVISIONALLY_AVAILABLE = 0x24,
+    MTRDataTypeCommonAreaTagGardenDoor MTR_PROVISIONALLY_AVAILABLE = 0x25,
+    MTRDataTypeCommonAreaTagGuestBathroom MTR_PROVISIONALLY_AVAILABLE = 0x26,
+    MTRDataTypeCommonAreaTagGuestBedroom MTR_PROVISIONALLY_AVAILABLE = 0x27,
+    MTRDataTypeCommonAreaTagGuestRoom MTR_PROVISIONALLY_AVAILABLE = 0x29,
+    MTRDataTypeCommonAreaTagGym MTR_PROVISIONALLY_AVAILABLE = 0x2A,
+    MTRDataTypeCommonAreaTagHallway MTR_PROVISIONALLY_AVAILABLE = 0x2B,
+    MTRDataTypeCommonAreaTagHearthRoom MTR_PROVISIONALLY_AVAILABLE = 0x2C,
+    MTRDataTypeCommonAreaTagKidsRoom MTR_PROVISIONALLY_AVAILABLE = 0x2D,
+    MTRDataTypeCommonAreaTagKidsBedroom MTR_PROVISIONALLY_AVAILABLE = 0x2E,
+    MTRDataTypeCommonAreaTagKitchen MTR_PROVISIONALLY_AVAILABLE = 0x2F,
+    MTRDataTypeCommonAreaTagLaundryRoom MTR_PROVISIONALLY_AVAILABLE = 0x31,
+    MTRDataTypeCommonAreaTagLawn MTR_PROVISIONALLY_AVAILABLE = 0x32,
+    MTRDataTypeCommonAreaTagLibrary MTR_PROVISIONALLY_AVAILABLE = 0x33,
+    MTRDataTypeCommonAreaTagLivingRoom MTR_PROVISIONALLY_AVAILABLE = 0x34,
+    MTRDataTypeCommonAreaTagLounge MTR_PROVISIONALLY_AVAILABLE = 0x35,
+    MTRDataTypeCommonAreaTagMediaTVRoom MTR_PROVISIONALLY_AVAILABLE = 0x36,
+    MTRDataTypeCommonAreaTagMudRoom MTR_PROVISIONALLY_AVAILABLE = 0x37,
+    MTRDataTypeCommonAreaTagMusicRoom MTR_PROVISIONALLY_AVAILABLE = 0x38,
+    MTRDataTypeCommonAreaTagNursery MTR_PROVISIONALLY_AVAILABLE = 0x39,
+    MTRDataTypeCommonAreaTagOffice MTR_PROVISIONALLY_AVAILABLE = 0x3A,
+    MTRDataTypeCommonAreaTagOutdoorKitchen MTR_PROVISIONALLY_AVAILABLE = 0x3B,
+    MTRDataTypeCommonAreaTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x3C,
+    MTRDataTypeCommonAreaTagPantry MTR_PROVISIONALLY_AVAILABLE = 0x3D,
+    MTRDataTypeCommonAreaTagParkingLot MTR_PROVISIONALLY_AVAILABLE = 0x3E,
+    MTRDataTypeCommonAreaTagParlor MTR_PROVISIONALLY_AVAILABLE = 0x3F,
+    MTRDataTypeCommonAreaTagPatio MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRDataTypeCommonAreaTagPlayRoom MTR_PROVISIONALLY_AVAILABLE = 0x41,
+    MTRDataTypeCommonAreaTagPoolRoom MTR_PROVISIONALLY_AVAILABLE = 0x42,
+    MTRDataTypeCommonAreaTagPorch MTR_PROVISIONALLY_AVAILABLE = 0x43,
+    MTRDataTypeCommonAreaTagPrimaryBathroom MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRDataTypeCommonAreaTagPrimaryBedroom MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRDataTypeCommonAreaTagRamp MTR_PROVISIONALLY_AVAILABLE = 0x46,
+    MTRDataTypeCommonAreaTagReceptionRoom MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRDataTypeCommonAreaTagRecreationRoom MTR_PROVISIONALLY_AVAILABLE = 0x48,
+    MTRDataTypeCommonAreaTagRoof MTR_PROVISIONALLY_AVAILABLE = 0x4A,
+    MTRDataTypeCommonAreaTagSauna MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRDataTypeCommonAreaTagScullery MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRDataTypeCommonAreaTagSewingRoom MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRDataTypeCommonAreaTagShed MTR_PROVISIONALLY_AVAILABLE = 0x4E,
+    MTRDataTypeCommonAreaTagSideDoor MTR_PROVISIONALLY_AVAILABLE = 0x4F,
+    MTRDataTypeCommonAreaTagSideYard MTR_PROVISIONALLY_AVAILABLE = 0x50,
+    MTRDataTypeCommonAreaTagSittingRoom MTR_PROVISIONALLY_AVAILABLE = 0x51,
+    MTRDataTypeCommonAreaTagSnug MTR_PROVISIONALLY_AVAILABLE = 0x52,
+    MTRDataTypeCommonAreaTagSpa MTR_PROVISIONALLY_AVAILABLE = 0x53,
+    MTRDataTypeCommonAreaTagStaircase MTR_PROVISIONALLY_AVAILABLE = 0x54,
+    MTRDataTypeCommonAreaTagSteamRoom MTR_PROVISIONALLY_AVAILABLE = 0x55,
+    MTRDataTypeCommonAreaTagStorageRoom MTR_PROVISIONALLY_AVAILABLE = 0x56,
+    MTRDataTypeCommonAreaTagStudio MTR_PROVISIONALLY_AVAILABLE = 0x57,
+    MTRDataTypeCommonAreaTagStudy MTR_PROVISIONALLY_AVAILABLE = 0x58,
+    MTRDataTypeCommonAreaTagSunRoom MTR_PROVISIONALLY_AVAILABLE = 0x59,
+    MTRDataTypeCommonAreaTagSwimmingPool MTR_PROVISIONALLY_AVAILABLE = 0x5A,
+    MTRDataTypeCommonAreaTagTerrace MTR_PROVISIONALLY_AVAILABLE = 0x5B,
+    MTRDataTypeCommonAreaTagUtilityRoom MTR_PROVISIONALLY_AVAILABLE = 0x5C,
+    MTRDataTypeCommonAreaTagWard MTR_PROVISIONALLY_AVAILABLE = 0x5D,
+    MTRDataTypeCommonAreaTagWorkshop MTR_PROVISIONALLY_AVAILABLE = 0x5E,
+    MTRDataTypeCommonAreaTagToilet MTR_PROVISIONALLY_AVAILABLE = 0x5F,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonCompassDirectionTag) {
+    MTRDataTypeCommonCompassDirectionTagNorthward MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonCompassDirectionTagNorthEastward MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonCompassDirectionTagEastward MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonCompassDirectionTagSouthEastward MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonCompassDirectionTagSouthward MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonCompassDirectionTagSouthWestward MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonCompassDirectionTagWestward MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCommonCompassDirectionTagNorthWestward MTR_PROVISIONALLY_AVAILABLE = 0x07,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonCompassLocationTag) {
+    MTRDataTypeCommonCompassLocationTagNorth MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonCompassLocationTagNorthEast MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonCompassLocationTagEast MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonCompassLocationTagSouthEast MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonCompassLocationTagSouth MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonCompassLocationTagSouthWest MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonCompassLocationTagWest MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCommonCompassLocationTagNorthWest MTR_PROVISIONALLY_AVAILABLE = 0x07,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonDirectionTag) {
+    MTRDataTypeCommonDirectionTagUpward MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonDirectionTagDownward MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonDirectionTagLeftward MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonDirectionTagRightward MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonDirectionTagForward MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonDirectionTagBackward MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonLandmarkTag) {
+    MTRDataTypeCommonLandmarkTagAirConditioner MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonLandmarkTagAirPurifier MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonLandmarkTagBackDoor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonLandmarkTagBarStool MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonLandmarkTagBathMat MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonLandmarkTagBathtub MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonLandmarkTagBed MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCommonLandmarkTagBookshelf MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeCommonLandmarkTagChair MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeCommonLandmarkTagChristmasTree MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeCommonLandmarkTagCoatRack MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeCommonLandmarkTagCoffeeTable MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeCommonLandmarkTagCookingRange MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeCommonLandmarkTagCouch MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeCommonLandmarkTagCountertop MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeCommonLandmarkTagCradle MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeCommonLandmarkTagCrib MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeCommonLandmarkTagDesk MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeCommonLandmarkTagDiningTable MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeCommonLandmarkTagDishwasher MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeCommonLandmarkTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeCommonLandmarkTagDresser MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRDataTypeCommonLandmarkTagLaundryDryer MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRDataTypeCommonLandmarkTagFan MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRDataTypeCommonLandmarkTagFireplace MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRDataTypeCommonLandmarkTagFreezer MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRDataTypeCommonLandmarkTagFrontDoor MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRDataTypeCommonLandmarkTagHighChair MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRDataTypeCommonLandmarkTagKitchenIsland MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRDataTypeCommonLandmarkTagLamp MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRDataTypeCommonLandmarkTagLitterBox MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+    MTRDataTypeCommonLandmarkTagMirror MTR_PROVISIONALLY_AVAILABLE = 0x1F,
+    MTRDataTypeCommonLandmarkTagNightstand MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRDataTypeCommonLandmarkTagOven MTR_PROVISIONALLY_AVAILABLE = 0x21,
+    MTRDataTypeCommonLandmarkTagPetBed MTR_PROVISIONALLY_AVAILABLE = 0x22,
+    MTRDataTypeCommonLandmarkTagPetBowl MTR_PROVISIONALLY_AVAILABLE = 0x23,
+    MTRDataTypeCommonLandmarkTagPetCrate MTR_PROVISIONALLY_AVAILABLE = 0x24,
+    MTRDataTypeCommonLandmarkTagRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x25,
+    MTRDataTypeCommonLandmarkTagScratchingPost MTR_PROVISIONALLY_AVAILABLE = 0x26,
+    MTRDataTypeCommonLandmarkTagShoeRack MTR_PROVISIONALLY_AVAILABLE = 0x27,
+    MTRDataTypeCommonLandmarkTagShower MTR_PROVISIONALLY_AVAILABLE = 0x28,
+    MTRDataTypeCommonLandmarkTagSideDoor MTR_PROVISIONALLY_AVAILABLE = 0x29,
+    MTRDataTypeCommonLandmarkTagSink MTR_PROVISIONALLY_AVAILABLE = 0x2A,
+    MTRDataTypeCommonLandmarkTagSofa MTR_PROVISIONALLY_AVAILABLE = 0x2B,
+    MTRDataTypeCommonLandmarkTagStove MTR_PROVISIONALLY_AVAILABLE = 0x2C,
+    MTRDataTypeCommonLandmarkTagTable MTR_PROVISIONALLY_AVAILABLE = 0x2D,
+    MTRDataTypeCommonLandmarkTagToilet MTR_PROVISIONALLY_AVAILABLE = 0x2E,
+    MTRDataTypeCommonLandmarkTagTrashCan MTR_PROVISIONALLY_AVAILABLE = 0x2F,
+    MTRDataTypeCommonLandmarkTagLaundryWasher MTR_PROVISIONALLY_AVAILABLE = 0x30,
+    MTRDataTypeCommonLandmarkTagWindow MTR_PROVISIONALLY_AVAILABLE = 0x31,
+    MTRDataTypeCommonLandmarkTagWineCooler MTR_PROVISIONALLY_AVAILABLE = 0x32,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
@@ -20296,11 +20421,173 @@ typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagWineCooler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x32,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
-typedef NS_ENUM(uint8_t, MTRDataTypeLocationTag) {
-    MTRDataTypeLocationTagIndoor MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeLocationTagOutdoor MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeLocationTagInside MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDataTypeLocationTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x03,
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonLevelTag) {
+    MTRDataTypeCommonLevelTagLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonLevelTagMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonLevelTagHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonLocationTag) {
+    MTRDataTypeCommonLocationTagIndoor MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonLocationTagOutdoor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonLocationTagInside MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonLocationTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonLocationTagZone MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonNumberTag) {
+    MTRDataTypeCommonNumberTagZero MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonNumberTagOne MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonNumberTagTwo MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonNumberTagThree MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonNumberTagFour MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonNumberTagFive MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonNumberTagSix MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCommonNumberTagSeven MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeCommonNumberTagEight MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeCommonNumberTagNine MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeCommonNumberTagTen MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeCommonNumberTagEleven MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeCommonNumberTagTwelve MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeCommonNumberTagThirteen MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeCommonNumberTagFourteen MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeCommonNumberTagFifteen MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeCommonNumberTagSixteen MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeCommonNumberTagSeventeen MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeCommonNumberTagEighteen MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeCommonNumberTagNineteen MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeCommonNumberTagTwenty MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeCommonNumberTagTwentyOne MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRDataTypeCommonNumberTagTwentyTwo MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRDataTypeCommonNumberTagTwentyThree MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRDataTypeCommonNumberTagTwentyFour MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRDataTypeCommonNumberTagTwentyFive MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRDataTypeCommonNumberTagTwentySix MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRDataTypeCommonNumberTagTwentySeven MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRDataTypeCommonNumberTagTwentyEight MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRDataTypeCommonNumberTagTwentyNine MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRDataTypeCommonNumberTagThirty MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonPositionTag) {
+    MTRDataTypeCommonPositionTagLeft MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonPositionTagRight MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonPositionTagTop MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonPositionTagBottom MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonPositionTagMiddle MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonPositionTagRow MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonPositionTagColumn MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
+    MTRDataTypePositionTagLeft MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
+    MTRDataTypePositionTagRight MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
+    MTRDataTypePositionTagTop MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
+    MTRDataTypePositionTagBottom MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
+    MTRDataTypePositionTagMiddle MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRDataTypePositionTagRow MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
+    MTRDataTypePositionTagColumn MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
+} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonRelativePositionTag) {
+    MTRDataTypeCommonRelativePositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonRelativePositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonRelativePositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCommonRelativePositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCommonRelativePositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCommonRelativePositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCommonRelativePositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
+    MTRDataTypeRelativePositionTagUnder MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
+    MTRDataTypeRelativePositionTagNextTo MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
+    MTRDataTypeRelativePositionTagAround MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
+    MTRDataTypeRelativePositionTagOn MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
+    MTRDataTypeRelativePositionTagAbove MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRDataTypeRelativePositionTagFrontOf MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
+    MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
+} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionFormFactorTag) {
+    MTRDataTypeElectricalDistributionFormFactorTagMiniature MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionFormFactorTagMoldedCase MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionOverVoltageTag) {
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToNeutral MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToGround MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeElectricalDistributionOverVoltageTagNeutralToGround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToLine MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalMeasurementTag) {
+    MTRDataTypeElectricalMeasurementTagDC MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalMeasurementTagAC MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeElectricalMeasurementTagACPhase1 MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeElectricalMeasurementTagACPhase2 MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeElectricalMeasurementTagACPhase3 MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedHumanActivityTag) {
+    MTRDataTypeIdentifiedHumanActivityTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedHumanActivityTagFall MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedHumanActivityTagSleeping MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedHumanActivityTagWalking MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedHumanActivityTagWorkout MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedHumanActivityTagSitting MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedHumanActivityTagStanding MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedHumanActivityTagDancing MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedHumanActivityTagPackageDelivery MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedHumanActivityTagPackageRetrieval MTR_PROVISIONALLY_AVAILABLE = 0x09,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedObjectTag) {
+    MTRDataTypeIdentifiedObjectTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedObjectTagAdult MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedObjectTagChild MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedObjectTagPerson MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedObjectTagRVC MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedObjectTagPet MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedObjectTagDog MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedObjectTagCat MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedObjectTagAnimal MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedObjectTagCar MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeIdentifiedObjectTagVehicle MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeIdentifiedObjectTagPackage MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeIdentifiedObjectTagClothes MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedSoundTag) {
+    MTRDataTypeIdentifiedSoundTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedSoundTagObjectFall MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedSoundTagSnoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedSoundTagCoughing MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedSoundTagBarking MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedSoundTagShattering MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedSoundTagBabyCrying MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedSoundTagUtilityAlarm MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedSoundTagUrgentShouting MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedSoundTagDoorbell MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeIdentifiedSoundTagKnocking MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeIdentifiedSoundTagUrgentSiren MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeIdentifiedSoundTagFaucetRunning MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeIdentifiedSoundTagKettleBoiling MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeIdentifiedSoundTagFanDryer MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeIdentifiedSoundTagClapping MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeIdentifiedSoundTagFingerSnapping MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeIdentifiedSoundTagMeowing MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeIdentifiedSoundTagLaughing MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeIdentifiedSoundTagGlassBreaking MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeIdentifiedSoundTagDoorKnocking MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeIdentifiedSoundTagPersonTalking MTR_PROVISIONALLY_AVAILABLE = 0x15,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeLaundryTag) {
+    MTRDataTypeLaundryTagNormal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeLaundryTagLightDry MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeLaundryTagExtraDry MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeLaundryTagNoDry MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRDataTypeMeasurementTypeEnum) {
@@ -20329,15 +20616,13 @@ typedef NS_ENUM(uint8_t, MTRDataTypeMediumType) {
     MTRDataTypeMediumTypeWater MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
-    MTRDataTypePositionTagLeft MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
-    MTRDataTypePositionTagRight MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
-    MTRDataTypePositionTagTop MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
-    MTRDataTypePositionTagBottom MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
-    MTRDataTypePositionTagMiddle MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
-    MTRDataTypePositionTagRow MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
-    MTRDataTypePositionTagColumn MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
-} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+typedef NS_ENUM(uint8_t, MTRDataTypePowerSourceTag) {
+    MTRDataTypePowerSourceTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypePowerSourceTagGrid MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypePowerSourceTagSolar MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypePowerSourceTagBattery MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypePowerSourceTagEV MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypePowerThresholdSourceEnum) {
     MTRDataTypePowerThresholdSourceEnumContract MTR_PROVISIONALLY_AVAILABLE = 0x00,
@@ -20345,36 +20630,47 @@ typedef NS_ENUM(uint8_t, MTRDataTypePowerThresholdSourceEnum) {
     MTRDataTypePowerThresholdSourceEnumEquipment MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
-    MTRDataTypeRelativePositionTagUnder MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
-    MTRDataTypeRelativePositionTagNextTo MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
-    MTRDataTypeRelativePositionTagAround MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
-    MTRDataTypeRelativePositionTagOn MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
-    MTRDataTypeRelativePositionTagAbove MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
-    MTRDataTypeRelativePositionTagFrontOf MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
-    MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
-} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+typedef NS_ENUM(uint8_t, MTRDataTypeRefrigeratorTag) {
+    MTRDataTypeRefrigeratorTagRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRefrigeratorTagFreezer MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
-    MTRDataTypeSemanticTagNamespaceIdCompassDirection MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDataTypeSemanticTagNamespaceIdCompassLocation MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRDataTypeSemanticTagNamespaceIdDirection MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRDataTypeSemanticTagNamespaceIdLevel MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRDataTypeSemanticTagNamespaceIdLocation MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDataTypeSemanticTagNamespaceIdNumber MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDataTypeSemanticTagNamespaceIdPosition MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDataTypeSemanticTagNamespaceIdElectricalMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypeSemanticTagNamespaceIdCommodityTariffChronology MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDataTypeSemanticTagNamespaceIdCommodityTariffDirection MTR_PROVISIONALLY_AVAILABLE = 0x0D,
-    MTRDataTypeSemanticTagNamespaceIdLaundry MTR_PROVISIONALLY_AVAILABLE = 0x0E,
-    MTRDataTypeSemanticTagNamespaceIdPowerSource MTR_PROVISIONALLY_AVAILABLE = 0x0F,
-    MTRDataTypeSemanticTagNamespaceIdCommonArea MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRDataTypeSemanticTagNamespaceIdCommonLandmark MTR_PROVISIONALLY_AVAILABLE = 0x11,
-    MTRDataTypeSemanticTagNamespaceIdRelativePosition MTR_PROVISIONALLY_AVAILABLE = 0x12,
-    MTRDataTypeSemanticTagNamespaceIdClosure MTR_PROVISIONALLY_AVAILABLE = 0x44,
-    MTRDataTypeSemanticTagNamespaceIdClosurePanel MTR_PROVISIONALLY_AVAILABLE = 0x45,
-    MTRDataTypeSemanticTagNamespaceIdClosureWindow MTR_PROVISIONALLY_AVAILABLE = 0x47,
-    MTRDataTypeSemanticTagNamespaceIdClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
+typedef NS_ENUM(uint8_t, MTRDataTypeRoomAirConditionerTag) {
+    MTRDataTypeRoomAirConditionerTagEvaporator MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRoomAirConditionerTagCondenser MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceID) {
+    MTRDataTypeSemanticTagNamespaceIDCommonCompassDirection MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSemanticTagNamespaceIDCommonCompassLocation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSemanticTagNamespaceIDCommonDirection MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSemanticTagNamespaceIDCommonLevel MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSemanticTagNamespaceIDCommonLocation MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSemanticTagNamespaceIDCommonNumber MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSemanticTagNamespaceIDCommonPosition MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSemanticTagNamespaceIDElectricalMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSemanticTagNamespaceIDCommodityTariffChronology MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeSemanticTagNamespaceIDCommodityTariffCommodity MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeSemanticTagNamespaceIDLaundry MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeSemanticTagNamespaceIDPowerSource MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeSemanticTagNamespaceIDCommonArea MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeSemanticTagNamespaceIDCommonLandmark MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeSemanticTagNamespaceIDCommonRelativePosition MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeSemanticTagNamespaceIDCommodityTariffFlow MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeSemanticTagNamespaceIDRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x41,
+    MTRDataTypeSemanticTagNamespaceIDRoomAirConditioner MTR_PROVISIONALLY_AVAILABLE = 0x42,
+    MTRDataTypeSemanticTagNamespaceIDSwitches MTR_PROVISIONALLY_AVAILABLE = 0x43,
+    MTRDataTypeSemanticTagNamespaceIDClosure MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRDataTypeSemanticTagNamespaceIDClosurePanel MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRDataTypeSemanticTagNamespaceIDClosureCovering MTR_PROVISIONALLY_AVAILABLE = 0x46,
+    MTRDataTypeSemanticTagNamespaceIDClosureWindow MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRDataTypeSemanticTagNamespaceIDClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
+    MTRDataTypeSemanticTagNamespaceIDIdentifiedObject MTR_PROVISIONALLY_AVAILABLE = 0x49,
+    MTRDataTypeSemanticTagNamespaceIDIdentifiedSound MTR_PROVISIONALLY_AVAILABLE = 0x4A,
+    MTRDataTypeSemanticTagNamespaceIDIdentifiedHumanActivity MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRDataTypeSemanticTagNamespaceIDAlarmSeverity MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRDataTypeSemanticTagNamespaceIDElectricalDistributionFormFactor MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRDataTypeSemanticTagNamespaceIDElectricalDistributionOverVoltage MTR_PROVISIONALLY_AVAILABLE = 0x4E,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
@@ -20382,6 +20678,21 @@ typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeStreamUsageEnumAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeStreamUsageEnumLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSwitchesTag) {
+    MTRDataTypeSwitchesTagOn MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSwitchesTagOff MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSwitchesTagToggle MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSwitchesTagUp MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSwitchesTagDown MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSwitchesTagNext MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSwitchesTagPrevious MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSwitchesTagEnterOkSelect MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSwitchesTagCustom MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSwitchesTagOpen MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeSwitchesTagClose MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSwitchesTagStop MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {

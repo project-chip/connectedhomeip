@@ -70,3 +70,8 @@ k{{asUpperCamelCase label}} = {{asHex mask}},
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_SHARED_ENUMS
+#include <app/common/CompatGlobalEnumNames.h>
+#undef CHIP_INCLUDING_FROM_SHARED_ENUMS

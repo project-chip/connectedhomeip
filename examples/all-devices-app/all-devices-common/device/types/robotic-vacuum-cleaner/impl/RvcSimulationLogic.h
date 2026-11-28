@@ -49,7 +49,7 @@ inline void ApplyDefaultMapTopology(Clusters::ServiceArea::ServiceAreaCluster & 
     auto areaA = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdA)
                      .SetMapId(Topology::kMapIdXX)
-                     .SetLocationInfo("My Location A"_span, Nullable<int16_t>(4), Nullable<Globals::AreaTypeTag>());
+                     .SetLocationInfo("My Location A"_span, Nullable<int16_t>(4), Nullable<Globals::CommonAreaTag>());
 
     auto areaB = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdB)
@@ -59,14 +59,14 @@ inline void ApplyDefaultMapTopology(Clusters::ServiceArea::ServiceAreaCluster & 
     auto areaC = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdC)
                      .SetMapId(Topology::kMapIdYY)
-                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+                     .SetLocationInfo(""_span, -1, Globals::CommonAreaTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kBackDoor, Globals::CommonRelativePositionTag::kNextTo);
 
     auto areaD = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdD)
                      .SetMapId(Topology::kMapIdYY)
                      .SetLocationInfo("My Location D"_span, NullNullable, NullNullable)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kCouch, Globals::CommonRelativePositionTag::kNextTo);
 
     cluster.ClearSupportedAreas();
     cluster.AddSupportedArea(areaA);

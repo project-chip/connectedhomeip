@@ -238,10 +238,10 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
         {
             floorNumber = jsonValue["FloorNumber"].asInt();
         }
-        DataModel::Nullable<Globals::AreaTypeTag> areaType = DataModel::NullNullable;
+        DataModel::Nullable<Globals::CommonAreaTag> areaType = DataModel::NullNullable;
         if (jsonValue.isMember("AreaType"))
         {
-            areaType = Globals::AreaTypeTag(jsonValue["AreaType"].asUInt());
+            areaType = Globals::CommonAreaTag(jsonValue["AreaType"].asUInt());
         }
         auto locationName = jsonValue["LocationName"].asString();
 
@@ -251,13 +251,13 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
     // Set landmark info
     if (jsonValue.isMember("LandmarkTag"))
     {
-        DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag = DataModel::NullNullable;
+        DataModel::Nullable<Globals::CommonRelativePositionTag> relativePositionTag = DataModel::NullNullable;
         if (jsonValue.isMember("RelativePositionTag"))
         {
-            relativePositionTag = Globals::RelativePositionTag(jsonValue["RelativePositionTag"].asUInt());
+            relativePositionTag = Globals::CommonRelativePositionTag(jsonValue["RelativePositionTag"].asUInt());
         }
 
-        area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asUInt()), relativePositionTag);
+        area.SetLandmarkInfo(Globals::CommonLandmarkTag(jsonValue["LandmarkTag"].asUInt()), relativePositionTag);
     }
 
     mRvcDevice->HandleAddServiceAreaArea(area);

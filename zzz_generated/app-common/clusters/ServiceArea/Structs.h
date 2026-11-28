@@ -47,8 +47,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Globals::LandmarkTag landmarkTag = static_cast<Globals::LandmarkTag>(0);
-    DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag;
+    Globals::CommonLandmarkTag landmarkTag = static_cast<Globals::CommonLandmarkTag>(0);
+    DataModel::Nullable<Globals::CommonRelativePositionTag> relativePositionTag;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
