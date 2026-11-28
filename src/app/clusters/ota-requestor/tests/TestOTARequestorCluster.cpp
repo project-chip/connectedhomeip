@@ -211,6 +211,19 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
     EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
+
+    payload.endpoint   = kInvalidEndpointId;
+    auto invalidResult = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(invalidResult.status,
+              std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError)));
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
+    EXPECT_EQ(otaCommands.GetLastAnnounceCommandPayload()->endpoint, 5);
+
+    payload.endpoint     = static_cast<EndpointId>(kInvalidEndpointId - 1);
+    auto recoveredResult = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_TRUE(recoveredResult.IsSuccess());
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
+    EXPECT_EQ(otaCommands.GetLastAnnounceCommandPayload()->endpoint, payload.endpoint);
 }
 
 TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)

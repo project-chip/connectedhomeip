@@ -189,6 +189,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
         VerifyOrReturnError(data.announcementReason != OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUnknownEnumValue,
                             Protocols::InteractionModel::Status::ConstraintError,
                             ChipLogError(Zcl, "Received unknown announcement reason"));
+        VerifyOrReturnError(IsValidEndpointId(data.endpoint), Protocols::InteractionModel::Status::ConstraintError);
         mOtaCommands.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
