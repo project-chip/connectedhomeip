@@ -58,5 +58,8 @@ Davis, CA 95616, USA
 :xrefstyle: basic
 -->
 <typeDefs>
+  <number name="AudioStreamID" type="uint16"/>
+  <number name="SnapshotStreamID" type="uint16"/>
+  <number name="VideoStreamID" type="uint16"/>
   <number name="WebRTCSessionID" type="uint16"/>
 </typeDefs>

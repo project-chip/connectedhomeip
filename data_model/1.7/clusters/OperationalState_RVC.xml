@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>
+    <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Disallow the Start and Stop commands. Add the GoHome command."/>
     <revision revision="3" summary="Add several operational states and errors"/>
   </revisionHistory>
   <clusterIds>
@@ -108,7 +108,7 @@ Davis, CA 95616, USA
       <item value="0x48" name="LowBattery" summary="The device is unable to start or to continue operating due to a low battery">
         <mandatoryConform/>
       </item>
-      <item value="0x49" name="CannotReachTargetArea" summary="The device is unable to move to an area where it was asked to operate, such as by setting the ServiceArea cluster&apos;s SelectedAreas attribute, due to an obstruction. For example, the obstruction might be a closed door or objects blocking the mapped path.">
+      <item value="0x49" name="CannotReachTargetArea" summary="The device is unable to move to an area where it was asked to operate, such as by setting the Service Area cluster&apos;s SelectedAreas attribute, due to an obstruction. For example, the obstruction might be a closed door or objects blocking the mapped path.">
         <mandatoryConform/>
       </item>
       <item value="0x4A" name="DirtyWaterTankFull" summary="The device has detected that its dirty water tank is full">

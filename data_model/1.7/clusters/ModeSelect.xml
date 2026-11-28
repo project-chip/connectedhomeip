@@ -57,17 +57,18 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0050" name="Mode Select Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0050" name="Mode Select Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="The MfgCode field was marked non-nullable, updated the related text and reordered subclauses"/>
+    <revision revision="3" summary="Added Scene quality on CurrentMode attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0050" name="Mode Select"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MOD" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the On/Off cluster">
       <optionalConform/>
     </feature>
   </features>
@@ -135,7 +136,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <desc/>

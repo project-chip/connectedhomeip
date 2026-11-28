@@ -223,9 +223,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="WattSettingIndex" type="uint8">
-        <optionalConform choice="b" more="true" min="1">
-          <feature name="WATTS"/>
-        </optionalConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform choice="b" more="true" min="1">
+            <feature name="WATTS"/>
+          </optionalConform>
+        </otherwiseConform>
         <constraint>
           <desc/>
         </constraint>

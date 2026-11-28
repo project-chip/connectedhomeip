@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
-    <revision revision="3" summary="Added Ecosystem Information Cluster and FabricSynchronizedNode Condition."/>
+    <revision revision="3" summary="Added Ecosystem Information Cluster and FabricSynchronizedNode Condition"/>
   </revisionHistory>
   <classification class="utility" scope="endpoint"/>
   <conditions>

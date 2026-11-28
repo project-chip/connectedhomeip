@@ -81,9 +81,6 @@ Davis, CA 95616, USA
       <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ProxyView">
-        <obsoleteConform/>
-      </item>
       <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
@@ -92,14 +89,6 @@ Davis, CA 95616, USA
       </item>
       <item value="5" name="Administer" summary="Manage privileges, and can observe and modify the Access Control Cluster">
         <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="DatastoreGroupKeyMulticastPolicyEnum">
-      <item value="0" name="PerGroupID" summary="Indicates filtering of multicast messages for a specific Group ID">
-        <obsoleteConform/>
-      </item>
-      <item value="1" name="AllNodes" summary="Indicates not filtering of multicast messages">
-        <obsoleteConform/>
       </item>
     </enum>
     <enum name="DatastoreGroupKeySecurityPolicyEnum">
@@ -349,9 +338,6 @@ Davis, CA 95616, USA
       <field id="7" name="EpochStartTime2" type="epoch-us">
         <quality nullable="true"/>
         <mandatoryConform/>
-      </field>
-      <field id="8" name="GroupKeyMulticastPolicy" type="DatastoreGroupKeyMulticastPolicyEnum">
-        <obsoleteConform/>
       </field>
     </struct>
     <struct name="DatastoreNodeInformationEntryStruct">

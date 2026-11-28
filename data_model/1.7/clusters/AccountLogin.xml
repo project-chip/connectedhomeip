@@ -69,21 +69,15 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="ALOGIN" scope="Endpoint"/>
   <features>
     <feature bit="0" code="OA" name="OAuth" summary="Support for account login via OAuth 2.0 Device Authorization Grant">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <attributes>
     <attribute id="0x0000" name="OAuthLoggedIn" type="bool">
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="OA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="OA"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -141,21 +135,15 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="GetDeviceAuthURI" direction="commandToServer" response="GetDeviceAuthURIResponse">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="OA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="OA"/>
+      </mandatoryConform>
     </command>
     <command id="0x05" name="GetDeviceAuthURIResponse" direction="responseFromServer">
       <access fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="OA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="OA"/>
+      </mandatoryConform>
       <field id="0" name="UserCode" type="string">
         <mandatoryConform/>
         <constraint>

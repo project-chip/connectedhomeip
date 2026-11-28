@@ -98,12 +98,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <features>
         <feature code="ACC">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform>
-              <condition name="AccessDevice"/>
-            </mandatoryConform>
-          </otherwiseConform>
+          <mandatoryConform>
+            <condition name="AccessDevice"/>
+          </mandatoryConform>
         </feature>
       </features>
     </cluster>

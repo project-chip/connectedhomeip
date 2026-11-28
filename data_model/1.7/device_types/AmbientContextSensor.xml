@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0150" name="Ambient Context Sensor" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0150" name="Ambient Context Sensor" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
-    <revision revision="2" summary="Added Ambient Sensing Union Cluster to expose multi-node ambient sensing configuration and diagnostic features"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions>
@@ -83,17 +82,6 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0432" name="Ambient Sensing Union" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="2"/>
-          </greaterOrEqualTerm>
-        </optionalConform>
       </otherwiseConform>
     </cluster>
   </clusters>

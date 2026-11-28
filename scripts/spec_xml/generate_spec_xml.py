@@ -22,6 +22,7 @@ import shlex
 import subprocess
 import sys
 import textwrap
+from collections.abc import Callable
 from pathlib import Path
 
 import click
@@ -194,6 +195,134 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         generate_data_model_xmls_gni.generate_dm_gni_file()
 
 
+def _extract_compiled_adocs(make_output: str) -> list[str]:
+    """Extracts compiled .adoc include targets from `make PRINT_FILENAMES=1` output."""
+    targets = []
+    for raw_line in make_output.splitlines():
+        line = raw_line.strip()
+        # print_includes.rb emits one raw include target path per line (no spaces or log prefixes).
+        if line and line.endswith('.adoc') and not any(ch.isspace() for ch in line) and ':' not in line:
+            targets.append(line)
+    return targets
+
+
+def _has_legacy_book_targets(spec_root: str) -> bool:
+    """Returns True if the spec Makefile defines separate pre-unified book targets."""
+    makefile_path = Path(spec_root) / 'Makefile'
+    if not makefile_path.is_file():
+        return False
+    makefile_text = makefile_path.read_text(encoding='utf-8', errors='replace')
+    return 'pdf-appclusters-book:' in makefile_text
+
+
+def _classify_includes_by_spec_dir(targets: list[str], spec_root: str) -> tuple[set[str], set[str], set[str]]:
+    """Fallback classifier that resolves include targets against `<spec_root>/src`."""
+    src_dir = (Path(spec_root) / 'src').resolve()
+    dir_stack = [src_dir]
+    cluster_files: set[str] = set()
+    device_type_files: set[str] = set()
+    namespace_files: set[str] = set()
+
+    for target in targets:
+        resolved: Path | None = None
+        while dir_stack:
+            candidate = (dir_stack[-1] / target).resolve()
+            if candidate.is_file():
+                resolved = candidate
+                break
+            if len(dir_stack) == 1:
+                break
+            dir_stack.pop()
+
+        if resolved is None:
+            continue
+
+        if resolved.parent != dir_stack[-1]:
+            dir_stack.append(resolved.parent)
+
+        try:
+            rel_parts = resolved.relative_to(src_dir).parts
+        except ValueError:
+            continue
+
+        if not rel_parts or 'images' in rel_parts:
+            continue
+
+        basename = resolved.name
+        if rel_parts[0] == 'device_types':
+            device_type_files.add(basename)
+        elif rel_parts[0] == 'namespaces':
+            namespace_files.add(basename)
+        elif rel_parts[0] in ('app_clusters', 'data_model', 'service_device_management', 'tls'):
+            cluster_files.add(basename)
+
+    return cluster_files, device_type_files, namespace_files
+
+
+def _parse_unified_spec_includes(main_out: str, spec_root: str) -> tuple[set[str], set[str], set[str]]:
+    """Splits single-document `PRINT_FILENAMES=1` output into cluster, device type, and namespace sets."""
+    targets = _extract_compiled_adocs(main_out)
+    cluster_files: set[str] = set()
+    device_type_files: set[str] = set()
+    namespace_files: set[str] = set()
+
+    # Core and appclusters both feed cluster XMLs (matching legacy main_out + cluster_out).
+    current_section = 'clusters'
+    saw_device_library = False
+    saw_namespaces = False
+
+    for target in targets:
+        basename = os.path.basename(target)
+        if basename == 'appclusters.adoc':
+            current_section = 'clusters'
+            continue
+        if basename == 'device_library.adoc':
+            current_section = 'device_types'
+            saw_device_library = True
+            continue
+        if basename == 'standard_namespaces.adoc':
+            current_section = 'namespaces'
+            saw_namespaces = True
+            continue
+        if basename in ('Security_Requirements.adoc', 'appendix.adoc'):
+            current_section = 'other'
+            continue
+
+        if current_section == 'clusters':
+            cluster_files.add(basename)
+        elif current_section == 'device_types':
+            device_type_files.add(basename)
+        elif current_section == 'namespaces':
+            namespace_files.add(basename)
+
+    if not saw_device_library or not saw_namespaces:
+        log.warning(
+            "Expected unified spec section markers not found in make output; "
+            "falling back to spec directory resolution under '%s'",
+            spec_root,
+        )
+        return _classify_includes_by_spec_dir(targets, spec_root)
+
+    return cluster_files, device_type_files, namespace_files
+
+
+def _remove_uncompiled_files(
+    directory: str,
+    compiled_adocs: set[str],
+    skip_predicate: Callable[[str], bool] | None = None,
+) -> None:
+    """Removes generated XML files whose corresponding .adoc file was not compiled into the spec."""
+    for filename in os.listdir(directory):
+        if not filename.endswith('.xml'):
+            continue
+        if skip_predicate is not None and skip_predicate(filename):
+            continue
+        adoc = os.path.basename(filename).replace('.xml', '.adoc')
+        if adoc not in compiled_adocs:
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
+            os.remove(os.path.join(directory, filename))
+
+
 def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre_1_2):
     log.info('Scraping main spec - this may take several seconds')
     cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
@@ -214,44 +343,42 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre
 
     log.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    log.info("Generating cluster spec to get file include list - this may take a few minutes")
-    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating device type library to get file include list - this may take a few minutes")
-    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating namespaces to get file include list - this may take a few minutes")
-    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
+    main_basenames = {os.path.basename(t) for t in _extract_compiled_adocs(main_out)}
 
-    cluster_files = main_out + cluster_out
+    if 'device_library.adoc' not in main_basenames and _has_legacy_book_targets(spec_root):
+        log.info("Generating cluster spec to get file include list - this may take a few minutes")
+        cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+        log.info("Generating device type library to get file include list - this may take a few minutes")
+        device_type_out = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+        log.info("Generating namespaces to get file include list - this may take a few minutes")
+        namespace_out = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
+
+        cluster_files = main_basenames | {os.path.basename(t) for t in _extract_compiled_adocs(cluster_out)}
+        device_type_files = {os.path.basename(t) for t in _extract_compiled_adocs(device_type_out)}
+        namespace_files = {os.path.basename(t) for t in _extract_compiled_adocs(namespace_out)}
+    else:
+        cluster_files, device_type_files, namespace_files = _parse_unified_spec_includes(main_out, spec_root)
 
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
     namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
-    for filename in os.listdir(clusters_output_dir):
-        # There are a couple of clusters that appear in the same adoc file and they have prefixes.
-        # Look for these specifically.
-        # For 1.5 onward, we should separate these.
-        if "Label-Cluster" in filename or "bridge-clusters" in filename:
-            continue
-        adoc = os.path.basename(filename).replace('.xml', '.adoc')
-        if adoc not in cluster_files:
-            log.info("Removing '%s' as it was not in the generated spec document", adoc)
-            os.remove(os.path.join(clusters_output_dir, filename))
 
-    for filename in os.listdir(device_types_output_dir):
-        # Closures also has multiple device types in one file, should fix this, but for now a workaround:
-        if filename.startswith('ClosureBaseDeviceTypes'):
-            continue
-        adoc = os.path.basename(filename).replace('.xml', '.adoc')
-        if adoc not in device_type_files:
-            log.info("Removing '%s' as it was not in the generated spec document", adoc)
-            os.remove(os.path.join(device_types_output_dir, filename))
-
-    for filename in os.listdir(namespaces_output_dir):
-        adoc = os.path.basename(filename).replace('.xml', '.adoc')
-        if adoc not in namespace_files:
-            log.info("Removing '%s' as it was not in the generated spec document", adoc)
-            os.remove(os.path.join(namespaces_output_dir, filename))
+    # There are a couple of clusters that appear in the same adoc file and they have prefixes.
+    # Look for these specifically.
+    # For 1.5 onward, we should separate these.
+    _remove_uncompiled_files(
+        clusters_output_dir,
+        cluster_files,
+        skip_predicate=lambda f: "Label-Cluster" in f or "bridge-clusters" in f,
+    )
+    # Closures also has multiple device types in one file, should fix this, but for now a workaround:
+    _remove_uncompiled_files(
+        device_types_output_dir,
+        device_type_files,
+        skip_predicate=lambda f: f.startswith('ClosureBaseDeviceTypes'),
+    )
+    _remove_uncompiled_files(namespaces_output_dir, namespace_files)
 
 
 def cleanup_old_spec_dms(output_dir):

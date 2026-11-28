@@ -109,7 +109,13 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x050C" name="Application Launcher" side="server">
       <mandatoryConform>
-        <condition name="ContentAppPlatform"/>
+        <andTerm>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="4"/>
+          </greaterOrEqualTerm>
+          <condition name="ContentAppPlatform"/>
+        </andTerm>
       </mandatoryConform>
       <features>
         <feature code="AP">

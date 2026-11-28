@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0700" name="Commodity Tariff Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0700" name="Commodity Tariff Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Matter revision"/>
-    <revision revision="2" summary="Added ExternalID field to TariffComponentStruct"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0700" name="Commodity Tariff"/>
@@ -340,12 +339,6 @@ Davis, CA 95616, USA
       </field>
       <field id="8" name="Predicted" type="bool" default="false">
         <optionalConform/>
-      </field>
-      <field id="9" name="ExternalID" type="string" default="empty">
-        <optionalConform/>
-        <constraint>
-          <maxLength value="36"/>
-        </constraint>
       </field>
     </struct>
     <struct name="TariffInformationStruct">

@@ -257,7 +257,7 @@ Davis, CA 95616, USA
     <event id="0x01" name="OperationCompletion" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="CompletionErrorCode" type="enum8">
+      <field id="0" name="CompletionErrorCode" type="ErrorStateEnum">
         <mandatoryConform/>
       </field>
       <field id="1" name="TotalOperationalTime" type="elapsed-s">

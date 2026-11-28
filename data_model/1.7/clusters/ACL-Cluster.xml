@@ -102,9 +102,6 @@ Davis, CA 95616, USA
       <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ProxyView">
-        <obsoleteConform/>
-      </item>
       <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
         <mandatoryConform/>
       </item>

@@ -90,9 +90,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="3" code="LOG" name="Logging">
-      <obsoleteConform/>
-    </feature>
     <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
       <optionalConform/>
     </feature>
@@ -118,9 +115,6 @@ Davis, CA 95616, USA
           <feature name="ALIRO"/>
         </orTerm>
       </mandatoryConform>
-    </feature>
-    <feature bit="9" code="NOT" name="Notification">
-      <obsoleteConform/>
     </feature>
     <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
       <optionalConform/>

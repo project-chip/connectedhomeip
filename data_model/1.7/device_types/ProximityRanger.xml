@@ -67,10 +67,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0433" name="Proximity Ranging" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
     </cluster>
   </clusters>
 </deviceType>

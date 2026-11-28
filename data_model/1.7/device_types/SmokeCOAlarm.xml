@@ -91,15 +91,12 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0434" name="Smoke Concentration Measurement" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="3"/>
-          </greaterOrEqualTerm>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="3"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </cluster>
   </clusters>
 </deviceType>

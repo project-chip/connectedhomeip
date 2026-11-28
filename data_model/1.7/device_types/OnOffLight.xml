@@ -68,7 +68,12 @@ Davis, CA 95616, USA
   <conditionRequirements>
     <deviceType id="0x0016" name="Root Node">
       <conditionRequirement name="GroupcastListenerCond">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="4"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </conditionRequirement>
     </deviceType>
   </conditionRequirements>
@@ -124,7 +129,12 @@ Davis, CA 95616, USA
       </attributes>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <mandatoryConform/>
+      <mandatoryConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="3"/>
+        </greaterOrEqualTerm>
+      </mandatoryConform>
       <commands>
         <command id="0x0040" name="CopyScene">
           <mandatoryConform/>

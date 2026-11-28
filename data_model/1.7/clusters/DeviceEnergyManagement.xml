@@ -121,10 +121,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="7" code="PRA" name="PowerRangeAdjustment" summary="Allows an EMS to make a temporary power range adjustment (within the limits offered by the ESA).">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" max="1"/>
-      </otherwiseConform>
+      <optionalConform choice="a" max="1"/>
     </feature>
   </features>
   <dataTypes>
@@ -143,7 +140,7 @@ Davis, CA 95616, USA
       <item value="1" name="Offline" summary="The ESA was set to offline">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Fault" summary="The ESA has developed a fault could not complete the adjustment">
+      <item value="2" name="Fault" summary="The ESA has developed a fault and could not complete the adjustment">
         <mandatoryConform/>
       </item>
       <item value="3" name="UserOptOut" summary="The user has disabled the ESA&apos;s flexibility capability">
@@ -153,10 +150,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="5" name="Invalid" summary="The adjustment was no longer valid">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="CostTypeEnum">
@@ -603,12 +597,9 @@ Davis, CA 95616, USA
     <attribute id="0x0008" name="PowerRangeAdjustment" type="PowerRangeAdjustStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PRA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PRA"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -725,12 +716,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x08" name="PowerRangeAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PRA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PRA"/>
+      </mandatoryConform>
       <field id="0" name="MinPower" type="power-mW">
         <optionalConform choice="a" more="true" min="1"/>
         <constraint>
@@ -778,12 +766,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x09" name="CancelPowerRangeAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PRA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PRA"/>
+      </mandatoryConform>
     </command>
   </commands>
   <events>
@@ -825,12 +810,9 @@ Davis, CA 95616, USA
     </event>
     <event id="0x04" name="PowerRangeAdjustStart" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PRA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PRA"/>
+      </mandatoryConform>
       <field id="0" name="Adjustment" type="PowerRangeAdjustStruct">
         <mandatoryConform/>
       </field>
@@ -840,12 +822,9 @@ Davis, CA 95616, USA
     </event>
     <event id="0x05" name="PowerRangeAdjustEnd" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="PRA"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="PRA"/>
+      </mandatoryConform>
       <field id="0" name="Cause" type="CauseEnum">
         <mandatoryConform/>
       </field>

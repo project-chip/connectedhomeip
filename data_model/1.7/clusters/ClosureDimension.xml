@@ -104,10 +104,7 @@ Davis, CA 95616, USA
       </optionalConform>
     </feature>
     <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -342,7 +339,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="Resolution" type="percent100ths" default="1">
+    <attribute id="0x0002" name="Resolution" type="percent100ths">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -352,7 +349,7 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="StepValue" type="percent100ths" default="1">
+    <attribute id="0x0003" name="StepValue" type="percent100ths">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -460,14 +457,11 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="GroupedSetTarget" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <notTerm>
-            <feature name="ACC"/>
-          </notTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="ACC"/>
+        </notTerm>
+      </mandatoryConform>
       <field id="0" name="Position" type="percent100ths">
         <optionalConform choice="a" more="true" min="1"/>
       </field>
@@ -480,17 +474,14 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="GroupedStep" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="PS"/>
-            <notTerm>
-              <feature name="ACC"/>
-            </notTerm>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="PS"/>
+          <notTerm>
+            <feature name="ACC"/>
+          </notTerm>
+        </andTerm>
+      </mandatoryConform>
       <field id="0" name="Direction" type="StepDirectionEnum">
         <mandatoryConform/>
       </field>
@@ -502,9 +493,6 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Speed" type="ThreeLevelAutoEnum">
         <optionalConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
   </commands>

@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0433" name="Proximity Ranging">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0433" name="Proximity Ranging"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="PROXR" scope="Endpoint"/>
   <features>
@@ -77,23 +75,11 @@ Davis, CA 95616, USA
     <feature bit="2" code="BLERBC" name="BLE Beacon RSSI" summary="Supports proximity ranging based on BLE Beacon RSSI">
       <optionalConform choice="a" more="true" min="1"/>
     </feature>
-    <feature bit="3" code="UWBRNG" name="UWB Ranging" summary="Supports proximity ranging based on UWB ranging">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
-    </feature>
   </features>
   <dataTypes>
     <enum name="BLERBCSecurityModeEnum">
       <item value="0" name="BLEDeviceIDObfuscation" summary="BLE Device ID is obfuscated using HMAC-SHA256 keyed with SessionKey">
         <mandatoryConform/>
-      </item>
-      <item value="1" name="EncryptedAdvertisingData" summary="Encrypted Advertising Data (EAD) as defined in Bluetooth® Core Specification 5.4">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
       </item>
     </enum>
     <enum name="BLTCSModeEnum">
@@ -452,7 +438,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="6" name="MaxConcurrentSessions" type="uint8">
-        <optionalConform/>
+        <mandatoryConform/>
         <constraint>
           <min value="1"/>
         </constraint>

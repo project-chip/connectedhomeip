@@ -65,7 +65,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="utility" scope="endpoint"/>
   <conditions>
-    <condition name="ControllableESA" summary="The DEM cluster on this endpoint accepts commands to adjust its energy operation."/>
+    <condition name="ControllableESA" summary="The Device Energy Management cluster on this endpoint accepts commands to adjust its energy operation."/>
   </conditions>
   <clusters>
     <cluster id="0x0098" name="Device Energy Management" side="server">

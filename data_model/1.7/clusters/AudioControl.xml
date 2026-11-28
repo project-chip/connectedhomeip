@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0512" name="Audio Control">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0512" name="Audio Control"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AUDIOCONTROL" scope="Endpoint"/>
   <features>
@@ -105,7 +103,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="SoftMuted" type="bool">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="PhysicallyMuted" type="bool" default="false">
@@ -114,7 +112,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="Volume" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -244,7 +242,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000E" name="Bass" type="int16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform choice="a" more="true" min="1">
         <feature name="BEQ"/>
       </optionalConform>
@@ -261,7 +259,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000F" name="Mid" type="int16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform choice="a" more="true" min="1">
         <feature name="BEQ"/>
       </optionalConform>
@@ -278,7 +276,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="Treble" type="int16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform choice="a" more="true" min="1">
         <feature name="BEQ"/>
       </optionalConform>
