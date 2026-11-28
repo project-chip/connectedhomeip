@@ -106,22 +106,37 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-// Keep track of the parsed featureMap option
-#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
-#error Cannot define CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+static chip::BitMask<Feature> BuildFeatureMap()
+{
+    chip::BitMask<Feature> featureMap;
+#if CONFIG_DEM_SUPPORT_POWER_ADJUSTMENT
+    featureMap.Set(Feature::kPowerAdjustment);
+#elif CONFIG_DEM_SUPPORT_POWER_RANGE_ADJUSTMENT
+    featureMap.Set(Feature::kPowerRangeAdjustment);
 #endif
 
-#ifdef CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
+#if CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
+    featureMap.Set(Feature::kPowerForecastReporting);
 #elif CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                          Feature::kConstraintBasedAdjustment);
-#else
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
+    featureMap.Set(Feature::kStateForecastReporting);
 #endif
+
+#if CONFIG_DEM_SUPPORT_START_TIME_ADJUSTMENT
+    featureMap.Set(Feature::kStartTimeAdjustment);
+#endif
+#if CONFIG_DEM_SUPPORT_PAUSABLE
+    featureMap.Set(Feature::kPausable);
+#endif
+#if CONFIG_DEM_SUPPORT_FORECAST_ADJUSTMENT
+    featureMap.Set(Feature::kForecastAdjustment);
+#endif
+#if CONFIG_DEM_SUPPORT_CONSTRAINT_BASED_ADJUSTMENT
+    featureMap.Set(Feature::kConstraintBasedAdjustment);
+#endif
+    return featureMap;
+}
+
+static const chip::BitMask<Feature> sFeatureMap = BuildFeatureMap();
 
 chip::BitMask<Feature> GetFeatureMap()
 {
