@@ -178,10 +178,17 @@ class Commission:
     async def _find_or_establish_pase_if_needed(self):
         setup_code = self.info.setup_code
         if setup_code is None:
-            setup_code = self.dev_ctrl.CreateManualCode(
-                self.info.filter_value,
-                self.info.passcode
-            )
+            if self.info.filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
+                if not 0 <= self.info.filter_value <= 4095:
+                    raise ValueError("Long discriminator must be in the range 0-4095")
+                setup_code = SetupPayload().GenerateQrCode(
+                    passcode=self.info.passcode, vendorId=0, productId=0,
+                    discriminator=self.info.filter_value, capabilities=0x3F)
+            else:
+                setup_code = self.dev_ctrl.CreateManualCode(
+                    self.info.filter_value,
+                    self.info.passcode
+                )
 
         if self.commissioning_info.commissioning_method == "thread-meshcop":
             thread_ba_host = self.commissioning_info.thread_ba_host

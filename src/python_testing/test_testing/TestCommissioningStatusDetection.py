@@ -36,6 +36,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from python_path import PythonPath
 
+import matter.native
+
 # Add the python_testing directory to path so mdns_discovery module can be found
 with PythonPath('..', relative_to=__file__):
     import mdns_discovery.mdns_discovery  # noqa: F401
@@ -754,6 +756,156 @@ async def test_get_fabric_count_not_operational_no_pase_params():
     return None
 
 
+async def test_raw_long_discriminator_uses_qr_code():
+    """Raw long discriminators must not lose precision through manual codes."""
+    from matter.testing import commissioning
+
+    controller = MockDeviceController()
+    info = commissioning.SetupPayloadInfo(
+        filter_type=commissioning.discovery.FilterType.LONG_DISCRIMINATOR,
+        filter_value=TEST_DISCRIMINATOR, passcode=TEST_PASSCODE)
+    with patch.object(commissioning, 'SetupPayload') as payload:
+        payload.return_value.GenerateQrCode.return_value = "MT:synthetic"
+        await commissioning.Commission(
+            controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+        )._find_or_establish_pase_if_needed()
+        payload.return_value.GenerateQrCode.assert_called_once_with(
+            passcode=TEST_PASSCODE, vendorId=0, productId=0,
+            discriminator=TEST_DISCRIMINATOR, capabilities=0x3F)
+        controller.CreateManualCode.assert_not_called()
+        controller.FindOrEstablishPASESession.assert_awaited_once_with(
+            setupCode="MT:synthetic", nodeId=TEST_NODE_ID)
+
+
+async def test_raw_long_payload_round_trip():
+    """Native QR generation retains full discriminator and unspecified identity."""
+    from matter.testing import commissioning
+
+    for discriminator in (0, 3840, 4021, 4095):
+        controller = MockDeviceController()
+        info = commissioning.SetupPayloadInfo(filter_value=discriminator, passcode=TEST_PASSCODE)
+        await commissioning.Commission(
+            controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+        )._find_or_establish_pase_if_needed()
+        setup_code = controller.FindOrEstablishPASESession.call_args.kwargs['setupCode']
+        payload = commissioning.SetupPayload().ParseQrCode(setup_code)
+        assert payload.long_discriminator == discriminator
+        assert payload.short_discriminator is None
+        assert payload.setup_passcode == TEST_PASSCODE
+        assert payload.vendor_id == 0
+        assert payload.product_id == 0
+        assert int(payload.attributes['RendezvousInformation']) == 0x3F
+        controller.CreateManualCode.assert_not_called()
+
+
+async def test_supplied_setup_codes_unchanged():
+    """Supplied codes bypass generation, even when raw metadata is invalid."""
+    from matter.testing import commissioning
+
+    for setup_code in ("MT:YNJV7VSC00KA0648G00", "34970112332", "mt:unchanged", ""):
+        controller = MockDeviceController()
+        info = commissioning.SetupPayloadInfo(filter_value=4096, passcode=0, setup_code=setup_code)
+        with patch.object(commissioning, 'SetupPayload') as payload:
+            await commissioning.Commission(
+                controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+            )._find_or_establish_pase_if_needed()
+            payload.assert_not_called()
+        controller.CreateManualCode.assert_not_called()
+        controller.FindOrEstablishPASESession.assert_awaited_once_with(
+            setupCode=setup_code, nodeId=TEST_NODE_ID)
+
+
+async def test_raw_short_discriminator_unchanged():
+    """Raw SHORT metadata keeps the existing manual-code call unchanged."""
+    from matter.testing import commissioning
+
+    controller = MockDeviceController()
+    info = commissioning.SetupPayloadInfo(
+        filter_type=commissioning.discovery.FilterType.SHORT_DISCRIMINATOR,
+        filter_value=15, passcode=TEST_PASSCODE)
+    with patch.object(commissioning, 'SetupPayload') as payload:
+        await commissioning.Commission(
+            controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+        )._find_or_establish_pase_if_needed()
+        payload.assert_not_called()
+    controller.CreateManualCode.assert_called_once_with(15, TEST_PASSCODE)
+    controller.FindOrEstablishPASESession.assert_awaited_once_with(
+        setupCode=controller.CreateManualCode.return_value, nodeId=TEST_NODE_ID)
+
+
+async def test_raw_long_invalid_inputs():
+    """Invalid raw payloads fail without starting PASE."""
+    from matter.testing import commissioning
+
+    for discriminator in (-1, 4096, 65536, 65536 + TEST_DISCRIMINATOR):
+        controller = MockDeviceController()
+        info = commissioning.SetupPayloadInfo(filter_value=discriminator, passcode=TEST_PASSCODE)
+        with patch.object(commissioning, 'SetupPayload') as payload:
+            try:
+                await commissioning.Commission(
+                    controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+                )._find_or_establish_pase_if_needed()
+            except ValueError:
+                pass
+            else:
+                return "Expected ValueError for an out-of-range long discriminator"
+            payload.assert_not_called()
+        controller.FindOrEstablishPASESession.assert_not_awaited()
+
+    for passcode in (0, 11111111, 12345678, 87654321, 99999999):
+        controller = MockDeviceController()
+        info = commissioning.SetupPayloadInfo(filter_value=TEST_DISCRIMINATOR, passcode=passcode)
+        try:
+            await commissioning.Commission(
+                controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+            )._find_or_establish_pase_if_needed()
+        except commissioning.ChipStackError:
+            pass
+        else:
+            return "Expected native payload validation to reject an invalid setup passcode"
+        controller.FindOrEstablishPASESession.assert_not_awaited()
+    return None
+
+
+async def test_raw_long_meshcop_arguments_and_errors():
+    """MeshCoP host, port and failure propagation remain unchanged."""
+    from matter.testing import commissioning
+
+    info = commissioning.SetupPayloadInfo(filter_value=TEST_DISCRIMINATOR, passcode=TEST_PASSCODE)
+    for host, port in (("fe80::1234%test", 49191), (None, 49191), ("fe80::1234%test", None)):
+        controller = MockDeviceController()
+        config = commissioning.CommissioningInfo(
+            commissioning_method="thread-meshcop", thread_ba_host=host, thread_ba_port=port)
+        if host is None or port is None:
+            try:
+                await commissioning.Commission(controller, TEST_NODE_ID, info, config)._find_or_establish_pase_if_needed()
+            except ValueError:
+                pass
+            else:
+                return "Expected missing MeshCoP host or port to fail"
+            controller.FindOrEstablishPASESession.assert_not_awaited()
+        else:
+            await commissioning.Commission(controller, TEST_NODE_ID, info, config)._find_or_establish_pase_if_needed()
+            arguments = controller.FindOrEstablishPASESession.call_args.kwargs
+            assert arguments['threadMeshCoPConfig'] == (host, port)
+            assert arguments['nodeId'] == TEST_NODE_ID
+            assert commissioning.SetupPayload().ParseQrCode(arguments['setupCode']).long_discriminator == TEST_DISCRIMINATOR
+
+    controller = MockDeviceController()
+    expected_error = TimeoutError("PASE timed out")
+    controller.FindOrEstablishPASESession.side_effect = expected_error
+    try:
+        await commissioning.Commission(
+            controller, TEST_NODE_ID, info, commissioning.CommissioningInfo()
+        )._find_or_establish_pase_if_needed()
+    except TimeoutError as error:
+        assert error is expected_error
+    else:
+        return "Expected PASE failure to propagate without retry"
+    assert controller.FindOrEstablishPASESession.await_count == 1
+    return None
+
+
 # =============================================================================
 # TEST RUNNER
 # =============================================================================
@@ -791,6 +943,12 @@ def main():
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
         ("D2. get_fabric_count: SCENARIO 1 - factory fresh", test_get_fabric_count_scenario1_factory_fresh),
         ("D3. get_fabric_count: not operational, no PASE params", test_get_fabric_count_not_operational_no_pase_params),
+        ("E1. raw LONG preserves discriminator precision", test_raw_long_discriminator_uses_qr_code),
+        ("E2. raw LONG native payload round trip", test_raw_long_payload_round_trip),
+        ("E3. supplied setup codes unchanged", test_supplied_setup_codes_unchanged),
+        ("E4. raw SHORT unchanged", test_raw_short_discriminator_unchanged),
+        ("E5. raw LONG invalid inputs", test_raw_long_invalid_inputs),
+        ("E6. raw LONG MeshCoP arguments and errors", test_raw_long_meshcop_arguments_and_errors),
     ]
 
     print("\n" + "=" * 70)
@@ -801,10 +959,13 @@ def main():
     passed = 0
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+    payload_library = matter.native.GetLibraryHandle(flags=matter.native.HandleFlags(0))
 
     for test_name, test_func in tests:
         try:
-            error = loop.run_until_complete(test_func())
+            with patch('matter.setup_payload.setup_payload.GetLibraryHandle', return_value=payload_library), \
+                    patch('matter.native.GetLibraryHandle', return_value=payload_library):
+                error = loop.run_until_complete(test_func())
             if error:
                 failures.append(f"{test_name}: {error}")
                 print(f"  FAIL: {test_name}")
