@@ -9,6 +9,7 @@ tool or Matter accessories on Linux.
 
 -   [Using Python CHIP Controller advanced features](#using-python-chip-controller-advanced-features)
     -   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+    -   [Restricting minimal mDNS to specific interfaces](#restricting-minimal-mdns-to-specific-interfaces)
     -   [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
@@ -72,6 +73,39 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     ```bash
     matter-repl --ble-controller=2
     ```
+
+<hr>
+
+## Restricting minimal mDNS to specific interfaces
+
+Minimal mDNS opens a fixed number of endpoints (`kMaxEndPoints`, 30) and assigns
+them in interface order. On a host with many network interfaces, such as a
+container host with one virtual Ethernet pair per container, the pool can run
+out before the interface that reaches the Matter devices gets an endpoint.
+Discovery then fails with `No endpoint was available to send the message`.
+
+`ChipStack` accepts a list of interface names to restrict minimal mDNS to:
+
+```python
+from matter.ChipStack import ChipStack
+
+stack = ChipStack(persistentStorage, mdnsInterfaces=["vlan3020"])
+```
+
+-   Names must match exactly; there is no wildcard matching.
+-   At most eight names can be given.
+-   IPv4 endpoints bound to all interfaces are not affected.
+-   Loopback interfaces stay excluded, as without the filter.
+-   If none of the names is present and usable, an error is logged. Only IPv4
+    endpoints bound to all interfaces remain, if the platform policy provides
+    them.
+-   Builds with platform mDNS (`chip_mdns="platform"`) reject a non-empty list
+    with `CHIP_ERROR_NOT_IMPLEMENTED`.
+
+Applications embedding the SDK directly can wrap any `AddressPolicy` in
+`mdns::Minimal::FilteredAddressPolicy` and install it with
+`mdns::Minimal::SetAddressPolicy()`. Implement `InterfacePredicate` to select
+interfaces by other criteria than an exact name.
 
 <hr>
 
