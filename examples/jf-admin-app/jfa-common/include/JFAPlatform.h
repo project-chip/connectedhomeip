@@ -23,8 +23,11 @@
 // via CommissionerMain.h helpers (InitCommissioner / GetDeviceCommissioner).
 // Those helpers are Linux-only, so the shared code must not call them
 // directly. Instead, each platform implements the two hooks declared below
-// (for Linux: examples/jf-admin-app/linux/JFAPlatformLinux.cpp) and the shared
-// JFAManagerBase / JFADatastoreSync code calls through this interface.
+// (for Linux: examples/jf-admin-app/linux/JFAPlatformLinux.cpp).
+//
+// The hooks are only used when CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE is set
+// (see JFACaseSessionProvider.h). Platforms without the commissioner role do
+// not need to implement them.
 
 #pragma once
 

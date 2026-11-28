@@ -24,7 +24,11 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 
+#include "JFACaseSessionProvider.h"
+
+#if CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
 #include "JFAPlatform.h"
+#endif
 
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -201,6 +205,7 @@ void JFAManagerBase::HandleCommissioningCompleteEvent()
 
                 LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
 
+#if CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
                 if (!mCommissionerInitialized)
                 {
                     CHIP_ERROR err = JFAInitCommissioner(fb.GetFabricId(), fabricIndex);
@@ -215,6 +220,7 @@ void JFAManagerBase::HandleCommissioningCompleteEvent()
                         ChipLogError(JointFabric, "Failed to initialize commissioner mode: %" CHIP_ERROR_FORMAT, err.Format());
                     }
                 }
+#endif // CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
 
                 ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }
