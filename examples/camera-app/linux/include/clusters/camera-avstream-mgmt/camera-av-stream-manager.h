@@ -114,6 +114,8 @@ public:
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
+    void SyncCurrentFrameRateFromHAL();
+
 private:
     CHIP_ERROR AllocatedVideoStreamsLoaded();
 
