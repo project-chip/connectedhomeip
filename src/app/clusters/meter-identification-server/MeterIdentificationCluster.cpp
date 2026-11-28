@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +15,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include "MeterIdentificationCluster.h"
 
-#include <protocols/interaction_model/StatusCode.h>
+#include <algorithm>
+#include <cstring>
 
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/EventLogging.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/MeterIdentification/Metadata.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::MeterIdentification;
 using namespace chip::app::Clusters::MeterIdentification::Attributes;
-
 using chip::Protocols::InteractionModel::Status;
+
 namespace {
+
+bool PowerThresholdStructEqual(const Globals::Structs::PowerThresholdStruct::Type & a,
+                               const Globals::Structs::PowerThresholdStruct::Type & b)
+{
+    return a.powerThreshold == b.powerThreshold && a.apparentPowerThreshold == b.apparentPowerThreshold &&
+        a.powerThresholdSource == b.powerThresholdSource;
+}
+
 bool NullableCharSpanEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
 {
     if (a.IsNull() || b.IsNull())
@@ -44,217 +51,201 @@ bool NullableCharSpanEqual(const DataModel::Nullable<CharSpan> & a, const DataMo
 
     return a.Value().data_equal(b.Value());
 }
+
+// Copies `value` into `buf` (clamped to kMaximumStringSize) and stores the resulting span in `dest`,
+// or nulls `dest` if `value` is null. Uses memmove since `buf` may alias `value` (e.g. a caller
+// passing back a span obtained from this same cluster's Get*() accessor).
+void SetNullableString(char * buf, DataModel::Nullable<CharSpan> & dest, const DataModel::Nullable<CharSpan> & value)
+{
+    if (value.IsNull())
+    {
+        dest.SetNull();
+        return;
+    }
+
+    const size_t len = std::min(value.Value().size(), MeterIdentificationCluster::kMaximumStringSize);
+    memmove(buf, value.Value().data(), len);
+    dest.SetNonNull(CharSpan(buf, len));
+}
+
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MeterIdentification {
+namespace chip::app::Clusters {
 
-Instance::~Instance()
+MeterIdentificationCluster::MeterIdentificationCluster(EndpointId endpointId, const Config & config) :
+    DefaultServerCluster(ConcreteClusterPath(endpointId, MeterIdentification::Id)), mFeatureMap(config.mFeatureMap),
+    mOptionalAttributeSet([&config]() {
+        OptionalAttributeSet attrs;
+        if (config.mOptionalAttributes.IsSet(ProtocolVersion::Id))
+        {
+            attrs.Set<ProtocolVersion::Id>();
+        }
+        if (config.mFeatureMap.Has(Feature::kPowerThreshold))
+        {
+            // PowerThreshold is not part of OptionalAttributeSet's template pack: its presence is
+            // forced by the feature, not independently settable via Config::mOptionalAttributes.
+            attrs.ForceSet<PowerThreshold::Id>();
+        }
+        return attrs;
+    }())
 {
-    Shutdown();
+    // Route initial values through the real setters so construction gets the same validation
+    // (enum checks, length limits) as runtime writes, instead of storing unvalidated Config data
+    // directly. An invalid initial value is logged and left null rather than failing construction.
+    LogErrorOnFailure(SetMeterType(config.mMeterType));
+    LogErrorOnFailure(SetPointOfDelivery(config.mPointOfDelivery));
+    LogErrorOnFailure(SetMeterSerialNumber(config.mMeterSerialNumber));
+
+    // SetProtocolVersion/SetPowerThreshold reject any call (even with a null value) when their
+    // attribute/feature isn't enabled, so only call them when applicable to avoid logging a
+    // spurious error for the common case of an unconfigured optional attribute.
+    if (mOptionalAttributeSet.IsSet(ProtocolVersion::Id))
+    {
+        LogErrorOnFailure(SetProtocolVersion(config.mProtocolVersion));
+    }
+    if (HasFeature(Feature::kPowerThreshold))
+    {
+        LogErrorOnFailure(SetPowerThreshold(config.mPowerThreshold));
+    }
 }
 
-CHIP_ERROR Instance::Init()
+DataModel::ActionReturnStatus MeterIdentificationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                        AttributeValueEncoder & encoder)
 {
-    mMeterType.SetNull();
-    mPointOfDelivery.SetNull();
-    mMeterSerialNumber.SetNull();
-    mProtocolVersion.SetNull();
-    mPowerThreshold.SetNull();
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id:
+        return encoder.Encode(MeterIdentification::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatureMap.Raw());
+    case MeterType::Id:
+        return encoder.Encode(mMeterType);
+    case PointOfDelivery::Id:
+        return encoder.Encode(mPointOfDelivery);
+    case MeterSerialNumber::Id:
+        return encoder.Encode(mMeterSerialNumber);
+    case ProtocolVersion::Id:
+        return encoder.Encode(mProtocolVersion);
+    case PowerThreshold::Id:
+        return encoder.Encode(mPowerThreshold);
+    default:
+        return Status::UnsupportedAttribute;
+    }
+}
+
+CHIP_ERROR MeterIdentificationCluster::Attributes(const ConcreteClusterPath & path,
+                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const DataModel::AttributeEntry optionalAttrs[] = {
+        ProtocolVersion::kMetadataEntry,
+        PowerThreshold::kMetadataEntry,
+    };
+
+    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttrs), mOptionalAttributeSet);
+}
+
+CHIP_ERROR MeterIdentificationCluster::SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value)
+{
+    if (!value.IsNull())
+    {
+        VerifyOrReturnError(EnsureKnownEnumValue(value.Value()) != MeterTypeEnum::kUnknownEnumValue,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    SetAttributeValue(mMeterType, value, MeterType::Id);
     return CHIP_NO_ERROR;
 }
 
-void Instance::Shutdown()
+CHIP_ERROR MeterIdentificationCluster::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & value)
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-bool Instance::HasFeature(const Feature & aFeature) const
-{
-    return mFeature.Has(aFeature);
-}
-
-CHIP_ERROR Instance::SetMeterType(const DataModel::Nullable<MeterTypeEnum> & newValue)
-{
-    if (newValue == mMeterType)
-    {
-        return CHIP_NO_ERROR;
-    }
-    if (!newValue.IsNull() && MeterTypeEnum::kUnknownEnumValue == EnsureKnownEnumValue(newValue.Value()))
-    {
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
-    }
-    mMeterType = newValue;
-
-    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterType::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & newValue)
-{
-    if (NullableCharSpanEqual(newValue, mPointOfDelivery))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-
-    if (!newValue.IsNull())
-    {
-        memmove(mPointOfDeliveryBuf, newValue.Value().data(), len);
-        mPointOfDelivery = MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
-    }
-    else
-    {
-        mPointOfDelivery.SetNull();
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
-{
-    if (NullableCharSpanEqual(newValue, mMeterSerialNumber))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mMeterSerialNumberBuf) < len)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-
-    if (!newValue.IsNull())
-    {
-        memmove(mMeterSerialNumberBuf, newValue.Value().data(), len);
-        mMeterSerialNumber = MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
-    }
-    else
-    {
-        mMeterSerialNumber.SetNull();
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterSerialNumber::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
-{
-    if (NullableCharSpanEqual(newValue, mProtocolVersion))
+    if (NullableCharSpanEqual(value, mPointOfDelivery))
     {
         return CHIP_NO_ERROR;
     }
 
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mProtocolVersionBuf) < len)
+    if (!value.IsNull())
     {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
+        VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
-    if (!newValue.IsNull())
-    {
-        memmove(mProtocolVersionBuf, newValue.Value().data(), len);
-        mProtocolVersion = MakeNullable(CharSpan(mProtocolVersionBuf, len));
-    }
-    else
-    {
-        mProtocolVersion.SetNull();
-    }
+    SetNullableString(mPointOfDeliveryBuf, mPointOfDelivery, value);
 
-    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, ProtocolVersion::Id);
+    NotifyAttributeChanged(PointOfDelivery::Id);
     return CHIP_NO_ERROR;
 }
 
-bool operator==(const Globals::Structs::PowerThresholdStruct::Type & a, const Globals::Structs::PowerThresholdStruct::Type & b)
+CHIP_ERROR MeterIdentificationCluster::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & value)
 {
-    return a.powerThreshold == b.powerThreshold && a.apparentPowerThreshold == b.apparentPowerThreshold &&
-        a.powerThresholdSource == b.powerThresholdSource;
+    if (NullableCharSpanEqual(value, mMeterSerialNumber))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (!value.IsNull())
+    {
+        VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    SetNullableString(mMeterSerialNumberBuf, mMeterSerialNumber, value);
+
+    NotifyAttributeChanged(MeterSerialNumber::Id);
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & newValue)
+CHIP_ERROR MeterIdentificationCluster::SetProtocolVersion(const DataModel::Nullable<CharSpan> & value)
 {
-    if (newValue.IsNull())
+    VerifyOrReturnError(mOptionalAttributeSet.IsSet(ProtocolVersion::Id), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    if (NullableCharSpanEqual(value, mProtocolVersion))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (!value.IsNull())
+    {
+        VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    SetNullableString(mProtocolVersionBuf, mProtocolVersion, value);
+
+    NotifyAttributeChanged(ProtocolVersion::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+MeterIdentificationCluster::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & value)
+{
+    VerifyOrReturnError(HasFeature(Feature::kPowerThreshold), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    if (value.IsNull())
     {
         if (mPowerThreshold.IsNull())
         {
             return CHIP_NO_ERROR;
         }
-
         mPowerThreshold.SetNull();
     }
     else
     {
-        if (!mPowerThreshold.IsNull() && mPowerThreshold.Value() == newValue.Value())
+        if (!mPowerThreshold.IsNull() && PowerThresholdStructEqual(mPowerThreshold.Value(), value.Value()))
         {
             return CHIP_NO_ERROR;
         }
 
-        if (!newValue.Value().powerThresholdSource.IsNull() &&
-            Globals::PowerThresholdSourceEnum::kUnknownEnumValue ==
-                EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))
+        if (!value.Value().powerThresholdSource.IsNull())
         {
-            return CHIP_ERROR_INVALID_INTEGER_VALUE;
+            VerifyOrReturnError(EnsureKnownEnumValue(value.Value().powerThresholdSource.Value()) !=
+                                    Globals::PowerThresholdSourceEnum::kUnknownEnumValue,
+                                CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
 
-        mPowerThreshold.SetNonNull(newValue.Value());
+        mPowerThreshold.SetNonNull(value.Value());
     }
 
-    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThreshold::Id);
+    NotifyAttributeChanged(PowerThreshold::Id);
     return CHIP_NO_ERROR;
 }
 
-// AttributeAccessInterface
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    ChipLogProgress(Zcl, "Meter Indication read attr %" PRIu32 " on endpoint %" PRIu32, static_cast<uint32_t>(aPath.mAttributeId),
-                    static_cast<uint32_t>(mEndpointId));
-
-    switch (aPath.mAttributeId)
-    {
-    case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
-        break;
-    case MeterType::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeterType()));
-        break;
-
-    case PointOfDelivery::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetPointOfDelivery()));
-        break;
-
-    case MeterSerialNumber::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeterSerialNumber()));
-        break;
-
-    case ProtocolVersion::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetProtocolVersion()));
-        break;
-
-    case PowerThreshold::Id:
-        if (HasFeature(Feature::kPowerThreshold))
-            ReturnErrorOnFailure(aEncoder.Encode(GetPowerThreshold()));
-        else
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
-} // namespace MeterIdentification
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-// -----------------------------------------------------------------------------
-// Plugin initialization
-
-void MatterMeterIdentificationPluginServerInitCallback() {}
+} // namespace chip::app::Clusters
