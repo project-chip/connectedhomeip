@@ -31,8 +31,8 @@ config CHIP_APP_COMMON
 
 config CHIP_APP_FAILSAFE_EARLY_EXPIRY
     bool "Expire the commissioning fail-safe early when the CHIPoBLE link is lost"
-    default y if CHIP_NXP_PLATFORM_MCXW72
-    depends on CHIP_APP_COMMON && NET_L2_OPENTHREAD
+    default y
+    depends on CHIP_APP_COMMON && NET_L2_OPENTHREAD && CHIP_NXP_PLATFORM_MCXW72 && BT && !CHIP_DEVICE_USE_ZEPHYR_BLE
     help
         MCXW72 only (shared 2.4 GHz radio). When the CHIPoBLE connection carrying the PASE session closes while the fail-safe is armed:
         (i) ConnectNetwork not received -> expire the fail-safe immediately;
