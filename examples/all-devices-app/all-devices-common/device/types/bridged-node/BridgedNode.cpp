@@ -37,6 +37,10 @@ CHIP_ERROR BridgedNode::Register(EndpointId endpoint, CodeDrivenDataModelProvide
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
+    // This BridgedNode device interface defines only one bridged node device type on the endpoint, so the bridged node uses
+    // "Separate Endpoints" pattern. In this case bridged node is specified to use full-family composition
+    // type, so we just force it here.
+    composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the Bridged Device Basic Information cluster.
