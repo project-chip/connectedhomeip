@@ -523,7 +523,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
 
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
@@ -584,7 +583,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedDeallocatesConnect
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
     server.GetLogic().SetDelegate(&mockDelegate);
     server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
 
     Testing::MockCommandHandler commandHandler;
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
@@ -684,7 +682,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
     server.GetLogic().SetDelegate(&mockDelegate);
     server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
 
     Testing::MockCommandHandler commandHandler;
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
@@ -709,16 +706,16 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
+    restartedServer.SetDelegate(&mockDelegate);
+    restartedServer.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     ASSERT_EQ(restartedServer.Startup(failingContext), CHIP_NO_ERROR);
-    restartedServer.GetLogic().SetDelegate(&mockDelegate);
-    restartedServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 
-    // With writes working again, a subsequent load drops the stale entry still in storage and
+    // With writes working again, a subsequent restart drops the stale entry still in storage and
     // corrects the persisted list.
     failingProvider.FailWrites(false);
-    EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
+    restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(restartedServer.Startup(failingContext), CHIP_NO_ERROR);
     EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 
     restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -742,7 +739,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedSetsTransportInact
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
     server.GetLogic().SetDelegate(&busyDelegate);
     server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
 
     Testing::MockCommandHandler commandHandler;
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
@@ -1183,7 +1179,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     // Set the delegate to the server logic
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -1518,7 +1513,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     // Set the delegate to the server logic
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
@@ -1538,7 +1532,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
 
     // Start the Server back up
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
     // Validate persisted fields
@@ -1627,8 +1620,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
 
     // Start the Server back up
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     // The number of currentConnections in persisted storage should be 0.
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
@@ -1738,7 +1729,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     // Set the delegate to the server logic
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
@@ -2026,7 +2016,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -2150,7 +2139,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_UpdateMotionZoneOptions)
 
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -2449,7 +2437,6 @@ TEST_F(MockEventLoggingNoPerZoneSensitivity, Test_AllocateTransport_UpdateMotion
 
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -2689,7 +2676,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, MigrationTest_NoStoredValue)
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     mServer.GetLogic().SetDelegate(&mockDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
 }
 
@@ -2725,7 +2711,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, MigrationTest_LegacyCurrentConnecti
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     mServer.GetLogic().SetDelegate(&mockDelegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
     uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
@@ -2753,10 +2738,127 @@ TEST_F(TestPushAVStreamTransportServerLogic, MigrationTest_LegacyCurrentConnecti
             .KeyName()));
 
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].connectionID, allocatedConnectionID);
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+namespace {
+
+class RecordingPersistenceDelegate : public TestPushAVStreamTransportDelegateImpl
+{
+public:
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override { mServer = server; }
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override
+    {
+        mLoadedCallbackCount++;
+        if (mServer != nullptr)
+        {
+            mLoadedConnectionIds.clear();
+            for (const auto & connection : mServer->GetLogic().mCurrentConnections)
+            {
+                mLoadedConnectionIds.push_back(connection.connectionID);
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    PushAvStreamTransportServer * mServer = nullptr;
+    size_t mLoadedCallbackCount           = 0;
+    std::vector<uint16_t> mLoadedConnectionIds;
+};
+
+TransportOptionsDecodableStruct MakeContinuousTransportOptions(const std::string & url, const std::string & trackName)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+
+    TransportOptionsDecodableStruct transportOptions;
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID                  = 1;
+    transportOptions.url                            = Span(url.data(), url.size());
+    transportOptions.triggerOptions.triggerType     = TransportTriggerTypeEnum::kContinuous;
+    transportOptions.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    transportOptions.expiryTime.ClearValue();
+    return transportOptions;
+}
+
+} // namespace
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestStartupNotifiesDelegateWhenSetBeforeStartup)
+{
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    TestPushAVStreamTransportDelegateImpl setupDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+    mServer.SetDelegate(&setupDelegate);
+    mServer.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    ASSERT_SUCCESS(mServer.Startup(mClusterTester.GetServerClusterContext()));
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(mFabricIndex);
+    ConcreteCommandPath commandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = MakeContinuousTransportOptions(url, trackName);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, commandPath, commandData), std::nullopt);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), mFabricHelper.GetFabricTable());
+    RecordingPersistenceDelegate delegate;
+    restartedServer.SetDelegate(&delegate);
+    EXPECT_EQ(delegate.mServer, &restartedServer);
+    EXPECT_EQ(delegate.mLoadedCallbackCount, 0u);
+
+    ASSERT_SUCCESS(restartedServer.Startup(mClusterTester.GetServerClusterContext()));
+    EXPECT_EQ(delegate.mLoadedCallbackCount, 1u);
+    ASSERT_EQ(delegate.mLoadedConnectionIds.size(), 1u);
+    EXPECT_EQ(delegate.mLoadedConnectionIds[0], allocatedConnectionID);
+
+    restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestSetDelegateAfterStartupNotifiesDelegateWithLoadedConnections)
+{
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    TestPushAVStreamTransportDelegateImpl setupDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+    mServer.SetDelegate(&setupDelegate);
+    mServer.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    ASSERT_SUCCESS(mServer.Startup(mClusterTester.GetServerClusterContext()));
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(mFabricIndex);
+    ConcreteCommandPath commandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = MakeContinuousTransportOptions(url, trackName);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, commandPath, commandData), std::nullopt);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), mFabricHelper.GetFabricTable());
+    ASSERT_SUCCESS(restartedServer.Startup(mClusterTester.GetServerClusterContext()));
+    ASSERT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), 1u);
+
+    RecordingPersistenceDelegate delegate;
+    restartedServer.SetDelegate(&delegate);
+    EXPECT_EQ(delegate.mServer, &restartedServer);
+    EXPECT_EQ(delegate.mLoadedCallbackCount, 1u);
+    ASSERT_EQ(delegate.mLoadedConnectionIds.size(), 1u);
+    EXPECT_EQ(delegate.mLoadedConnectionIds[0], allocatedConnectionID);
+
+    restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace PushAvStreamTransport

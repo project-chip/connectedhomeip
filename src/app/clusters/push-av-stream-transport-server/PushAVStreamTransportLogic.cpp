@@ -100,8 +100,10 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider &
     LogErrorOnFailure(LoadCurrentConnections());
     RemoveConnectionsForMissingFabrics(fabricTable);
 
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    if (mDelegate != nullptr)
+    {
+        LogErrorOnFailure(mDelegate->PersistentAttributesLoadedCallback());
+    }
     return CHIP_NO_ERROR;
 }
 
