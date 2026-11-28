@@ -82,14 +82,20 @@ GroupcastCluster::~GroupcastCluster()
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
+    {
+        if (!mFeatures.Has(Groupcast::Feature::kSender))
+        {
+            // A mapping without GroupInfo is left over from a removed group, unless the node sends to that group with a
+            // mapping written before Groupcast was enabled. Only a node without the Sender feature can rule that out.
+            // Runs before the listener is attached so that the removals are not reported as Membership changes.
+            ReconcileGroupKeys();
+        }
+        mGroupcastContext.testing.SetDelegate(this);
+    }
     mGroupcastContext.groupDataProvider.SetListener(this);
     SetDataModelProvider(context.provider);
     UpdateUsedMcastAddrCount();
-
-    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
-    {
-        mGroupcastContext.testing.SetDelegate(this);
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -469,6 +475,9 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
     err               = groups.GetGroupInfo(fabricIndex, data.groupID, info);
     bool is_new_group = (CHIP_ERROR_NOT_FOUND == err);
     VerifyOrReturnError(is_new_group || (CHIP_NO_ERROR == err), Status::Failure);
+    JoinGroupRollbackState rollback;
+    rollback.is_new_group  = is_new_group;
+    rollback.previous_info = info;
     // If the group is new, the fabric entries will increase
     uint16_t new_count = (is_new_group) ? info.count + 1 : info.count;
     VerifyOrReturnError(new_count <= groups.GetMaxGroupsPerFabric(), Status::ResourceExhausted);
@@ -508,38 +517,86 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
                             Status::ResourceExhausted);
     }
 
-    // Key handling
-    Status stat = SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key);
+    // A group without GroupInfo can still have a mapping, written before Groupcast was enabled.
+    rollback.had_previous_key = (CHIP_NO_ERROR == groups.GetGroupKey(fabricIndex, data.groupID, rollback.previous_keyset_id));
+
+    // Key handling. On failure, SetKeySet has already removed a keyset that it created.
+    Status stat = SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key, rollback.created_keyset);
     VerifyOrReturnError(Status::Success == stat, stat);
 
-    // Add/update entry in the group table
-    err = groups.SetGroupInfo(fabricIndex, info);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
-
-    if (data.replaceEndpoints.HasValue() && data.replaceEndpoints.Value())
+    err = StoreJoinGroupMembership(fabricIndex, data, info, rollback);
+    if (CHIP_NO_ERROR != err)
     {
-        // Replace endpoints
-        err = groups.RemoveEndpoints(fabricIndex, data.groupID);
-        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+        RollbackJoinGroup(fabricIndex, data, rollback);
+        stat = (CHIP_ERROR_INVALID_LIST_LENGTH == err) ? Status::ResourceExhausted : Status::Failure;
     }
 
-    // Add Endpoints
-    {
-        size_t group_count = 0;
-        auto iter          = data.endpoints.begin();
-        while (iter.Next() && (group_count++ < kMaxCommandEndpoints))
-        {
-            err = groups.AddEndpoint(fabricIndex, data.groupID, iter.GetValue());
-            VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
-        }
-    }
-
+    // Also after a failure: the rollback may not have undone every change, and an event without a change only makes
+    // observers read the auxiliary ACL again.
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
         AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
-    return Status::Success;
+    return stat;
+}
+
+CHIP_ERROR GroupcastCluster::StoreJoinGroupMembership(FabricIndex fabric_index,
+                                                      const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                                      const GroupDataProvider::GroupInfo & info, JoinGroupRollbackState & state)
+{
+    GroupDataProvider & groups = Provider();
+
+    // Add/update entry in the group table
+    ReturnErrorOnFailure(groups.SetGroupInfo(fabric_index, info));
+    state.group_info_stored = true;
+
+    if (data.replaceEndpoints.HasValue() && data.replaceEndpoints.Value())
+    {
+        ReturnErrorOnFailure(groups.RemoveEndpoints(fabric_index, data.groupID));
+    }
+
+    size_t endpoint_count = 0;
+    auto iter             = data.endpoints.begin();
+    while (iter.Next() && (endpoint_count++ < kMaxCommandEndpoints))
+    {
+        ReturnErrorOnFailure(groups.AddEndpoint(fabric_index, data.groupID, iter.GetValue()));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void GroupcastCluster::RollbackJoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                         const JoinGroupRollbackState & state)
+{
+    GroupDataProvider & groups = Provider();
+
+    if (state.group_info_stored)
+    {
+        if (state.is_new_group)
+        {
+            LogErrorOnFailure(groups.RemoveGroupInfo(fabric_index, data.groupID));
+        }
+        else
+        {
+            LogErrorOnFailure(groups.SetGroupInfo(fabric_index, state.previous_info));
+        }
+    }
+
+    // After the GroupInfo: removing the GroupInfo of a new group can also remove its mapping.
+    if (state.had_previous_key)
+    {
+        LogErrorOnFailure(groups.SetGroupKey(fabric_index, data.groupID, state.previous_keyset_id));
+    }
+    else
+    {
+        RemoveGroupKeyMappings(fabric_index, data.groupID);
+    }
+
+    if (state.created_keyset)
+    {
+        LogErrorOnFailure(groups.RemoveKeySet(fabric_index, data.keySetID));
+    }
 }
 
 Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints,
@@ -599,7 +656,8 @@ Status GroupcastCluster::UpdateGroupKey(const ConcreteCommandPath & path,
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-    return SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key);
+    bool created_keyset = false;
+    return SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key, created_keyset);
 }
 
 Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
@@ -639,11 +697,14 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 }
 
 Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip::Access::SubjectDescriptor & subjectDescriptor,
-                                   GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key)
+                                   GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key,
+                                   bool & created_keyset)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
     GroupDataProvider & groups    = Provider();
     GroupDataProvider::KeySet ks;
+
+    created_keyset = false;
 
     // Keys can only be touched if the client has admin privileges, but this is called from commands that only require
     // Manage privileges. We do the check here before touching the keys.
@@ -682,6 +743,7 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
             err = groups.SetKeySet(fabricIndex, compressedFabricId, ks);
             VerifyOrReturnError(CHIP_ERROR_INVALID_LIST_LENGTH != err, Status::ResourceExhausted);
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+            created_keyset = true;
         }
     }
     else
@@ -693,7 +755,15 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
 
     // Assign keyset to group
     err = groups.SetGroupKey(fabricIndex, group_id, keyset_id);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    if (CHIP_NO_ERROR != err)
+    {
+        if (created_keyset)
+        {
+            // Best effort: the command is already failing.
+            LogErrorOnFailure(groups.RemoveKeySet(fabricIndex, keyset_id));
+        }
+        return (CHIP_ERROR_INVALID_LIST_LENGTH == err) ? Status::ResourceExhausted : Status::Failure;
+    }
 
     return Status::Success;
 }
@@ -842,6 +912,45 @@ void GroupcastCluster::NotifyUsedMcastAddrCountOnChange()
     if (old_count != mUsedMcastAddrCount)
     {
         NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
+    }
+}
+
+void GroupcastCluster::ReconcileGroupKeys()
+{
+    for (const FabricInfo & fabric : Fabrics())
+    {
+        RemoveGroupKeyMappings(fabric.GetFabricIndex(), std::nullopt);
+    }
+}
+
+void GroupcastCluster::RemoveGroupKeyMappings(FabricIndex fabric_index, std::optional<GroupId> group_id)
+{
+    GroupDataProvider & groups = Provider();
+    size_t mapCount            = 0;
+    {
+        AutoRelease iter(groups.IterateGroupKeys(fabric_index));
+        VerifyOrReturn(!iter.IsNull());
+        mapCount = iter->Count();
+    }
+
+    // From the last index down: removing a mapping changes the index of the mappings after it.
+    for (size_t remaining = mapCount; remaining > 0; --remaining)
+    {
+        const size_t index = remaining - 1;
+        GroupDataProvider::GroupKey keyMap;
+        if (groups.GetGroupKeyAt(fabric_index, index, keyMap) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        GroupInfo info;
+        const bool shouldRemove = group_id.has_value()
+            ? (keyMap.group_id == *group_id)
+            : (groups.GetGroupInfo(fabric_index, keyMap.group_id, info) == CHIP_ERROR_NOT_FOUND);
+        if (shouldRemove)
+        {
+            LogErrorOnFailure(groups.RemoveGroupKeyAt(fabric_index, index));
+        }
     }
 }
 

@@ -35,6 +35,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <platform/NetworkCommissioning.h>
@@ -42,7 +43,9 @@
 #include <array>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <cstring>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <optional>
 #include <set>
 
 namespace {
@@ -187,6 +190,7 @@ struct TestGroupcastCluster : public ::testing::Test
 
     void TearDown() override
     {
+        mTestContext.StorageDelegate().ClearPoisonKeys();
         mAccessDelegate.Finish();
         mAccessControl.Finish();
         mSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
@@ -203,6 +207,12 @@ struct TestGroupcastCluster : public ::testing::Test
     {
         ASSERT_TRUE(status.has_value());
         EXPECT_EQ(status->GetStatusCode().GetStatus(), expected);
+    }
+
+    // Makes every write and delete of the storage record fail, while reads still succeed.
+    void FailWritesOf(const StorageKeyName & recordKey)
+    {
+        mTestContext.StorageDelegate().AddPoisonKey(recordKey.KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
     }
 
     FabricIndex mFabricIndex = kTestFabricIndex;
@@ -2184,6 +2194,479 @@ TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsConstrain
         EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
         EXPECT_FALSE(result.response.has_value());
     }
+}
+
+TEST_F(TestGroupcastCluster, TestJoinAndLeaveDistinctGroupsReclaimsKeyMapSlots)
+{
+    const KeysetId kKeyset = 0xabcd;
+    const uint8_t key[]    = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    const uint16_t maxPerFabric = mProvider.GetMaxGroupsPerFabric();
+    const uint16_t totalGroups  = static_cast<uint16_t>(maxPerFabric * 2 + 4);
+    std::optional<uint16_t> sessionId;
+
+    for (uint16_t step = 0; step < totalGroups; step++)
+    {
+        const GroupId groupId = static_cast<GroupId>(0x1000 + step);
+
+        Commands::JoinGroup::Type joinData;
+        joinData.groupID   = groupId;
+        joinData.keySetID  = kKeyset;
+        joinData.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+        if (step == 0)
+        {
+            joinData.key = MakeOptional(ByteSpan(key));
+        }
+
+        auto joinResult = tester.Invoke(Commands::JoinGroup::Id, joinData);
+        ASSERT_EQ(joinResult.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        if (!sessionId.has_value())
+        {
+            auto * keyContext = mProvider.GetKeyContext(kTestFabricIndex, groupId);
+            ASSERT_NE(keyContext, nullptr);
+            sessionId = keyContext->GetKeyHash();
+            keyContext->Release();
+
+            auto * activeSessionIter = mProvider.IterateGroupSessions(*sessionId);
+            ASSERT_NE(activeSessionIter, nullptr);
+            EXPECT_GT(activeSessionIter->Count(), 0u);
+            activeSessionIter->Release();
+        }
+
+        Commands::LeaveGroup::Type leaveData;
+        if ((step % 3) == 0)
+        {
+            // Whole-group LeaveGroup
+            leaveData.groupID = groupId;
+        }
+        else if ((step % 3) == 1)
+        {
+            // Leave-all LeaveGroup(0)
+            leaveData.groupID = kUndefinedGroupId;
+        }
+        else
+        {
+            // Listener-only last-endpoint LeaveGroup deletes the group and its key mapping
+            leaveData.groupID   = groupId;
+            leaveData.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints)));
+        }
+
+        auto leaveResult = tester.Invoke(Commands::LeaveGroup::Id, leaveData);
+        ASSERT_EQ(leaveResult.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+
+    auto * keyIter = mProvider.IterateGroupKeys(kTestFabricIndex);
+    ASSERT_NE(keyIter, nullptr);
+    EXPECT_EQ(keyIter->Count(), 0u);
+    keyIter->Release();
+
+    ASSERT_TRUE(sessionId.has_value());
+    auto * sessionIter = mProvider.IterateGroupSessions(*sessionId);
+    ASSERT_NE(sessionIter, nullptr);
+    EXPECT_EQ(sessionIter->Count(), 0u);
+    GroupDataProvider::GroupSession staleSession;
+    EXPECT_FALSE(sessionIter->Next(staleSession));
+    sessionIter->Release();
+}
+
+TEST_F(TestGroupcastCluster, TestSenderEndpointLeaveRetainsKeyMapUntilWholeGroupLeave)
+{
+    const GroupId kGroupId = 0x3001;
+    const KeysetId kKeyset = 0x3002;
+    const uint8_t key[]    = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    app::Clusters::GroupcastCluster listenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
+                                                         mAccessControl, mTesting },
+                                                       BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
+    ASSERT_EQ(listenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(listenerAndSender);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinData;
+    joinData.groupID   = kGroupId;
+    joinData.keySetID  = kKeyset;
+    joinData.key       = MakeOptional(ByteSpan(key));
+    joinData.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinData).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    // Removing the last endpoint when Sender feature is supported keeps the group and its key mapping.
+    Commands::LeaveGroup::Type endpointLeave;
+    endpointLeave.groupID   = kGroupId;
+    endpointLeave.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints)));
+    ASSERT_EQ(tester.Invoke(Commands::LeaveGroup::Id, endpointLeave).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    GroupDataProvider::GroupInfo info;
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    EXPECT_EQ(mProvider.GetGroupInfo(kTestFabricIndex, kGroupId, info), CHIP_NO_ERROR);
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kGroupId, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kKeyset);
+
+    // Whole-group LeaveGroup removes both GroupInfo and GroupKeyMap.
+    Commands::LeaveGroup::Type wholeGroupLeave;
+    wholeGroupLeave.groupID = kGroupId;
+    ASSERT_EQ(tester.Invoke(Commands::LeaveGroup::Id, wholeGroupLeave).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    EXPECT_EQ(mProvider.GetGroupInfo(kTestFabricIndex, kGroupId, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kGroupId, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+
+    listenerAndSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestGroupcastCluster, TestStartupRemovesGroupKeysWithoutGroupInfoUnlessSender)
+{
+    const GroupId kActiveGroup = 0x4001;
+    const KeysetId kKeyset     = 0x4002;
+    const uint8_t key[]        = { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinData;
+    joinData.groupID   = kActiveGroup;
+    joinData.keySetID  = kKeyset;
+    joinData.key       = MakeOptional(ByteSpan(key));
+    joinData.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinData).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    // Simulate reboot from unpatched firmware that leaked KeyMapData entries up to GetMaxGroupsPerFabric().
+    mSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+    mListener.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+    ASSERT_FALSE(mMockTimerDelegate.IsTimerActive(nullptr));
+
+    const uint16_t maxPerFabric = mProvider.GetMaxGroupsPerFabric();
+    for (uint16_t leakedOffset = 0; leakedOffset + 1 < maxPerFabric; leakedOffset++)
+    {
+        const GroupId leakedGroup = static_cast<GroupId>(0x4100 + leakedOffset);
+        ASSERT_EQ(mProvider.SetGroupKey(kTestFabricIndex, leakedGroup, kKeyset), CHIP_NO_ERROR);
+    }
+
+    // A cluster with the Sender feature keeps mappings that have no GroupInfo: the node may send to those groups with
+    // mappings written before Groupcast was enabled.
+    ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);
+    auto * keyIter = mProvider.IterateGroupKeys(kTestFabricIndex);
+    ASSERT_NE(keyIter, nullptr);
+    EXPECT_EQ(keyIter->Count(), maxPerFabric);
+    keyIter->Release();
+    mSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+
+    // A cluster without the Sender feature removes them, and does not report the removals as Membership changes.
+    ASSERT_EQ(mListener.Startup(*clusterContext), CHIP_NO_ERROR);
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(nullptr));
+    ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);
+
+    keyIter = mProvider.IterateGroupKeys(kTestFabricIndex);
+    ASSERT_NE(keyIter, nullptr);
+    EXPECT_EQ(keyIter->Count(), 1u);
+    keyIter->Release();
+
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kActiveGroup, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kKeyset);
+
+    // All reclaimed slots must now be usable for new JoinGroup commands.
+    joinData.key.ClearValue();
+    for (uint16_t slot = 1; slot < maxPerFabric; slot++)
+    {
+        joinData.groupID = static_cast<GroupId>(0x4200 + slot);
+        ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinData).GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestSetKeySetFailureRollsBackInlineKeyAndReturnsResourceExhausted)
+{
+    const KeysetId kSeedKeyset   = 0x5001;
+    const KeysetId kInlineKeyset = 0x5002;
+    const GroupId kTargetGroup   = 0x5100;
+    const uint8_t key[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    const FabricInfo * fabric = mFabricHelper.GetFabricTable().FindFabricWithIndex(kTestFabricIndex);
+    ASSERT_NE(fabric, nullptr);
+    uint8_t compressedFabricIdBuffer[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricId(compressedFabricIdBuffer);
+    ASSERT_EQ(fabric->GetCompressedFabricIdBytes(compressedFabricId), CHIP_NO_ERROR);
+
+    GroupDataProvider::KeySet seedKeySet(kSeedKeyset, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+    memcpy(seedKeySet.epoch_keys[0].key, key, sizeof(key));
+    seedKeySet.epoch_keys[0].start_time = 1;
+    ASSERT_EQ(mProvider.SetKeySet(kTestFabricIndex, compressedFabricId, seedKeySet), CHIP_NO_ERROR);
+
+    // Fill GroupKeyMap capacity without adding GroupInfo so JoinGroup reaches SetKeySet -> SetGroupKey and hits
+    // INVALID_LIST_LENGTH.
+    const uint16_t maxPerFabric = mProvider.GetMaxGroupsPerFabric();
+    for (uint16_t idx = 0; idx < maxPerFabric; idx++)
+    {
+        ASSERT_EQ(mProvider.SetGroupKey(kTestFabricIndex, static_cast<GroupId>(0x5200 + idx), kSeedKeyset), CHIP_NO_ERROR);
+    }
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinData;
+    joinData.groupID   = kTargetGroup;
+    joinData.keySetID  = kInlineKeyset;
+    joinData.key       = MakeOptional(ByteSpan(key));
+    joinData.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    auto result = tester.Invoke(Commands::JoinGroup::Id, joinData);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+
+    // Inline keyset creation must have been rolled back so retrying after freeing a slot does not fail with AlreadyExists.
+    GroupDataProvider::KeySet outKeySet;
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kInlineKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+
+    ASSERT_EQ(mProvider.RemoveGroupKeyAt(kTestFabricIndex, 0), CHIP_NO_ERROR);
+    result = tester.Invoke(Commands::JoinGroup::Id, joinData);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kInlineKeyset, outKeySet), CHIP_NO_ERROR);
+}
+
+TEST_F(TestGroupcastCluster, TestJoinGroupRollsBackKeysWhenSetGroupInfoFails)
+{
+    const GroupId kExistingGroup   = 0x6001;
+    const GroupId kFailedNewGroup  = 0x6002;
+    const KeysetId kInitialKeyset  = 0x6101;
+    const KeysetId kNewGroupKeyset = 0x6102;
+    const KeysetId kUpdateKeyset   = 0x6103;
+    const uint8_t key[] = { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinExisting;
+    joinExisting.groupID   = kExistingGroup;
+    joinExisting.keySetID  = kInitialKeyset;
+    joinExisting.key       = MakeOptional(ByteSpan(key));
+    joinExisting.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinExisting).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroup(kTestFabricIndex, kFailedNewGroup));
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroup(kTestFabricIndex, kExistingGroup));
+
+    // 1. Failing SetGroupInfo on a new group rolls back both the new KeyMapData and inline KeySet.
+    Commands::JoinGroup::Type joinNew;
+    joinNew.groupID   = kFailedNewGroup;
+    joinNew.keySetID  = kNewGroupKeyset;
+    joinNew.key       = MakeOptional(ByteSpan(key));
+    joinNew.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinNew).GetStatusCode(), ClusterStatusCode(Status::Failure));
+
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    GroupDataProvider::KeySet outKeySet;
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kFailedNewGroup, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kNewGroupKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+
+    // 2. Failing SetGroupInfo when updating an existing group restores its prior keyset mapping and removes the new inline KeySet.
+    joinExisting.keySetID        = kUpdateKeyset;
+    joinExisting.key             = MakeOptional(ByteSpan(key));
+    joinExisting.useAuxiliaryACL = MakeOptional(true);
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinExisting).GetStatusCode(), ClusterStatusCode(Status::Failure));
+
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kExistingGroup, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kInitialKeyset);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kUpdateKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+
+    // 3. Failing SetGroupInfo when updating an existing group that has no key mapping unlinks the newly written KeyMapData.
+    mTestContext.StorageDelegate().ClearPoisonKeys();
+    ASSERT_EQ(mProvider.RemoveKeySet(kTestFabricIndex, kInitialKeyset), CHIP_NO_ERROR);
+    ASSERT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kExistingGroup, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroup(kTestFabricIndex, kExistingGroup));
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinExisting).GetStatusCode(), ClusterStatusCode(Status::Failure));
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kExistingGroup, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kUpdateKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestGroupcastCluster, TestJoinGroupRollsBackWhenAddEndpointFails)
+{
+    const GroupId kNewGroup         = 0x7001;
+    const GroupId kExistingGroup    = 0x7002;
+    const KeysetId kNewInlineKeyset = 0x7101;
+    const KeysetId kExistingKeyset  = 0x7102;
+    const KeysetId kUpdatedKeyset   = 0x7103;
+    const uint8_t key[] = { 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F };
+    const EndpointId kTwoEndpoints[] = { 1, 2 };
+    const EndpointId kInitialEp[]    = { 1 };
+    const EndpointId kAdditionalEp[] = { 2 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // 1. New group where AddEndpoint fails on the second endpoint rolls back endpoint #1, GroupInfo, KeyMapData, KeySet, and
+    // AuxACL notification state.
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroupEndpoint(kTestFabricIndex, kNewGroup, 2));
+
+    Commands::JoinGroup::Type joinNew;
+    joinNew.groupID         = kNewGroup;
+    joinNew.keySetID        = kNewInlineKeyset;
+    joinNew.key             = MakeOptional(ByteSpan(key));
+    joinNew.useAuxiliaryACL = MakeOptional(true);
+    joinNew.mcastAddrPolicy = MakeOptional(MulticastAddrPolicyEnum::kPerGroup);
+    joinNew.endpoints       = DataModel::List<const EndpointId>(kTwoEndpoints, MATTER_ARRAY_SIZE(kTwoEndpoints));
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinNew).GetStatusCode(), ClusterStatusCode(Status::Failure));
+
+    GroupDataProvider::GroupInfo info;
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    GroupDataProvider::KeySet outKeySet;
+    EXPECT_EQ(mProvider.GetGroupInfo(kTestFabricIndex, kNewGroup, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_FALSE(mProvider.HasEndpoint(kTestFabricIndex, kNewGroup, 1));
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kNewGroup, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kNewInlineKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+    EXPECT_FALSE(mProvider.ConsumeAuxAclNotificationNeeded());
+
+    uint16_t usedMcastAddrCount = 0;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::UsedMcastAddrCount::Id, usedMcastAddrCount), CHIP_NO_ERROR);
+    EXPECT_EQ(usedMcastAddrCount, 0u);
+
+    // Retrying with working storage must succeed with the same KeySetID and inline key.
+    mTestContext.StorageDelegate().ClearPoisonKeys();
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinNew).GetStatusCode(), ClusterStatusCode(Status::Success));
+    EXPECT_EQ(mProvider.GetGroupInfo(kTestFabricIndex, kNewGroup, info), CHIP_NO_ERROR);
+    EXPECT_TRUE(mProvider.HasEndpoint(kTestFabricIndex, kNewGroup, 1));
+    EXPECT_TRUE(mProvider.HasEndpoint(kTestFabricIndex, kNewGroup, 2));
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kNewInlineKeyset, outKeySet), CHIP_NO_ERROR);
+
+    // 2. Existing group where adding a new endpoint fails restores its prior GroupInfo flags, prior keyset, and rolls back the new
+    // inline KeySet.
+    Commands::JoinGroup::Type joinExisting;
+    joinExisting.groupID         = kExistingGroup;
+    joinExisting.keySetID        = kExistingKeyset;
+    joinExisting.key             = MakeOptional(ByteSpan(key));
+    joinExisting.useAuxiliaryACL = MakeOptional(false);
+    joinExisting.endpoints       = DataModel::List<const EndpointId>(kInitialEp, MATTER_ARRAY_SIZE(kInitialEp));
+    ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinExisting).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroupEndpoint(kTestFabricIndex, kExistingGroup, 2));
+    auto & generatedEvents = mTestContext.EventsGenerator();
+    while (generatedEvents.GetNextEvent().has_value())
+    {
+    }
+
+    joinExisting.keySetID        = kUpdatedKeyset;
+    joinExisting.key             = MakeOptional(ByteSpan(key));
+    joinExisting.useAuxiliaryACL = MakeOptional(true);
+    joinExisting.endpoints       = DataModel::List<const EndpointId>(kAdditionalEp, MATTER_ARRAY_SIZE(kAdditionalEp));
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinExisting).GetStatusCode(), ClusterStatusCode(Status::Failure));
+
+    EXPECT_EQ(mProvider.GetGroupInfo(kTestFabricIndex, kExistingGroup, info), CHIP_NO_ERROR);
+    EXPECT_FALSE(info.HasAuxiliaryACL());
+    EXPECT_TRUE(mProvider.HasEndpoint(kTestFabricIndex, kExistingGroup, 1));
+    EXPECT_FALSE(mProvider.HasEndpoint(kTestFabricIndex, kExistingGroup, 2));
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kExistingGroup, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kExistingKeyset);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kUpdatedKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+
+    // The auxiliary ACL flag of a group with an endpoint was changed and restored. The failed command reports that with
+    // an event and leaves no notification pending for the next command.
+    auto auxiliaryAccessEvent = generatedEvents.GetNextEvent();
+    ASSERT_TRUE(auxiliaryAccessEvent.has_value());
+    EXPECT_EQ(auxiliaryAccessEvent.value().eventOptions.mPath.mEventId,
+              Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    EXPECT_FALSE(generatedEvents.GetNextEvent().has_value());
+    EXPECT_FALSE(mProvider.ConsumeAuxAclNotificationNeeded());
+}
+
+TEST_F(TestGroupcastCluster, TestFailedJoinGroupRestoresGroupKeyOfGroupWithoutGroupInfo)
+{
+    const GroupId kGroupId         = 0x7801;
+    const KeysetId kPreviousKeyset = 0x7811;
+    const KeysetId kInlineKeyset   = 0x7812;
+    const uint8_t key[] = { 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F };
+
+    // A node that sends to a group can hold a mapping for it without GroupInfo, written before Groupcast was enabled.
+    ASSERT_EQ(mProvider.SetGroupKeyAt(kTestFabricIndex, 0, GroupDataProvider::GroupKey(kGroupId, kPreviousKeyset)), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(mSender);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    FailWritesOf(DefaultStorageKeyAllocator::FabricGroup(kTestFabricIndex, kGroupId));
+
+    Commands::JoinGroup::Type joinData;
+    joinData.groupID  = kGroupId;
+    joinData.keySetID = kInlineKeyset;
+    joinData.key      = MakeOptional(ByteSpan(key));
+    EXPECT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinData).GetStatusCode(), ClusterStatusCode(Status::Failure));
+
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    GroupDataProvider::KeySet outKeySet;
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kGroupId, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kPreviousKeyset);
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kInlineKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailureRollsBackInlineKeyAndReturnsResourceExhausted)
+{
+    const GroupId kTargetGroup   = 0x8001;
+    const KeysetId kInitialKey   = 0x8101;
+    const KeysetId kSeedKey      = 0x8102;
+    const KeysetId kInlineKeyset = 0x8103;
+    const uint8_t key[] = { 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F };
+    const EndpointId kEndpoints[] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinData;
+    joinData.groupID   = kTargetGroup;
+    joinData.keySetID  = kInitialKey;
+    joinData.key       = MakeOptional(ByteSpan(key));
+    joinData.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    ASSERT_EQ(tester.Invoke(Commands::JoinGroup::Id, joinData).GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    // Remove the group's keyset so GroupInfo exists without a KeyMapData entry, then fill GroupKeyMap capacity.
+    ASSERT_EQ(mProvider.RemoveKeySet(kTestFabricIndex, kInitialKey), CHIP_NO_ERROR);
+
+    const FabricInfo * fabric = mFabricHelper.GetFabricTable().FindFabricWithIndex(kTestFabricIndex);
+    ASSERT_NE(fabric, nullptr);
+    uint8_t compressedFabricIdBuffer[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricId(compressedFabricIdBuffer);
+    ASSERT_EQ(fabric->GetCompressedFabricIdBytes(compressedFabricId), CHIP_NO_ERROR);
+
+    GroupDataProvider::KeySet seedKeySet(kSeedKey, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+    memcpy(seedKeySet.epoch_keys[0].key, key, sizeof(key));
+    seedKeySet.epoch_keys[0].start_time = 1;
+    ASSERT_EQ(mProvider.SetKeySet(kTestFabricIndex, compressedFabricId, seedKeySet), CHIP_NO_ERROR);
+
+    const uint16_t maxPerFabric = mProvider.GetMaxGroupsPerFabric();
+    for (uint16_t idx = 0; idx < maxPerFabric; idx++)
+    {
+        ASSERT_EQ(mProvider.SetGroupKey(kTestFabricIndex, static_cast<GroupId>(0x8200 + idx), kSeedKey), CHIP_NO_ERROR);
+    }
+
+    Commands::UpdateGroupKey::Type updateData;
+    updateData.groupID  = kTargetGroup;
+    updateData.keySetID = kInlineKeyset;
+    updateData.key      = MakeOptional(ByteSpan(key));
+    EXPECT_EQ(tester.Invoke(Commands::UpdateGroupKey::Id, updateData).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+
+    GroupDataProvider::KeySet outKeySet;
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kInlineKeyset, outKeySet), CHIP_ERROR_NOT_FOUND);
+
+    // Removing a leaked slot allows retrying UpdateGroupKey with the same inline keyset.
+    ASSERT_EQ(mProvider.RemoveGroupKeyAt(kTestFabricIndex, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.Invoke(Commands::UpdateGroupKey::Id, updateData).GetStatusCode(), ClusterStatusCode(Status::Success));
+    EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kInlineKeyset, outKeySet), CHIP_NO_ERROR);
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    EXPECT_EQ(mProvider.GetGroupKey(kTestFabricIndex, kTargetGroup, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kInlineKeyset);
 }
 
 } // namespace
