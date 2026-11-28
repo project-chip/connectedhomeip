@@ -34,6 +34,8 @@ class TC_DA_1_13(PQCDACommissionerTestBase):
     """[TC-DA-1.13] ML-DSA Device Attestation Request Validation Scenario [DUT-Commissioner]"""
 
     kDiscriminatorBase = 0x710
+    # This is a commissioner test and therefore a subscription is not required.
+    disable_wildcard_subscription = True
 
     @pics("MCORE.ROLE.COMMISSIONER")
     @async_test_body
