@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@
  * to be used for the next commissioning session. Calling this function is mandatory for the
  * Casting Player/Commissioner-Generated passcode commissioning flow, since the commissioning session's PAKE
  * verifier needs to be updated with the user entered passcode.
+ * Calling this function is also mandatory for Fixed Passcode Commissioning.
+ * The update is serialized on the Matter work queue.
  */
-- (NSError *)updateCommissionableDataProvider;
+- (NSError * _Nullable)updateCommissionableDataProvider;
 
 @end
 

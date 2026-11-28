@@ -37,6 +37,10 @@
     <string name="matter_discovery_error_message_start_error">Start discovery error. -</string>
     <string name="matter_discovery_error_message_stop_before_starting">Start discovery error. Discovery ongoing, stop before starting. -</string>
     <string name="matter_discovery_error_message_stop_error">Stop discovery error. -</string>
+    <string name="matter_use_fixed_passcode_commissioning_text">Use Fixed Passcode Commissioning</string>
+    <string name="matter_fixed_passcode_commissioning_passcode_label">Fixed passcode:</string>
+    <string name="matter_fixed_passcode_commissioning_passcode_hint">Remembered fixed passcode</string>
+    <string name="matter_fixed_passcode_commissioning_default_passcode">1234</string>
     <string name="matter_connection_next_button_text">Next</string>
     <string name="matter_connection_input_dialog_title">Enter the Commissioner-Generated Passcode</string>
     <string name="matter_connection_input_dialog_instructions">Input the Commissioner-Generated passcode displayed on the CastingPlayer UX, or use the default provided (12345678).</string>

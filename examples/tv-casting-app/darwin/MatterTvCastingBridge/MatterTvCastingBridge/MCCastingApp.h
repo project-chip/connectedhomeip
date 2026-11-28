@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -56,6 +56,13 @@
  * @brief true, if MCCastingApp is running. false otherwise
  */
 - (bool)isRunning;
+
+/**
+ * @brief Refreshes the Matter platform after the MCDataSource's MCCommissionableData changes.
+ *
+ * The update is serialized on the Matter work queue.
+ */
+- (NSError * _Nullable)updateCommissionableDataProvider;
 
 /**
  * @brief Tears down all active subscriptions.

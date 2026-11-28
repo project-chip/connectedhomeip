@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -301,10 +301,8 @@ CHIP_ERROR CastingPlayer::ContinueConnecting()
     VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() called while not in connecting state"););
     VerifyOrReturnValue(
-        mIdOptions.mCommissionerPasscode, CHIP_ERROR_INCORRECT_STATE,
-        ChipLogError(AppServer,
-                     "CastingPlayer::ContinueConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should "
-                     "only be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
+        mIdOptions.mCommissionerPasscode || mFixedPasscodeCommissioningSelected, CHIP_ERROR_INCORRECT_STATE,
+        ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() called without a passcode continuation flow in progress."););
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
     mTargetCastingPlayer = weak_from_this();
@@ -313,7 +311,17 @@ CHIP_ERROR CastingPlayer::ContinueConnecting()
     SuccessOrExit(err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
                       chip::System::Clock::Seconds16(mCommissioningWindowTimeoutSec)));
 
-    mIdOptions.mCommissionerPasscodeReady = true;
+    if (mFixedPasscodeCommissioningSelected)
+    {
+        mIdOptions.mCommissionerPasscodeReady           = false;
+        mIdOptions.mFixedPasscodeCommissioningSupported = false;
+        mIdOptions.mFixedPasscodeCommissioningReady     = true;
+    }
+    else
+    {
+        mIdOptions.mFixedPasscodeCommissioningReady = false;
+        mIdOptions.mCommissionerPasscodeReady       = true;
+    }
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting() calling SendUserDirectedCommissioningRequest()");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     SuccessOrExit(err = SendUserDirectedCommissioningRequest());
@@ -347,10 +355,11 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     mIdOptions.LogDetail();
 
     // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
-    mIdOptions.mCommissionerPasscode      = true;
-    mIdOptions.mNoPasscode                = true;
-    mIdOptions.mCancelPasscode            = false;
-    mIdOptions.mCommissionerPasscodeReady = false;
+    mIdOptions.mCommissionerPasscode            = true;
+    mIdOptions.mNoPasscode                      = true;
+    mIdOptions.mCancelPasscode                  = false;
+    mIdOptions.mCommissionerPasscodeReady       = false;
+    mIdOptions.mFixedPasscodeCommissioningReady = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     err = SendUserDirectedCommissioningRequest();
     if (err != CHIP_NO_ERROR)
@@ -359,9 +368,10 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    mIdOptions.mCancelPasscode     = true;
-    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
-    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    mIdOptions.mCancelPasscode          = true;
+    mConnectionState                    = CASTING_PLAYER_NOT_CONNECTED;
+    mCommissioningWindowTimeoutSec      = kCommissioningWindowTimeoutSec;
+    mFixedPasscodeCommissioningSelected = false;
     if (!shouldSendIdentificationDeclarationMessage)
     {
         ChipLogProgress(AppServer,
@@ -406,8 +416,9 @@ void CastingPlayer::resetState(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::resetState()");
     TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
-    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
-    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    mConnectionState                    = CASTING_PLAYER_NOT_CONNECTED;
+    mCommissioningWindowTimeoutSec      = kCommissioningWindowTimeoutSec;
+    mFixedPasscodeCommissioningSelected = false;
 
     // Unregister from CommissioningWindowManager when unsetting mTargetCastingPlayer
     chip::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(nullptr);

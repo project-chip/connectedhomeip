@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,6 +150,12 @@ public:
     void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
     uint8_t GetPasscodeLength() const { return mPasscodeLength; };
 
+    void SetFixedPasscodeCommissioningSupported(bool newValue) { mFixedPasscodeCommissioningSupported = newValue; };
+    bool GetFixedPasscodeCommissioningSupported() const { return mFixedPasscodeCommissioningSupported; };
+
+    void SetFixedPasscodeCommissioningReady(bool newValue) { mFixedPasscodeCommissioningReady = newValue; };
+    bool GetFixedPasscodeCommissioningReady() const { return mFixedPasscodeCommissioningReady; };
+
     /**
      *  Writes the IdentificationDeclaration message to the given buffer.
      *
@@ -189,6 +195,8 @@ public:
         client->SetCommissionerPasscodeReady(GetCommissionerPasscodeReady());
         client->SetCancelPasscode(GetCancelPasscode());
         client->SetPasscodeLength(GetPasscodeLength());
+        client->SetFixedPasscodeCommissioningSupported(GetFixedPasscodeCommissioningSupported());
+        client->SetFixedPasscodeCommissioningReady(GetFixedPasscodeCommissioningReady());
     }
 
     void DebugLog()
@@ -261,6 +269,14 @@ public:
         {
             ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
         }
+        if (mFixedPasscodeCommissioningSupported)
+        {
+            ChipLogDetail(AppServer, "\tfixed passcode commissioning supported: true");
+        }
+        if (mFixedPasscodeCommissioningReady)
+        {
+            ChipLogDetail(AppServer, "\tfixed passcode commissioning ready: true");
+        }
         ChipLogDetail(AppServer, "---- Identification Declaration End ----");
 #endif
     }
@@ -287,6 +303,8 @@ private:
         kCommissionerPasscodeReadyTag,
         kCancelPasscodeTag,
         kPasscodeLengthTag,
+        kFixedPasscodeCommissioningSupportedTag,
+        kFixedPasscodeCommissioningReadyTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -307,12 +325,14 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 
-    bool mNoPasscode                = false;
-    bool mCdUponPasscodeDialog      = false;
-    bool mCommissionerPasscode      = false;
-    bool mCommissionerPasscodeReady = false;
-    bool mCancelPasscode            = false;
-    uint8_t mPasscodeLength         = 0;
+    bool mNoPasscode                          = false;
+    bool mCdUponPasscodeDialog                = false;
+    bool mCommissionerPasscode                = false;
+    bool mCommissionerPasscodeReady           = false;
+    bool mCancelPasscode                      = false;
+    uint8_t mPasscodeLength                   = 0;
+    bool mFixedPasscodeCommissioningSupported = false;
+    bool mFixedPasscodeCommissioningReady     = false;
 };
 
 /**
@@ -371,6 +391,9 @@ public:
     void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
     uint8_t GetPasscodeLength() const { return mPasscodeLength; };
 
+    void SetFixedPasscodeCommissioningSelected(bool newValue) { mFixedPasscodeCommissioningSelected = newValue; };
+    bool GetFixedPasscodeCommissioningSelected() const { return mFixedPasscodeCommissioningSelected; };
+
     /**
      *  Writes the CommissionerDeclaration message to the given buffer.
      *
@@ -420,6 +443,10 @@ public:
         {
             ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
         }
+        if (mFixedPasscodeCommissioningSelected)
+        {
+            ChipLogDetail(AppServer, "\tfixed passcode commissioning selected: true");
+        }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
 
@@ -435,18 +462,20 @@ private:
         kQRCodeDisplayedTag,
         kCancelPasscodeTag,
         kPasscodeLengthTag,
+        kFixedPasscodeCommissioningSelectedTag,
 
         kMaxNum = UINT8_MAX
     };
 
-    CdError mErrorCode            = CdError::kNoError;
-    bool mNeedsPasscode           = false;
-    bool mNoAppsFound             = false;
-    bool mPasscodeDialogDisplayed = false;
-    bool mCommissionerPasscode    = false;
-    bool mQRCodeDisplayed         = false;
-    bool mCancelPasscode          = false;
-    uint8_t mPasscodeLength       = 0;
+    CdError mErrorCode                       = CdError::kNoError;
+    bool mNeedsPasscode                      = false;
+    bool mNoAppsFound                        = false;
+    bool mPasscodeDialogDisplayed            = false;
+    bool mCommissionerPasscode               = false;
+    bool mQRCodeDisplayed                    = false;
+    bool mCancelPasscode                     = false;
+    uint8_t mPasscodeLength                  = 0;
+    bool mFixedPasscodeCommissioningSelected = false;
 };
 
 class DLL_EXPORT InstanceNameResolver
@@ -505,6 +534,16 @@ public:
      *
      */
     virtual void OnCommissionerPasscodeReady(UDCClientState state) = 0;
+
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the fixed passcode commissioning ready flag set.
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnFixedPasscodeCommissioningReady(UDCClientState state) = 0;
 
     virtual ~UserConfirmationProvider() = default;
 };
@@ -688,6 +727,7 @@ private:
     void HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id);
     void HandleUDCCancel(IdentificationDeclaration & id);
     void HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id);
+    void HandleUDCFixedPasscodeCommissioningReady(IdentificationDeclaration & id);
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * ctxt = nullptr) override;
 

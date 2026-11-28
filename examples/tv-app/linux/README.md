@@ -129,6 +129,15 @@ You can also install or uninstall the app by using commands:
     $ app install 65521 32768
     $ app uninstall 65521 32768
 
+The example Commissioner stores its Fixed Passcode Commissioning configuration
+in persistent storage. Use the following commands to update the passcode, or
+enable or disable the feature. Updating the passcode or disabling and then
+re-enabling the feature clears the authentication-failure lockout:
+
+    $ app fixed-passcode set 1234
+    $ app fixed-passcode enable
+    $ app fixed-passcode disable
+
 As an app platform, local apps can be used to facilitate commissioning using
 their AccountLogin clusters. The dummy apps have hardcoded setup codes - on a
 real device, these apps would communicate with a cloud service to obtain the

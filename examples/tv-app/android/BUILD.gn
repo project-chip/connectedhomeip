@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ shared_library("jni") {
 
   deps = [
     "${chip_root}/examples/platform/linux:commissioner-main",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",

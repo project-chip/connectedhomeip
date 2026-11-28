@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
         _passcodeLength = 0;
+        _fixedPasscodeCommissioningSupported = NO;
+        _fixedPasscodeCommissioningReady = NO;
     }
     return self;
 }
@@ -59,6 +61,26 @@
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
         _passcodeLength = 0;
+        _fixedPasscodeCommissioningSupported = NO;
+        _fixedPasscodeCommissioningReady = NO;
+    }
+    return self;
+}
+
+- (instancetype)initWithCommissionerPasscode:(BOOL)commissionerPasscode
+         fixedPasscodeCommissioningSupported:(BOOL)fixedPasscodeCommissioningSupported
+{
+    self = [super init];
+    if (self) {
+        _noPasscode = NO;
+        _cdUponPasscodeDialog = NO;
+        _commissionerPasscode = commissionerPasscode;
+        _commissionerPasscodeReady = NO;
+        _cancelPasscode = NO;
+        _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = 0;
+        _fixedPasscodeCommissioningSupported = fixedPasscodeCommissioningSupported;
+        _fixedPasscodeCommissioningReady = NO;
     }
     return self;
 }
@@ -74,6 +96,26 @@
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
         _passcodeLength = passcodeLength;
+        _fixedPasscodeCommissioningSupported = NO;
+        _fixedPasscodeCommissioningReady = NO;
+    }
+    return self;
+}
+
+- (instancetype)initWithPasscodeLength:(NSInteger)passcodeLength
+    fixedPasscodeCommissioningSupported:(BOOL)fixedPasscodeCommissioningSupported
+{
+    self = [super init];
+    if (self) {
+        _noPasscode = NO;
+        _cdUponPasscodeDialog = NO;
+        _commissionerPasscode = NO;
+        _commissionerPasscodeReady = NO;
+        _cancelPasscode = NO;
+        _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = passcodeLength;
+        _fixedPasscodeCommissioningSupported = fixedPasscodeCommissioningSupported;
+        _fixedPasscodeCommissioningReady = NO;
     }
     return self;
 }
@@ -90,6 +132,8 @@
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
         _passcodeLength = 0;
+        _fixedPasscodeCommissioningSupported = NO;
+        _fixedPasscodeCommissioningReady = NO;
         _instanceName = instanceName;
     }
     return self;
@@ -126,6 +170,16 @@
     return _passcodeLength;
 }
 
+- (BOOL)getFixedPasscodeCommissioningSupported
+{
+    return _fixedPasscodeCommissioningSupported;
+}
+
+- (BOOL)getFixedPasscodeCommissioningReady
+{
+    return _fixedPasscodeCommissioningReady;
+}
+
 - (NSString *)getInstanceName
 {
     return _instanceName;
@@ -154,6 +208,10 @@
     [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscodeReady: %d\n", self.commissionerPasscodeReady];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::cancelPasscode:            %d\n", self.cancelPasscode];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::passcodeLength:            %d\n", self.passcodeLength];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::fixedPasscodeCommissioningSupported: %d\n",
+        self.fixedPasscodeCommissioningSupported];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::fixedPasscodeCommissioningReady:     %d\n",
+        self.fixedPasscodeCommissioningReady];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::instanceName:              %@\n", self.instanceName];
     [sb appendString:@"MCIdentificationDeclarationOptions::targetAppInfos list:\n"];
 
@@ -173,6 +231,8 @@
     cppIdOptions.mCommissionerPasscodeReady = [self getCommissionerPasscodeReady];
     cppIdOptions.mCancelPasscode = [self getCancelPasscode];
     cppIdOptions.mPasscodeLength = [self getPasscodeLength];
+    cppIdOptions.mFixedPasscodeCommissioningSupported = [self getFixedPasscodeCommissioningSupported];
+    cppIdOptions.mFixedPasscodeCommissioningReady = [self getFixedPasscodeCommissioningReady];
 
     NSString * instanceNameStr = [self getInstanceName];
     if (instanceNameStr != nil && instanceNameStr.length > 0) {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,6 +76,12 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
         return;
     }
 
+    if (id.GetFixedPasscodeCommissioningReady())
+    {
+        HandleUDCFixedPasscodeCommissioningReady(id);
+        return;
+    }
+
     HandleNewUDC(source, id);
 }
 
@@ -99,6 +105,8 @@ void UserDirectedCommissioningServer::HandleNewUDC(const Transport::PeerAddress 
             return;
         }
 
+        id.UpdateClientState(client);
+
         if (id.HasDiscoveryInfo())
         {
             // if we received mDNS info, skip the commissionable lookup
@@ -107,8 +115,6 @@ void UserDirectedCommissioningServer::HandleNewUDC(const Transport::PeerAddress 
 
             client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
             client->SetPeerAddress(source);
-
-            id.UpdateClientState(client);
 
             // Call the registered mUserConfirmationProvider, if any.
             if (mUserConfirmationProvider != nullptr)
@@ -179,6 +185,38 @@ void UserDirectedCommissioningServer::HandleUDCCommissionerPasscodeReady(Identif
     if (mUserConfirmationProvider != nullptr)
     {
         mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
+    }
+}
+
+void UserDirectedCommissioningServer::HandleUDCFixedPasscodeCommissioningReady(IdentificationDeclaration & id)
+{
+    const char * instanceName = id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleUDCFixedPasscodeCommissioningReady instance=%s", instanceName);
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
+    {
+        ChipLogProgress(AppServer, "UDC no matching instance found");
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kWaitingForFixedPasscodeCommissioningReady)
+    {
+        ChipLogProgress(AppServer, "UDC instance not waiting for fixed passcode commissioning ready");
+        return;
+    }
+
+    id.DebugLog();
+    mUdcClients.MarkUDCClientActive(client);
+    if (id.GetCdPort() != 0)
+    {
+        PeerAddress peerAddress = client->GetPeerAddress();
+        peerAddress.SetPort(id.GetCdPort());
+        client->SetPeerAddress(peerAddress);
+    }
+    client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
+    if (mUserConfirmationProvider != nullptr)
+    {
+        mUserConfirmationProvider->OnFixedPasscodeCommissioningReady(*client);
     }
 }
 
@@ -399,6 +437,14 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         case kPasscodeLengthTag:
             err = reader.Get(mPasscodeLength);
             break;
+        case kFixedPasscodeCommissioningSupportedTag:
+            err = reader.Get(mFixedPasscodeCommissioningSupported);
+            break;
+        case kFixedPasscodeCommissioningReadyTag:
+            err = reader.Get(mFixedPasscodeCommissioningReady);
+            break;
+        default:
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
@@ -453,6 +499,10 @@ uint32_t CommissionerDeclaration::WritePayload(uint8_t * payloadBuffer, size_t p
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
+                 LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR ==
+                     (err = writer.PutBoolean(chip::TLV::ContextTag(kFixedPasscodeCommissioningSelectedTag),
+                                              mFixedPasscodeCommissioningSelected)),
                  LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
@@ -551,6 +601,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+        client->SetCdPort(nodeData.port);
         client->SetDeviceName(nodeData.deviceName);
         client->SetLongDiscriminator(nodeData.longDiscriminator);
         client->SetVendorId(nodeData.vendorId);

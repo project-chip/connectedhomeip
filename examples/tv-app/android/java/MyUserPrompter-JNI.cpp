@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -87,6 +87,14 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     if (mPromptCommissioningFailedMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptCommissioningFailed' method");
+        env->ExceptionClear();
+    }
+
+    mPromptFixedPasscodeCommissioningLockoutMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptFixedPasscodeCommissioningLockout", "(Ljava/lang/String;)V");
+    if (mPromptFixedPasscodeCommissioningLockoutMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptFixedPasscodeCommissioningLockout' method");
         env->ExceptionClear();
     }
 }
@@ -417,5 +425,41 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "PromptCommissioningFailed error: %s", err.AsString());
+    }
+}
+
+void JNIMyUserPrompter::PromptFixedPasscodeCommissioningLockout(const char * commissioneeName)
+{
+    DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPromptFixedPasscodeCommissioningLockoutMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        jstring jcommissioneeName = nullptr;
+        err                       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(commissioneeName),
+                                                                                 reinterpret_cast<jobject &>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
+
+        env->ExceptionClear();
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptFixedPasscodeCommissioningLockoutMethod,
+                            jcommissioneeName);
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in PromptFixedPasscodeCommissioningLockout");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PromptFixedPasscodeCommissioningLockout error: %s", err.AsString());
     }
 }

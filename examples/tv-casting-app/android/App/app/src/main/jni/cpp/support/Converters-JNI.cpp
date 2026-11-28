@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-24 Project CHIP Authors
+ *   Copyright (c) 2020-2026 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -491,14 +491,16 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
         ChipLogError(AppServer,
                      "convertIdentificationDeclarationOptionsFromJavaToCpp() IdentificationDeclarationOptions class not found!"));
 
-    jfieldID noPasscodeField                = env->GetFieldID(idOptionsClass, "noPasscode", "Z");
-    jfieldID cdUponPasscodeDialogField      = env->GetFieldID(idOptionsClass, "cdUponPasscodeDialog", "Z");
-    jfieldID commissionerPasscodeField      = env->GetFieldID(idOptionsClass, "commissionerPasscode", "Z");
-    jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
-    jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
-    jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
-    jfieldID passcodeLengthField            = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
-    jfieldID instanceNameField              = env->GetFieldID(idOptionsClass, "instanceName", "Ljava/lang/String;");
+    jfieldID noPasscodeField                          = env->GetFieldID(idOptionsClass, "noPasscode", "Z");
+    jfieldID cdUponPasscodeDialogField                = env->GetFieldID(idOptionsClass, "cdUponPasscodeDialog", "Z");
+    jfieldID commissionerPasscodeField                = env->GetFieldID(idOptionsClass, "commissionerPasscode", "Z");
+    jfieldID commissionerPasscodeReadyField           = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
+    jfieldID cancelPasscodeField                      = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
+    jfieldID fixedPasscodeCommissioningSupportedField = env->GetFieldID(idOptionsClass, "fixedPasscodeCommissioningSupported", "Z");
+    jfieldID fixedPasscodeCommissioningReadyField     = env->GetFieldID(idOptionsClass, "fixedPasscodeCommissioningReady", "Z");
+    jfieldID targetAppInfosField                      = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
+    jfieldID passcodeLengthField                      = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
+    jfieldID instanceNameField                        = env->GetFieldID(idOptionsClass, "instanceName", "Ljava/lang/String;");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
@@ -516,6 +518,14 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
         cancelPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() cancelPasscodeField not found!"));
     VerifyOrReturnValue(
+        fixedPasscodeCommissioningSupportedField != nullptr, nullptr,
+        ChipLogError(AppServer,
+                     "convertIdentificationDeclarationOptionsFromJavaToCpp() fixedPasscodeCommissioningSupportedField not found!"));
+    VerifyOrReturnValue(
+        fixedPasscodeCommissioningReadyField != nullptr, nullptr,
+        ChipLogError(AppServer,
+                     "convertIdentificationDeclarationOptionsFromJavaToCpp() fixedPasscodeCommissioningReadyField not found!"));
+    VerifyOrReturnValue(
         targetAppInfosField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosField not found!"));
     VerifyOrReturnValue(
@@ -528,12 +538,14 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
         new matter::casting::core::IdentificationDeclarationOptions();
 
-    cppIdOptions->mNoPasscode                = env->GetBooleanField(jIdOptions, noPasscodeField);
-    cppIdOptions->mCdUponPasscodeDialog      = env->GetBooleanField(jIdOptions, cdUponPasscodeDialogField);
-    cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
-    cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
-    cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
-    cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
+    cppIdOptions->mNoPasscode                          = env->GetBooleanField(jIdOptions, noPasscodeField);
+    cppIdOptions->mCdUponPasscodeDialog                = env->GetBooleanField(jIdOptions, cdUponPasscodeDialogField);
+    cppIdOptions->mCommissionerPasscode                = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
+    cppIdOptions->mCommissionerPasscodeReady           = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
+    cppIdOptions->mCancelPasscode                      = env->GetBooleanField(jIdOptions, cancelPasscodeField);
+    cppIdOptions->mPasscodeLength                      = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
+    cppIdOptions->mFixedPasscodeCommissioningSupported = env->GetBooleanField(jIdOptions, fixedPasscodeCommissioningSupportedField);
+    cppIdOptions->mFixedPasscodeCommissioningReady     = env->GetBooleanField(jIdOptions, fixedPasscodeCommissioningReadyField);
 
     jstring jInstanceName = (jstring) env->GetObjectField(jIdOptions, instanceNameField);
     if (jInstanceName != nullptr)
@@ -595,7 +607,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
                                                                          jCommissionerDeclarationClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
-    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZI)V");
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZIZ)V");
     if (jCommissionerDeclarationConstructor == nullptr)
     {
         ChipLogError(AppServer,
@@ -607,7 +619,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
     return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
                           static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
                           cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
-                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength());
+                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength(), cppCd.GetFixedPasscodeCommissioningSelected());
 }
 
 }; // namespace support

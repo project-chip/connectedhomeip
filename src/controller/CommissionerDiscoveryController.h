@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -153,6 +153,16 @@ public:
      */
     virtual void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) = 0;
 
+    /**
+     * @brief
+     *   Called to notify the user that Fixed Passcode Commissioning has been disabled after
+     *   repeated authentication failures.
+     *
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptFixedPasscodeCommissioningLockout(const char * commissioneeName) = 0;
+
     virtual ~UserPrompter() = default;
 };
 
@@ -165,6 +175,8 @@ struct PasscodeInfo
 class DLL_EXPORT PasscodeService
 {
 public:
+    static constexpr uint8_t kMaxFixedPasscodeCommissioningFailures = 20;
+
     /**
      * @brief
      *   Called to determine if the given target app is available to the commissionee with the given
@@ -194,6 +206,44 @@ public:
      *
      */
     virtual PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+
+    /**
+     * @brief
+     *   Returns the passcode to use for Fixed Passcode Commissioning.
+     *
+     * The platform implementation owns the local policy decision and retrieval of the
+     * configured passcode. This method is called on the main CHIP thread and must not
+     * block. It returns 0 when the feature is disabled, no passcode is available, or
+     * the consecutive authentication failure limit has been reached.
+     *
+     * The default implementation disables Fixed Passcode Commissioning so platforms
+     * that do not implement this feature retain the existing commissioning behavior.
+     */
+    virtual uint32_t GetFixedPasscodeCommissioningPasscode() { return 0; }
+
+    /**
+     * @brief
+     *   Records a Fixed Passcode Commissioning authentication failure.
+     *
+     * The platform implementation must persist the failure count across restarts and
+     * stop returning a passcode from GetFixedPasscodeCommissioningPasscode() after
+     * kMaxFixedPasscodeCommissioningFailures consecutive failures.
+     *
+     *  @param[out] failureLimitReached Set to true when this call reaches the failure limit.
+     */
+    virtual CHIP_ERROR RecordFixedPasscodeCommissioningAuthenticationFailure(bool & failureLimitReached)
+    {
+        failureLimitReached = false;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief
+     *   Resets the consecutive Fixed Passcode Commissioning authentication failure count.
+     *
+     * This method is called on the main CHIP thread and must not block.
+     */
+    virtual CHIP_ERROR ResetFixedPasscodeCommissioningAuthenticationFailures() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief
@@ -320,6 +370,11 @@ public:
      * This code will trigger the Commissioner to begin commissioning
      */
     void OnCommissionerPasscodeReady(UDCClientState state) override;
+
+    /**
+     * UserConfirmationProvider callback for FixedPasscodeCommissioningReady.
+     */
+    void OnFixedPasscodeCommissioningReady(UDCClientState state) override;
 
     /**
      * This method should be called after the user has given consent for commissioning of the client
@@ -458,10 +513,11 @@ protected:
     bool mReady          = true; // ready to start commissioning
     bool mPendingConsent = false;
     char mCurrentInstance[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
-    uint16_t mVendorId  = 0;
-    uint16_t mProductId = 0;
-    NodeId mNodeId      = 0;
-    uint32_t mPasscode  = 0;
+    uint16_t mVendorId                           = 0;
+    uint16_t mProductId                          = 0;
+    NodeId mNodeId                               = 0;
+    uint32_t mPasscode                           = 0;
+    uint32_t mFixedPasscodeCommissioningPasscode = 0;
     std::string mRotatingId;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;

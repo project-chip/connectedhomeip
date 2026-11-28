@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2026 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
 #include "CommissionerMain.h"
 #include "ContentLauncherManager.h"
 #include "DeviceCallbacks.h"
+#include "DeviceInfoProviderImpl.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
@@ -44,6 +45,8 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <platform/KeyValueStoreManager.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -168,6 +171,7 @@ JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::preServerInit");
+    chip::DeviceLayer::SetDeviceInfoProvider(&chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance());
 }
 
 JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
@@ -202,6 +206,11 @@ JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider
 }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+constexpr uint32_t kExampleFixedPasscodeCommissioningPasscode = 1234;
+constexpr char kFixedPasscodeCommissioningEnabledKey[]        = "fpc-enabled";
+constexpr char kFixedPasscodeCommissioningPasscodeKey[]       = "fpc-passcode";
+constexpr char kFixedPasscodeCommissioningAuthFailuresKey[]   = "fpc-auth-failures";
+
 class MyPincodeService : public PasscodeService
 {
     void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
@@ -234,6 +243,100 @@ class MyPincodeService : public PasscodeService
         return { 12345678, 8 };
     }
 
+    uint32_t GetFixedPasscodeCommissioningPasscode() override
+    {
+        if (!IsFixedPasscodeCommissioningEnabled())
+        {
+            return 0;
+        }
+        if (mFixedPasscodeCommissioningLocked ||
+            GetFixedPasscodeCommissioningAuthenticationFailureCount() >= kMaxFixedPasscodeCommissioningFailures)
+        {
+            ChipLogError(AppServer, "Fixed Passcode Commissioning is locked after repeated authentication failures");
+            return 0;
+        }
+        return GetConfiguredFixedPasscodeCommissioningPasscode();
+    }
+
+    CHIP_ERROR RecordFixedPasscodeCommissioningAuthenticationFailure(bool & failureLimitReached) override
+    {
+        failureLimitReached  = false;
+        uint8_t failureCount = GetFixedPasscodeCommissioningAuthenticationFailureCount();
+        if (failureCount >= kMaxFixedPasscodeCommissioningFailures)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        failureCount++;
+        CHIP_ERROR error =
+            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFixedPasscodeCommissioningAuthFailuresKey, failureCount);
+        if (error != CHIP_NO_ERROR)
+        {
+            mFixedPasscodeCommissioningLocked = true;
+            failureLimitReached               = true;
+            return error;
+        }
+        failureLimitReached = failureCount == kMaxFixedPasscodeCommissioningFailures;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ResetFixedPasscodeCommissioningAuthenticationFailures() override
+    {
+        CHIP_ERROR error = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFixedPasscodeCommissioningAuthFailuresKey);
+        if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            mFixedPasscodeCommissioningLocked = false;
+            return CHIP_NO_ERROR;
+        }
+        if (error == CHIP_NO_ERROR)
+        {
+            mFixedPasscodeCommissioningLocked = false;
+        }
+        return error;
+    }
+
+public:
+    CHIP_ERROR SetFixedPasscodeCommissioningPasscode(uint32_t passcode)
+    {
+        VerifyOrReturnError(SetupPayload::IsValidSetupPIN(passcode), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(
+            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFixedPasscodeCommissioningPasscodeKey, passcode));
+        return ResetFixedPasscodeCommissioningAuthenticationFailures();
+    }
+
+    CHIP_ERROR SetFixedPasscodeCommissioningEnabled(bool enabled)
+    {
+        uint8_t storedValue = 1;
+        CHIP_ERROR error =
+            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFixedPasscodeCommissioningEnabledKey, &storedValue);
+        if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            storedValue = 1;
+        }
+        else
+        {
+            ReturnErrorOnFailure(error);
+        }
+
+        if ((storedValue != 0) == enabled)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        if (enabled)
+        {
+            ReturnErrorOnFailure(ResetFixedPasscodeCommissioningAuthenticationFailures());
+        }
+
+        storedValue = enabled ? 1 : 0;
+        ReturnErrorOnFailure(
+            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFixedPasscodeCommissioningEnabledKey, storedValue));
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    bool mFixedPasscodeCommissioningLocked = false;
+
     void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
     {
         uint32_t passcode = ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
@@ -243,8 +346,67 @@ class MyPincodeService : public PasscodeService
             cdc->HandleContentAppPasscodeResponse(passcode);
         }
     }
+
+    uint8_t GetFixedPasscodeCommissioningAuthenticationFailureCount()
+    {
+        uint8_t failureCount = 0;
+        CHIP_ERROR error =
+            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFixedPasscodeCommissioningAuthFailuresKey, &failureCount);
+        if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return 0;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to read Fixed Passcode Commissioning PASE failure count: %s", ErrorStr(error));
+            return kMaxFixedPasscodeCommissioningFailures;
+        }
+        return failureCount;
+    }
+
+    bool IsFixedPasscodeCommissioningEnabled()
+    {
+        uint8_t enabled  = 1;
+        CHIP_ERROR error = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFixedPasscodeCommissioningEnabledKey, &enabled);
+        if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return true;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to read Fixed Passcode Commissioning enable state: %s", ErrorStr(error));
+            return false;
+        }
+        return enabled != 0;
+    }
+
+    uint32_t GetConfiguredFixedPasscodeCommissioningPasscode()
+    {
+        uint32_t passcode = kExampleFixedPasscodeCommissioningPasscode;
+        CHIP_ERROR error = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFixedPasscodeCommissioningPasscodeKey, &passcode);
+        if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return kExampleFixedPasscodeCommissioningPasscode;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to read Fixed Passcode Commissioning passcode: %s", ErrorStr(error));
+            return 0;
+        }
+        return passcode;
+    }
 };
 MyPincodeService gMyPincodeService;
+
+CHIP_ERROR SetExampleFixedPasscodeCommissioningPasscode(uint32_t passcode)
+{
+    return gMyPincodeService.SetFixedPasscodeCommissioningPasscode(passcode);
+}
+
+CHIP_ERROR SetExampleFixedPasscodeCommissioningEnabled(bool enabled)
+{
+    return gMyPincodeService.SetFixedPasscodeCommissioningEnabled(enabled);
+}
 
 class SampleTvAppInstallationService : public AppInstallationService
 {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 #include "MyUserPrompter-JNI.h"
 #include <jni.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/JniReferences.h>
 
 class TvAppJNI
@@ -41,3 +42,6 @@ inline class TvAppJNI & TvAppJNIMgr()
 {
     return TvAppJNI::sInstance;
 }
+
+CHIP_ERROR SetExampleFixedPasscodeCommissioningPasscode(uint32_t passcode);
+CHIP_ERROR SetExampleFixedPasscodeCommissioningEnabled(bool enabled);

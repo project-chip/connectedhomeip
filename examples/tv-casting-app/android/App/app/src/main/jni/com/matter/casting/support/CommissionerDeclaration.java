@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Project CHIP Authors All rights reserved.
+ * Copyright (c) 2024-2026 Project CHIP Authors All rights reserved.
  *
  * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -112,6 +112,10 @@ public class CommissionerDeclaration {
 
   /** Feature: Commissioner-Generated Passcode - Length of passcode */
   private int passcodeLength = 0;
+  /**
+   * Feature: Fixed Passcode Commissioning - The Commissioner selected Fixed Passcode Commissioning.
+   */
+  private boolean fixedPasscodeCommissioningSelected = false;
 
   public CommissionerDeclaration(
       int errorCode,
@@ -121,7 +125,8 @@ public class CommissionerDeclaration {
       boolean commissionerPasscode,
       boolean qRCodeDisplayed,
       boolean cancelPasscode,
-      int passcodeLength) {
+      int passcodeLength,
+      boolean fixedPasscodeCommissioningSelected) {
     this.errorCode = CdError.values()[errorCode];
     this.needsPasscode = needsPasscode;
     this.noAppsFound = noAppsFound;
@@ -130,6 +135,7 @@ public class CommissionerDeclaration {
     this.qRCodeDisplayed = qRCodeDisplayed;
     this.cancelPasscode = cancelPasscode;
     this.passcodeLength = passcodeLength;
+    this.fixedPasscodeCommissioningSelected = fixedPasscodeCommissioningSelected;
   }
 
   public void setErrorCode(CdError errorCode) {
@@ -188,6 +194,10 @@ public class CommissionerDeclaration {
     return this.passcodeLength;
   }
 
+  public boolean getFixedPasscodeCommissioningSelected() {
+    return this.fixedPasscodeCommissioningSelected;
+  }
+
   @Override
   public String toString() {
     return "CommissionerDeclaration::errorCode:               "
@@ -207,6 +217,9 @@ public class CommissionerDeclaration {
         + "\n"
         + "CommissionerDeclaration:passcodeLength:     "
         + passcodeLength
+        + "\n"
+        + "CommissionerDeclaration::fixedPasscodeCommissioningSelected: "
+        + fixedPasscodeCommissioningSelected
         + "\n"
         + "CommissionerDeclaration::qRCodeDisplayed:         "
         + qRCodeDisplayed

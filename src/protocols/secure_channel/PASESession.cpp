@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -768,7 +768,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier.Bytes(), &verifier_len));
 
-    SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
+    VerifyOrExit(mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len) == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
     msg2 = nullptr;
 
     {

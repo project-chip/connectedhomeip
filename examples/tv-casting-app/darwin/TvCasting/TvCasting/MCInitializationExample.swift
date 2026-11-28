@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,9 +48,13 @@ class MCAppParametersDataSource : NSObject, MCDataSource
     * post-initialization. For example, when the Commissioner-Generated Passcode feature is used.
     */
     func update(_ newCommissionableData: MCCommissionableData) {
-        Log.info("MCAppParametersDataSource.update() - Before update, passcode: \(self.commissionableData.passcode)")
+        Log.info("MCAppParametersDataSource.update() - Updating commissionable data")
         self.commissionableData = newCommissionableData
-        Log.info("MCAppParametersDataSource.update() - After update, passcode: \(self.commissionableData.passcode)")
+        Log.info("MCAppParametersDataSource.update() - Updated commissionable data")
+    }
+
+    func getCommissionableData() -> MCCommissionableData {
+        return commissionableData
     }
     
     func clientQueue() -> DispatchQueue {
@@ -151,6 +155,7 @@ class MCInitializationExample {
     // We store the client defined instance of the MCAppParametersDataSource passed to CastingApp.initialize().
     // MCAppParametersDataSource may need to be updated by the client in case of the Casting 
     // Player/Commissioner-Generated passcode commissioning flow.
+    // MCAppParametersDataSource also needs to be updated for Fixed Passcode Commissioning.
     private var appParametersDataSource: MCAppParametersDataSource?
 
     private init() {

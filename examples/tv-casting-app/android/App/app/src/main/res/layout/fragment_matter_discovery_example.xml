@@ -34,6 +34,29 @@
             android:layout_height="wrap_content"
             android:text="@string/matter_clear_results_button_text" />
 
+        <CheckBox
+            android:id="@+id/useFixedPasscodeCommissioningCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/matter_use_fixed_passcode_commissioning_text" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/fixedPasscodeCommissioningPasscodeEditText"
+            android:text="@string/matter_fixed_passcode_commissioning_passcode_label" />
+
+        <EditText
+            android:id="@+id/fixedPasscodeCommissioningPasscodeEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/matter_fixed_passcode_commissioning_passcode_hint"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:singleLine="true"
+            android:text="@string/matter_fixed_passcode_commissioning_default_passcode" />
+
         <TextView
             android:id="@+id/matterDiscoveryMessageTextView"
             android:text="string/matter_discovery_message_default_text"

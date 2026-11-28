@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,13 @@
 
 #include "CommissioningCallbacks.h"
 
+#include <LinuxCommissionableDataProvider.h>
+#include <memory>
+#include <setup_payload/SetupPayload.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 using namespace chip;
 using namespace chip::System;
 using namespace chip::DeviceLayer;
@@ -29,6 +36,137 @@ using namespace chip::Dnssd;
 const char kContentUrl[]        = "https://www.test.com/videoid";
 const char kContentDisplayStr[] = "Test video";
 int gInitialContextVal          = 121212;
+
+namespace {
+
+std::unique_ptr<LinuxCommissionableDataProvider> gFixedPasscodeCommissionableDataProvider;
+CommissionableDataProvider * gOriginalCommissionableDataProvider = nullptr;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+uint32_t gFixedPasscodeCommissioningPasscode = 1234;
+bool gFixedPasscodeCommissioningSelected     = false;
+bool gFixedPasscodeCommissioningEnabled      = false;
+std::string gFixedPasscodeCommissioningCastingPlayerId;
+std::vector<Inet::IPAddress> gFixedPasscodeCommissioningCastingPlayerAddresses;
+std::unordered_map<std::string, uint32_t> gRejectedFixedPasscodes;
+uint32_t gFixedPasscodeCommissioningAttemptPasscode = 0;
+
+bool CommissionerDeclarationMatchesActiveCastingPlayer(const chip::Transport::PeerAddress & source)
+{
+    for (const auto & address : gFixedPasscodeCommissioningCastingPlayerAddresses)
+    {
+        if (address == source.GetIPAddress())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+void RestoreCommissionableDataProvider()
+{
+    if (gOriginalCommissionableDataProvider != nullptr)
+    {
+        DeviceLayer::SetCommissionableDataProvider(gOriginalCommissionableDataProvider);
+        gOriginalCommissionableDataProvider = nullptr;
+        gFixedPasscodeCommissionableDataProvider.reset();
+    }
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+void HandleCommissionerDeclaration(const chip::Transport::PeerAddress & source,
+                                   chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration commissionerDeclaration)
+{
+    bool sourceMatchesActiveCastingPlayer = CommissionerDeclarationMatchesActiveCastingPlayer(source);
+    if (commissionerDeclaration.GetErrorCode() ==
+            chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError::kPaseAuthFailed &&
+        gFixedPasscodeCommissioningSelected)
+    {
+        if (!sourceMatchesActiveCastingPlayer)
+        {
+            ChipLogError(AppServer, "Ignoring PASE authentication failure from a non-target commissioner");
+            return;
+        }
+        gRejectedFixedPasscodes[gFixedPasscodeCommissioningCastingPlayerId] = gFixedPasscodeCommissioningAttemptPasscode;
+        gFixedPasscodeCommissioningAttemptPasscode                          = 0;
+        gFixedPasscodeCommissioningSelected                                 = false;
+        RestoreCommissionableDataProvider();
+        ChipLogError(AppServer,
+                     "The stored fixed setup passcode does not match this commissioner. Update the stored passcode or use another "
+                     "passcode flow.");
+        return;
+    }
+
+    if (commissionerDeclaration.GetCancelPasscode())
+    {
+        if (!sourceMatchesActiveCastingPlayer)
+        {
+            ChipLogError(AppServer, "Ignoring cancellation from a non-target commissioner");
+            return;
+        }
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
+        RestoreCommissionableDataProvider();
+        ChipLogError(AppServer, "The commissioner canceled the commissioning attempt");
+        return;
+    }
+
+    if (!commissionerDeclaration.GetFixedPasscodeCommissioningSelected())
+    {
+        return;
+    }
+
+    gFixedPasscodeCommissioningSelected          = true;
+    CommissionableDataProvider * currentProvider = DeviceLayer::GetCommissionableDataProvider();
+    if (currentProvider == nullptr)
+    {
+        ChipLogError(AppServer, "Fixed Passcode Commissioning has no CommissionableDataProvider");
+        gFixedPasscodeCommissioningSelected = false;
+        TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->CancelFixedPasscodeCommissioning(source);
+        return;
+    }
+
+    gFixedPasscodeCommissionableDataProvider = std::make_unique<LinuxCommissionableDataProvider>();
+    uint16_t discriminator                   = 0;
+    CHIP_ERROR err                           = currentProvider->GetSetupDiscriminator(discriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to read setup discriminator: %" CHIP_ERROR_FORMAT, err.Format());
+        gFixedPasscodeCommissioningSelected = false;
+        gFixedPasscodeCommissionableDataProvider.reset();
+        TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->CancelFixedPasscodeCommissioning(source);
+        return;
+    }
+
+    chip::Optional<std::vector<uint8_t>> noVerifier;
+    chip::Optional<std::vector<uint8_t>> noSalt;
+    err = gFixedPasscodeCommissionableDataProvider->Init(noVerifier, noSalt, chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
+                                                         chip::MakeOptional(gFixedPasscodeCommissioningPasscode), discriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to configure fixed passcode: %" CHIP_ERROR_FORMAT, err.Format());
+        gFixedPasscodeCommissioningSelected = false;
+        gFixedPasscodeCommissionableDataProvider.reset();
+        TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->CancelFixedPasscodeCommissioning(source);
+        return;
+    }
+
+    gFixedPasscodeCommissioningAttemptPasscode = gFixedPasscodeCommissioningPasscode;
+    gOriginalCommissionableDataProvider        = currentProvider;
+    err = CastingServer::GetInstance()->ContinueFixedPasscodeCommissioning(source, gFixedPasscodeCommissionableDataProvider.get());
+    if (err != CHIP_NO_ERROR)
+    {
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
+        RestoreCommissionableDataProvider();
+        TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->CancelFixedPasscodeCommissioning(source);
+        ChipLogError(AppServer, "Failed to continue Fixed Passcode Commissioning: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+} // namespace
 
 CHIP_ERROR DiscoverCommissioners()
 {
@@ -54,7 +192,38 @@ CHIP_ERROR RequestCommissioning(int index)
         ChipLogError(AppServer, "No such commissioner with index %d exists", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    std::string castingPlayerId = selectedCommissioner->instanceName;
+    auto rejectedPasscode       = gRejectedFixedPasscodes.find(castingPlayerId);
+    bool fixedPasscodeRejected =
+        rejectedPasscode != gRejectedFixedPasscodes.end() && rejectedPasscode->second == gFixedPasscodeCommissioningPasscode;
+    CastingServer::GetInstance()->SetFixedPasscodeCommissioningEnabled(gFixedPasscodeCommissioningEnabled &&
+                                                                       !fixedPasscodeRejected);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     PrepareForCommissioning(selectedCommissioner);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetUseFixedPasscodeCommissioning(bool enabled)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    gFixedPasscodeCommissioningEnabled = enabled;
+    CastingServer::GetInstance()->SetFixedPasscodeCommissioningEnabled(enabled);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    ChipLogProgress(AppServer, "Fixed Passcode Commissioning %s", enabled ? "enabled" : "disabled");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetFixedPasscodeCommissioningPasscode(uint32_t passcode)
+{
+    VerifyOrReturnError(gOriginalCommissionableDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(SetupPayload::IsValidSetupPIN(passcode), CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    gFixedPasscodeCommissioningPasscode = passcode;
+    gRejectedFixedPasscodes.clear();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    ChipLogProgress(AppServer, "Updated the remembered Fixed Passcode Commissioning passcode");
     return CHIP_NO_ERROR;
 }
 
@@ -67,8 +236,32 @@ void PrepareForCommissioning(const Dnssd::CommissionNodeData * selectedCommissio
 {
     TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->Init();
 
+    RestoreCommissionableDataProvider();
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    gFixedPasscodeCommissioningSelected        = false;
+    gFixedPasscodeCommissioningAttemptPasscode = 0;
+    gFixedPasscodeCommissioningCastingPlayerId.clear();
+    gFixedPasscodeCommissioningCastingPlayerAddresses.clear();
+    if (selectedCommissioner != nullptr)
+    {
+        gFixedPasscodeCommissioningCastingPlayerId = selectedCommissioner->instanceName;
+        gFixedPasscodeCommissioningCastingPlayerAddresses.assign(selectedCommissioner->ipAddress,
+                                                                 selectedCommissioner->ipAddress + selectedCommissioner->numIPs);
+    }
+    CastingServer::GetInstance()->SetCommissionerDeclarationCallback(HandleCommissionerDeclaration);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     CommissioningCallbacks commissioningCallbacks;
-    commissioningCallbacks.commissioningComplete = HandleCommissioningCompleteCallback;
+    commissioningCallbacks.sessionEstablished = []() {
+        RestoreCommissionableDataProvider();
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+        gFixedPasscodeCommissioningSelected = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    };
+    commissioningCallbacks.sessionEstablishmentError   = [](CHIP_ERROR) { RestoreCommissionableDataProvider(); };
+    commissioningCallbacks.sessionEstablishmentStopped = RestoreCommissionableDataProvider;
+    commissioningCallbacks.commissioningWindowClosed   = RestoreCommissionableDataProvider;
+    commissioningCallbacks.commissioningComplete       = HandleCommissioningCompleteCallback;
     TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->OpenBasicCommissioningWindow(
         commissioningCallbacks, OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint);
 

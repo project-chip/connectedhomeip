@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,17 @@ public:
      * Field to indicate the length of the passcode displayed by the client.
      */
     uint8_t mPasscodeLength = 0;
+    /**
+     * Feature: Fixed Passcode Commissioning
+     * Flag to indicate whether the Commissionee supports and requests Fixed Passcode Commissioning for this commissioning attempt.
+     */
+    bool mFixedPasscodeCommissioningSupported = false;
+    /**
+     * Feature: Fixed Passcode Commissioning
+     * Flag to indicate whether the Commissionee has opened a commissioning window using a PAKE verifier derived from its configured
+     * fixed setup Passcode.
+     */
+    bool mFixedPasscodeCommissioningReady = false;
 
     /**
      * Commissionee's (random) DNS-SD instance name. This field is mandatory and will be auto generated if not provided by the
@@ -92,12 +103,14 @@ public:
 
     void resetState()
     {
-        mNoPasscode                = false;
-        mCdUponPasscodeDialog      = false;
-        mCommissionerPasscode      = false;
-        mCommissionerPasscodeReady = false;
-        mCancelPasscode            = false;
-        mPasscodeLength            = 0;
+        mNoPasscode                          = false;
+        mCdUponPasscodeDialog                = false;
+        mCommissionerPasscode                = false;
+        mCommissionerPasscodeReady           = false;
+        mCancelPasscode                      = false;
+        mPasscodeLength                      = 0;
+        mFixedPasscodeCommissioningSupported = false;
+        mFixedPasscodeCommissioningReady     = false;
         mTargetAppInfos.clear();
     }
 
@@ -119,14 +132,20 @@ public:
         id.SetCdUponPasscodeDialog(mCdUponPasscodeDialog);
         id.SetCancelPasscode(mCancelPasscode);
         id.SetCommissionerPasscode(mCommissionerPasscode);
+        id.SetCommissionerPasscodeReady(mCommissionerPasscodeReady);
+        id.SetFixedPasscodeCommissioningSupported(mFixedPasscodeCommissioningSupported);
+        id.SetFixedPasscodeCommissioningReady(mFixedPasscodeCommissioningReady);
+        if (mFixedPasscodeCommissioningReady)
+        {
+            id.SetCdPort(chip::app::DnssdServer::Instance().GetSecuredPort());
+        }
         if (!mCommissionerPasscode)
         {
             // only makes sense to have a length when the client is displaying the passcode
             id.SetPasscodeLength(mPasscodeLength);
         }
-        if (mCommissionerPasscodeReady)
+        if (mCommissionerPasscodeReady || mFixedPasscodeCommissioningReady)
         {
-            id.SetCommissionerPasscodeReady(true);
             id.SetInstanceName(mCommissioneeInstanceName);
         }
         // mCommissioneeInstanceName cannot be null
@@ -175,6 +194,10 @@ public:
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissioneeInstanceName:  %s", mCommissioneeInstanceName);
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mPasscodeLength:            %d",
                       static_cast<uint16_t>(mPasscodeLength));
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mFixedPasscodeCommissioningSupported: %s",
+                      mFixedPasscodeCommissioningSupported ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mFixedPasscodeCommissioningReady: %s",
+                      mFixedPasscodeCommissioningReady ? "true" : "false");
 
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");
         for (size_t i = 0; i < mTargetAppInfos.size(); i++)

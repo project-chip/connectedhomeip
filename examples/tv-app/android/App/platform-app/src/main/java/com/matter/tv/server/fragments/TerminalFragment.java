@@ -32,7 +32,10 @@ public class TerminalFragment extends Fragment {
           + "add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: "
           + "add-admin-vendor 65521\r\n"
           + "print-app-access     Print all ACLs for app platform fabric. Usage: print-app-access\r\n"
-          + "remove-app-access    Remove all ACLs for app platform fabric. Usage: remove-app-access\r\n";
+          + "remove-app-access    Remove all ACLs for app platform fabric. Usage: remove-app-access\r\n"
+          + "fixed-passcode set <passcode>    Set the Fixed Passcode Commissioning passcode.\r\n"
+          + "fixed-passcode enable    Enable Fixed Passcode Commissioning. Re-enable after disabling to clear lockout.\r\n"
+          + "fixed-passcode disable    Disable Fixed Passcode Commissioning.\r\n";
 
   public TerminalFragment() {
     // Required empty public constructor

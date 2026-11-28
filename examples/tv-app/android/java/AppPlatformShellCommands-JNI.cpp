@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <access/AccessControl.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -208,6 +209,62 @@ exit:
     }
 }
 
+char * FixedPasscodeCommissioningHandler(int argc, char ** argv)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (argc == 0 || strcmp(argv[0], "help") == 0)
+    {
+        strcpy(response,
+               "fixed-passcode set <passcode>\n"
+               "fixed-passcode enable\n"
+               "fixed-passcode disable");
+        return response;
+    }
+    if (strcmp(argv[0], "set") == 0)
+    {
+        uint32_t passcode;
+        if (argc != 2 || !ArgParser::ParseInt(argv[1], passcode))
+        {
+            strcpy(response, "Usage: fixed-passcode set <passcode>");
+            return response;
+        }
+        err = SetExampleFixedPasscodeCommissioningPasscode(passcode);
+        if (err == CHIP_NO_ERROR)
+        {
+            strcpy(response, "Fixed Passcode Commissioning passcode updated.");
+            return response;
+        }
+    }
+    else if (strcmp(argv[0], "enable") == 0 && argc == 1)
+    {
+        err = SetExampleFixedPasscodeCommissioningEnabled(true);
+        if (err == CHIP_NO_ERROR)
+        {
+            strcpy(response, "Fixed Passcode Commissioning enabled.");
+            return response;
+        }
+    }
+    else if (strcmp(argv[0], "disable") == 0 && argc == 1)
+    {
+        err = SetExampleFixedPasscodeCommissioningEnabled(false);
+        if (err == CHIP_NO_ERROR)
+        {
+            strcpy(response, "Fixed Passcode Commissioning disabled.");
+            return response;
+        }
+    }
+    else
+    {
+        strcpy(response, "Invalid Fixed Passcode Commissioning command. Use fixed-passcode help.");
+        return response;
+    }
+
+    ChipLogError(DeviceLayer, "Fixed Passcode Commissioning command failed: %" CHIP_ERROR_FORMAT, err.Format());
+    snprintf(response, sizeof(response), "Error: %s", ErrorStr(err));
+    return response;
+}
+
 char * AppPlatformHandler(int argc, char ** argv)
 {
     CHIP_ERROR err;
@@ -355,6 +412,10 @@ char * AppPlatformHandler(int argc, char ** argv)
         SuccessOrExit(err = pairApp(true, index));
         return response;
     }
+    else if (strcmp(argv[0], "fixed-passcode") == 0)
+    {
+        return FixedPasscodeCommissioningHandler(argc - 1, argv + 1);
+    }
     else
     {
         strcpy(response, "invalid argument");
@@ -387,10 +448,12 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray string
     // Store response to show it to the users
     char * buf = AppPlatformHandler(argc, argv);
 
+    bool isFixedPasscodeSetCommand = argc >= 2 && strcmp(argv[0], "fixed-passcode") == 0 && strcmp(argv[1], "set") == 0;
+
     // Release UTF Chars
     for (int i = 0; i < argc; i++)
     {
-        ChipLogProgress(DeviceLayer, " Value=%s ", argv[i]);
+        ChipLogProgress(DeviceLayer, " Value=%s ", isFixedPasscodeSetCommand && i >= 2 ? "<redacted>" : argv[i]);
         jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
         env->ReleaseStringUTFChars(string, argv[i]);
     }

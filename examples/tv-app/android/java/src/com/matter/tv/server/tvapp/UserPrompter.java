@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2026 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,6 +81,12 @@ public interface UserPrompter {
    *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
    */
   void promptCommissioningFailed(String commissioneeName, String error);
+
+  /*
+   * Called to notify the user that Fixed Passcode Commissioning has been disabled after repeated
+   * authentication failures.
+   */
+  void promptFixedPasscodeCommissioningLockout(String commissioneeName);
 
   /*
    * Called to display a message on the screen

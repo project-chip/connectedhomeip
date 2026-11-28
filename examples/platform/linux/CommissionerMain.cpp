@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -319,19 +319,16 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-        if (cdc != nullptr)
-        {
-            cdc->CommissioningFailed(CHIP_ERROR_CONNECTION_ABORTED);
-        }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         break;
     }
 }
 
 void PairingCommand::OnPairingComplete(CHIP_ERROR err)
 {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Pairing Success");
@@ -339,6 +336,12 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     else
     {
         ChipLogProgress(AppServer, "Pairing Failure: %s", ErrorStr(err));
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        if (cdc != nullptr)
+        {
+            cdc->CommissioningFailed(err);
+        }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     }
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -171,6 +171,14 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
                  LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR ==
+                     (err = writer.PutBoolean(chip::TLV::ContextTag(kFixedPasscodeCommissioningSupportedTag),
+                                              mFixedPasscodeCommissioningSupported)),
+                 LogErrorOnFailure(err));
+    VerifyOrExit(
+        CHIP_NO_ERROR ==
+            (err = writer.PutBoolean(chip::TLV::ContextTag(kFixedPasscodeCommissioningReadyTag), mFixedPasscodeCommissioningReady)),
+        LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
@@ -230,6 +238,11 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
             break;
         case kPasscodeLengthTag:
             err = reader.Get(mPasscodeLength);
+            break;
+        case kFixedPasscodeCommissioningSelectedTag:
+            err = reader.Get(mFixedPasscodeCommissioningSelected);
+            break;
+        default:
             break;
         }
     }

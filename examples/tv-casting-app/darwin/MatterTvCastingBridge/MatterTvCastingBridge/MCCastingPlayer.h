@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -156,6 +156,7 @@ typedef enum {
  *     passcode via the following function call:
  *     MCDataSource.update(MCCommissionableData). This updates the
  *     commissioning session's PAKE verifier with the user entered passcode.
+ *     This function is also required for Fixed Passcode Commissioning.
  *     <p>Note: The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed
  *     into verifyOrEstablishConnection() will be used.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
@@ -170,6 +171,7 @@ typedef enum {
  *     Client/Commissionee, have cancelled the commissioning process. This indicates that the
  *     CastingPlayer/Commissioner can dismiss any dialogs corresponding to commissioning, such as
  *     a Passcode input dialog or a Passcode display dialog.
+ *     This function also cancels Fixed Passcode Commissioning.
  *     <p>Note: stopConnecting() does not call the connectionCompleteCallback() callback passed to the
  *     VerifyOrEstablishConnection() API above since no connection is established.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
