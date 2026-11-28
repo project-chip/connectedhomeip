@@ -987,4 +987,59 @@ TEST_F(TestDataModelSerialization, NullablesOptionalsCommand)
     NullablesOptionalsEncodeDecodeCheck<EncType, DecType>();
 }
 
+TEST_F(TestDataModelSerialization, ContentAppMessageEncodesEmptyDataWithoutEncodingHint)
+{
+    // Matter 1.6.1 section 6.12.5.1 requires Data and permits EncodingHint to be omitted.
+    SetupBuf();
+    ContentAppObserver::Commands::ContentAppMessage::Type request;
+    ASSERT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), request), CHIP_NO_ERROR);
+    ASSERT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
+
+    SetupReader();
+    TLV::TLVType outer;
+    ASSERT_EQ(mReader.EnterContainer(outer), CHIP_NO_ERROR);
+    ASSERT_EQ(mReader.Next(), CHIP_NO_ERROR);
+    ASSERT_EQ(mReader.GetTag(), TLV::ContextTag(0));
+    CharSpan data;
+    ASSERT_EQ(DataModel::Decode(mReader, data), CHIP_NO_ERROR);
+    EXPECT_TRUE(data.empty());
+    EXPECT_EQ(mReader.Next(), CHIP_END_OF_TLV);
+    EXPECT_EQ(mReader.ExitContainer(outer), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDataModelSerialization, ContentAppMessageRoundTripWithoutEncodingHint)
+{
+    SetupBuf();
+    ContentAppObserver::Commands::ContentAppMessage::Type request;
+    request.data = "payload"_span;
+    ASSERT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), request), CHIP_NO_ERROR);
+    ASSERT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
+
+    SetupReader();
+    ContentAppObserver::Commands::ContentAppMessage::DecodableType decoded;
+    ASSERT_EQ(DataModel::Decode(mReader, decoded), CHIP_NO_ERROR);
+    EXPECT_TRUE(decoded.data.data_equal(request.data));
+    EXPECT_FALSE(decoded.encodingHint.HasValue());
+}
+
+TEST_F(TestDataModelSerialization, ContentAppMessageRoundTripWithEncodingHint)
+{
+    for (CharSpan hint : { ""_span, "text/plain"_span })
+    {
+        SetupBuf();
+        ContentAppObserver::Commands::ContentAppMessage::Type request;
+        request.data         = "payload"_span;
+        request.encodingHint = MakeOptional(hint);
+        ASSERT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), request), CHIP_NO_ERROR);
+        ASSERT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
+
+        SetupReader();
+        ContentAppObserver::Commands::ContentAppMessage::DecodableType decoded;
+        ASSERT_EQ(DataModel::Decode(mReader, decoded), CHIP_NO_ERROR);
+        EXPECT_TRUE(decoded.data.data_equal(request.data));
+        ASSERT_TRUE(decoded.encodingHint.HasValue());
+        EXPECT_TRUE(decoded.encodingHint.Value().data_equal(hint));
+    }
+}
+
 } // namespace

@@ -4,6 +4,7 @@ from rich.pretty import pprint
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.tlv import TLVReader
 
 '''
 This file contains tests for validating the generated cluster objects by running encoding and decoding
@@ -39,6 +40,27 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         data.h = 0
 
         self.CheckData(data)
+
+    def test_content_app_message_without_encoding_hint(self) -> None:
+        # Matter 1.6.1 section 6.12.5.1 requires Data; EncodingHint is optional.
+        for data in ('', 'payload'):
+            with self.subTest(data=data):
+                request = Clusters.ContentAppObserver.Commands.ContentAppMessage(data=data)
+                self.assertEqual(TLVReader(request.ToTLV()).get()['Any'], {0: data})
+                self.CheckData(request)
+
+    def test_content_app_message_with_encoding_hint(self) -> None:
+        for hint in ('', 'text/plain'):
+            with self.subTest(encoding_hint=hint):
+                request = Clusters.ContentAppObserver.Commands.ContentAppMessage(data='payload', encodingHint=hint)
+                self.assertEqual(TLVReader(request.ToTLV()).get()['Any'], {0: 'payload', 1: hint})
+                self.CheckData(request)
+
+    def test_content_app_message_missing_data(self) -> None:
+        request = Clusters.ContentAppObserver.Commands.ContentAppMessage(data=None, encodingHint='text/plain')
+        # None would omit Data, which is mandatory in Matter 1.6.1 section 6.12.5.1.
+        with self.assertRaises(ValueError):
+            request.ToTLV()
 
     def test_double_nested_struct_list(self):
         simpleStruct = Clusters.UnitTesting.Structs.SimpleStruct()

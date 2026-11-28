@@ -74,8 +74,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 
-    Optional<chip::CharSpan> data;
-    chip::CharSpan encodingHint;
+    chip::CharSpan data;
+    Optional<chip::CharSpan> encodingHint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -91,8 +91,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Optional<chip::CharSpan> data;
-    chip::CharSpan encodingHint;
+    chip::CharSpan data;
+    Optional<chip::CharSpan> encodingHint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

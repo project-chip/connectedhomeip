@@ -153,8 +153,8 @@ CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeM
     chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, mEndPointId);
 
     chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Type request;
-    request.data         = Optional<CharSpan>(CharSpan::fromCharString(mData.c_str()));
-    request.encodingHint = CharSpan::fromCharString(mEncodingHint.c_str());
+    request.data         = CharSpan::fromCharString(mData.c_str());
+    request.encodingHint = MakeOptional(CharSpan::fromCharString(mEncodingHint.c_str()));
     CHIP_ERROR err       = cluster.InvokeCommand(request, nullptr, OnCommandResponse, OnCommandFailure);
     if (err != CHIP_NO_ERROR)
     {
