@@ -80,6 +80,7 @@ if (chip_build_tests) {
       "TestIPv6Datagram.cpp",
       "TestInetAddress.cpp",
       "TestInetErrorStr.cpp",
+      "TestRouteLookup.cpp",
     ]
     sources = []
 
