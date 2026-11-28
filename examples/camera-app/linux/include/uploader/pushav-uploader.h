@@ -74,6 +74,39 @@ private:
     void UploadData(std::pair<std::string, std::string> data);
     PushAVCertPath mCertPath;
     PushAVCertBuffer mCertBuffer;
+
+    // PEM files curl reads, in a private 0700 directory owned by one uploader. Created on first use
+    // and removed (key zeroed first) in the destructor.
+    class TlsFiles
+    {
+    public:
+        TlsFiles() = default;
+        ~TlsFiles();
+        TlsFiles(const TlsFiles &)             = delete;
+        TlsFiles & operator=(const TlsFiles &) = delete;
+
+        // Writes the files on the first call. Returns false, and keeps no files, if any step fails.
+        bool EnsureCreated(const PushAVCertBuffer & certBuffer);
+
+        // Valid only after EnsureCreated() returned true.
+        const std::string & RootPath() const { return mRootPath; }
+        const std::string & DevCertPath() const { return mDevCertPath; }
+        const std::string & DevKeyPath() const { return mDevKeyPath; }
+
+    private:
+        void RemoveLocked();
+
+        std::mutex mMutex;
+        bool mReady = false;
+        std::string mDir;
+        std::string mRootPath;
+        std::string mDevCertPath;
+        std::string mDevKeyPath;
+    };
+
+    // Destroyed after ~PushAVUploader() has stopped and drained the uploader thread
+    TlsFiles mTlsFiles;
+
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
