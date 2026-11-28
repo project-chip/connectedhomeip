@@ -519,6 +519,14 @@ public:
     bool TriggerResubscribeIfScheduled(const char * reason);
 
     /**
+     * Abort a one-shot read with CHIP_ERROR_CANCELLED and OnDone. The stack must be locked,
+     * the client must still be alive, and this must not be called from a read callback.
+     * OnDone may destroy this client. Subscriptions are rejected without being changed.
+     * Clients without an active read exchange are rejected with CHIP_ERROR_INCORRECT_STATE.
+     */
+    CHIP_ERROR AbortRead();
+
+    /**
      * Returns the timeout after which we consider the subscription to have
      * dropped, if we have received no messages within that amount of time.
      *
@@ -557,6 +565,7 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    void OnExchangeClosing(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
      *  Updates the type (LIT ICD or not) of the peer.

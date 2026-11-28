@@ -519,6 +519,9 @@ using Milliseconds32 = System::Clock::Milliseconds32;
 class TestReadInteraction : public chip::Testing::AppContext
 {
 public:
+    void TestAbortReadInactive();
+    void TestReadExchangeClosed();
+
     static void SetUpTestSuiteCommon(bool syncScheduler = false)
     {
         AppContext::SetUpTestSuite();
@@ -806,6 +809,80 @@ void TestReadInteraction::TestReadClient()
 
     GenerateReportData(buf, ReportType::kValid, true /* aSuppressResponse*/);
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction), CHIP_NO_ERROR);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestAbortReadInactive)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestAbortReadInactive)
+void TestReadInteraction::TestAbortReadInactive()
+{
+    class CompletionCounter final : public MockInteractionModelApp
+    {
+    public:
+        void OnDone(ReadClient *) override { ++doneCount; }
+        uint32_t doneCount = 0;
+    } delegate;
+    ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate, ReadClient::InteractionType::Read);
+    EXPECT_EQ(client.AbortRead(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.doneCount, 0u);
+    EXPECT_FALSE(delegate.mReadError);
+
+    ReadPrepareParams params(GetSessionBobToAlice());
+    ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+    auto payload = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    GenerateReportData(payload, ReportType::kValid, true);
+    PayloadHeader header;
+    header.SetMessageType(Protocols::InteractionModel::MsgType::ReportData);
+    ASSERT_EQ(client.OnMessageReceived(client.mExchange.Get(), header, std::move(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.doneCount, 1u);
+    EXPECT_FALSE(delegate.mReadError);
+    EXPECT_EQ(client.AbortRead(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.doneCount, 1u);
+    EXPECT_FALSE(delegate.mReadError);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadExchangeClosed)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadExchangeClosed)
+void TestReadInteraction::TestReadExchangeClosed()
+{
+    class CompletionCounter final : public MockInteractionModelApp
+    {
+    public:
+        void OnDone(ReadClient *) override { ++doneCount; }
+        void OnError(CHIP_ERROR error) override
+        {
+            MockInteractionModelApp::OnError(error);
+            lastError = error;
+        }
+        uint32_t doneCount   = 0;
+        CHIP_ERROR lastError = CHIP_NO_ERROR;
+    } delegate;
+    ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate, ReadClient::InteractionType::Read);
+    ReadPrepareParams params(GetSessionBobToAlice());
+    ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+    auto payload = System::PacketBufferHandle::New(128);
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(payload));
+    ReportDataMessage::Builder report;
+    ASSERT_EQ(report.Init(&writer), CHIP_NO_ERROR);
+    report.MoreChunkedMessages(true).SuppressResponse(false);
+    ASSERT_EQ(report.EndOfReportDataMessage(), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(&payload), CHIP_NO_ERROR);
+    PayloadHeader header;
+    header.SetMessageType(Protocols::InteractionModel::MsgType::ReportData);
+    auto * exchange = client.mExchange.Get();
+    exchange->GetReliableMessageContext()->SetWaitingForAck(false);
+    exchange->GetReliableMessageContext()->SetAutoRequestAck(false);
+    ASSERT_EQ(exchange->HandleMessage(1000, header, Messaging::MessageFlags(), std::move(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.doneCount, 0u);
+    client.mExchange->Close();
+    EXPECT_EQ(delegate.doneCount, 1u);
+    EXPECT_EQ(delegate.lastError, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(client.AbortRead(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.doneCount, 1u);
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadUnexpectedSubscriptionId)
