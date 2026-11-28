@@ -72,3 +72,10 @@ SystemCommands
 |CompareFiles|file1<br />file2|char_string<br />char_string|false<br />false|
 |CreateFile|filePath<br />fileContent|char_string<br />char_string|false<br />false|
 |DeleteFile|filePath|char_string|false|
+
+
+ValueCommands
+|command|args|arg type| arg optional|
+|:---|:---|:---|:---|
+|UnsignedNumberValue|Value|int64u|false|
+|UnsignedNumberValueResponse|Value|int64u|false|
