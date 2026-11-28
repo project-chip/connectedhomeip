@@ -3,6 +3,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <functional>
+#include <lib/support/CodeUtils.h>
 #include <optional>
 #include <protocols/bdx/TransferFacilitator.h>
 #include <system/SystemClock.h>
@@ -35,6 +36,10 @@ public:
 
     CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
     {
+        // Like the real System::Layer, keep at most one timer per callback and appState: replace a pending one.
+        // Otherwise duplicates outlive the object they point at, and fire into a later test.
+        CancelTimer(aComplete, aAppState);
+
         Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
         TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
         mTimerList.Add(node);
@@ -137,7 +142,10 @@ public:
     // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void ScheduleImmediatePoll() { Initiator::ScheduleImmediatePoll(); }
 
+    bool CanHandleOutput() const override { return mCanHandleOutput; }
+
     std::optional<TransferSessionOutputHandler> mTransferSessionOutputHandler{ std::nullopt };
+    bool mCanHandleOutput = true;
 };
 
 TEST_F(TestTransferFacilitator, InitiatesTransfer)
@@ -215,4 +223,77 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
 
     // Check if the timer was started
     EXPECT_TRUE(timerStarted);
+}
+
+TEST_F(TestTransferFacilitator, LeavesOutputPendingWhileItCannotBeHandled)
+{
+    TestInitiator initiator;
+    initiator.mCanHandleOutput = false;
+
+    int timersStarted                    = 0;
+    gSystemLayerAndClock.mStartTimerHook = [&timersStarted](auto, auto, void *) { timersStarted++; };
+    auto resetHook                       = ScopeExit([] { gSystemLayerAndClock.mStartTimerHook = std::nullopt; });
+
+    std::optional<TransferSession::OutputEventType> handledEvent;
+    initiator.mTransferSessionOutputHandler = [&handledEvent](TransferSession::OutputEvent & event) {
+        handledEvent = event.EventType;
+    };
+
+    auto initData           = TransferSession::TransferInitData();
+    initData.MaxBlockSize   = 1024;
+    initData.FileDesignator = reinterpret_cast<const uint8_t *>("test_file.txt");
+    initData.FileDesLength  = static_cast<uint16_t>(strlen(reinterpret_cast<const char *>(initData.FileDesignator)));
+    EXPECT_EQ(initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, initData, System::Clock::Seconds16(60),
+                                         System::Clock::Milliseconds32(500)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(timersStarted, 1);
+
+    initiator.PollForOutput();
+    EXPECT_FALSE(handledEvent.has_value());
+    EXPECT_EQ(timersStarted, 2);
+
+    initiator.mCanHandleOutput = true;
+    initiator.PollForOutput();
+    EXPECT_EQ(handledEvent.value_or(TransferSession::OutputEventType::kNone), TransferSession::OutputEventType::kMsgToSend);
+    EXPECT_EQ(timersStarted, 3);
+}
+
+TEST_F(TestTransferFacilitator, TimesOutWhileOutputCannotBeHandled)
+{
+    TestInitiator initiator;
+
+    std::optional<TransferSession::OutputEventType> firstEvent;
+    int timeouts                            = 0;
+    initiator.mTransferSessionOutputHandler = [&firstEvent, &timeouts](TransferSession::OutputEvent & event) {
+        if (!firstEvent.has_value())
+        {
+            firstEvent = event.EventType;
+        }
+        if (event.EventType == TransferSession::OutputEventType::kTransferTimeout)
+        {
+            timeouts++;
+        }
+    };
+
+    auto initData           = TransferSession::TransferInitData();
+    initData.MaxBlockSize   = 1024;
+    initData.FileDesignator = reinterpret_cast<const uint8_t *>("test_file.txt");
+    initData.FileDesLength  = static_cast<uint16_t>(strlen(reinterpret_cast<const char *>(initData.FileDesignator)));
+    EXPECT_EQ(initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, initData, System::Clock::Seconds16(10),
+                                         System::Clock::Milliseconds32(500)),
+              CHIP_NO_ERROR);
+
+    // The first poll hands out the SendInit, which starts the wait for a response.
+    gSystemLayerAndClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+    EXPECT_EQ(firstEvent.value_or(TransferSession::OutputEventType::kNone), TransferSession::OutputEventType::kMsgToSend);
+
+    // Output stays held back, as it does while a sent message waits for an MRP ack that does not arrive, for longer than
+    // the transfer timeout. The poll timer fires on every step.
+    initiator.mCanHandleOutput = false;
+    for (int i = 0; i < 21; i++)
+    {
+        gSystemLayerAndClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+    }
+
+    EXPECT_EQ(timeouts, 1);
 }
