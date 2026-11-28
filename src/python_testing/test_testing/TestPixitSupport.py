@@ -25,10 +25,12 @@ matter_testing_infrastructure/matter/testing/test_pixit.py.
 """
 
 import unittest
+from unittest import mock
 
 from mobly import signals
 
 from matter.testing import global_stash
+from matter.testing.CommissioningPreTest import CommissionDeviceTest
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.pixit import pixit
@@ -140,6 +142,104 @@ class TestMatterBaseTestSetupValidation(unittest.TestCase):
         self.assertIn("PIXIT parameter type error", msg)
         self.assertIn("smoke_timeout", msg)
         self.assertNotIn("AccessControl", msg)
+
+
+class TestMatterBaseTestBaselineCapture(unittest.TestCase):
+    """Regression coverage for pre-test DUT baseline probing."""
+
+    def _make_instance(self, *, commissioning_method=None, in_test_commissioning_method=None,
+                       dut_confirmed=False, pre_test_commissioning_complete=False):
+        class _CommissioningTest(MatterBaseTest):
+            pass
+
+        instance = _CommissioningTest.__new__(_CommissioningTest)
+        instance.is_commissioning = False
+        instance._original_acl = None
+        instance._original_fabrics = None
+        instance._dut_confirmed_available = dut_confirmed
+        instance.event_loop = mock.Mock()
+        instance._capture_original_acl = mock.Mock()
+        instance._capture_original_fabrics = mock.Mock()
+
+        config = MatterTestConfig(commissioning_method=commissioning_method,
+                                  in_test_commissioning_method=in_test_commissioning_method,
+                                  dut_node_ids=[0x12344321])
+        config._pre_test_commissioning_complete = pre_test_commissioning_complete
+        controller = mock.Mock()
+        instance.user_params = {
+            "matter_test_config": global_stash.stash_globally(config),
+            "default_controller": global_stash.stash_globally(controller),
+        }
+        return instance, controller
+
+    def test_configured_commissioning_skips_unconfirmed_default_node_lookup(self):
+        """Do not start CASE discovery before configured framework commissioning."""
+        instance, controller = self._make_instance(commissioning_method="ble-thread")
+
+        instance._capture_dut_baseline()
+
+        controller.GetConnectedDevice.assert_not_called()
+        instance.event_loop.run_until_complete.assert_not_called()
+
+    def test_in_test_commissioning_skips_unconfirmed_default_node_lookup(self):
+        """Do not start CASE discovery before commissioning performed in the test body."""
+        instance, controller = self._make_instance(in_test_commissioning_method="ble-thread")
+
+        instance._capture_dut_baseline()
+
+        controller.GetConnectedDevice.assert_not_called()
+        instance.event_loop.run_until_complete.assert_not_called()
+
+    def test_no_commissioning_method_retains_short_baseline_probe(self):
+        instance, controller = self._make_instance()
+
+        instance._capture_dut_baseline()
+
+        controller.GetConnectedDevice.assert_called_once_with(
+            nodeId=0x12344321, allowPASE=False, timeoutMs=500)
+        instance._capture_original_acl.assert_called_once_with()
+        instance._capture_original_fabrics.assert_called_once_with()
+
+    def test_confirmed_dut_retains_full_baseline_capture(self):
+        instance, controller = self._make_instance(in_test_commissioning_method="ble-thread", dut_confirmed=True)
+
+        instance._capture_dut_baseline()
+
+        controller.GetConnectedDevice.assert_called_once_with(
+            nodeId=0x12344321, allowPASE=False, timeoutMs=5000)
+        instance._capture_original_acl.assert_called_once_with()
+        instance._capture_original_fabrics.assert_called_once_with()
+
+    def test_completed_framework_commissioning_retains_full_baseline_capture(self):
+        instance, controller = self._make_instance(commissioning_method="ble-thread",
+                                                   pre_test_commissioning_complete=True)
+
+        instance._capture_dut_baseline()
+
+        self.assertTrue(instance._dut_confirmed_available)
+        controller.GetConnectedDevice.assert_called_once_with(
+            nodeId=0x12344321, allowPASE=False, timeoutMs=5000)
+        instance._capture_original_acl.assert_called_once_with()
+        instance._capture_original_fabrics.assert_called_once_with()
+
+    def test_successful_framework_commissioning_is_shared_with_test_class(self):
+        config = MatterTestConfig(commissioning_method="ble-thread")
+        instance = CommissionDeviceTest.__new__(CommissionDeviceTest)
+        instance.event_loop = mock.Mock()
+        instance.event_loop.run_until_complete.return_value = True
+        instance.dut_node_ids = []
+        instance.setup_payloads = []
+        instance.commissioning_info = mock.sentinel.commissioning_info
+        instance.user_params = {
+            "matter_test_config": global_stash.stash_globally(config),
+            "default_controller": global_stash.stash_globally(mock.Mock()),
+        }
+
+        with mock.patch("matter.testing.CommissioningPreTest.commission_devices",
+                        new=mock.Mock(return_value=mock.sentinel.commissioning)):
+            instance.test_run_commissioning()
+
+        self.assertTrue(config._pre_test_commissioning_complete)
 
 
 if __name__ == "__main__":
