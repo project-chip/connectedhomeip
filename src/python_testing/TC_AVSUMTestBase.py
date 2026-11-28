@@ -20,6 +20,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 
 log = logging.getLogger(__name__)
@@ -237,6 +238,15 @@ class AVSUMTestBase:
             asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
 
         return match_found
+
+    async def read_dptz_viewport(self, endpoint, videoStreamID: int) -> Globals.Structs.ViewportStruct:
+        """Read the viewport of a video stream from the DPTZStreams attribute."""
+        dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.Attributes.DPTZStreams)
+        for streams in dptz_streams_dut:
+            if streams.videoStreamID == videoStreamID:
+                return streams.viewport
+        asserts.assert_fail(f"Stream {videoStreamID} not found in DPTZStreams")
+        return None
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
         cluster = Clusters.Objects.CameraAvStreamManagement
