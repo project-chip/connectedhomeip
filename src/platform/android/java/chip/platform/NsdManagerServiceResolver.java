@@ -168,6 +168,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     String mapKey = type + ":" + serviceName;
 
     synchronized (mRegistrationLock) {
+      String preservedServiceName = null;
       ActiveRegistration existing = mActiveRegistrations.get(mapKey);
       if (existing != null) {
         if (existing.matches(port, txtAttributes, subTypeSet)) {
@@ -176,21 +177,26 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           return;
         }
         Log.i(TAG, "publish: replacing changed registration for " + mapKey);
+        preservedServiceName = existing.nsdServiceName;
         unregisterServiceSafely(existing.listener, mapKey);
         mActiveRegistrations.remove(mapKey);
       }
 
+      String nsdServiceName =
+          preservedServiceName != null && !isServiceNameInUseLocked(preservedServiceName)
+              ? preservedServiceName
+              : uniqueServiceNameLocked(serviceName, mapKey);
       ActiveRegistration reg = null;
       try {
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
-        serviceInfo.setServiceName(serviceName);
+        serviceInfo.setServiceName(nsdServiceName);
         applyServiceTypeAndSubtypesLocked(serviceInfo, type, subTypeSet);
         serviceInfo.setPort(port);
 
         Log.i(
             TAG,
             "publish serviceName="
-                + serviceName
+                + nsdServiceName
                 + " type="
                 + serviceInfo.getServiceType()
                 + " subTypes="
@@ -202,7 +208,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           Log.i(TAG, "     " + entry.getKey() + "=" + entry.getValue());
         }
 
-        reg = new ActiveRegistration(mapKey, port, txtAttributes, subTypeSet);
+        reg = new ActiveRegistration(mapKey, nsdServiceName, port, txtAttributes, subTypeSet);
         if (!publishMulticastLock.isHeld()) {
           publishMulticastLock.acquire();
         }
@@ -326,6 +332,46 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     }
   }
 
+  // Some Android 14 mDNS advertisers reject an instance name already registered for another
+  // service type (e.g. _matterc._udp and _matterd._udp) with NameConflictException and never call
+  // onRegistrationFailed. Fixed in AOSP by
+  // https://android-review.googlesource.com/c/platform/packages/modules/Connectivity/+/2968064
+  // Pick a name no other active registration uses; 16-hex-digit names stay 16 uppercase hex digits.
+  private String uniqueServiceNameLocked(String serviceName, String mapKey) {
+    if (serviceName == null || !isServiceNameInUseLocked(serviceName)) {
+      return serviceName;
+    }
+    String candidate = null;
+    if (serviceName.matches("[0-9A-F]{16}")) {
+      int nibble = Character.digit(serviceName.charAt(0), 16);
+      for (int mask = 1; mask <= 15; mask++) {
+        char first = Character.toUpperCase(Character.forDigit(nibble ^ mask, 16));
+        String name = first + serviceName.substring(1);
+        if (!isServiceNameInUseLocked(name)) {
+          candidate = name;
+          break;
+        }
+      }
+    }
+    if (candidate == null) {
+      int i = 2;
+      do {
+        candidate = serviceName + "-" + i++;
+      } while (isServiceNameInUseLocked(candidate));
+    }
+    Log.i(TAG, "publish: renamed " + serviceName + " to " + candidate + " for " + mapKey);
+    return candidate;
+  }
+
+  private boolean isServiceNameInUseLocked(String name) {
+    for (ActiveRegistration reg : mActiveRegistrations.values()) {
+      if (name.equalsIgnoreCase(reg.nsdServiceName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void unregisterServiceSafely(NsdManager.RegistrationListener listener, String mapKey) {
     try {
       nsdManager.unregisterService(listener);
@@ -351,6 +397,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
   private class ActiveRegistration {
     final String mapKey;
+    final String nsdServiceName;
     final int port;
     final Map<String, String> txtAttributes;
     final Set<String> subTypes;
@@ -358,8 +405,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     boolean pendingRemoval = false;
 
     ActiveRegistration(
-        String mapKey, int port, Map<String, String> txtAttributes, Set<String> subTypes) {
+        String mapKey,
+        String nsdServiceName,
+        int port,
+        Map<String, String> txtAttributes,
+        Set<String> subTypes) {
       this.mapKey = mapKey;
+      this.nsdServiceName = nsdServiceName;
       this.port = port;
       this.txtAttributes = txtAttributes;
       this.subTypes = subTypes;
