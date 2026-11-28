@@ -37,6 +37,8 @@ public:
     {
         Config(EndpointId endpoint, ClosureDimensionClusterDelegate & delegate) : mEndpointId(endpoint), mDelegate(delegate) {}
 
+        CHIP_ERROR ValidatePositioning() const;
+
         Config & WithPositioning(Percent100ths resolution, Percent100ths stepValue)
         {
             mFeatureMap.Set(Feature::kPositioning);
@@ -110,6 +112,8 @@ public:
 
     ClosureDimensionCluster(const Config & config);
     ~ClosureDimensionCluster();
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -190,6 +194,7 @@ public:
 
 private:
     ClosureDimensionClusterDelegate & mDelegate;
+    const bool mPositioningConfigValid;
     DataModel::Nullable<GenericDimensionStateStruct> mCurrentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericDimensionStateStruct> mTargetState{ DataModel::NullNullable };
     Percent100ths mResolution                                      = 1;
