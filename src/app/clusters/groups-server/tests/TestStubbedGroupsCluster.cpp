@@ -18,6 +18,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/groups-server/StubbedGroupsCluster.h>
+#include <app/clusters/scenes-server/Constants.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Groups/Attributes.h>
@@ -28,7 +30,9 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/StringBuilderAdapters.h>
 
+#include <algorithm>
 #include <memory>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -42,6 +46,26 @@ constexpr EndpointId kTestEndpointId  = 1;
 constexpr EndpointId kOtherEndpointId = 2;
 constexpr KeysetId kKeysetId          = 123;
 
+class MockScenesIntegrationDelegate : public scenes::ScenesIntegrationDelegate
+{
+public:
+    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override
+    {
+        mRemovedGroups.push_back({ fabricIndex, groupId });
+        return CHIP_NO_ERROR;
+    }
+
+    struct RemovedGroup
+    {
+        FabricIndex fabricIndex;
+        GroupId groupId;
+    };
+    std::vector<RemovedGroup> mRemovedGroups;
+};
+
 class TestStubbedGroupsCluster : public ::testing::Test
 {
 public:
@@ -53,6 +77,7 @@ public:
         mCluster       = std::make_unique<StubbedGroupsCluster>(kTestEndpointId,
                                                           StubbedGroupsCluster::Context{
                                                                     .groupDataProvider = mGroupDataProvider,
+                                                                    .scenesIntegration = &mScenesDelegate,
                                                           });
         mClusterTester = std::make_unique<ClusterTester>(*mCluster);
 
@@ -90,6 +115,7 @@ protected:
 
     GroupDataProviderImpl mGroupDataProvider{ 16, 16 };
     Crypto::DefaultSessionKeystore mSessionKeystore;
+    MockScenesIntegrationDelegate mScenesDelegate;
     std::unique_ptr<StubbedGroupsCluster> mCluster;
     std::unique_ptr<ClusterTester> mClusterTester;
 };
@@ -207,6 +233,63 @@ TEST_F(TestStubbedGroupsCluster, TestRemoveAllGroupsRemovesEndpoint)
     EXPECT_FALSE(mGroupDataProvider.HasEndpoint(kTestFabricIndex, kGroupId1, kTestEndpointId));
     EXPECT_FALSE(mGroupDataProvider.HasEndpoint(kTestFabricIndex, kGroupId2, kTestEndpointId));
     EXPECT_TRUE(mGroupDataProvider.HasEndpoint(kTestFabricIndex, kGroupId1, kOtherEndpointId));
+}
+
+TEST_F(TestStubbedGroupsCluster, TestRemoveGroupNotifiesScenes)
+{
+    constexpr GroupId kGroupId = 42;
+
+    SetupKeySet(kTestFabricIndex);
+    AddGroupWithEndpoint(kTestFabricIndex, kGroupId, kTestEndpointId);
+
+    Groups::Commands::RemoveGroup::Type request;
+    request.groupID = kGroupId;
+    auto result     = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(request);
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(static_cast<Status>(result.response->status), Status::Success);
+
+    ASSERT_EQ(mScenesDelegate.mRemovedGroups.size(), 1u);
+    EXPECT_EQ(mScenesDelegate.mRemovedGroups[0].fabricIndex, kTestFabricIndex);
+    EXPECT_EQ(mScenesDelegate.mRemovedGroups[0].groupId, kGroupId);
+}
+
+TEST_F(TestStubbedGroupsCluster, TestRemoveGroupNotFoundDoesNotNotifyScenes)
+{
+    Groups::Commands::RemoveGroup::Type request;
+    request.groupID = 99;
+    auto result     = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(request);
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(static_cast<Status>(result.response->status), Status::NotFound);
+
+    EXPECT_TRUE(mScenesDelegate.mRemovedGroups.empty());
+}
+
+TEST_F(TestStubbedGroupsCluster, TestRemoveAllGroupsNotifiesScenes)
+{
+    constexpr GroupId kGroupId1           = 10;
+    constexpr GroupId kGroupId2           = 20;
+    constexpr GroupId kOtherEndpointGroup = 30;
+
+    SetupKeySet(kTestFabricIndex);
+    AddGroupWithEndpoint(kTestFabricIndex, kGroupId1, kTestEndpointId, 0);
+    AddGroupWithEndpoint(kTestFabricIndex, kGroupId2, kTestEndpointId, 1);
+    AddGroupWithEndpoint(kTestFabricIndex, kOtherEndpointGroup, kOtherEndpointId, 2);
+
+    Groups::Commands::RemoveAllGroups::Type request;
+    auto result = mClusterTester->Invoke<Groups::Commands::RemoveAllGroups::Type>(request);
+    EXPECT_TRUE(result.IsSuccess());
+
+    // The groups of this endpoint plus the global scene group; groups of other endpoints are untouched.
+    ASSERT_EQ(mScenesDelegate.mRemovedGroups.size(), 3u);
+    std::vector<GroupId> removed;
+    for (const auto & entry : mScenesDelegate.mRemovedGroups)
+    {
+        EXPECT_EQ(entry.fabricIndex, kTestFabricIndex);
+        removed.push_back(entry.groupId);
+    }
+    EXPECT_NE(std::find(removed.begin(), removed.end(), kGroupId1), removed.end());
+    EXPECT_NE(std::find(removed.begin(), removed.end(), kGroupId2), removed.end());
+    EXPECT_NE(std::find(removed.begin(), removed.end(), scenes::kGlobalSceneGroupId), removed.end());
 }
 
 TEST_F(TestStubbedGroupsCluster, TestRemoveGroupAndRemoveAllGroupsReclaimKeyMapWhenGroupcastEnabled)

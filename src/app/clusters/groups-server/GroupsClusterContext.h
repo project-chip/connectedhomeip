@@ -21,25 +21,18 @@
 
 namespace chip::scenes {
 
-// Forward declared rather than included: this header is used by StubbedGroupsCluster, which must
-// not pull in (and link) the scenes cluster implementation.
 class ScenesIntegrationDelegate;
 
 } // namespace chip::scenes
 
 namespace chip::app::Clusters {
 
-/// Construction arguments common to both Groups cluster implementation.
-///
-/// The shape is identical across implementations so that callers can build a context without
-/// knowing which one `GroupsCluster` resolves to. StubbedGroupsCluster only uses
-/// `groupDataProvider`; the other members are for implementations that support the commands
-/// requiring them.
+/// Construction arguments for the Groups cluster.
 struct GroupsClusterContext
 {
     Credentials::GroupDataProvider & groupDataProvider;
-    scenes::ScenesIntegrationDelegate * scenesIntegration = nullptr; // if null, no scenes support
-    IdentifyIntegrationDelegate * identifyIntegration     = nullptr; // if null, no identify support
+    scenes::ScenesIntegrationDelegate * scenesIntegration = nullptr; // if null, scenes are not notified of removed groups
+    IdentifyIntegrationDelegate * identifyIntegration     = nullptr; // currently unused; kept for source compatibility of callers
 };
 
 } // namespace chip::app::Clusters

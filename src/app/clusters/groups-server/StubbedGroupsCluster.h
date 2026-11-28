@@ -28,16 +28,14 @@ namespace chip::app::Clusters {
 
 /// Compatibility-only Groups cluster implementation for revision 5 and later, where groupcast
 /// owns group membership: the commands that would add or report groups fail with InvalidInState.
-/// Applications should use the `GroupsCluster` alias from GroupsCluster.h rather than naming this
-/// class directly.
 class StubbedGroupsCluster : public DefaultServerCluster
 {
 public:
-    /// Shared with the full implementation; only `groupDataProvider` is used here.
     using Context = GroupsClusterContext;
 
     StubbedGroupsCluster(EndpointId endpointId, const Context & context) :
-        DefaultServerCluster({ endpointId, Groups::Id }), mGroupDataProvider(context.groupDataProvider)
+        DefaultServerCluster({ endpointId, Groups::Id }), mGroupDataProvider(context.groupDataProvider),
+        mScenesIntegration(context.scenesIntegration)
     {}
 
     // ServerClusterInterface
@@ -53,6 +51,7 @@ public:
 
 private:
     Credentials::GroupDataProvider & mGroupDataProvider;
+    scenes::ScenesIntegrationDelegate * mScenesIntegration;
 };
 
 } // namespace chip::app::Clusters

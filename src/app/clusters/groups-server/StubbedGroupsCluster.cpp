@@ -16,15 +16,20 @@
 #include <app/clusters/groups-server/StubbedGroupsCluster.h>
 
 #include <app/clusters/access-control-server/AccessControlEventHelper.h>
+#include <app/clusters/scenes-server/Constants.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>
 #include <clusters/Groups/Structs.h>
 #include <lib/core/GroupId.h>
+#include <lib/support/AutoRelease.h>
 #include <tracing/macros.h>
 
 using namespace chip::app::Clusters::Groups;
+
+using chip::Credentials::GroupDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
@@ -136,6 +141,11 @@ std::optional<DataModel::ActionReturnStatus> StubbedGroupsCluster::InvokeCommand
                         return Status::NotFound;
                     }
 
+                    if (mScenesIntegration != nullptr)
+                    {
+                        LogErrorOnFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, groupId));
+                    }
+
                     return Status::Success;
                 }()),
                 .groupID = groupId,
@@ -149,6 +159,22 @@ std::optional<DataModel::ActionReturnStatus> StubbedGroupsCluster::InvokeCommand
     }
     case RemoveAllGroups::Id: {
         MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
+
+        if (mScenesIntegration != nullptr)
+        {
+            AutoRelease iter(mGroupDataProvider.IterateEndpoints(fabricIndex));
+            GroupDataProvider::GroupEndpoint mapping;
+
+            VerifyOrReturnError(!iter.IsNull(), Status::Failure);
+            while (iter->Next(mapping))
+            {
+                if (mPath.mEndpointId == mapping.endpoint_id)
+                {
+                    LogErrorOnFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, mapping.group_id));
+                }
+            }
+            LogErrorOnFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, scenes::kGlobalSceneGroupId));
+        }
 
         CHIP_ERROR err = mGroupDataProvider.RemoveEndpoint(fabricIndex, mPath.mEndpointId);
         if (err != CHIP_NO_ERROR)
