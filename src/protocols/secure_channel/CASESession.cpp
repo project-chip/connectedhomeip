@@ -1393,10 +1393,17 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msgR2->Start(), msgR2->DataLength() }));
 
+    // The exchange arms its response timer before it dispatches the message,
+    // so take the timestamp first; the time the send takes then counts against
+    // the remaining wait instead of extending it.
+    System::Clock::Timestamp sendStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2)));
 
-    mState = State::kSentSigma2;
+    mState                 = State::kSentSigma2;
+    mSigma2SentTime        = sendStartTime;
+    mSigma2ResponseTimeout = mExchangeCtxt->GetResponseTimeout();
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
     MATTER_TRACE_COUNTER("Sigma2");
@@ -2707,6 +2714,23 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
 {
     // Sigma2 is never the first message on the exchange.
     return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
+}
+
+bool CASESession::IsSigma2Undeliverable()
+{
+    return mState == State::kSentSigma2 && mExchangeCtxt && mExchangeCtxt->HasGivenUpRetransmittingUnackedMessage();
+}
+
+System::Clock::Milliseconds32 CASESession::RemainingSigma2ResponseTime()
+{
+    VerifyOrReturnValue(mState == State::kSentSigma2, System::Clock::kZero);
+
+    // Report the deadline the exchange's response timer is actually using; the
+    // session parameters from Sigma1 can differ from the ones it was computed with.
+    auto timeout = std::chrono::duration_cast<System::Clock::Milliseconds32>(mSigma2ResponseTimeout);
+    auto elapsed =
+        std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp() - mSigma2SentTime);
+    return elapsed < timeout ? timeout - elapsed : System::Clock::kZero;
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

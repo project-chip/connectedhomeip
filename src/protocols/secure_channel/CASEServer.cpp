@@ -90,6 +90,18 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
 
         // Invoke watchdog to fix any stuck handshakes
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
+
+        // A Sigma2 that was never acknowledged and is no longer being
+        // retransmitted cannot be answered, so that handshake can only end in
+        // a response timeout.  Give it up now rather than tell this initiator
+        // to wait for that timeout.
+        if (!watchdogFired && GetSession().IsSigma2Undeliverable())
+        {
+            ChipLogProgress(Inet, "Abandoning CASE handshake whose Sigma2 was never acknowledged");
+            GetSession().AbandonPendingEstablishment(CHIP_ERROR_TIMEOUT);
+            watchdogFired = true;
+        }
+
         if (!watchdogFired)
         {
             // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
@@ -99,12 +111,12 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
             System::Clock::Milliseconds16 delay = System::Clock::kZero;
             if (GetSession().GetState() == CASESession::State::kSentSigma2)
             {
-                // The delay should be however long we think it will take for
-                // that to time out.
-                auto sigma2Timeout = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
-                if (sigma2Timeout < System::Clock::Milliseconds16::max())
+                // The delay should be however long the current Sigma2 still
+                // has before it times out.
+                auto remaining = GetSession().RemainingSigma2ResponseTime();
+                if (remaining < System::Clock::Milliseconds16::max())
                 {
-                    delay = std::chrono::duration_cast<System::Clock::Milliseconds16>(sigma2Timeout);
+                    delay = std::chrono::duration_cast<System::Clock::Milliseconds16>(remaining);
                 }
                 else
                 {

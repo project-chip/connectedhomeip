@@ -54,6 +54,8 @@ ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext 
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
 {
     ec->SetWaitingForAck(true);
+    // A new reliable message replaces any earlier one that was given up on.
+    ec->mFlags.Clear(ReliableMessageContext::Flags::kFlagGivenUpMessageCounterIsValid);
 }
 
 ReliableMessageMgr::RetransTableEntry::~RetransTableEntry()
@@ -210,6 +212,8 @@ void ReliableMessageMgr::ExecuteActions()
                 }
                 session->NotifySessionHang();
             }
+
+            ec->NoteGivenUpMessage(entry->retainedBuf.GetMessageCounter());
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
@@ -418,6 +422,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
                      err.Format(), entry->retainedBuf.GetMessageCounter(), ChipLogValueExchange(&entry->ec.Get()),
                      entry->sendCount);
 
+        entry->ec->NoteGivenUpMessage(entry->retainedBuf.GetMessageCounter());
         ClearRetransTable(*entry);
     }
     return err;
@@ -428,6 +433,7 @@ void ReliableMessageMgr::ClearRetransTable(ReliableMessageContext * rc)
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         if (entry->ec->GetReliableMessageContext() == rc)
         {
+            rc->NoteGivenUpMessage(entry->retainedBuf.GetMessageCounter());
             ClearRetransTable(*entry);
             return Loop::Break;
         }
@@ -608,6 +614,21 @@ int ReliableMessageMgr::TestGetCountRetransTable()
         return Loop::Continue;
     });
     return count;
+}
+
+bool ReliableMessageMgr::TestGetRetransMessageCounter(ReliableMessageContext * rc, uint32_t & messageCounter)
+{
+    bool found = false;
+    mRetransTable.ForEachActiveObject([&](auto * entry) {
+        if (entry->ec->GetReliableMessageContext() == rc)
+        {
+            messageCounter = entry->retainedBuf.GetMessageCounter();
+            found          = true;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+    return found;
 }
 #endif // CHIP_CONFIG_TEST
 

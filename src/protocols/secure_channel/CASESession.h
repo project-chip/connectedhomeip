@@ -183,6 +183,20 @@ public:
 
     State GetState() { return mState; }
 
+    // Returns true if we sent Sigma2, it was never acknowledged, and the
+    // reliable messaging layer has stopped retransmitting it.  The initiator
+    // cannot answer a Sigma2 it never received, so the handshake cannot make
+    // progress and should not keep other initiators waiting.
+    bool IsSigma2Undeliverable();
+
+    // Returns how long the current Sigma2 still has before its response
+    // timeout expires, or kZero if we are not waiting on a Sigma2 response.
+    System::Clock::Milliseconds32 RemainingSigma2ResponseTime();
+
+    // Abandon a pending handshake that cannot complete, notifying the
+    // delegate as for a response timeout.
+    void AbandonPendingEstablishment(CHIP_ERROR err) { AbortPendingEstablish(err); }
+
     // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
     // If this function returns true, the CASE session has been reset and is ready for a new session establishment.
     bool InvokeBackgroundWorkWatchdog();
@@ -604,6 +618,11 @@ private:
 
     State mState;
     bool mDeferSessionRelease = false;
+
+    // When we sent the Sigma2 we are waiting on a response for, and the
+    // response timeout the exchange armed for it.
+    System::Clock::Timestamp mSigma2SentTime      = System::Clock::kZero;
+    System::Clock::Timeout mSigma2ResponseTimeout = System::Clock::kZero;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();

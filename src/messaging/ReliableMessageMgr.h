@@ -209,6 +209,9 @@ public:
     // Functions for testing
     int TestGetCountRetransTable();
 
+    // Returns the counter of the message `rc` is waiting on an ack for, if it has one in the table.
+    bool TestGetRetransMessageCounter(ReliableMessageContext * rc, uint32_t & messageCounter);
+
     // Enumerate the retransmission table.  Clearing an entry while enumerating
     // that entry is allowed.  F must take a RetransTableEntry as an argument
     // and return Loop::Continue or Loop::Break.

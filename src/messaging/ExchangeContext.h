@@ -194,6 +194,12 @@ public:
     //
     void SetResponseTimeout(Timeout timeout);
 
+    /**
+     * The response timeout that will be armed for the next message sent with
+     * kExpectResponse (or is armed for the last one).
+     */
+    Timeout GetResponseTimeout() const { return mResponseTimeout; }
+
     // This API is used by commands that need to shut down all existing
     // sessions/exchanges on a fabric but need to make sure the response to the
     // command still goes out on the exchange the command came in on.  This API
@@ -220,6 +226,21 @@ public:
      * yet been sent).
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
+     * Determine whether a message that expects a response was sent on this
+     * exchange, was never acknowledged, and is no longer being retransmitted
+     * (the reliable messaging layer gave up on it).  The response timer may
+     * still be running in that case, but the peer will not see any further
+     * copies of the message.
+     *
+     * Only sessions that use MRP track acknowledgements; on any other session
+     * (e.g. TCP) a message is never "waiting for an ack", so this is false.
+     */
+    bool HasGivenUpRetransmittingUnackedMessage() const
+    {
+        return mSession && mSession->AllowsMRP() && IsResponseExpected() && WaitingForResponseOrAck() && !IsWaitingForAck();
+    }
 
     /**
      * Tracks whether we have received at least one application level message

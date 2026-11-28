@@ -24,10 +24,12 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
+#include <messaging/tests/ReliableMessageContextTestAccess.h>
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -222,6 +224,151 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
                 EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             });
     }
+}
+
+// Sends one message that expects a response on `ec`, then returns.
+static CHIP_ERROR SendExpectingResponse(ExchangeContext * ec)
+{
+    return ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                           System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                           SendFlags(SendMessageFlags::kExpectResponse));
+}
+
+TEST_F(TestExchange, GivenUpRetransmittingOnMRPSessionAfterRetransmissionsStop)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    // Nothing reaches the peer, so the message stays unacknowledged.
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    auto resetLoopback          = ScopeExit([&]() { loopback.Reset(); });
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    ASSERT_TRUE(ec->GetSessionHandle()->AllowsMRP());
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    // MRP runs out of retransmissions; the response timer is still running.
+    GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(ec->GetReliableMessageContext());
+    EXPECT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
+TEST_F(TestExchange, LateAckForGivenUpMessageIsRecognized)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    // Nothing reaches the peer, so the message stays unacknowledged.
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    auto resetLoopback          = ScopeExit([&]() { loopback.Reset(); });
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    auto * mrpMgr = GetExchangeManager().GetReliableMessageMgr();
+    uint32_t messageCounter;
+    ASSERT_TRUE(mrpMgr->TestGetRetransMessageCounter(ec->GetReliableMessageContext(), messageCounter));
+
+    // MRP stops retransmitting; the peer's ack for that message arrives later.
+    mrpMgr->ClearRetransTable(ec->GetReliableMessageContext());
+    ASSERT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    Testing::ReliableMessageContextTestAccess(ec->GetReliableMessageContext()).ReceiveAck(messageCounter);
+
+    // The peer did receive it, so it was not given up on after all.
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
+TEST_F(TestExchange, LateAckAfterRetransmitSendFailureIsRecognized)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    // Retransmit quickly.
+    ec->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+        SessionParameters(ReliableMessageProtocolConfig(System::Clock::Milliseconds32(50), System::Clock::Milliseconds32(50))));
+
+    // The first transmission goes out (and is lost); the retransmission then
+    // fails with an error that is not transient, so MRP stops retransmitting.
+    auto & loopback                         = GetLoopback();
+    loopback.mNumMessagesToDrop             = 1;
+    loopback.mNumMessagesToAllowBeforeError = 1;
+    loopback.mMessageSendError              = CHIP_ERROR_INTERNAL;
+    auto resetLoopback                      = ScopeExit([&]() { loopback.Reset(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    auto * mrpMgr = GetExchangeManager().GetReliableMessageMgr();
+    uint32_t messageCounter;
+    ASSERT_TRUE(mrpMgr->TestGetRetransMessageCounter(ec->GetReliableMessageContext(), messageCounter));
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return mrpMgr->TestGetCountRetransTable() == 0; });
+    ASSERT_EQ(mrpMgr->TestGetCountRetransTable(), 0);
+    ASSERT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    // The first transmission did reach the peer after all; its ack arrives late.
+    Testing::ReliableMessageContextTestAccess(ec->GetReliableMessageContext()).ReceiveAck(messageCounter);
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
+TEST_F(TestExchange, LateAckForOtherMessageIsIgnored)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    auto resetLoopback          = ScopeExit([&]() { loopback.Reset(); });
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    auto * mrpMgr = GetExchangeManager().GetReliableMessageMgr();
+    uint32_t messageCounter;
+    ASSERT_TRUE(mrpMgr->TestGetRetransMessageCounter(ec->GetReliableMessageContext(), messageCounter));
+
+    mrpMgr->ClearRetransTable(ec->GetReliableMessageContext());
+
+    // An ack for some other message counter does not count.
+    Testing::ReliableMessageContextTestAccess(ec->GetReliableMessageContext()).ReceiveAck(messageCounter + 1);
+    EXPECT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
+TEST_F(TestExchange, NeverGivenUpRetransmittingOnSessionWithoutMRP)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    // A session to a TCP peer address does not use MRP, so nothing tracks an
+    // acknowledgement for what is sent on it.
+    Transport::PeerAddress tcpPeer  = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+    Optional<SessionHandle> session = GetSecureSessionManager().CreateUnauthenticatedSession(tcpPeer, GetDefaultMRPConfig());
+    ASSERT_TRUE(session.HasValue());
+    ASSERT_FALSE(session.Value()->AllowsMRP());
+
+    ExchangeContext * ec = GetExchangeManager().NewContext(session.Value(), &delegate);
+    ASSERT_NE(ec, nullptr);
+    ec->SetResponseTimeout(System::Clock::Seconds16(30));
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    // The message is still in flight: it was never "given up on".
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    ec->Abort();
+    GetLoopback().Reset();
+    DrainAndServiceIO();
 }
 
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and
