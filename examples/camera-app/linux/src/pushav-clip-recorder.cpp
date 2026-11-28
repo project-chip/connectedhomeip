@@ -371,15 +371,13 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, int6
         ChipLogError(Camera, "ERROR: AVPacket allocation failed!");
         return nullptr;
     }
-    packet->data = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(size)));
-    if (!packet->data)
+    if (av_new_packet(packet, size) < 0)
     {
         ChipLogError(Camera, "ERROR: AVPacket data allocation failed!");
         av_packet_free(&packet);
         return nullptr;
     }
     memcpy(packet->data, data, static_cast<size_t>(size));
-    packet->size = size;
 
     if (isVideo)
     {
@@ -450,6 +448,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, int6
 
     if (packet->pts < 0)
     {
+        av_packet_free(&packet);
         return nullptr;
     }
 
@@ -785,14 +784,31 @@ RecorderStatus PushAVClipRecorder::ProcessBuffersAndWrite()
         std::string initSegName  = "#__$RepresentationID$__#.init";
         std::string mediaSegName = "#__$RepresentationID$__#segment_$Number%04d$.m4s";
         mInputFormatContext      = avformat_alloc_context();
+        if (!mInputFormatContext)
+        {
+            ChipLogError(Camera, "Error: Failed to allocate input format context");
+            return RecorderStatus::kFail;
+        }
         int64_t avioCtxBufferSize =
             (static_cast<int64_t>(mVideoInfo.mBitRate + mAudioInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
-        uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
-        struct BufferData data       = { 0 };
-        data.mPtr                    = static_cast<uint8_t *>(pkt->data);
-        data.mSize                   = static_cast<size_t>(pkt->size);
-        mInputFormatContext->pb =
-            avio_alloc_context(mAvioContextBuffer, avioCtxBufferSize, 0, &data, &ReadPacket, nullptr, nullptr);
+        uint8_t * avioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
+        if (!avioContextBuffer)
+        {
+            ChipLogError(Camera, "Error: Failed to allocate AVIO context buffer");
+            return RecorderStatus::kFail;
+        }
+        struct BufferData data = { 0 };
+        data.mPtr              = static_cast<uint8_t *>(pkt->data);
+        data.mSize             = static_cast<size_t>(pkt->size);
+        mInputAvioContext =
+            avio_alloc_context(avioContextBuffer, static_cast<int>(avioCtxBufferSize), 0, &data, &ReadPacket, nullptr, nullptr);
+        if (!mInputAvioContext)
+        {
+            ChipLogError(Camera, "Error: Failed to allocate AVIO context");
+            av_free(avioContextBuffer);
+            return RecorderStatus::kFail;
+        }
+        mInputFormatContext->pb    = mInputAvioContext;
         mInputFormatContext->flags = AVFMT_FLAG_CUSTOM_IO;
 
         if (mClipInfo.mHasVideo)
@@ -832,7 +848,15 @@ RecorderStatus PushAVClipRecorder::ProcessBuffersAndWrite()
     if (pkt->pts == AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE)
     {
         ChipLogError(Camera, "Warning packet has no valid timestamps");
-        av_packet_unref(pkt);
+        av_packet_free(&pkt);
+        if (useVideo)
+        {
+            mVideoQueue.pop();
+        }
+        else
+        {
+            mAudioQueue.pop();
+        }
         return RecorderStatus::kSuccess;
     }
 
@@ -890,6 +914,11 @@ void PushAVClipRecorder::CleanupOutput()
     {
         avformat_close_input(&mInputFormatContext);
         mInputFormatContext = nullptr;
+    }
+    if (mInputAvioContext)
+    {
+        av_freep(&mInputAvioContext->buffer);
+        avio_context_free(&mInputAvioContext);
     }
     if (mAudioEncoderContext)
     {
