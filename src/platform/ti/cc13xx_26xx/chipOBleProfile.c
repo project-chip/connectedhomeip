@@ -311,13 +311,27 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
                                             uint16_t offset, uint16_t maxLen, uint8_t method)
 {
     bStatus_t status = SUCCESS;
-    uint8 len        = maxLen;
 
-    if (offset + maxLen > CHIPOBLEPROFILE_CHAR_LEN)
-        len = CHIPOBLEPROFILE_CHAR_LEN - offset;
+    // A Read Blob Request carries a peer-controlled offset. Reject one past the
+    // value before computing the remaining length, otherwise CHIPOBLEPROFILE_CHAR_LEN
+    // - offset wraps and osal_memcpy reads past the characteristic buffer.
+    if (offset > CHIPOBLEPROFILE_CHAR_LEN)
+    {
+        *pLen = 0;
+        return ATT_ERR_INVALID_OFFSET;
+    }
+
+    uint16_t len = CHIPOBLEPROFILE_CHAR_LEN - offset;
+    if (len > maxLen)
+    {
+        len = maxLen;
+    }
 
     *pLen = len;
-    VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
+    if (len != 0)
+    {
+        VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
+    }
 
     return status;
 }
@@ -346,10 +360,31 @@ static bStatus_t CHIPoBLEProfile_WriteAttrCB(uint16_t connHandle, gattAttribute_
     {
         if (!memcmp(pAttr->type.uuid, chipOBleProfileRxCharUUID, pAttr->type.len))
         {
-            VOID osal_memcpy((pAttr->pValue) + offset, pValue, len);
+            // offset and len come from the ATT write. The application reads the Rx
+            // buffer from offset 0 with only len, so a write at a nonzero offset
+            // (e.g. a Prepare Write fragment) would hand it the wrong bytes. CHIPoBLE
+            // writes always use offset 0, so reject anything else and bound len.
+            if (offset != 0)
+            {
+                status = ATT_ERR_INVALID_OFFSET;
+            }
+            else if (len > CHIPOBLEPROFILE_CHAR_LEN)
+            {
+                status = ATT_ERR_INVALID_VALUE_SIZE;
+            }
+            else
+            {
+                VOID osal_memcpy((pAttr->pValue) + offset, pValue, len);
 
-            // Send notification to BLE Event handler
-            notifyApp = CHIPOBLEPROFILE_RX_CHAR;
+                // CHIPoBLEProfile_GetParameter copies the whole characteristic when its len is
+                // 0, so an empty write must not be forwarded: the handler sizes its receive
+                // buffer from len and would get CHIPOBLEPROFILE_CHAR_LEN bytes copied into it.
+                if (len != 0)
+                {
+                    // Send notification to BLE Event handler
+                    notifyApp = CHIPOBLEPROFILE_RX_CHAR;
+                }
+            }
         }
         else
         {
