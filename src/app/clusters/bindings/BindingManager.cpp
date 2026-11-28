@@ -20,6 +20,7 @@
 #include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Scoped.h>
 
 namespace chip {
 namespace app {
@@ -28,6 +29,18 @@ namespace Binding {
 
 Manager Manager::sBindingManager;
 
+Manager::~Manager()
+{
+    mIsShuttingDown = true;
+    while (!mConnectionCallbacks.Empty())
+    {
+        auto * callback = &*mConnectionCallbacks.begin();
+        mConnectionCallbacks.Remove(callback);
+        Platform::Delete(callback);
+    }
+    mPendingNotificationMap.Shutdown();
+}
+
 CHIP_ERROR Manager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
     return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
@@ -35,12 +48,14 @@ CHIP_ERROR Manager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 
 CHIP_ERROR Manager::UnicastBindingRemoved(uint8_t bindingEntryId)
 {
+    ScopedChange removing(mRemovingBindings, true);
     mPendingNotificationMap.RemoveEntry(bindingEntryId);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 {
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -77,6 +92,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 
 CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 {
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
@@ -107,25 +123,32 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 
 void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    FabricIndex fabricToRemove = kUndefinedFabricIndex;
-    NodeId nodeToRemove        = kUndefinedNodeId;
-
-    // Note: not using a const ref here, because the mPendingNotificationMap
-    // iterator returns things by value anyway.
-    for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
+    for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
     {
-        TableEntry entry = mBindingTable.GetAt(pendingNotification.mBindingEntryId);
-
-        if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
+        if (it->type != MATTER_UNICAST_BINDING || sessionHandle->GetPeer() != ScopedNodeId(it->nodeId, it->fabricIndex))
         {
-            fabricToRemove = entry.fabricIndex;
-            nodeToRemove   = entry.nodeId;
-            OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
-            mBoundDeviceChangedHandler(entry, &device, pendingNotification.mContext->GetContext());
+            continue;
+        }
+        for (PendingNotificationEntry pending : mPendingNotificationMap)
+        {
+            if (pending.mBindingEntryId == it.GetIndex())
+            {
+                if (pending.mContext->HasExpired())
+                {
+                    mPendingNotificationMap.RemoveEntry(pending.mBindingEntryId, CHIP_ERROR_TIMEOUT);
+                    break;
+                }
+                const TableEntry entry = *it;
+                auto * context         = pending.mContext;
+                context->IncrementConsumersNumber();
+                mPendingNotificationMap.RemoveEntry(pending.mBindingEntryId, CHIP_NO_ERROR);
+                OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+                mBoundDeviceChangedHandler(entry, &device, context->GetContext());
+                context->DecrementConsumersNumber();
+                break;
+            }
         }
     }
-
-    mPendingNotificationMap.RemoveAllEntriesForNode(ScopedNodeId(nodeToRemove, fabricToRemove));
 }
 
 void Manager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
@@ -143,6 +166,7 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 {
     VerifyOrDie(mInitParams.mCASESessionManager != nullptr);
 
+    ScopedChange removing(mRemovingBindings, true);
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
 
     // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
@@ -153,7 +177,17 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsShuttingDown && !mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(),
+                        CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
+
+    for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
+    {
+        if (it->local == endpoint && it->clusterId.value_or(cluster) == cluster && it->type == MATTER_UNICAST_BINDING)
+        {
+            VerifyOrReturnError(!mPendingNotificationMap.HasPendingNotification(it.GetIndex(), true), CHIP_ERROR_BUSY);
+        }
+    }
 
     auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
     VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -190,6 +224,63 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
 
     bindingContext->DecrementConsumersNumber();
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Manager::DispatchCommand(EndpointId endpoint, ClusterId cluster, void * context,
+                                    PendingCommandFailureHandler failureHandler, System::Layer & layer,
+                                    System::Clock::Timeout timeout)
+{
+    VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsShuttingDown && !mRemovingBindings && !mPendingNotificationMap.IsShuttingDown(),
+                        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
+    VerifyOrReturnError(failureHandler != nullptr && timeout.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    bool hasUnicast = false;
+    for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
+    {
+        if (it->local == endpoint && it->clusterId.value_or(cluster) == cluster && it->type == MATTER_UNICAST_BINDING)
+        {
+            hasUnicast = true;
+            VerifyOrReturnError(!mPendingNotificationMap.HasPendingNotification(it.GetIndex()), CHIP_ERROR_BUSY);
+        }
+    }
+    auto * pending = mPendingNotificationMap.NewPendingNotificationContext(context, failureHandler);
+    VerifyOrReturnError(pending != nullptr, CHIP_ERROR_NO_MEMORY);
+    if (hasUnicast)
+    {
+        CHIP_ERROR error = pending->StartTimer(mPendingNotificationMap, layer, timeout);
+        if (error != CHIP_NO_ERROR)
+        {
+            Platform::Delete(pending);
+            return error;
+        }
+    }
+    pending->IncrementConsumersNumber();
+    for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
+    {
+        if (it->local == endpoint && it->clusterId.value_or(cluster) == cluster && it->type == MATTER_UNICAST_BINDING)
+        {
+            VerifyOrDie(mPendingNotificationMap.AddPendingNotification(it.GetIndex(), pending) == CHIP_NO_ERROR);
+        }
+    }
+    for (auto it = mBindingTable.begin(); it != mBindingTable.end(); ++it)
+    {
+        if (it->local != endpoint || it->clusterId.value_or(cluster) != cluster)
+        {
+            continue;
+        }
+        if (it->type == MATTER_MULTICAST_BINDING)
+        {
+            mBoundDeviceChangedHandler(*it, nullptr, context);
+        }
+        else if (it->type == MATTER_UNICAST_BINDING)
+        {
+            // Session setup failure is retriable until the CASE deadline, without replaying sent commands.
+            (void) EstablishConnection(ScopedNodeId(it->nodeId, it->fabricIndex));
+        }
+    }
+    pending->DecrementConsumersNumber();
     return CHIP_NO_ERROR;
 }
 

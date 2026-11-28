@@ -57,7 +57,8 @@ void BindingHandler::Shutdown()
     mIsShutDown      = true;
 }
 
-CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command)
+CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command,
+                                    System::Clock::Timeout caseTimeout)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE,
@@ -71,10 +72,11 @@ CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::Unique
 
     // On success the Binding::Manager owns the context and calls ReleaseContext once it no longer needs it.
     // On failure the context was not taken and must be released here.
-    CHIP_ERROR err = mBindingManager->NotifyBoundClusterChanged(localEndpointId, clusterId, context);
+    CHIP_ERROR err = mBindingManager->DispatchCommand(localEndpointId, clusterId, context, HandleCommandFailure,
+                                                      *mExchangeManager->GetSessionManager()->SystemLayer(), caseTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Binding command admission failed: %" CHIP_ERROR_FORMAT, err.Format());
         ReleaseContext(context);
     }
     return err;
@@ -89,15 +91,23 @@ void BindingHandler::HandleBoundDeviceChanged(const Clusters::Binding::TableEntr
     switch (binding.type)
     {
     case Clusters::Binding::MATTER_UNICAST_BINDING: {
-        VerifyOrReturn(peer_device != nullptr && peer_device->ConnectionReady() && peer_device->GetExchangeManager() != nullptr,
-                       ChipLogError(AppServer, "BindingHandler: Peer device connection not ready"));
+        if (peer_device == nullptr || !peer_device->ConnectionReady() || peer_device->GetExchangeManager() == nullptr)
+        {
+            bindingContext.command->Failed(binding, CHIP_ERROR_NOT_CONNECTED);
+            return;
+        }
         auto session = peer_device->GetSecureSession();
-        VerifyOrReturn(session.HasValue(), ChipLogError(AppServer, "BindingHandler: Peer device has no secure session"));
+        if (!session.HasValue())
+        {
+            bindingContext.command->Failed(binding, CHIP_ERROR_NOT_CONNECTED);
+            return;
+        }
 
         bindingContext.command->Dispatch(UnicastBindingTarget{
             .exchangeManager = *peer_device->GetExchangeManager(),
             .session         = session.Value(),
             .endpoint        = binding.remote,
+            .binding         = &binding,
         });
         break;
     }
@@ -106,12 +116,18 @@ void BindingHandler::HandleBoundDeviceChanged(const Clusters::Binding::TableEntr
             .exchangeManager = bindingContext.groupExchangeManager,
             .fabricIndex     = binding.fabricIndex,
             .groupId         = binding.groupId,
+            .binding         = &binding,
         });
         break;
     default:
         ChipLogError(AppServer, "BindingHandler: Unsupported binding type %u", static_cast<unsigned>(binding.type));
         break;
     }
+}
+
+void BindingHandler::HandleCommandFailure(const Clusters::Binding::TableEntry & binding, void * context, CHIP_ERROR error)
+{
+    static_cast<BindingContext *>(context)->command->Failed(binding, error);
 }
 
 void BindingHandler::ReleaseContext(void * context)

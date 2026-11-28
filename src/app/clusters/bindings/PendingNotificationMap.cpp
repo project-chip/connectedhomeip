@@ -25,6 +25,21 @@ namespace app {
 namespace Clusters {
 namespace Binding {
 
+void PendingNotificationContext::HandleTimeout(System::Layer *, void * state)
+{
+    auto * context = static_cast<PendingNotificationContext *>(state);
+    context->mMap->RemoveContext(context, CHIP_ERROR_TIMEOUT);
+}
+
+void PendingNotificationMap::Shutdown()
+{
+    mIsShuttingDown = true;
+    while (mNumEntries != 0)
+    {
+        RemoveEntry(mPendingBindingEntries[0]);
+    }
+}
+
 CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 {
     // When entries are added to PendingNotificationMap, they are appended to the end.
@@ -56,17 +71,21 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     {
         value = UINT16_MAX;
     }
-    uint16_t appearIndex = 0;
+    bool peerHasCommand[Table::kMaxBindingEntries] = {};
+    uint16_t appearIndex                           = 0;
     for (PendingNotificationEntry pendingNotification : *this)
     {
-        lastAppear[bindingWithSamePeer[pendingNotification.mBindingEntryId]] = appearIndex;
+        const uint8_t peer = bindingWithSamePeer[pendingNotification.mBindingEntryId];
+        lastAppear[peer]   = appearIndex;
+        peerHasCommand[peer] =
+            peerHasCommand[peer] || (pendingNotification.mContext != nullptr && pendingNotification.mContext->IsCommand());
         appearIndex++;
     }
     uint8_t lruBindingEntryIndex;
     uint16_t minLastAppearValue = UINT16_MAX;
     for (uint8_t i = 0; i < Table::kMaxBindingEntries; i++)
     {
-        if (lastAppear[i] < minLastAppearValue)
+        if (!peerHasCommand[i] && lastAppear[i] < minLastAppearValue)
         {
             lruBindingEntryIndex = i;
             minLastAppearValue   = lastAppear[i];
@@ -83,12 +102,22 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 
 CHIP_ERROR PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
 {
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!HasPendingNotification(bindingEntryId, true) &&
+                            !(context != nullptr && context->IsCommand() && HasPendingNotification(bindingEntryId)),
+                        CHIP_ERROR_BUSY);
     RemoveEntry(bindingEntryId);
+    // Release callbacks may change admission state.
+    VerifyOrReturnError(!mIsShuttingDown, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!HasPendingNotification(bindingEntryId, true) &&
+                            !(context != nullptr && context->IsCommand() && HasPendingNotification(bindingEntryId)),
+                        CHIP_ERROR_BUSY);
     if (mNumEntries == Table::kMaxBindingEntries)
     {
-        // We know that the RemoveEntry above did not do anything so we don't need to try restoring it.
         return CHIP_ERROR_NO_MEMORY;
     }
+    VerifyOrReturnError(mLastSequence != UINT64_MAX, CHIP_ERROR_NO_MEMORY);
+    mPendingSequences[mNumEntries]      = ++mLastSequence;
     mPendingBindingEntries[mNumEntries] = bindingEntryId;
     mPendingContexts[mNumEntries]       = context;
     if (context)
@@ -99,63 +128,98 @@ CHIP_ERROR PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId
     return CHIP_NO_ERROR;
 }
 
-void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
+bool PendingNotificationMap::HasPendingNotification(uint8_t bindingEntryId, bool commandsOnly) const
 {
-    uint8_t newEntryCount = 0;
-    for (int i = 0; i < mNumEntries; i++)
+    for (uint8_t i = 0; i < mNumEntries; ++i)
+    {
+        if (mPendingBindingEntries[i] == bindingEntryId &&
+            (!commandsOnly || (mPendingContexts[i] != nullptr && mPendingContexts[i]->IsCommand())))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId, CHIP_ERROR error)
+{
+    for (uint8_t i = 0; i < mNumEntries; ++i)
     {
         if (mPendingBindingEntries[i] != bindingEntryId)
         {
-            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
-            mPendingContexts[newEntryCount]       = mPendingContexts[i];
-            newEntryCount++;
+            continue;
         }
-        else if (mPendingContexts[i] != nullptr)
+        auto * context           = mPendingContexts[i];
+        const TableEntry binding = mBindingTable.GetAt(bindingEntryId);
+        --mNumEntries;
+        for (uint8_t j = i; j < mNumEntries; ++j)
         {
-            mPendingContexts[i]->DecrementConsumersNumber();
+            mPendingBindingEntries[j] = mPendingBindingEntries[j + 1];
+            mPendingContexts[j]       = mPendingContexts[j + 1];
+            mPendingSequences[j]      = mPendingSequences[j + 1];
+        }
+        if (context != nullptr)
+        {
+            context->Failed(binding, error);
+            context->DecrementConsumersNumber();
+        }
+        return;
+    }
+}
+
+void PendingNotificationMap::RemoveContext(PendingNotificationContext * context, CHIP_ERROR error)
+{
+    context->IncrementConsumersNumber();
+    const uint64_t lastSequence = mLastSequence;
+    for (uint8_t i = 0; i < mNumEntries;)
+    {
+        if (mPendingSequences[i] <= lastSequence && mPendingContexts[i] == context)
+        {
+            RemoveEntry(mPendingBindingEntries[i], error);
+            i = 0;
+        }
+        else
+        {
+            ++i;
         }
     }
-    mNumEntries = newEntryCount;
+    context->DecrementConsumersNumber();
 }
 
 void PendingNotificationMap::RemoveAllEntriesForNode(const ScopedNodeId & nodeId)
 {
-    uint8_t newEntryCount = 0;
-    for (int i = 0; i < mNumEntries; i++)
+    const uint64_t lastSequence = mLastSequence;
+    for (uint8_t i = 0; i < mNumEntries;)
     {
-        TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
-        if (entry.fabricIndex != nodeId.GetFabricIndex() || entry.nodeId != nodeId.GetNodeId())
+        const TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
+        if (mPendingSequences[i] <= lastSequence && entry.fabricIndex == nodeId.GetFabricIndex() &&
+            entry.nodeId == nodeId.GetNodeId())
         {
-            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
-            mPendingContexts[newEntryCount]       = mPendingContexts[i];
-            newEntryCount++;
+            RemoveEntry(mPendingBindingEntries[i]);
+            i = 0;
         }
-        else if (mPendingContexts[i] != nullptr)
+        else
         {
-            mPendingContexts[i]->DecrementConsumersNumber();
+            ++i;
         }
     }
-    mNumEntries = newEntryCount;
 }
 
 void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
 {
-    uint8_t newEntryCount = 0;
-    for (int i = 0; i < mNumEntries; i++)
+    const uint64_t lastSequence = mLastSequence;
+    for (uint8_t i = 0; i < mNumEntries;)
     {
-        TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
-        if (entry.fabricIndex != fabric)
+        if (mPendingSequences[i] <= lastSequence && mBindingTable.GetAt(mPendingBindingEntries[i]).fabricIndex == fabric)
         {
-            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
-            mPendingContexts[newEntryCount]       = mPendingContexts[i];
-            newEntryCount++;
+            RemoveEntry(mPendingBindingEntries[i]);
+            i = 0;
         }
-        else if (mPendingContexts[i] != nullptr)
+        else
         {
-            mPendingContexts[i]->DecrementConsumersNumber();
+            ++i;
         }
     }
-    mNumEntries = newEntryCount;
 }
 
 } // namespace Binding

@@ -23,6 +23,8 @@
 #include <app/server/Server.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/IntrusiveList.h>
 
 namespace chip {
 namespace app {
@@ -68,6 +70,11 @@ struct ManagerInitParams
  *  - The binding cluster adds a unicast entry to the binding table.
  *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *
+ * All operations, including destruction, require the Matter event loop or the Matter stack lock.
+ * Destruction cancels this manager's outstanding CASE callbacks, so shared session setups may outlive it.
+ * Owners must unregister the manager from its FabricTable before destroying it. Dependencies used by
+ * pending notifications must remain available until those notifications have been released.
+ *
  * The class uses an LRU mechanism to choose the connection to eliminate when there is no space for a new connection.
  * The BindingManager class will not actively re-establish connection and will connect on-demand (when binding cluster
  * or watched cluster is changed).
@@ -77,6 +84,7 @@ class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}
+    ~Manager() override;
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -134,6 +142,8 @@ public:
      * @retval CHIP_ERROR_INCORRECT_STATE if the BindingManager is not initialized.
      * @retval CHIP_ERROR_HANDLER_NOT_SET if no BoundDeviceChangedHandler is registered.
      * @retval CHIP_ERROR_NO_MEMORY if the internal notification context cannot be allocated.
+     * @retval CHIP_ERROR_BUSY if a matching unicast binding has an accepted individual command pending.
+     *         No notifications are sent or replaced on this rejection.
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
@@ -147,6 +157,21 @@ public:
      * @param entry binding to add
      */
     CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
+
+    /**
+     * Accepts an individual command without coalescing. Rejects with CHIP_ERROR_BUSY if any matching
+     * unicast binding is pending; rejection has no side effects and leaves context owned by the caller.
+     * On error, no target is dispatched or queued and no callbacks run for context.
+     * On success, each target calls the registered changed handler or failureHandler exactly once.
+     * failureHandler must be non-null. The release handler releases context after all targets finish.
+     * The CASE wait is bounded by a positive timeout; layer must outlive pending commands. Invoke response lifetime
+     * and completion belong to the changed handler. All callbacks may run before this call returns.
+     * Existing state notifications retain their coalescing behavior and cannot replace commands.
+     * Callbacks may submit commands, but must not modify the binding table during dispatch.
+     * Submissions during binding or fabric removal are rejected with CHIP_ERROR_INCORRECT_STATE.
+     */
+    CHIP_ERROR DispatchCommand(EndpointId endpoint, ClusterId cluster, void * context, PendingCommandFailureHandler failureHandler,
+                               System::Layer & layer, System::Clock::Timeout timeout = System::Clock::Seconds16(30));
 
     Table & GetBindingTable() { return mBindingTable; }
 
@@ -163,13 +188,21 @@ private:
      * that was called when it establishes the connections asynchronously.
      *
      */
-    class ConnectionCallback
+    class ConnectionCallback : public IntrusiveListNodeBase<>
     {
     public:
         ConnectionCallback(Manager & bindingManager) :
             mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
             mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
-        {}
+        {
+            mBindingManager.mConnectionCallbacks.PushBack(this);
+        }
+
+        ~ConnectionCallback()
+        {
+            mOnConnectedCallback.Cancel();
+            mOnConnectionFailureCallback.Cancel();
+        }
 
         Callback::Callback<OnDeviceConnected> * GetOnDeviceConnected() { return &mOnConnectedCallback; }
         Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
@@ -178,15 +211,17 @@ private:
         static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                           const SessionHandle & sessionHandle)
         {
-            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
-            _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
-            Platform::Delete(_this);
+            Platform::UniquePtr<ConnectionCallback> self(static_cast<ConnectionCallback *>(context));
+            auto & manager = self->mBindingManager;
+            manager.mConnectionCallbacks.Remove(self.get());
+            manager.HandleDeviceConnected(exchangeMgr, sessionHandle);
         }
         static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
         {
-            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
-            _this->mBindingManager.HandleDeviceConnectionFailure(peerId, error);
-            Platform::Delete(_this);
+            Platform::UniquePtr<ConnectionCallback> self(static_cast<ConnectionCallback *>(context));
+            auto & manager = self->mBindingManager;
+            manager.mConnectionCallbacks.Remove(self.get());
+            manager.HandleDeviceConnectionFailure(peerId, error);
         }
 
         Manager & mBindingManager;
@@ -196,6 +231,7 @@ private:
 
     void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
+        FabricRemoved(fabricIndex);
         auto & bindingTable = GetBindingTable();
         auto iter           = bindingTable.begin();
         while (iter != bindingTable.end())
@@ -209,17 +245,19 @@ private:
                 ++iter;
             }
         }
-        FabricRemoved(fabricIndex);
     }
 
     static Manager sBindingManager;
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
+    IntrusiveList<ConnectionCallback> mConnectionCallbacks;
     Table mBindingTable;
     PendingNotificationMap mPendingNotificationMap{ mBindingTable };
-    BoundDeviceChangedHandler mBoundDeviceChangedHandler;
+    BoundDeviceChangedHandler mBoundDeviceChangedHandler = nullptr;
     ManagerInitParams mInitParams;
+    bool mRemovingBindings = false;
+    bool mIsShuttingDown   = false;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);

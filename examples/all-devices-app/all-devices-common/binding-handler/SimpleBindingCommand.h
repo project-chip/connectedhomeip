@@ -35,11 +35,11 @@ namespace app {
  * Reusable BindingCommand for standard ZAP-generated cluster commands.
  *
  * Sends unicast targets an InvokeCommandRequest and group targets an InvokeGroupCommandRequest, and
- * logs the result.
+ * reports one completion per target through options.onComplete. Failures are also logged.
  *
  * Commands that require a timed invoke (CommandType::MustUseTimedInvoke()) are sent to unicast targets
  * with a kTimedInvokeTimeoutMs timeout. Group targets are skipped for these commands because group
- * invokes cannot be timed.
+ * invokes cannot be timed. Skipped targets complete with CHIP_ERROR_INVALID_ARGUMENT.
  *
  * @tparam CommandType Standard cluster command struct, e.g.:
  *         - Clusters::Chime::Commands::PlayChimeSound::Type
@@ -52,68 +52,73 @@ class SimpleBindingCommand : public BindingCommand
 public:
     static constexpr uint16_t kTimedInvokeTimeoutMs = 10000;
 
-    explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
-    explicit SimpleBindingCommand(CommandType && command) : mCommand(std::move(command)) {}
+    explicit SimpleBindingCommand(const CommandType & command, BindingCommandOptions options = {}) :
+        mCommand(command), mOptions(options)
+    {}
+    explicit SimpleBindingCommand(CommandType && command, BindingCommandOptions options = {}) :
+        mCommand(std::move(command)), mOptions(options)
+    {}
 
     ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
 
+    void Failed(const Clusters::Binding::TableEntry & target, CHIP_ERROR error) override
+    {
+        BindingCommand::Failed(target, error);
+        mOptions.onComplete(target, error);
+    }
+
     void Dispatch(const BindingTarget & target) override
     {
+        const auto callback = mOptions.onComplete;
         if (const auto * unicast = std::get_if<UnicastBindingTarget>(&target))
         {
-            auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-                (void) status;
-                (void) dataResponse;
-                ChipLogProgress(AppServer, "Binding command (0x%" PRIx32 ", 0x%" PRIx32 ") succeeded on endpoint %u",
-                                CommandType::GetClusterId(), CommandType::GetCommandId(), commandPath.mEndpointId);
+            const auto peer    = unicast->session->GetPeer();
+            const auto binding = unicast->binding != nullptr
+                ? *unicast->binding
+                : Clusters::Binding::TableEntry::ForNode(peer.GetFabricIndex(), peer.GetNodeId(), kInvalidEndpointId,
+                                                         unicast->endpoint, GetClusterId());
+            auto onSuccess     = [callback, binding](const ConcreteCommandPath &, const StatusIB &, const auto &) {
+                callback(binding, CHIP_NO_ERROR);
             };
-
-            auto onFailure = [](CHIP_ERROR error) {
-                ChipLogError(AppServer, "Binding command (0x%" PRIx32 ", 0x%" PRIx32 ") failed: %" CHIP_ERROR_FORMAT,
-                             CommandType::GetClusterId(), CommandType::GetCommandId(), error.Format());
+            auto onFailure = [callback, binding](CHIP_ERROR error) {
+                ChipLogError(AppServer, "Binding command failed: %" CHIP_ERROR_FORMAT, error.Format());
+                callback(binding, error);
             };
-
-            CHIP_ERROR err;
+            Optional<uint16_t> timedTimeout;
             if constexpr (CommandType::MustUseTimedInvoke())
             {
-                err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
-                                                       onSuccess, onFailure, kTimedInvokeTimeoutMs);
+                timedTimeout.SetValue(kTimedInvokeTimeoutMs);
             }
-            else
+            CHIP_ERROR error =
+                Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
+                                                 onSuccess, onFailure, timedTimeout, MakeOptional(mOptions.responseTimeout));
+            if (error != CHIP_NO_ERROR)
             {
-                err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
-                                                       onSuccess, onFailure);
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(AppServer, "Failed to invoke binding command: %" CHIP_ERROR_FORMAT, err.Format());
+                onFailure(error);
             }
         }
         else if (const auto * group = std::get_if<GroupBindingTarget>(&target))
         {
-            if constexpr (CommandType::MustUseTimedInvoke())
+            const auto binding = group->binding != nullptr
+                ? *group->binding
+                : Clusters::Binding::TableEntry::ForGroup(group->fabricIndex, group->groupId, kInvalidEndpointId, GetClusterId());
+            CHIP_ERROR error   = CHIP_ERROR_INVALID_ARGUMENT;
+            if constexpr (!CommandType::MustUseTimedInvoke())
             {
-                ChipLogError(AppServer, "Timed binding command (0x%" PRIx32 ", 0x%" PRIx32 ") cannot be sent to group %u; skipped",
-                             CommandType::GetClusterId(), CommandType::GetCommandId(), group->groupId);
-            }
-            else
-            {
-                CHIP_ERROR err =
+                error =
                     Controller::InvokeGroupCommandRequest(&group->exchangeManager, group->fabricIndex, group->groupId, mCommand);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
-                }
-                else
-                {
-                    ChipLogProgress(AppServer, "Binding group command sent to group %u", group->groupId);
-                }
             }
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Binding group command failed: %" CHIP_ERROR_FORMAT, error.Format());
+            }
+            callback(binding, error);
         }
     }
 
 private:
     CommandType mCommand;
+    BindingCommandOptions mOptions;
 };
 
 } // namespace app

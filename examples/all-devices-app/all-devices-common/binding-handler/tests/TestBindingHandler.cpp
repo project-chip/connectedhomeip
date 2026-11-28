@@ -18,6 +18,8 @@
 
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/OperationalSessionSetupPool.h>
 #include <app/StatusResponse.h>
 #include <binding-handler/BindingCommand.h>
@@ -37,9 +39,12 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <pw_unit_test/framework.h>
+#include <system/RAIIMockClock.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <optional>
 
@@ -128,6 +133,17 @@ TEST_F(TestBindingHandler, ShutdownWithoutInitIsSafe)
     EXPECT_FALSE(handler.IsInitialized());
 }
 
+class GatedSessionSetupPool : public OperationalSessionSetupPool<2>
+{
+public:
+    bool enabled = true;
+    OperationalSessionSetup * Allocate(const CASEClientInitParams & params, CASEClientPoolDelegate * clients, ScopedNodeId peer,
+                                       OperationalSessionReleaseDelegate * delegate) override
+    {
+        return enabled ? OperationalSessionSetupPool<2>::Allocate(params, clients, peer, delegate) : nullptr;
+    }
+};
+
 /**
  * Fixture with a real Binding::Manager initialized through BindingHandler::Init, backed by a
  * loopback messaging stack and a real CASESessionManager.
@@ -173,11 +189,195 @@ protected:
     TestPersistentStorageDelegate mStorage;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     CASEClientPool<2> mCASEClientPool;
-    OperationalSessionSetupPool<2> mSessionSetupPool;
+    GatedSessionSetupPool mSessionSetupPool;
     CASESessionManager mCASESessionManager;
     Clusters::Binding::Manager mBindingManager;
     BindingHandler mHandler;
 };
+
+struct CompletionRecord
+{
+    int count        = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    std::optional<Clusters::Binding::TableEntry> target;
+
+    BindingCommandCallback Callback()
+    {
+        return { [](void * context, const Clusters::Binding::TableEntry & binding, CHIP_ERROR result) {
+                    auto & record = *static_cast<CompletionRecord *>(context);
+                    ++record.count;
+                    record.error  = result;
+                    record.target = binding;
+                },
+                 this };
+    }
+};
+
+TEST_F(TestBindingHandlerWithManager, ConflictingCommandRejectsAllTargetsAndPreservesFirst)
+{
+    auto & table = mBindingManager.GetBindingTable();
+    // The group precedes the busy unicast entry, so preflight must happen before iterating sends.
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForGroup(200, 1, kLocalEndpoint, kTestClusterId)));
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(200, 0x1234, kLocalEndpoint, 2, kTestClusterId)));
+    const uint8_t unicastIndex = (++table.begin()).GetIndex();
+    int destroyed              = 0;
+    DispatchRecord first;
+    DispatchRecord rejected;
+    auto cleanup = MakeDefer([&] { EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(unicastIndex)); });
+    ASSERT_SUCCESS(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destroyed, &first)));
+    EXPECT_EQ(first.count, 1);
+    EXPECT_EQ(destroyed, 0);
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destroyed, &rejected)), CHIP_ERROR_BUSY);
+    EXPECT_EQ(rejected.count, 0);
+    EXPECT_EQ(destroyed, 1);
+    EXPECT_EQ(first.count, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, ExpiredCommandReportsTimeoutOnceAndFreesBinding)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+    auto & table = mBindingManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(200, 0x1234, kLocalEndpoint, 2, Clusters::OnOff::Id)));
+    const uint8_t index = table.begin().GetIndex();
+    CompletionRecord first;
+    CompletionRecord second;
+    auto cleanup = MakeDefer([&] { EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(index)); });
+    BindingCommandOptions options{ first.Callback(), System::Clock::Milliseconds32(1) };
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, options));
+    options.onComplete = second.Callback();
+    EXPECT_EQ(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, options), CHIP_ERROR_BUSY);
+    EXPECT_EQ(second.count, 0);
+    clock.AdvanceMonotonic(System::Clock::Milliseconds32(2));
+    DrainAndServiceIO();
+    EXPECT_EQ(first.count, 1);
+    EXPECT_EQ(first.error, CHIP_ERROR_TIMEOUT);
+    ASSERT_TRUE(first.target.has_value());
+    EXPECT_EQ(first.target->nodeId, 0x1234u);
+    EXPECT_EQ(first.target->remote, 2);
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, options));
+    EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(index));
+    EXPECT_EQ(first.count, 1);
+    EXPECT_EQ(second.count, 1);
+    EXPECT_EQ(second.error, CHIP_ERROR_CANCELLED);
+    clock.AdvanceMonotonic(System::Clock::Milliseconds32(2));
+    DrainAndServiceIO();
+    EXPECT_EQ(second.count, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, CompletionReportsEachRemovedTarget)
+{
+    auto & table = mBindingManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(200, 0x1234, kLocalEndpoint, 2, Clusters::OnOff::Id)));
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(200, 0x5678, kLocalEndpoint, 3, Clusters::OnOff::Id)));
+    const uint8_t first  = table.begin().GetIndex();
+    const uint8_t second = (++table.begin()).GetIndex();
+    CompletionRecord record;
+    auto cleanup = MakeDefer([&] {
+        EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(first));
+        EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(second));
+    });
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { record.Callback() }));
+    EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(first));
+    EXPECT_EQ(record.count, 1);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->nodeId, 0x1234u);
+    EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(second));
+    EXPECT_EQ(record.count, 2);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->nodeId, 0x5678u);
+    EXPECT_EQ(record.error, CHIP_ERROR_CANCELLED);
+}
+
+TEST_F(TestBindingHandlerWithManager, BindingAndFabricRemovalRejectReentrantSubmission)
+{
+    auto & table = mBindingManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(200, 0x1234, kLocalEndpoint, 2, Clusters::OnOff::Id)));
+    struct Record
+    {
+        BindingHandler & handler;
+        int count            = 0;
+        CHIP_ERROR error     = CHIP_NO_ERROR;
+        CHIP_ERROR admission = CHIP_NO_ERROR;
+    } record{ mHandler };
+    BindingCommandOptions options;
+    options.onComplete = {
+        [](void * context, const Clusters::Binding::TableEntry & binding, CHIP_ERROR error) {
+            auto & result = *static_cast<Record *>(context);
+            ++result.count;
+            result.error = error;
+            EXPECT_EQ(binding.nodeId, 0x1234u);
+            result.admission = result.handler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{});
+        },
+        &record,
+    };
+    auto cleanup = MakeDefer([&] { EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(table.begin().GetIndex())); });
+    for (bool removeFabric : { false, true })
+    {
+        record.count = 0;
+        ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, options));
+        if (removeFabric)
+        {
+            mBindingManager.FabricRemoved(200);
+        }
+        else
+        {
+            EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(table.begin().GetIndex()));
+        }
+        EXPECT_EQ(record.count, 1);
+        EXPECT_EQ(record.error, CHIP_ERROR_CANCELLED);
+        EXPECT_EQ(record.admission, CHIP_ERROR_INCORRECT_STATE);
+    }
+}
+
+TEST_F(TestBindingHandlerWithManager, ManagerDestructionCancelsPendingCommandAndItsTimer)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+    CompletionRecord record;
+    TestPersistentStorageDelegate storage;
+    {
+        Clusters::Binding::Manager manager;
+        BindingHandler handler;
+        auto removeDelegate = MakeDefer([&] { GetFabricTable().RemoveFabricDelegate(&manager); });
+        ASSERT_SUCCESS(handler.Init(manager, { &GetFabricTable(), &mCASESessionManager, &storage }, GetExchangeManager()));
+        ASSERT_SUCCESS(manager.GetBindingTable().Add(
+            Clusters::Binding::TableEntry::ForNode(200, 0x1234, kLocalEndpoint, 2, Clusters::OnOff::Id)));
+        ASSERT_SUCCESS(handler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{},
+                                              { record.Callback(), System::Clock::Milliseconds32(1) }));
+        EXPECT_EQ(record.count, 0);
+        handler.Shutdown();
+    }
+    EXPECT_EQ(record.count, 1);
+    EXPECT_EQ(record.error, CHIP_ERROR_CANCELLED);
+    clock.AdvanceMonotonic(System::Clock::Milliseconds32(2));
+    DrainAndServiceIO();
+    EXPECT_EQ(record.count, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, GroupCompletionReportsLocalSendFailure)
+{
+    ASSERT_SUCCESS(mBindingManager.GetBindingTable().Add(
+        Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 7, kLocalEndpoint, Clusters::OnOff::Id)));
+    CompletionRecord record;
+    // Without group keys the local send fails; acceptance still succeeds and reports the target error.
+    EXPECT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { record.Callback() }));
+    EXPECT_EQ(record.count, 1);
+    EXPECT_NE(record.error, CHIP_NO_ERROR);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->groupId, 7);
+    EXPECT_EQ(record.target->fabricIndex, GetAliceFabricIndex());
+}
+
+TEST_F(TestBindingHandlerWithManager, InvalidTimeoutRejectsWithoutCompletion)
+{
+    CompletionRecord record;
+    EXPECT_EQ(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{},
+                                      { record.Callback(), System::Clock::kZero }),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{},
+                                      { record.Callback(), System::Clock::Seconds16(30), System::Clock::kZero }),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(record.count, 0);
+}
 
 TEST_F(TestBindingHandlerWithManager, InitTwiceFails)
 {
@@ -433,6 +633,168 @@ public:
     std::optional<uint8_t> firstMessageType;
 };
 
+class TogglePeer : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
+{
+public:
+    int received = 0;
+    bool on      = false;
+    bool respond = true;
+
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader &, ExchangeDelegate *& delegate) override
+    {
+        delegate = this;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & header,
+                                 System::PacketBufferHandle && payload) override
+    {
+        VerifyOrReturnError(header.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest),
+                            CHIP_ERROR_INVALID_MESSAGE_TYPE);
+        System::PacketBufferTLVReader reader;
+        reader.Init(std::move(payload));
+        InvokeRequestMessage::Parser request;
+        ReturnErrorOnFailure(request.Init(reader));
+        InvokeRequests::Parser commands;
+        ReturnErrorOnFailure(request.GetInvokeRequests(&commands));
+        ReturnErrorOnFailure(commands.Next());
+        commands.GetReader(&reader);
+        CommandDataIB::Parser command;
+        ReturnErrorOnFailure(command.Init(reader));
+        CommandPathIB::Parser path;
+        ReturnErrorOnFailure(command.GetPath(&path));
+        EndpointId endpoint;
+        ClusterId cluster;
+        CommandId id;
+        ReturnErrorOnFailure(path.GetEndpointId(&endpoint));
+        ReturnErrorOnFailure(path.GetClusterId(&cluster));
+        ReturnErrorOnFailure(path.GetCommandId(&id));
+        VerifyOrReturnError(cluster == Clusters::OnOff::Id && id == Clusters::OnOff::Commands::Toggle::Id,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        ++received;
+        on = !on;
+        VerifyOrReturnError(respond, CHIP_NO_ERROR);
+        auto buffer = System::PacketBufferHandle::New(256);
+        VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+        System::PacketBufferTLVWriter writer;
+        writer.Init(std::move(buffer));
+        InvokeResponseMessage::Builder response;
+        ReturnErrorOnFailure(response.Init(&writer));
+        response.SuppressResponse(true);
+        auto & responses = response.CreateInvokeResponses();
+        auto & item      = responses.CreateInvokeResponse();
+        auto & status    = item.CreateStatus();
+        ReturnErrorOnFailure(status.CreatePath().EndpointId(endpoint).ClusterId(cluster).CommandId(id).EndOfCommandPathIB());
+        ReturnErrorOnFailure(
+            status.CreateErrorStatus().EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Success)).GetError());
+        ReturnErrorOnFailure(status.EndOfCommandStatusIB());
+        ReturnErrorOnFailure(item.EndOfInvokeResponseIB());
+        ReturnErrorOnFailure(responses.EndOfInvokeResponses());
+        ReturnErrorOnFailure(response.EndOfInvokeResponseMessage());
+        ReturnErrorOnFailure(writer.Finalize(&buffer));
+        return exchange->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(buffer));
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+};
+
+TEST_F(TestBindingHandlerWithManager, DeferredToggleSurvivesRejectionAndRetryReachesPeer)
+{
+    TogglePeer peer;
+    ASSERT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, &peer));
+    auto unregister = MakeDefer([&] {
+        EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id));
+    });
+    auto & table    = mBindingManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(GetBobFabricIndex(), GetAliceFabric()->GetNodeId(),
+                                                                    kLocalEndpoint, 2, Clusters::OnOff::Id)));
+    CompletionRecord first;
+    CompletionRecord second;
+    const uint8_t index       = table.begin().GetIndex();
+    auto cleanup              = MakeDefer([&] { EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(index)); });
+    mSessionSetupPool.enabled = false;
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { first.Callback() }));
+    EXPECT_EQ(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { second.Callback() }),
+              CHIP_ERROR_BUSY);
+    DrainAndServiceIO();
+    EXPECT_EQ(peer.received, 0);
+    EXPECT_EQ(first.count, 0);
+    EXPECT_EQ(second.count, 0);
+    // Resource exhaustion and legacy notifications must not discard the accepted command.
+    int legacyContext = 0;
+    EXPECT_EQ(mBindingManager.NotifyBoundClusterChanged(kLocalEndpoint, Clusters::OnOff::Id, &legacyContext), CHIP_ERROR_BUSY);
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+    mSessionSetupPool.enabled = true;
+    ASSERT_SUCCESS(mBindingManager.UnicastBindingCreated(GetBobFabricIndex(), GetAliceFabric()->GetNodeId()));
+    DrainAndServiceIO();
+    EXPECT_EQ(peer.received, 1);
+    EXPECT_TRUE(peer.on);
+    EXPECT_EQ(first.count, 1);
+    EXPECT_SUCCESS(first.error);
+    EXPECT_EQ(first.target, table.GetAt(index));
+    EXPECT_EQ(second.count, 0);
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}, { second.Callback() }));
+    DrainAndServiceIO();
+    EXPECT_EQ(peer.received, 2);
+    EXPECT_FALSE(peer.on);
+    EXPECT_EQ(first.count, 1);
+    EXPECT_EQ(second.count, 1);
+    EXPECT_SUCCESS(second.error);
+}
+
+TEST_F(TestBindingHandlerWithManager, LateSessionCannotSendExpiredCommandBeforeTimerRuns)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+    CompletionRecord record;
+    auto & table = mBindingManager.GetBindingTable();
+    ASSERT_SUCCESS(table.Add(Clusters::Binding::TableEntry::ForNode(GetBobFabricIndex(), GetAliceFabric()->GetNodeId(),
+                                                                    kLocalEndpoint, 2, Clusters::OnOff::Id)));
+    const uint8_t index       = table.begin().GetIndex();
+    auto cleanup              = MakeDefer([&] { EXPECT_SUCCESS(mBindingManager.UnicastBindingRemoved(index)); });
+    mSessionSetupPool.enabled = false;
+    ASSERT_SUCCESS(mHandler.DispatchSimple(kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{},
+                                           { record.Callback(), System::Clock::Milliseconds32(1) }));
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+    clock.AdvanceMonotonic(System::Clock::Milliseconds32(2));
+    mSessionSetupPool.enabled = true;
+    ASSERT_SUCCESS(mBindingManager.UnicastBindingCreated(GetBobFabricIndex(), GetAliceFabric()->GetNodeId()));
+    EXPECT_EQ(record.count, 1);
+    EXPECT_EQ(record.error, CHIP_ERROR_TIMEOUT);
+    DrainAndServiceIO();
+    EXPECT_EQ(record.count, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, ResponseTimeoutReportsFailureWithoutReplayingToggle)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+    TogglePeer peer;
+    peer.respond = false;
+    ASSERT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, &peer));
+    auto unregister = MakeDefer([&] {
+        EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id));
+    });
+    CompletionRecord record;
+    const SessionHandle session = GetSessionBobToAlice();
+    {
+        SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> command(
+            Clusters::OnOff::Commands::Toggle::Type{},
+            { record.Callback(), System::Clock::Seconds16(30), System::Clock::Milliseconds32(5) });
+        command.Dispatch(UnicastBindingTarget{ GetExchangeManager(), session, 2 });
+    }
+    DrainAndServiceIO();
+    EXPECT_EQ(peer.received, 1);
+    clock.AdvanceMonotonic(System::Clock::Milliseconds32(6));
+    DrainAndServiceIO();
+    EXPECT_EQ(record.count, 1);
+    EXPECT_EQ(record.error, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(peer.received, 1);
+    EXPECT_TRUE(peer.on);
+}
+
 TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSendsTimedRequestToUnicastTarget)
 {
     InteractionModelMessageRecorder recorder;
@@ -456,6 +818,29 @@ TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSendsTimedRequestToUnica
     DrainAndServiceIO();
 
     EXPECT_EQ(recorder.firstMessageType, to_underlying(Protocols::InteractionModel::MsgType::TimedRequest));
+}
+
+TEST_F(TestBindingHandlerWithManager, ResponseCompletionSurvivesCommandDestruction)
+{
+    InteractionModelMessageRecorder recorder;
+    ASSERT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, &recorder));
+    auto unregister = MakeDefer([&] {
+        EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id));
+    });
+    CompletionRecord record;
+    const SessionHandle session = GetSessionBobToAlice();
+    {
+        SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> command(Clusters::OnOff::Commands::Toggle::Type{},
+                                                                              { record.Callback() });
+        command.Dispatch(UnicastBindingTarget{ GetExchangeManager(), session, 2 });
+        EXPECT_EQ(record.count, 0);
+    }
+    // The peer deliberately rejects the Invoke with Failure; completion must preserve that failure.
+    DrainAndServiceIO();
+    EXPECT_EQ(record.count, 1);
+    EXPECT_NE(record.error, CHIP_NO_ERROR);
+    ASSERT_TRUE(record.target.has_value());
+    EXPECT_EQ(record.target->remote, 2);
 }
 
 TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSkipsGroupTarget)

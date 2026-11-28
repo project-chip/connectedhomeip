@@ -31,6 +31,8 @@ namespace chip::app {
  * Dependencies must outlive the device. Call Send* from the Matter event loop or with the stack lock held.
  * Send* returns CHIP_ERROR_INCORRECT_STATE while unregistered. Otherwise BindingHandler::Dispatch applies:
  * success means the command was dispatched or queued; no matching binding is a successful no-op.
+ * Optional BindingCommandOptions report one completion per bound target and set CASE/response timeouts.
+ * The callback context must outlive all completions; the sensor need not remain registered until responses arrive.
  */
 class OnOffSensor : public SingleEndpoint
 {
@@ -51,10 +53,10 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
-    CHIP_ERROR SendOn();
-    CHIP_ERROR SendOff();
-    CHIP_ERROR SendToggle();
-    CHIP_ERROR SendIdentify(uint16_t identifyTimeSeconds);
+    CHIP_ERROR SendOn(BindingCommandOptions options = {});
+    CHIP_ERROR SendOff(BindingCommandOptions options = {});
+    CHIP_ERROR SendToggle(BindingCommandOptions options = {});
+    CHIP_ERROR SendIdentify(uint16_t identifyTimeSeconds, BindingCommandOptions options = {});
 
     /// Cluster accessors require successful registration.
     Clusters::IdentifyCluster & IdentifyCluster()
@@ -77,7 +79,7 @@ protected:
 
 private:
     template <typename CommandType>
-    CHIP_ERROR SendCommand(const CommandType & command);
+    CHIP_ERROR SendCommand(const CommandType & command, BindingCommandOptions options);
 
     const Context mContext;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
