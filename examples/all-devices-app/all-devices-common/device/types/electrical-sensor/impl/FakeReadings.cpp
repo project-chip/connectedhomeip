@@ -27,8 +27,7 @@ using namespace chip::app::Clusters;
 
 CHIP_ERROR FakeReadings::HandleEventTrigger(uint64_t eventTrigger)
 {
-    constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
-    EndpointId triggerEndpoint       = static_cast<EndpointId>((eventTrigger & kEndpointMask) >> 32);
+    EndpointId triggerEndpoint = GetEndpointIdFromEventTrigger(eventTrigger);
     VerifyOrReturnError(triggerEndpoint == kRootEndpointId || triggerEndpoint == mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
     EnergyReportingTrigger trigger = static_cast<EnergyReportingTrigger>(clearEndpointInEventTrigger(eventTrigger));
