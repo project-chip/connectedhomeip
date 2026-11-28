@@ -149,6 +149,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute and/or event reports to a specific set of paths.
  *
  * interestedPathsForAttributes may contain either MTRClusterPath or MTRAttributePath to specify interested clusters and attributes, or NSNumber for endpoints.
+ * It may also contain MTRAttributeRequestPath, whose nil fields are wildcards; for example, one attribute of one cluster on every endpoint.
  *
  * interestedPathsForEvents may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
  *

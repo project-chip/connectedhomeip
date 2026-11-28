@@ -76,6 +76,16 @@ static NSArray<id> * MTRRegistrationInterestedPaths(NSArray<id> * interestedPath
             [registrationPaths addObject:interestedPath];
             continue;
         }
+        if ([interestedPath isKindOfClass:[MTRAttributeRequestPath class]]) {
+            // Only the fields that are not wildcards are sent.
+            MTRAttributeRequestPath * requestPath = interestedPath;
+            NSMutableDictionary<NSString *, NSNumber *> * registrationPath = [NSMutableDictionary dictionary];
+            registrationPath[MTRDeviceControllerRegistrationInterestedPathEndpointIDKey] = requestPath.endpoint;
+            registrationPath[MTRDeviceControllerRegistrationInterestedPathClusterIDKey] = requestPath.cluster;
+            registrationPath[MTRDeviceControllerRegistrationInterestedPathAttributeIDKey] = requestPath.attribute;
+            [registrationPaths addObject:registrationPath];
+            continue;
+        }
 
         MTRClusterPath * clusterPath = interestedPath;
         NSMutableDictionary<NSString *, NSNumber *> * registrationPath = [NSMutableDictionary dictionary];
