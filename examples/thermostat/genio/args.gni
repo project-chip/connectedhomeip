@@ -32,3 +32,5 @@ declare_args() {
 
   chip_config_network_layer_ble = true
 }
+
+chip_config_enable_groupcast = true
