@@ -119,7 +119,28 @@ static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAV
         .snapshotCapabilities         = GetSnapshotCapabilities(),
         .maxNetworkBandwidth          = 128000000,
         .supportedStreamUsages        = GetSupportedStreamUsages(),
-        .streamUsagePriorities        = GetSupportedStreamUsages()
+        .streamUsagePriorities        = GetSupportedStreamUsages(),
+        .defaultAttributeValues       = {
+                  .softRecordingPrivacyModeEnabled  = true,
+                  .softLivestreamPrivacyModeEnabled = true,
+                  .hardPrivacyModeOn                = true,
+                  .nightVision                      = TriStateAutoEnum::kAuto,
+                  .viewport                         = { 0, 0, 1920, 1080 },
+                  .speakerMuted                     = true,
+                  .speakerVolumeLevel               = 1,
+                  .speakerMaxLevel                  = 254,
+                  .speakerMinLevel                  = 1,
+                  .microphoneMuted                  = true,
+                  .microphoneVolumeLevel            = 1,
+                  .microphoneMaxLevel               = 254,
+                  .microphoneMinLevel               = 1,
+                  .microphoneAGCEnabled             = true,
+                  .imageRotation                    = 0,
+                  .imageFlipHorizontal              = false,
+                  .imageFlipVertical                = false,
+                  .statusLightEnabled               = true,
+                  .statusLightBrightness            = Globals::ThreeLevelAutoEnum::kMedium,
+        },
     };
     return args;
 }
@@ -292,42 +313,12 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    static CHIP_ERROR InitializeCameraAVSMDefaults(CameraAvStreamManagement::CameraAVStreamManagementCluster & mServer)
-    {
-        ReturnErrorOnFailure(mServer.SetSoftRecordingPrivacyModeEnabled(true));
-        ReturnErrorOnFailure(mServer.SetSoftLivestreamPrivacyModeEnabled(true));
-        ReturnErrorOnFailure(mServer.SetHardPrivacyModeOn(true));
-        ReturnErrorOnFailure(mServer.SetNightVision(TriStateAutoEnum::kAuto));
-        ReturnErrorOnFailure(mServer.SetViewport({ 0, 0, 1920, 1080 }));
-        ReturnErrorOnFailure(mServer.SetSpeakerMuted(true));
-        ReturnErrorOnFailure(mServer.SetSpeakerVolumeLevel(1));
-        ReturnErrorOnFailure(mServer.SetSpeakerMinLevel(1));
-        ReturnErrorOnFailure(mServer.SetSpeakerMaxLevel(254));
-        ReturnErrorOnFailure(mServer.SetMicrophoneMuted(true));
-        ReturnErrorOnFailure(mServer.SetMicrophoneVolumeLevel(1));
-        ReturnErrorOnFailure(mServer.SetMicrophoneMinLevel(1));
-        ReturnErrorOnFailure(mServer.SetMicrophoneMaxLevel(254));
-        ReturnErrorOnFailure(mServer.SetMicrophoneAGCEnabled(true));
-        ReturnErrorOnFailure(mServer.SetImageRotation(0));
-        ReturnErrorOnFailure(mServer.SetImageFlipHorizontal(false));
-        ReturnErrorOnFailure(mServer.SetImageFlipVertical(false));
-        ReturnErrorOnFailure(mServer.SetStatusLightEnabled(true));
-        ReturnErrorOnFailure(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kMedium));
-
-        return CHIP_NO_ERROR;
-    }
-
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams), mServer(MakeInitArguments(mMockDelegate)),
         mClusterTester(mServer)
     {}
 
-    void SetUp() override
-    {
-        EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-        EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
-    }
+    void SetUp() override { EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
@@ -1768,11 +1759,10 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
     ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)),
               CHIP_NO_ERROR);
 
-    // 3. Simulate a reboot: Startup() re-establishes the cluster context, Init() reloads
-    //    persistent attributes (resetting refCounts) and validates feature configuration.
+    // 3. Simulate a reboot: Startup() re-establishes the cluster context, validates configuration,
+    //    and reloads persistent attributes (resetting refCounts).
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     // 4. Verify in-memory state has reset refCount
     Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
@@ -1817,7 +1807,6 @@ struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
     {
         ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         mServerStarted = true;
-        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
     }
 
     template <typename T>
@@ -1924,6 +1913,44 @@ TEST_F(TestCodegenCameraAVStreamManagementMigration, ExistingNewValueNotOverwrit
     bool hdrModeEnabled = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
     EXPECT_FALSE(hdrModeEnabled);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestStartupLoadsPersistedAttributesOverDefaults)
+{
+    // Defaults from InitArguments::defaultAttributeValues apply before any writes.
+    EXPECT_TRUE(mServer.GetSoftRecordingPrivacyModeEnabled());
+    EXPECT_EQ(mServer.GetSpeakerVolumeLevel(), 1);
+    EXPECT_EQ(mServer.GetNightVision(), TriStateAutoEnum::kAuto);
+
+    // Persist values that differ from constructor defaults.
+    ASSERT_SUCCESS(mServer.SetSoftRecordingPrivacyModeEnabled(false));
+    ASSERT_SUCCESS(mServer.SetSpeakerVolumeLevel(42));
+    ASSERT_SUCCESS(mServer.SetNightVision(TriStateAutoEnum::kOff));
+
+    // Restart with a fresh cluster instance constructed with the same defaultAttributeValues.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    std::vector<VideoStreamStruct> restartedVideoStreams;
+    std::vector<AudioStreamStruct> restartedAudioStreams;
+    std::vector<SnapshotStreamStruct> restartedSnapshotStreams;
+    MockCameraAVStreamManagementDelegate restartedDelegate(&restartedVideoStreams, &restartedAudioStreams,
+                                                           &restartedSnapshotStreams);
+    CameraAVStreamManagementCluster restartedServer(MakeInitArguments(restartedDelegate));
+    ASSERT_SUCCESS(restartedServer.Startup(mClusterTester.GetServerClusterContext()));
+
+    EXPECT_FALSE(restartedServer.GetSoftRecordingPrivacyModeEnabled());
+    EXPECT_EQ(restartedServer.GetSpeakerVolumeLevel(), 42);
+    EXPECT_EQ(restartedServer.GetNightVision(), TriStateAutoEnum::kOff);
+
+    restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestStartupValidatesFeatureConfiguration)
+{
+    auto invalidArgs     = MakeInitArguments(mMockDelegate);
+    invalidArgs.features = BitFlags<Feature>(Feature::kHighDynamicRange); // Missing Video or Snapshot
+    CameraAVStreamManagementCluster invalidServer(std::move(invalidArgs));
+    EXPECT_EQ(invalidServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace
