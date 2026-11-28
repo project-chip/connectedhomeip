@@ -28,6 +28,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRUnfairLock.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPError.h>
@@ -43,12 +44,24 @@ using namespace chip::Tracing::DarwinFramework;
 @interface MTRCommissioningOperation () <MTRDeviceControllerDelegate_Internal>
 @end
 
+#ifdef DEBUG
+// Declaring the selector so the compiler doesn't complain about testing for and calling it.
+@protocol MTRCommissioningOperationUnitTestDelegate <MTRCommissioningDelegate>
+- (void)unitTestCommissioningOperationWillEndWithError:(MTRCommissioningOperation *)commissioning;
+@end
+#endif
+
 @implementation MTRCommissioningOperation {
     MTRCommissioningParameters * _parameters;
     NSNumber * _commissioningID;
     id<MTRCommissioningDelegate> __weak _delegate;
     dispatch_queue_t _delegateQueue;
     MTRDeviceController_Concrete * __weak _controller;
+
+    // Protects _delegate and _ended.
+    os_unfair_lock _lock;
+    // Set by the first failure or success, so the delegate gets exactly one of them.
+    BOOL _ended;
 }
 
 - (instancetype)initWithParameters:(MTRCommissioningParameters *)parameters
@@ -95,6 +108,7 @@ using namespace chip::Tracing::DarwinFramework;
     _setupPayload = payload;
     _commissioningID = commissioningID;
     _isInternallyCreated = isInternallyCreated;
+    _lock = OS_UNFAIR_LOCK_INIT;
     _delegate = delegate;
     _delegateQueue = queue;
 
@@ -212,11 +226,23 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 
     MTR_LOG("%@ Device commissioning failed with controller %@ metrics %@", self, strongController, metrics);
 
-    id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
+#ifdef DEBUG
+    id testDelegate = [self _internalDelegate];
+    if ([testDelegate respondsToSelector:@selector(unitTestCommissioningOperationWillEndWithError:)]) {
+        [testDelegate unitTestCommissioningOperationWillEndWithError:self];
+    }
+#endif
 
-    // Null out the delegate, so we don't notify based on any internal cleanups
-    // we happen to do.
-    _delegate = nil;
+    // Take the delegate and null it out, so we don't notify based on any
+    // internal cleanups we happen to do. Only the first failure or success
+    // gets it: a stop can race with a continue that fails, and each would
+    // otherwise report a failure.
+    id<MTRCommissioningDelegate> delegate;
+    if (![self _endCommissioningReturningDelegate:&delegate]) {
+        MTR_LOG("%@ Ignoring commissioning failure %@: commissioning has already ended", self, error);
+        return;
+    }
+    auto * strongDelegate = static_cast<id<MTRCommissioningDelegate_Internal>>(delegate);
 
     // No matter what, notify our controller that we are done. Do this before
     // we dispath our notifications, so that in cases when the controller is not
@@ -235,9 +261,28 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
+- (BOOL)_endCommissioningReturningDelegate:(id<MTRCommissioningDelegate> __strong *)delegate
+{
+    std::lock_guard lock(_lock);
+    if (_ended) {
+        *delegate = nil;
+        return NO;
+    }
+    _ended = YES;
+    *delegate = _delegate;
+    _delegate = nil;
+    return YES;
+}
+
+- (id<MTRCommissioningDelegate>)_currentDelegate
+{
+    std::lock_guard lock(_lock);
+    return _delegate;
+}
+
 - (id<MTRCommissioningDelegate_Internal>)_internalDelegate
 {
-    return static_cast<id<MTRCommissioningDelegate_Internal>>(_delegate);
+    return static_cast<id<MTRCommissioningDelegate_Internal>>([self _currentDelegate]);
 }
 
 #pragma mark - MTRDeviceControllerDelegate implementation
@@ -303,12 +348,15 @@ static inline void emitMetricForSetupPayload(NSString * payload)
         return;
     }
 
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    // Take the delegate and null it out, so we don't notify based on any
+    // internal cleanups we happened to do. A failure that ended the
+    // commissioning first has already been reported.
+    id<MTRCommissioningDelegate> strongDelegate;
+    if (![self _endCommissioningReturningDelegate:&strongDelegate]) {
+        MTR_LOG("%@ Ignoring commissioning success for node %@: commissioning has already ended", self, nodeID);
+        return;
+    }
     MTRDeviceController_Concrete * strongController = _controller;
-
-    // Null out the delegate, so we don't notify based on any internal cleanups
-    // we happened to do.
-    _delegate = nil;
 
     // No matter what, notify our controller that we are done. Do this before
     // we dispath our notifications, so that in cases when the controller is not
@@ -331,7 +379,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 - (void)controller:(MTRDeviceController *)controller
     readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    id<MTRCommissioningDelegate> strongDelegate = [self _currentDelegate];
     dispatch_async(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:readCommissioneeInfo:)]) {
             [strongDelegate commissioning:self readCommissioneeInfo:info];
@@ -363,7 +411,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     needsWiFiCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
                                   error:(nullable NSError *)error
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    id<MTRCommissioningDelegate> strongDelegate = [self _currentDelegate];
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self needsWiFiCredentialsWithScanResults:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
@@ -401,7 +449,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     needsThreadCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
                                     error:(nullable NSError *)error
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    id<MTRCommissioningDelegate> strongDelegate = [self _currentDelegate];
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self needsThreadCredentialsWithScanResults:networks error:error completion:^(NSData * operationalDataset) {
@@ -434,7 +482,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    id<MTRCommissioningDelegate> strongDelegate = [self _currentDelegate];
     if ([strongDelegate respondsToSelector:@selector(commissioningStartingNetworkScan:)]) {
         dispatch_async(_delegateQueue, ^{
             [strongDelegate commissioningStartingNetworkScan:self];
@@ -449,7 +497,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                                           error:(NSError * _Nullable)error
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
+    id<MTRCommissioningDelegate> strongDelegate = [self _currentDelegate];
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self completedDeviceAttestation:attestationDeviceInfo error:error completion:^{

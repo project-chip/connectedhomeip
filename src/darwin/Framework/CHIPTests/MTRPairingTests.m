@@ -204,6 +204,68 @@ typedef void (^PASEEstablishedHandler)(MTRCommissioningOperation * commissioning
 }
 @end
 
+// Counts commissioning failures, and parks the first failure report until a
+// second one has started, so a stop and a failed continue both read the
+// delegate before either clears it.
+@interface MTRPairingTestsCountingCommissioningDelegate : MTRPairingTestsCommissioningDelegate
+@property (atomic, readonly) NSUInteger failureCount;
+@end
+
+@implementation MTRPairingTestsCountingCommissioningDelegate {
+    dispatch_semaphore_t _secondFailureStarted;
+    NSUInteger _failuresStarted;
+    NSUInteger _failureCount;
+}
+
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation
+{
+    if (!(self = [super initWithExpectation:expectation])) {
+        return nil;
+    }
+
+    _secondFailureStarted = dispatch_semaphore_create(0);
+    return self;
+}
+
+- (NSUInteger)failureCount
+{
+    @synchronized(self) {
+        return _failureCount;
+    }
+}
+
+- (void)unitTestCommissioningOperationWillEndWithError:(MTRCommissioningOperation *)commissioning
+{
+    NSUInteger started;
+    @synchronized(self) {
+        started = ++_failuresStarted;
+    }
+
+    if (started == 1) {
+        // Bounded, so a single failure report doesn't hang the test.
+        dispatch_semaphore_wait(_secondFailureStarted, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+    } else if (started == 2) {
+        dispatch_semaphore_signal(_secondFailureStarted);
+    }
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+      failedWithError:(NSError *)error
+              metrics:(MTRMetrics *)metrics
+{
+    NSUInteger count;
+    @synchronized(self) {
+        count = ++_failureCount;
+    }
+    // Only the first failure fulfills the expectation; the test asserts on
+    // the count.
+    if (count == 1) {
+        [super commissioning:commissioning failedWithError:error metrics:metrics];
+    }
+}
+
+@end
+
 typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
 @interface MTRPairingTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
@@ -861,6 +923,46 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+}
+
+- (void)test014a_CommissioningOperationStopDuringAttestationFailsOnce
+{
+    [self startServerApp];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    __auto_type * params = [[MTRCommissioningParameters alloc] init];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning stopped"];
+    __auto_type * commissioningDelegate = [[MTRPairingTestsCountingCommissioningDelegate alloc] initWithExpectation:expectation];
+    commissioningDelegate.expectFailure = YES;
+
+    __auto_type * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:params
+                                                                           setupPayload:kOnboardingPayload
+                                                                               delegate:commissioningDelegate
+                                                                                  queue:callbackQueue];
+
+    // The stop reports a cancellation failure, and the continue that follows
+    // fails because the commissioning has stopped. The delegate parks the
+    // first of those reports until the second has started, so both race to
+    // end the commissioning.
+    commissioningDelegate.attestationHandler = ^(dispatch_block_t completion) {
+        [commissioning stop];
+        completion();
+    };
+
+    [commissioning startWithController:sController];
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+
+    // Give a second failure report time to arrive.
+    XCTestExpectation * settled = [self expectationWithDescription:@"Failure reports settled"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 7 * NSEC_PER_SEC), callbackQueue, ^{
+        [settled fulfill];
+    });
+    [self waitForExpectations:@[ settled ] timeout:kTimeoutInSeconds + 7];
+
+    XCTAssertEqual(commissioningDelegate.failureCount, 1);
 }
 
 - (void)test015_CommissioningOperationStopAfterPASE
