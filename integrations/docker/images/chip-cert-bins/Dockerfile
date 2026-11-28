@@ -382,3 +382,9 @@ WORKDIR /root
 RUN mkdir -p credentials/test/revoked-attestation-certificates
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets
+
+# PQC development DAC-provider fixtures and the trust store holding the ML-DSA
+# PAAs, used by TC_OPCREDS_3_9, TC_DA_1_10, TC_DA_1_11, TC_DA_1_12 and
+# TC_DA_1_13 (see the CI test arguments in those scripts).
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/development/attestation credentials/development/attestation
+COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/development/paa-root-certs credentials/development/paa-root-certs
