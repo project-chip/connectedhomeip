@@ -139,7 +139,10 @@ static_library("ESP32_custom") {
   }
 
   if (chip_enable_ble) {
-    sources += [ "BLEManagerImpl.h" ]
+    sources += [
+      "${chip_root}/src/platform/ESP32/BLECommissioningHandoff.cpp",
+      "BLEManagerImpl.h",
+    ]
     if (chip_enable_ble_controller) {
       sources += [ "ChipDeviceScanner.h" ]
     }

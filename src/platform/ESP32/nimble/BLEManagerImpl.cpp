@@ -233,6 +233,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ResetNetworkHandoff();
+    mBleLinks = {};
+#endif
     if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
     {
         ChipLogProgress(DeviceLayer, "Ble already deinitialized, returning from ShutDown flow");
@@ -257,6 +261,14 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (mNetworkHandoff == NetworkHandoffState::kRestoringBle)
+        {
+            mFlags.Set(Flags::kAdvertisingEnabled);
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(EnsureBleLayerInitialized());
+#endif
         StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     }
 
@@ -343,6 +355,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    VerifyOrReturn(!HandleBleHandoffEvent(*event));
+#endif
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
@@ -661,11 +676,18 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 #endif
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR BLEManagerImpl::DisconnectBleLink(std::optional<BleLink> & link)
 {
-    ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
-    LogErrorOnFailure(CloseConnection(conId));
+    const int result = ble_gap_terminate(link->Connection, BLE_ERR_REM_USER_CONN_TERM);
+    if (result == BLE_HS_ENOTCONN)
+    {
+        link.reset();
+        return CHIP_NO_ERROR;
+    }
+    return result == BLE_HS_EALREADY ? CHIP_NO_ERROR : MapBLEError(result);
 }
+#endif
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
@@ -744,8 +766,11 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled &&
-        mFlags.Has(Flags::kAdvertisingEnabled)
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled)
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        && mNetworkHandoff == NetworkHandoffState::kIdle &&
+        IsInitialized()
+#endif
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
         // and no connections are active...
         && (_NumConnections() == 0)
@@ -1746,6 +1771,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %u reason 0x%02x)", gapEvent->disconnect.conn.conn_handle,
                     gapEvent->disconnect.reason);
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkDisconnected };
+    linkEvent.Platform.BLELink.Connection = gapEvent->disconnect.conn.conn_handle;
+    PlatformMgr().PostEventOrDie(&linkEvent);
+#endif
+
     // Update the number of GAP connections.
     if (mNumGAPCons > 0)
     {
@@ -1855,6 +1886,14 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
     switch (event->type)
     {
     case BLE_GAP_EVENT_CONNECT:
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (event->connect.status == 0)
+        {
+            ChipDeviceEvent linkEvent{ .Type = DeviceEventType::kPlatformESP32BLELinkConnected };
+            linkEvent.Platform.BLELink.Connection = event->connect.conn_handle;
+            PlatformMgr().PostEventOrDie(&linkEvent);
+        }
+#endif
         /* A new connection was established or a connection attempt failed */
         err = sInstance.HandleGAPConnect(event);
         SuccessOrExit(err);

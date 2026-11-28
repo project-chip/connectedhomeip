@@ -24,6 +24,8 @@
  */
 
 #pragma once
+#include <array>
+#include <optional>
 #include <sdkconfig.h>
 #include <string>
 
@@ -32,6 +34,7 @@
 #endif
 
 #include <lib/core/Optional.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
 
@@ -76,6 +79,9 @@ struct ble_gatt_char_context
 
 namespace chip {
 namespace DeviceLayer {
+
+class PlatformManagerImpl;
+
 namespace Internal {
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -188,6 +194,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void CheckNonConcurrentBleClosing() override;
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
@@ -209,6 +216,7 @@ private:
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
+    friend class ::chip::DeviceLayer::PlatformManagerImpl;
 
     static BLEManagerImpl sInstance;
 
@@ -295,6 +303,43 @@ private:
     uint16_t mC3CharAttrHandle;
 #endif
     uint16_t mTXCharCCCDAttrHandle;
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+    static constexpr size_t kMaxBleLinks = CONFIG_BT_ACL_CONNECTIONS;
+    struct BleLink
+    {
+        esp_bd_addr_t PeerAddress;
+        std::optional<uint16_t> ClientConnection;
+        std::optional<uint16_t> ServerConnection;
+
+        std::optional<uint16_t> & ConnectionFor(ChipDevicePlatformEvent::BleLink::GattRole role)
+        {
+            return role == ChipDevicePlatformEvent::BleLink::GattRole::kClient ? ClientConnection : ServerConnection;
+        }
+    };
+#else
+    static constexpr size_t kMaxBleLinks = CONFIG_BT_NIMBLE_MAX_CONNECTIONS;
+    using BleLink                        = ChipDevicePlatformEvent::BleLink;
+#endif
+
+    enum class NetworkHandoffState : uint8_t{
+        kIdle,
+        kStartingNetwork,
+        kRestoringBle,
+    };
+    std::array<std::optional<BleLink>, kMaxBleLinks> mBleLinks{};
+    NetworkHandoffState mNetworkHandoff = NetworkHandoffState::kIdle;
+    bool mNetworkHandoffPosted          = false;
+
+    bool HandleBleHandoffEvent(const ChipDeviceEvent & event);
+    CHIP_ERROR DisconnectBleLink(std::optional<BleLink> & link);
+    void StartNetworkHandoff(NetworkHandoffState state);
+    void ScheduleNetworkHandoff();
+    bool DisconnectBleLinks();
+    void ResetNetworkHandoff();
+    CHIP_ERROR EnsureBleLayerInitialized();
+    static void RetryNetworkHandoff(System::Layer *, void *);
+#endif
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     CHIP_ERROR MapBLEError(int bleErr);

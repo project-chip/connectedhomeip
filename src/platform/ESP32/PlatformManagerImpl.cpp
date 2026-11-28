@@ -29,6 +29,9 @@
 #include "ESP32Utils.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/internal/BLEManager.h>
+#endif
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include "esp_event.h"
@@ -55,6 +58,43 @@ void DeinitPlatformNetworkStack();
 } // namespace Internal
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void PlatformManagerImpl::_DispatchEvent(const ChipDeviceEvent * event)
+{
+    using Base = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
+    if (event->Type != DeviceEventType::kPlatformESP32BLEHandoff)
+    {
+        Base::_DispatchEvent(event);
+        return;
+    }
+
+    using HandoffState        = Internal::BLEManagerImpl::NetworkHandoffState;
+    auto & ble                = Internal::BLEMgrImpl();
+    ble.mNetworkHandoffPosted = false;
+    VerifyOrReturn(ble.mNetworkHandoff != HandoffState::kIdle);
+
+    if (ble.IsBleClosing())
+    {
+        const ChipDeviceEvent close{ .Type = DeviceEventType::kCloseAllBleConnections };
+        Base::_DispatchEvent(&close);
+    }
+
+    VerifyOrReturn(ble.DisconnectBleLinks());
+    const bool restoreBle = ble.mNetworkHandoff == HandoffState::kRestoringBle;
+    ble.ResetNetworkHandoff();
+    if (restoreBle)
+    {
+        VerifyOrReturn(ble.mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        LogErrorOnFailure(ble._IsAdvertisingEnabled() ? ble._SetAdvertisingEnabled(true) : ble.EnsureBleLayerInitialized());
+        return;
+    }
+
+    // Deliver readiness in this dispatch so a queued notification cannot outlive a cancelled handoff.
+    const ChipDeviceEvent ready{ .Type = DeviceEventType::kOperationalNetworkStarted };
+    Base::_DispatchEvent(&ready);
+}
+#endif
 
 #if !CHIP_CRYPTO_PSA
 // PSA crypto manages entropy internally, so only add entropy source for non-PSA builds

@@ -33,6 +33,13 @@
 #include <esp_wifi_types.h>
 
 namespace chip {
+
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+namespace System {
+class PacketBuffer;
+} // namespace System
+#endif
+
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -45,7 +52,6 @@ enum
     kESPSystemEvent = kRange_PublicPlatformSpecific,
 };
 
-#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 /**
  * Enumerates ESP32 platform-specific event types that are internal to the Chip Device Layer.
  */
@@ -57,9 +63,11 @@ enum InternalPlatformSpecificEventTypes
     kPlatformESP32BLEWriteComplete,
     kPlatformESP32BLESubscribeOpComplete,
     kPlatformESP32BLEIndicationReceived,
+    kPlatformESP32BLELinkConnected,
+    kPlatformESP32BLELinkDisconnected,
+    kPlatformESP32BLEHandoff,
 };
 
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 } // namespace DeviceEventType
 
 /**
@@ -67,6 +75,21 @@ enum InternalPlatformSpecificEventTypes
  */
 struct ChipDevicePlatformEvent final
 {
+    struct BleLink
+    {
+        uint16_t Connection;
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
+        enum class GattRole : uint8_t
+        {
+            kClient,
+            kServer,
+        };
+
+        GattRole Role;
+        uint8_t PeerAddress[6];
+#endif
+    };
+
     union
     {
         struct
@@ -94,6 +117,7 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
+        BleLink BLELink;
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         struct
         {
