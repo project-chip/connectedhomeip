@@ -12,6 +12,7 @@
 {{#if (isStrEqual source "client")}}
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 {{else if (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}
 @dynamic timedInvokeTimeoutMs;
 {{/if}}

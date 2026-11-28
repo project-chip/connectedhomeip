@@ -18,6 +18,8 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#include <cmath>
+
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeChangesOmittedCheck.h"
 #import "MTRAttributeSpecifiedCheck.h"
@@ -42,6 +44,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUserInvokeToken_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 #import "zap-generated/MTRCommandPayloads_Private.h"
@@ -57,6 +60,7 @@
 #import <app/InteractionModelEngine.h>
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
+#import <protocols/secure_channel/CASESession.h>
 
 #pragma mark - TimeSynchronization configuration
 
@@ -275,12 +279,30 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldIDIndex = 2
 };
 
+// Why an invoke's work item was cancelled, as recorded by the work queue (MTRAsyncWorkItem.cancelReason).  Zero means
+// any other cancel: a user command token's, or the device going away.
+static const NSUInteger MTRDeviceInvokeCancelReasonQueueTimeout = 1;
+
 typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
     MTRDeviceWriteRequestFieldPathIndex = 0,
     MTRDeviceWriteRequestFieldValueIndex = 1,
     MTRDeviceWriteRequestFieldTimeoutIndex = 2,
     MTRDeviceWriteRequestFieldExpectedValueIDIndex = 3,
+    MTRDeviceWriteRequestFieldExpectedValueIntervalIndex = 4,
+    MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex = 5,
 };
+
+// The expiration time of an expected value whose request is still waiting in the work queue.  Its interval has
+// not started yet: it starts when the request is actually sent (see -_startExpectedValueIntervalForAttributePaths:).
+static NSDate * MTRPendingExpectedValueExpirationTime(void)
+{
+    return NSDate.distantFuture;
+}
+
+static BOOL MTRExpectedValueIsPending(NSArray * expectedValue)
+{
+    return [expectedValue[MTRDeviceExpectedValueFieldExpirationTimeIndex] isEqualToDate:MTRPendingExpectedValueExpirationTime()];
+}
 
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
     MTRDeviceWorkItemBatchingReadID = 1,
@@ -440,6 +462,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
+- (void)unitTestWriteDidInstallExpectedValue:(MTRDevice *)device attributePath:(MTRAttributePath *)attributePath;
+- (void)unitTestInvokeWillCancelForQueueTimeout:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
@@ -765,7 +789,44 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     dispatch_sync(self.queue, block);
 }
+
+// Called without the lock held, right before an invoke is cancelled for its queue timeout, so a test can hold that
+// cancel here while it makes another cancel or send happen first.
+- (void)_unitTestInvokeWillCancelForQueueTimeout
+{
+    id testDelegate;
+    {
+        std::lock_guard lock(_lock);
+        testDelegate = [_delegateManager firstDelegate];
+    }
+    if ([testDelegate respondsToSelector:@selector(unitTestInvokeWillCancelForQueueTimeout:)]) {
+        [testDelegate unitTestInvokeWillCancelForQueueTimeout:self];
+    }
+}
 #endif
+
+#ifdef DEBUG
+static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
+#endif
+
+// How long an invoke with expected values and no user command token, or a write with an expected value, may wait in
+// the queue before it is sent.  Its expected values are shown for the whole wait, so the wait needs a bound.  The
+// value is the framework's default timed interaction timeout: a choice, not a derived bound.
+static constexpr uint32_t kMTRUntokenedInvokeQueueTimeoutMs = MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS;
+
+// The shortest caller timeout a user command accepts: one session attempt, the bound OperationalSessionSetup uses
+// for one CASE attempt (CASESession::ComputeSigma1ResponseTimeout with the default MRP config).
+static uint32_t MTRUserInvokeMinimumTimeoutMs()
+{
+#ifdef DEBUG
+    uint32_t overrideMs = sUserInvokeMinimumTimeoutOverrideMs.load(std::memory_order_relaxed);
+    if (overrideMs) {
+        return overrideMs;
+    }
+#endif
+    auto timeout = chip::CASESession::ComputeSigma1ResponseTimeout(chip::GetDefaultMRPConfig());
+    return static_cast<uint32_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(timeout).count());
+}
 
 #pragma mark - Time Synchronization
 
@@ -3698,6 +3759,10 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
         NSNumber * nodeID = [self nodeID];
+        // The read reports when it is about to send.  Until then, including while it waits for a session, it has
+        // sent nothing: not yet sent is queued, not running, so a user command may go ahead of it.
+        workItem.tracksSend = YES;
+        MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
 
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
@@ -3750,34 +3815,44 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             readParams.filterByFabric = NO;
 
             MTRBaseDevice * baseDevice = [self newBaseDevice];
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             mtr_weakify(self);
             [baseDevice
                 readAttributePaths:readRequests
-                        eventPaths:nil
-                            params:readParams
+                eventPaths:nil
+                params:readParams
                 includeDataVersion:YES
-                             queue:self.queue
-                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                            mtr_strongify(self);
-                            VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
-                            if (values) {
-                                // Since the format is the same data-value dictionary, this looks like an
-                                // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
-                                MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values fromSubscription:NO];
-                            }
+                requestWillBeSent:^BOOL {
+                    // A read is never cancelled: it always sends.  Reporting the send marks it as running, so user
+                    // commands queued after this no longer go ahead of it.
+                    MTRAsyncWorkItem * item = weakWorkItem;
+                    if (item) {
+                        [workQueue workItem:item readyToSend:^ {}];
+                    }
+                    return YES;
+                }
+                queue:self.queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    mtr_strongify(self);
+                    VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
+                    if (values) {
+                        // Since the format is the same data-value dictionary, this looks like an
+                        // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
+                        MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        [self _handleAttributeReport:values fromSubscription:NO];
+                    }
 
-                            // TODO: better retry logic
-                            if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                completion(MTRAsyncWorkNeedsRetry);
-                            } else {
-                                if (error) {
-                                    MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                }
-                                completion(MTRAsyncWorkComplete);
-                            }
-                        }];
+                    // TODO: better retry logic
+                    if (error && (retryCount < 2)) {
+                        MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        completion(MTRAsyncWorkNeedsRetry);
+                    } else {
+                        if (error) {
+                            MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        }
+                        completion(MTRAsyncWorkComplete);
+                    }
+                }];
         }];
         [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ 0x%llx (%@) 0x%llx (%@)",
                                                   endpointID,
@@ -3821,15 +3896,30 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
 
     uint64_t expectedValueID = 0;
     if (useValueAsExpectedValue) {
-        // Commit change into expected value cache
+        // Commit change into expected value cache.  The write may wait in the work queue behind other work, so the
+        // expected value interval does not start here: it starts when the write is sent, once the ready handler below
+        // has a session.  Otherwise a write queued for longer than its interval would roll back before it was sent.
         NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
-        [self setExpectedValues:@[ newExpectedValueDictionary ]
-            expectedValueInterval:expectedValueInterval
-                  expectedValueID:&expectedValueID];
+        [self _setPendingExpectedValues:@[ newExpectedValueDictionary ] expectedValueID:&expectedValueID];
     }
+
+#ifdef DEBUG
+    if (useValueAsExpectedValue) {
+        // Called without the lock held, so a test can hold this write here while other writes run.
+        id testDelegate;
+        {
+            std::lock_guard lock(_lock);
+            testDelegate = [_delegateManager firstDelegate];
+        }
+        if ([testDelegate respondsToSelector:@selector(unitTestWriteDidInstallExpectedValue:attributePath:)]) {
+            [testDelegate unitTestWriteDidInstallExpectedValue:self attributePath:attributePath];
+        }
+    }
+#endif
 
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
     NSNumber * nodeID = _nodeID;
 
     // Write request data is an array of items (for now always length 1).  Each
@@ -3837,8 +3927,11 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     //
     //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
     //
-    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
-    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID) ];
+    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts.  A fifth item, the expected
+    // value interval, travels with the expected value ID so that a write merged into an earlier work item starts its
+    // own interval when that work item sends it.  A sixth item lists the [ path, expectedValueID ] of each write
+    // that a later write replaced while merging, whose value is never sent.
+    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID), useValueAsExpectedValue ? expectedValueInterval : [NSNull null], [NSMutableArray array] ];
 
     NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
 
@@ -3863,8 +3956,19 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 return outcome;
             }
 
-            // Replace our one request with the first one from the next item.
-            auto writeItem = writeRequestsNext.firstObject;
+            // Replace our one request with the first one from the next item.  The replaced request's value is
+            // never sent, so its expected value is removed when this work item sends, fails or is cancelled.  This
+            // work item's own request is not listed: those paths already handle its expected value.
+            NSArray * replacedRequest = writeRequestsCurrent[0];
+            NSMutableArray<NSArray *> * mergedOutExpectedValues = replacedRequest[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex];
+            NSNumber * replacedExpectedValueID = replacedRequest[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
+            if (replacedRequest[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex] != [NSNull null]
+                && replacedExpectedValueID.unsignedLongLongValue != expectedValueID) {
+                [mergedOutExpectedValues addObject:@[ replacedRequest[MTRDeviceWriteRequestFieldPathIndex], replacedExpectedValueID ]];
+            }
+            NSMutableArray * writeItem = [writeRequestsNext.firstObject mutableCopy];
+            [mergedOutExpectedValues addObjectsFromArray:writeItem[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex]];
+            writeItem[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex] = mergedOutExpectedValues;
             [writeRequestsNext removeObjectAtIndex:0];
             [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
             MTR_LOG("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
@@ -3894,6 +3998,50 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             timedWriteTimeout = nil;
         }
 
+        // The expected value interval starts when the request is actually sent, after the session is ready, not
+        // here: getting the session can take longer than the interval.  Until then the expected value stays pending
+        // and cannot expire.  If a later write was merged into this work item, the request carries that write's
+        // expected value ID and interval, and this work item's own expected value is removed, since its value is
+        // not sent.  If the merged write set no expected value, this work item's own is started instead.
+        NSNumber * requestExpectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
+        id requestExpectedValueInterval = request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex];
+        NSArray<NSArray *> * mergedOutExpectedValues = [request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex] copy];
+        MTRRequestWillBeSentHandler requestWillBeSent = nil;
+        if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null] || mergedOutExpectedValues.count) {
+            mtr_weakify(self);
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
+            requestWillBeSent = ^BOOL {
+                mtr_strongify(self);
+                // A write that has sent nothing can be cancelled up to here (the device is going away): if it was,
+                // send nothing.  Its cancel handler has already removed its expected values.
+                if (weakWorkItem && ![workQueue workItem:weakWorkItem readyToSend:^ {}]) {
+                    MTR_LOG("Write attribute work item [%llu] was cancelled before it was sent", workItemID);
+                    return NO;
+                }
+                if (!self) {
+                    return YES;
+                }
+                BOOL sendsMergedWrite = (requestExpectedValueInterval != [NSNull null] && requestExpectedValueID.unsignedLongLongValue != expectedValueID);
+                if (useValueAsExpectedValue) {
+                    if (sendsMergedWrite) {
+                        // This work item's own value is not what is sent: a later write replaced it.  Remove its
+                        // expected value rather than start it; it would otherwise be shown for a whole interval
+                        // when it was set after the write that replaced it.
+                        [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+                    } else {
+                        [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                    }
+                }
+                if (sendsMergedWrite) {
+                    [self _startExpectedValueIntervalForAttributePaths:@[ path ]
+                                                       expectedValueID:requestExpectedValueID.unsignedLongLongValue
+                                                 expectedValueInterval:requestExpectedValueInterval];
+                }
+                [self _removeMergedOutWriteExpectedValues:mergedOutExpectedValues];
+                return YES;
+            };
+        }
+
         mtr_weakify(self);
         [baseDevice
             _writeAttributeWithEndpointID:path.endpoint
@@ -3901,6 +4049,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                               attributeID:path.attribute
                                     value:request[MTRDeviceWriteRequestFieldValueIndex]
                         timedWriteTimeout:timedWriteTimeout
+                        requestWillBeSent:requestWillBeSent
                                     queue:self.queue
                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                    mtr_strongify(self);
@@ -3908,13 +4057,49 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                    if (error) {
                                        MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
                                        if (useValueAsExpectedValue) {
-                                           NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
-                                           [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
+                                           [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
                                        }
+                                       // A later write merged into this work item carries its own expected value.
+                                       // Remove that too, whether or not this work item set one.
+                                       if (requestExpectedValueInterval != [NSNull null]) {
+                                           [self removeExpectedValueForAttributePath:path expectedValueID:requestExpectedValueID.unsignedLongLongValue];
+                                       }
+                                       [self _removeMergedOutWriteExpectedValues:mergedOutExpectedValues];
                                    }
                                    completion(MTRAsyncWorkComplete);
                                }];
     }];
+    // The work queue cancels its work items when the device is invalidated.  A write dropped before it was sent still
+    // has a pending expected value, which would never expire, so remove it, and that of a write merged into this one,
+    // even if this write did not set one.
+    // Removal only touches expected values that still carry these IDs; a write already in flight loses its expected
+    // value too only when the device is going away.
+    mtr_weakify(self);
+    [workItem setCancelHandler:^{
+        mtr_strongify(self);
+        VerifyOrReturn(self);
+        if (useValueAsExpectedValue) {
+            [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+        }
+        auto * request = writeRequests[0];
+        if (request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex] != [NSNull null]) {
+            [self removeExpectedValueForAttributePath:request[MTRDeviceWriteRequestFieldPathIndex]
+                                      expectedValueID:[request[MTRDeviceWriteRequestFieldExpectedValueIDIndex] unsignedLongLongValue]];
+        }
+        [self _removeMergedOutWriteExpectedValues:request[MTRDeviceWriteRequestFieldMergedOutExpectedValuesIndex]];
+    }];
+    if (useValueAsExpectedValue) {
+        // How long the write's expected value is shown while the write waits to be sent is bounded: if it has not been
+        // sent by then, its expected value is removed.  The write stays queued and is still sent.  Each write bounds
+        // its own expected value, whether or not its work item was merged into another.
+        mtr_weakify(self);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kMTRUntokenedInvokeQueueTimeoutMs * NSEC_PER_MSEC)), self.queue, ^{
+            mtr_strongify(self);
+            if (self && [self _removePendingExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID]) {
+                MTR_LOG("Write attribute work item [%llu] not sent after %u ms in the queue: its expected value is removed", workItemID, kMTRUntokenedInvokeQueueTimeoutMs);
+            }
+        });
+    }
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
@@ -4020,10 +4205,88 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                       userInvokeToken:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    if (userInvokeToken) {
+        // A user command whose caller allows it less than one session attempt would only be queued to fail, so
+        // refuse it now.  The bound is the one used for a single CASE attempt; no separate constant.
+        NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
+        // The timeout becomes a dispatch_time in nanoseconds, so it must be a finite number that fits.
+        if (userTimeoutMs != nil && !(std::isfinite(userTimeoutMs.doubleValue) && userTimeoutMs.doubleValue <= static_cast<double>(INT64_MAX / NSEC_PER_MSEC))) {
+            MTR_LOG_ERROR("%@ user command timeout %@ ms is not a usable time; not queued", self, userTimeoutMs);
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            });
+            return;
+        }
+        if (userTimeoutMs != nil && userTimeoutMs.doubleValue < MTRUserInvokeMinimumTimeoutMs()) {
+            MTR_LOG_ERROR("%@ user command timeout %@ ms is shorter than one session attempt (%u ms); not queued", self, userTimeoutMs, MTRUserInvokeMinimumTimeoutMs());
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            });
+            return;
+        }
+        if (userInvokeToken.cancelledBeforeUse) {
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
+        // The caller hears about a user command exactly once: from its result, from a cancel while it has sent
+        // nothing, or from its timeout running out while it has sent nothing.  Whichever comes first wins.
+        auto completedOnce = std::make_shared<std::atomic<bool>>(false);
+        MTRDeviceResponseHandler callerCompletion = completion;
+        completion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            if (!completedOnce->exchange(true)) {
+                callerCompletion(values, error);
+            }
+        };
+    }
+
+    // An empty array sets no expected values, so it is the same as nil: it gets no queue bound.
+    if (!expectedValues.count || !expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
+    }
+
+    // An invoke with expected values and no token gets the bound a token's timeout gives: if it has sent nothing by
+    // then, it fails with a timeout, its expected values are removed, and it is never sent.
+    NSNumber * queueTimeoutMs = userInvokeToken ? userInvokeToken.timeoutMs : nil;
+    BOOL boundedWithoutToken = (!userInvokeToken && expectedValues);
+    if (boundedWithoutToken) {
+        queueTimeoutMs = @(kMTRUntokenedInvokeQueueTimeoutMs);
+        // As for a user command, the caller hears exactly once: from the result or from the timeout.
+        auto completedOnce = std::make_shared<std::atomic<bool>>(false);
+        MTRDeviceResponseHandler callerCompletion = completion;
+        completion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            if (!completedOnce->exchange(true)) {
+                callerCompletion(values, error);
+            }
+        };
     }
 
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
@@ -4042,7 +4305,10 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     uint64_t expectedValueID = 0;
     NSMutableArray<MTRAttributePath *> * attributePaths = nil;
     if (expectedValues) {
-        [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval expectedValueID:&expectedValueID];
+        // The command may wait in the work queue behind other work, so the expected value interval does not start
+        // here: it starts when the command is sent, once the ready handler below has a session.  Otherwise a command
+        // queued for longer than its interval would roll back before it was even sent.
+        [self _setPendingExpectedValues:expectedValues expectedValueID:&expectedValueID];
         attributePaths = [NSMutableArray array];
         for (NSDictionary<NSString *, id> * expectedValue in expectedValues) {
             [attributePaths addObject:expectedValue[MTRAttributePathKey]];
@@ -4050,6 +4316,19 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
+    // The queue timeout cancels the item with this reason, by the timer or at the send point.  The work queue keeps
+    // the reason of the one cancel that succeeds, so the handlers below report the cancel that won.
+    const NSUInteger queueTimeoutCancelReason = MTRDeviceInvokeCancelReasonQueueTimeout;
+    // The queue timeout's deadline, on a monotonic clock, checked again at the send point.
+    dispatch_time_t queueDeadline = (queueTimeoutMs != nil)
+        ? dispatch_time(DISPATCH_TIME_NOW, (int64_t) (queueTimeoutMs.doubleValue * NSEC_PER_MSEC))
+        : DISPATCH_TIME_FOREVER;
+    if (userInvokeToken) {
+        // A user command goes ahead of queued reads that have sent nothing yet, including reads waiting for a
+        // session: not yet sent is queued, not running.  Reads that have sent finish first.
+        workItem.jumpsUnsentWork = YES;
+    }
     // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
     // change values, only read requests after this should be considered for duplicate requests.
     [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
@@ -4058,6 +4337,15 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }];
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            // If the work item was cancelled first by a user command's token or by a queue timeout, its cancel
+            // handler reports that cancel to the caller and removes the expected values: that outcome won, so report
+            // nothing here.  Any other cancel (the device going away) reports nothing to the caller, so this result
+            // still does.
+            BOOL accepted = workCompletion(MTRAsyncWorkComplete);
+            if (!accepted && (userInvokeToken || workItem.cancelReason == queueTimeoutCancelReason)) {
+                MTR_LOG("Invoke work item [%llu] was cancelled before its result arrived: %@", workItemID, error);
+                return;
+            }
             // Remove a failed invoke's expected values first, so its completion sees the cached value.
             if (error && expectedValues) {
                 [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
@@ -4065,7 +4353,6 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             dispatch_async(queue, ^{
                 completion(values, error);
             });
-            workCompletion(MTRAsyncWorkComplete);
         };
 
         NSNumber * timedInvokeTimeout = nil;
@@ -4083,6 +4370,44 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             // in our queuing and retries.
             timedInvokeTimeout = @([cutoffTime timeIntervalSinceDate:now] * 1000);
         }
+        // The expected value interval starts when the request is actually sent, after the session is ready, not
+        // here: getting the session can take longer than the interval.  Until then the expected values stay pending
+        // and cannot expire.  A retry does not restart the interval.  If the command fails, workDone still removes
+        // them.
+        MTRRequestWillBeSentHandler requestWillBeSent = nil;
+        if (expectedValues || userInvokeToken) {
+            mtr_weakify(self);
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
+            requestWillBeSent = ^BOOL {
+                mtr_strongify(self);
+                __block BOOL send = YES;
+                if ((userInvokeToken || boundedWithoutToken) && weakWorkItem) {
+                    // Past its queue deadline it is not sent, even if the timer has not run yet or is running now:
+                    // cancel it as timed out.  If another cancel got there first, readyToSend below refuses it.
+                    BOOL pastDeadline = (queueDeadline != DISPATCH_TIME_FOREVER && dispatch_time(DISPATCH_TIME_NOW, 0) >= queueDeadline);
+#ifdef DEBUG
+                    if (pastDeadline) {
+                        [self _unitTestInvokeWillCancelForQueueTimeout];
+                    }
+#endif
+                    if (pastDeadline && [workQueue cancelWorkItemIfUnsent:weakWorkItem reason:queueTimeoutCancelReason]) {
+                        MTR_LOG("Invoke work item [%llu] reached its send point after its queue deadline; not sent", workItemID);
+                        return NO;
+                    }
+                    // A command that has sent nothing can be cancelled up to here: if it was, send nothing.  Its
+                    // caller has already been completed by the cancel.  From here on it is sent and completes.
+                    send = [workQueue workItem:weakWorkItem readyToSend:^ {}];
+                }
+                if (!send) {
+                    MTR_LOG("Invoke work item [%llu] was cancelled before it was sent", workItemID);
+                    return NO;
+                }
+                if (self && expectedValues) {
+                    [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                }
+                return YES;
+            };
+        }
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         mtr_weakify(self);
         [baseDevice
@@ -4093,6 +4418,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                       timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
                                  logCall:NO
+                       requestWillBeSent:requestWillBeSent
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   mtr_strongify(self);
@@ -4110,6 +4436,74 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                   workDone(values, error);
                               }];
     }];
+    if (expectedValues || userInvokeToken) {
+        // The work queue cancels its work items when the device is invalidated, and a user command's token or
+        // timeout cancels it while it has sent nothing.  A command dropped either way before it was sent still has
+        // pending expected values, which would never expire, so remove them.  Removal only touches expected values
+        // that still carry this ID; a command already in flight loses its expected values too only when the device
+        // is going away.  A user command's caller is told it was cancelled; the timeout reports itself.
+        mtr_weakify(self);
+        [workItem setCancelHandler:^{
+            mtr_strongify(self);
+            if (self && expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            BOOL timedOut = (workItem.cancelReason == queueTimeoutCancelReason);
+            if (userInvokeToken) {
+                NSError * error = timedOut ? [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT] : [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+                dispatch_async(queue, ^{
+                    completion(nil, error);
+                });
+            } else if (timedOut) {
+                dispatch_async(queue, ^{
+                    completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]);
+                });
+            }
+        }];
+    }
+    if (userInvokeToken) {
+        switch ([userInvokeToken attachToWorkItem:workItem queue:_asyncWorkQueue]) {
+        case MTRUserInvokeTokenUseCancelledBeforeUse: {
+            // Cancelled after the check above: its cancel returned YES, so do not queue it.  Like the check above,
+            // complete the caller with a cancelled error, and remove the expected values set since.
+            MTR_LOG("%@ user command was cancelled before it was queued; not sent", self);
+            if (expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
+        case MTRUserInvokeTokenUseAlreadyUsed:
+            MTR_LOG_ERROR("%@ user command token was already used for another invoke; it cannot cancel this one", self);
+            break;
+        case MTRUserInvokeTokenUseTied:
+            break;
+        }
+    }
+    if (queueTimeoutMs != nil) {
+        // The caller's timeout, or for an invoke with expected values and no token the default above, bounds the
+        // command's wait in the queue: if it has sent nothing by then, it fails with a timeout and is never sent.
+        // The send point checks the same deadline, for a session that arrives while this timer is still waiting
+        // to run.
+        MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+#ifdef DEBUG
+        mtr_weakify(self); // only the test hook below uses it
+#endif
+        dispatch_after(queueDeadline, self.queue, ^{
+            MTRAsyncWorkItem * item = weakWorkItem;
+#ifdef DEBUG
+            if (item) {
+                mtr_strongify(self);
+                [self _unitTestInvokeWillCancelForQueueTimeout];
+            }
+#endif
+            if (item && [workQueue cancelWorkItemIfUnsent:item reason:queueTimeoutCancelReason]) {
+                MTR_LOG("Invoke work item [%llu] timed out after %@ ms in the queue before it was sent", workItemID, queueTimeoutMs);
+            }
+        });
+    }
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
@@ -4469,6 +4863,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
             if ([now compare:attributeExpirationDate] == NSOrderedDescending) {
                 // expired - save [path, values] pair to attributeToRemove
                 [attributeInfoToRemove addObject:@[ attributePath, expectedValue[MTRDeviceExpectedValueFieldValueIndex] ]];
+            } else if (MTRExpectedValueIsPending(expectedValue)) {
+                // Pending: its request has not been sent yet, so its interval has not started and there is nothing
+                // to schedule.  The timer is scheduled when the interval starts.
             } else {
                 // get the next expiration date
                 if (!nextExpirationDate || [nextExpirationDate compare:attributeExpirationDate] == NSOrderedDescending) {
@@ -5266,6 +5663,24 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     MTR_LOG(
         "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
+    [self _setExpectedValues:values expirationTime:expirationTime expectedValueID:expectedValueID];
+}
+
+// Sets expected values for a request that is about to be queued.  They take effect right away, but do not expire
+// until -_startExpectedValueIntervalForAttributePaths: starts their interval when the request is sent: time spent
+// waiting in the work queue must not count against the interval.
+- (void)_setPendingExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
+                  expectedValueID:(uint64_t *)expectedValueID
+{
+    MTR_LOG("%@ Setting expected values %@ pending until their request is sent", self, values);
+
+    [self _setExpectedValues:values expirationTime:MTRPendingExpectedValueExpirationTime() expectedValueID:expectedValueID];
+}
+
+- (void)_setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
+            expirationTime:(NSDate *)expirationTime
+           expectedValueID:(uint64_t *)expectedValueID
+{
     std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithNewExpectedValues will log attribute paths reported
@@ -5277,6 +5692,36 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     [self _checkExpiredExpectedValues];
 }
 
+// Called when the request that set pending expected values is sent: the expected value interval starts now.
+// Only expected values that are still pending and still belong to expectedValueID change; one that a later request
+// replaced, or whose interval already started (a retry), is left alone.
+- (void)_startExpectedValueIntervalForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths
+                                     expectedValueID:(uint64_t)expectedValueID
+                               expectedValueInterval:(NSNumber *)expectedValueInterval
+{
+    // since NSTimeInterval is in seconds, convert ms into seconds in double
+    NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
+
+    std::lock_guard lock(_lock);
+
+    BOOL started = NO;
+    for (MTRAttributePath * attributePath in attributePaths) {
+        NSArray * expectedValue = _expectedValueCache[attributePath];
+        if (!expectedValue || !MTRExpectedValueIsPending(expectedValue)
+            || [expectedValue[MTRDeviceExpectedValueFieldIDIndex] unsignedLongLongValue] != expectedValueID) {
+            continue;
+        }
+        _expectedValueCache[attributePath] = @[ expirationTime, expectedValue[MTRDeviceExpectedValueFieldValueIndex], @(expectedValueID) ];
+        started = YES;
+    }
+
+    if (started) {
+        MTR_LOG("%@ Expected values %llu for %@ sent, expiration time %f seconds from now", self, expectedValueID, attributePaths, [expirationTime timeIntervalSinceNow]);
+        // Schedules the expiration timer for the new expiration time.
+        [self _checkExpiredExpectedValues];
+    }
+}
+
 - (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths
                               expectedValueID:(uint64_t)expectedValueID
 {
@@ -5284,6 +5729,28 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+    }
+}
+
+// Removes the expected value with this ID for this path only while its request has not been sent.  Returns whether it
+// removed one.
+- (BOOL)_removePendingExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
+{
+    std::lock_guard lock(_lock);
+    NSArray * expectedValue = _expectedValueCache[attributePath];
+    if (!expectedValue || !MTRExpectedValueIsPending(expectedValue)
+        || [expectedValue[MTRDeviceExpectedValueFieldIDIndex] unsignedLongLongValue] != expectedValueID) {
+        return NO;
+    }
+    [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+    return YES;
+}
+
+// Removes the expected values of writes a later write replaced while merging; each entry is [ path, expectedValueID ].
+- (void)_removeMergedOutWriteExpectedValues:(NSArray<NSArray *> *)mergedOutExpectedValues
+{
+    for (NSArray * mergedOut in mergedOutExpectedValues) {
+        [self removeExpectedValueForAttributePath:mergedOut[0] expectedValueID:[mergedOut[1] unsignedLongLongValue]];
     }
 }
 
@@ -5633,6 +6100,22 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 }
 
 @end
+
+#ifdef DEBUG
+@implementation MTRDevice (UserInvokeTestHooks)
+
++ (uint32_t)unitTestUserInvokeMinimumTimeoutMs
+{
+    return MTRUserInvokeMinimumTimeoutMs();
+}
+
++ (void)unitTestSetUserInvokeMinimumTimeoutOverrideMs:(uint32_t)overrideMs
+{
+    sUserInvokeMinimumTimeoutOverrideMs.store(overrideMs, std::memory_order_relaxed);
+}
+
+@end
+#endif
 
 #pragma mark - SubscriptionCallback
 namespace {

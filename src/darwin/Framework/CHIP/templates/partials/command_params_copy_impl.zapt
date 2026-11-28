@@ -11,6 +11,8 @@
 {{/if}}
 {{#if (isStrEqual source "client")}}
   other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+  // Copies share the token: cancelling it cancels the invoke made with either object.
+  other.userInvokeToken = self.userInvokeToken;
 {{/if}}
 
   return other;

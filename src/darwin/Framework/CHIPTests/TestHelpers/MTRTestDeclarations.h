@@ -58,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDevice *)_existingDeviceForNodeID:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * sessionAttemptPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 @end
 
@@ -89,6 +90,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
+@property (nonatomic, readonly) dispatch_queue_t queue;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -108,6 +110,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 + (void)unitTestResetInvokeRequestMessageCount;
 + (NSUInteger)unitTestInvokeRequestMessageCount;
+
+// Counts single invoke requests actually sent from MTRBaseDevice's invoke path.
++ (void)unitTestResetSingleInvokeSendCount;
++ (NSUInteger)unitTestSingleInvokeSendCount;
++ (void)unitTestResetReadSendCount;
++ (NSUInteger)unitTestReadSendCount;
 
 // Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
@@ -141,6 +149,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+@end
+
+@interface MTRDevice (UserInvokeTestHooks)
+// The shortest caller timeout a user command accepts (one session attempt), and an override (0 restores it).
++ (uint32_t)unitTestUserInvokeMinimumTimeoutMs;
++ (void)unitTestSetUserInvokeMinimumTimeoutOverrideMs:(uint32_t)overrideMs;
 @end
 #endif
 
