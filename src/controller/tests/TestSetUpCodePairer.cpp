@@ -113,6 +113,24 @@ public:
 protected:
     PairerAccess & Access() { return *mAccess; }
 
+    void PrepareDiscoveryNotification(uint16_t discriminator = kDiscriminatorA, uint8_t commissioningMode = 1)
+    {
+        SetupPayload payload;
+        payload.discriminator.SetLongValue(kDiscriminatorA);
+        Access().SetSetupPayload(payload);
+        Access().SetWaitingForPASE(true);
+
+        Dnssd::DiscoveredNodeData discovered;
+        discovered.Set<Dnssd::CommissionNodeData>();
+        auto & nodeData            = discovered.Get<Dnssd::CommissionNodeData>();
+        nodeData.longDiscriminator = discriminator;
+        nodeData.commissioningMode = commissioningMode;
+        nodeData.numIPs            = 1;
+        nodeData.ipAddress[0]      = ParseIP("2001:db8::1");
+        nodeData.port              = 5540;
+        mPairer->NotifyCommissionableDeviceDiscovered(discovered);
+    }
+
 private:
     std::unique_ptr<DeviceCommissioner> mCommissioner;
     std::unique_ptr<SetUpCodePairer> mPairer;
@@ -325,6 +343,44 @@ TEST_F(TestSetUpCodePairer, NotifyDiscovered_CoalescesAcrossCallbacks)
     // Different address -> new entry.
     Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(ParseIP("2001:db8::2"), MakeInterfaceId(1)), kDiscriminatorA);
     EXPECT_EQ(Access().GetDiscoveredParametersCount(), 2u);
+}
+
+TEST_F(TestSetUpCodePairer, PassiveDiscoveryDoesNotQueuePairingWithRetainedPayload)
+{
+    PrepareDiscoveryNotification();
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
+}
+
+TEST_F(TestSetUpCodePairer, ActiveDNSSDDiscoveryQueuesMatchingNode)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    PrepareDiscoveryNotification();
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+}
+
+TEST_F(TestSetUpCodePairer, OtherTransportDiscoveryDoesNotAcceptUnsolicitedDNSSD)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
+    PrepareDiscoveryNotification();
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
+}
+
+TEST_F(TestSetUpCodePairer, ActiveDNSSDDiscoveryRejectsMismatchedDiscriminator)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    PrepareDiscoveryNotification(kDiscriminatorB);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
+}
+
+TEST_F(TestSetUpCodePairer, ActiveDNSSDDiscoveryRejectsClosedWindow)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    PrepareDiscoveryNotification(kDiscriminatorA, 0);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
 }
 
 } // namespace
