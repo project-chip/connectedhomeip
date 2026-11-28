@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <cinttypes>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
@@ -228,8 +229,13 @@ CHIP_ERROR ProvisionStorageReader::DecryptUsingOtaTlvEncryptionKey(MutableByteSp
 
 CHIP_ERROR ProvisionStorageReader::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
-    (void) keySpan;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    uint8_t key[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
+    size_t keyLength                                        = 0;
+    VerifyOrReturnError(keySpan.size() >= sizeof(key), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(
+        ZephyrConfig::ReadConfigValueBin(ZephyrStorage::kConfigKeyTestEventTriggerKey, key, sizeof(key), keyLength));
+    VerifyOrReturnError(keyLength == sizeof(key), CHIP_ERROR_INVALID_ARGUMENT);
+    return CopySpanToMutableSpan(ByteSpan(key), keySpan);
 }
 } // namespace Provision
 } // namespace Silabs
