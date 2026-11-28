@@ -100,6 +100,8 @@ public:
                  uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials);
 
+    bool ClearUser(UserIndex userIndex);
+
     bool SetDoorState(DoorStateEnum newState);
 
     DoorStateEnum GetDoorState() const;

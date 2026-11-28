@@ -20,6 +20,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/door-lock-server/door-lock-delegate.h>
+#include <app/clusters/door-lock-server/door-lock-types.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/DoorLock/Attributes.h>
@@ -28,10 +29,12 @@
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Metadata.h>
 #include <clusters/DoorLock/Structs.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <array>
 #include <cstdint>
@@ -81,7 +84,9 @@ struct OptionalAttributes
 /// attributes describe the physical lock and must match the actual hardware.
 struct Config
 {
-    explicit Config(TimerDelegate & timerDelegateIn) : timerDelegate(timerDelegateIn) {}
+    explicit Config(TimerDelegate & timerDelegateIn, FabricTable & fabricTableIn) :
+        timerDelegate(timerDelegateIn), fabricTable(fabricTableIn)
+    {}
 
     // ---- Feature configuration ----------------------------------------------
     BitFlags<Feature> features;
@@ -102,7 +107,10 @@ struct Config
     uint8_t numberOfYearDaySchedulesPerUser     = 0;
     uint8_t numberOfHolidaySchedulesSupported   = 0;
     uint8_t numberOfCredentialsSupportedPerUser = 0;
-    BitMask<DlCredentialRuleMask> credentialRulesSupport;
+    // Credential rules the cluster accepts for SetUser. The default rule
+    // (kSingle) is always accepted; dual and tri only when added here, so an
+    // unconfigured cluster keeps the single-user behavior.
+    BitMask<DlCredentialRuleMask> credentialRulesSupport{ DlCredentialRuleMask::kSingle };
 
     uint8_t maxPINCodeLength  = 0;
     uint8_t minPINCodeLength  = 0;
@@ -135,6 +143,10 @@ struct Config
 
     /// Timer delegate used for auto-relock scheduling and monotonic timestamps.
     TimerDelegate & timerDelegate;
+
+    /// Fabric table the cluster registers its fabric-removal observer with
+    /// ([USR] feature).
+    FabricTable & fabricTable;
 };
 
 /**
@@ -152,9 +164,11 @@ class DoorLockCluster : public DefaultServerCluster
 public:
     DoorLockCluster(EndpointId endpointId, Delegate & delegate, const Config & config);
 
-    ~DoorLockCluster() override = default;
+    ~DoorLockCluster() override;
 
     // ---- ServerClusterInterface implementation --------------------------------
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     void Shutdown(ClusterShutdownType shutdownType) override;
 
@@ -173,7 +187,13 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     // ---- Application-facing API ------------------------------------------------
+
+    /// Reclaims the user records that fabricIndex created or last modified.
+    /// Invoked by the fabric table observer on fabric removal.
+    void OnFabricRemoved(FabricIndex fabricIndex);
 
     /// Applies a lock-state change originating from a local operation and emits the
     /// corresponding LockOperation / LockOperationError events.
@@ -208,7 +228,21 @@ public:
     }
 
     DlLockState GetLockState() const { return mLockState.ValueOr(DlLockState::kNotFullyLocked); }
+    const DataModel::Nullable<DlLockState> & GetLockStateNullable() const { return mLockState; }
     uint32_t GetAutoRelockTime() const { return mAutoRelockTime; }
+    bool GetRequirePINforRemoteOperation() const { return mRequirePINforRemoteOperation; }
+
+    /// Updates the ActuatorEnabled read-only state (application reported).
+    void SetActuatorEnabled(bool actuatorEnabled)
+    {
+        SetAttributeValue(mActuatorEnabled, actuatorEnabled, Attributes::ActuatorEnabled::Id);
+    }
+
+    /// Updates the AutoRelockTime attribute without changing any pending relock.
+    void SetAutoRelockTime(uint32_t autoRelockTime)
+    {
+        SetAttributeValue(mAutoRelockTime, autoRelockTime, Attributes::AutoRelockTime::Id);
+    }
 
 private:
     Delegate & mDelegate;
@@ -269,9 +303,95 @@ private:
     };
     AutoRelockTimerContext mAutoRelockTimerContext;
 
+    /// FabricTable observer that reclaims this endpoint's user records when a
+    /// fabric used for a user record is removed. Kept as a composed observer
+    /// (not a base class): deriving from FabricTable::Delegate would inject
+    /// its "Delegate" name into the class scope, shadowing DoorLock::Delegate
+    /// for the delegate member declarations.
+    class FabricTableObserver : public FabricTable::Delegate
+    {
+    public:
+        explicit FabricTableObserver(DoorLockCluster & clusterIn) : mCluster(clusterIn) {}
+        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            mCluster.OnFabricRemoved(fabricIndex);
+        }
+
+    private:
+        DoorLockCluster & mCluster;
+    };
+    FabricTableObserver mFabricTableObserver;
+
+    FabricTable & mFabricTable;
+
     // ---- Internal helpers -----------------------------------------------------------
 
     using DelegateLockOpHandler = std::optional<OperationErrorEnum> (Delegate::*)(const LockOperationRequest &);
+
+    // ---- User / credential / schedule command handlers --------------------------
+    // Each handler mirrors the ember implementation behavior 1:1 (including
+    // response commands, cluster-specific failure codes and LockUserChange
+    // events); the response is always sent to the CommandHandler here, so the
+    // InvokeCommand dispatch returns std::nullopt after calling them.
+
+    /// Computes the command status; the caller adds it to the CommandHandler
+    /// through the allocation-failure-tolerant AddStatus overload.
+    chip::Protocols::InteractionModel::ClusterStatusCode HandleSetUser(const DataModel::InvokeRequest & request,
+                                                                       const Commands::SetUser::DecodableType & commandData);
+    /// Sends the GetUserResponse through the CommandHandler and reports a
+    /// status only when the request did not produce one.
+    std::optional<chip::Protocols::InteractionModel::Status> HandleGetUser(const DataModel::InvokeRequest & request,
+                                                                           UserIndex userIndex, CommandHandler * handler);
+    chip::Protocols::InteractionModel::ClusterStatusCode HandleClearUser(const DataModel::InvokeRequest & request,
+                                                                         UserIndex userIndex);
+    // ---- Command helpers (ported from the ember implementation) -----------------
+
+    /// True when the user management feature is enabled (also required for
+    /// per-user schedules and user-scoped credentials).
+    bool SupportsUSR() const { return mFeatures.Has(Feature::kUser); }
+
+    bool UserIndexValid(UserIndex userIndex) const;
+    bool UserIndexValid(UserIndex userIndex, uint16_t & maxNumberOfUsers) const;
+
+    /// ClearUser reserves 0xFFFE as the clear-all wildcard: a user capacity at
+    /// or above the sentinel can not address its last slots. A failed Startup
+    /// does not unregister the cluster, so the command handlers verify this
+    /// again instead of trusting the Startup check.
+    bool UserCapacityValid() const;
+
+    /// Sets userIndex to the first occupied slot at or after startIndex, or the
+    /// invalid index when no occupied slot exists. Returns CHIP_ERROR_INTERNAL
+    /// on a delegate lookup failure so callers can distinguish it from "no more
+    /// users".
+    CHIP_ERROR FindOccupiedUserSlot(UserIndex startIndex, UserIndex & userIndex) const;
+
+    chip::Protocols::InteractionModel::ClusterStatusCode
+    CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, UserIndex userIndex,
+               const DataModel::Nullable<CharSpan> & userName, const DataModel::Nullable<uint32_t> & userUniqueId,
+               const DataModel::Nullable<UserStatusEnum> & userStatus, const DataModel::Nullable<UserTypeEnum> & userType,
+               const DataModel::Nullable<CredentialRuleEnum> & credentialRule,
+               const DataModel::Nullable<CredentialStruct> & credential = DataModel::Nullable<CredentialStruct>());
+    chip::Protocols::InteractionModel::Status ModifyUser(FabricIndex modifierFabricIndex, NodeId sourceNodeId, UserIndex userIndex,
+                                                         const DataModel::Nullable<CharSpan> & userName,
+                                                         const DataModel::Nullable<uint32_t> & userUniqueId,
+                                                         const DataModel::Nullable<UserStatusEnum> & userStatus,
+                                                         const DataModel::Nullable<UserTypeEnum> & userType,
+                                                         const DataModel::Nullable<CredentialRuleEnum> & credentialRule);
+    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, UserIndex userIndex,
+                                                        bool sendUserChangeEvent);
+
+    void ClearFabricFromUsers(FabricIndex fabricIndex) const;
+
+    void SendRemoteLockUserChange(LockDataTypeEnum dataType, DataOperationTypeEnum operation, NodeId nodeId,
+                                  FabricIndex fabricIndex, uint16_t userIndex, uint16_t dataIndex) const;
+
+    /// Loads persistent attribute values from the attribute storage.
+    void LoadPersistentAttributes(ServerClusterContext & context);
+
+    /// Stores LockState into the attribute persistence storage.
+    CHIP_ERROR StoreLockState() const;
+
+    // ---- Response encoding helpers ------------------------------------------------
 
     /// Shared implementation of LockDoor/UnlockDoor/UnlockWithTimeout/UnboltDoor:
     /// operating-mode gate, lockout window, credential checks, hardware actuation,
@@ -293,7 +413,7 @@ private:
     /// Emits any typed cluster event through the interaction model context.
     /// Nothing actionable can be done on failure: GenerateEvent already logs it.
     template <typename T>
-    void SendEvent(const T & event)
+    void SendEvent(const T & event) const
     {
         if (IsStarted())
         {

@@ -232,8 +232,9 @@ public:
      * Must succeed even for unoccupied slots (userStatus == kAvailable), the
      * slot content is only populated for occupied ones.
      *
-     * @param[in] userIndex user index as on the wire (0 is the invalid index),
-     *            guaranteed within NumberOfTotalUsersSupported when valid
+     * @param[in] userIndex user index as received on the wire, with
+     *            UserIndex::IsValid() marking valid slots; guaranteed within
+     *            NumberOfTotalUsersSupported when valid
      * @param[out] user the user record
      * @retval true if the user index is within the application database
      */
@@ -254,6 +255,22 @@ public:
     {
         return false;
     }
+
+    /**
+     * @brief Remove a user record together with its credentials and schedules.
+     *
+     * Called once per cleared user, replacing the cluster's earlier per-record
+     * writes: the cluster reports the command result from this single call and
+     * never clears the user's references itself, so an implementation must
+     * remove the user record, its credentials and its schedules in this
+     * operation and return false (leaving all records intact) on failure.
+     * Clearing an available slot is a no-op.
+     *
+     * @param[in] userIndex user index as received on the wire
+     * @retval true all affected records were removed
+     * @retval false all records were left unchanged
+     */
+    virtual bool ClearUser(UserIndex userIndex) { return false; }
 
     // ---- Credential storage ------------------------------------------------------
 
