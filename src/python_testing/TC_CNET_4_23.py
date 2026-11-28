@@ -60,7 +60,9 @@ TIMED_REQUEST_TIMEOUT_MS = 5000         # Matter timed-request window (5s)
 MDNS_DISCOVERY_TIMEOUT = 10             # mDNS discovery timeout per attempt (10s)
 SCAN_RETRY_DELAY = 3                    # Delay between scan retries (3s)
 MAX_ATTEMPTS = 3                        # Maximum discovery/retry attempts
-TIMEOUT = 180                           # Overall test timeout (3 min)
+# Overall test timeout (10 min). Steps 0, 3, 9 and 13 may each legitimately take up to
+# ConnectMaxTimeSeconds (often 60s or more), so 3 minutes is not enough for slower DUTs.
+TIMEOUT = 600
 
 # Cluster references
 cnet = Clusters.NetworkCommissioning
@@ -345,6 +347,33 @@ class TC_CNET_4_23(MatterTestCommissioner):
         )
         logger.info(" --- Extended fail-safe timer to 300 seconds")
 
+        # ConnectNetwork and ScanNetworks responses are only sent once the DUT finishes (or gives up on)
+        # the operation, which can take up to ConnectMaxTimeSeconds / ScanMaxTimeSeconds. The SDK's default
+        # interaction timeout (transport round-trip + ~2s of expected processing) is not enough for that,
+        # so compute the interaction timeouts from the values advertised by the DUT.
+        connect_max_time_s = await self.read_single_attribute_check_success(
+            cluster=cnet,
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.ConnectMaxTimeSeconds,
+        )
+        scan_max_time_s = await self.read_single_attribute_check_success(
+            cluster=cnet,
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.ScanMaxTimeSeconds,
+        )
+        connect_interaction_timeout_ms = self.default_controller.ComputeRoundTripTimeout(
+            self.dut_node_id, upperLayerProcessingTimeoutMs=connect_max_time_s * 1000)
+        scan_interaction_timeout_ms = self.default_controller.ComputeRoundTripTimeout(
+            self.dut_node_id, upperLayerProcessingTimeoutMs=scan_max_time_s * 1000)
+        logger.info(" --- ConnectMaxTimeSeconds = %d -> ConnectNetwork interaction timeout = %d ms",
+                    connect_max_time_s, connect_interaction_timeout_ms)
+        logger.info(" --- ScanMaxTimeSeconds = %d -> ScanNetworks interaction timeout = %d ms",
+                    scan_max_time_s, scan_interaction_timeout_ms)
+
         # Step 1: Remove all configured networks
         self.step(1)
 
@@ -380,7 +409,8 @@ class TC_CNET_4_23(MatterTestCommissioner):
         logger.info(" --- Sending ConnectNetwork with incorrect SSID...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
-            cmd=cnet.Commands.ConnectNetwork(networkID=incorrect_ssid, breadcrumb=2))
+            cmd=cnet.Commands.ConnectNetwork(networkID=incorrect_ssid, breadcrumb=2),
+            interactionTimeoutMs=connect_interaction_timeout_ms)
         await self._validate_connect_network_response(response, expect_success=False)
         logger.info(" --- ConnectNetwork failed as expected for incorrect SSID: %s", incorrect_ssid.decode())
 
@@ -428,7 +458,8 @@ class TC_CNET_4_23(MatterTestCommissioner):
         logger.info(" --- Sending ConnectNetwork with incorrect credentials...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
-            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid, breadcrumb=5))
+            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid, breadcrumb=5),
+            interactionTimeoutMs=connect_interaction_timeout_ms)
         await self._validate_connect_network_response(response, expect_success=False)
         logger.info(" --- ConnectNetwork failed as expected with incorrect credentials")
 
@@ -448,7 +479,8 @@ class TC_CNET_4_23(MatterTestCommissioner):
             logger.info(" --- ScanNetworks attempt %d/%d", attempt, MAX_ATTEMPTS)
             response = await self.send_single_cmd(
                 endpoint=endpoint,
-                cmd=cnet.Commands.ScanNetworks(breadcrumb=6))
+                cmd=cnet.Commands.ScanNetworks(breadcrumb=6),
+                interactionTimeoutMs=scan_interaction_timeout_ms)
             asserts.assert_true(isinstance(response, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from ScanNetworks")
 
@@ -489,7 +521,8 @@ class TC_CNET_4_23(MatterTestCommissioner):
         logger.info(" --- Sending ConnectNetwork with correct credentials...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
-            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid, breadcrumb=8))
+            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid, breadcrumb=8),
+            interactionTimeoutMs=connect_interaction_timeout_ms)
         await self._validate_connect_network_response(response, expect_success=True)
         logger.info(" --- ConnectNetwork succeeded for SSID: %s", correct_ssid.decode('utf-8', errors='replace'))
 
