@@ -54,14 +54,26 @@ jobs:
             matrix:
                 include:
                     - board: xg26_rb4118a
+                      vendor: silabs
+                      west_projects: "+hal_silabs"
                       toolchain: zephyr # gcc
                       build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
                       sysbuild: --sysbuild
 
                     - board: siwx917_rb4338a
+                      vendor: silabs
+                      west_projects: "+hal_silabs"
                       toolchain: zephyr
                       build_dir: all-devices-zephyr-siwx917
+                      sysbuild: ""
+
+                    - board: frdm_rw612
+                      vendor: nxp
+                      west_projects: "+hal_nxp,+hostap,+cmsis"
+                      toolchain: zephyr # gcc
+                      build_dir: all-devices-zephyr-frdm-rw612
+                      extra_args: -DCONFIG_BUILD_ONLY_NO_BLOBS=y
                       sysbuild: ""
 
         steps:
@@ -84,7 +96,7 @@ jobs:
                   sdk-version: "1.0.1"
                   toolchains: arm-zephyr-eabi:llvm
                   enable-ccache: "false"
-                  west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
+                  west-project-filter: "-.*,-matter,${{ matrix.west_projects }},+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
 
             - name: Restore ccache
               uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -103,6 +115,8 @@ jobs:
             - name: Configure Zephyr workspace and Matter submodules
               shell: bash
               working-directory: zephyrproject
+              env:
+                  VENDOR: ${{ matrix.vendor }}
               run: |
                   set -euxo pipefail
                   west zephyr-export
@@ -113,10 +127,16 @@ jobs:
                       third_party/nlassert/repo \
                       third_party/nlio/repo \
                       third_party/uriparser/repo \
-                      third_party/pigweed/repo \
-                      third_party/silabs/matter_support
-                  : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
-                  west blobs fetch
+                      third_party/pigweed/repo
+
+                  if [[ "$VENDOR" == "silabs" ]]; then
+                      git -C "$GITHUB_WORKSPACE" submodule update --init --depth 1 --jobs 4 -- \
+                          third_party/silabs/matter_support
+                      : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
+                      west blobs fetch
+                  else
+                      : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
+                  fi
 
             - name: Install GN from Matter's pinned CIPD version
               shell: bash
