@@ -28,10 +28,15 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --no-wildcard-subscription
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [needs-followup-fixes]
+#     issues:
+#       - https://github.com/project-chip/connectedhomeip/issues/75426
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --device fan-no-onoff

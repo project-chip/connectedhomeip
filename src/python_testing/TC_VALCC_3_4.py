@@ -18,8 +18,9 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device irrigation-system:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     # Endpoint 3 is the zone 2 valve, the irrigation valve that has LevelStep.
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -27,7 +28,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#       --endpoint 3
 #     factory-reset: true
 #     quiet: true
 #   run2:
