@@ -336,7 +336,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
         return;
     }
 
-    if (CHIP_NO_ERROR != error)
+    if (CHIP_NO_ERROR != error && CHIP_ERROR_IN_PROGRESS != error)
     {
         impl->mOperationalDelegate->OnOperationalNodeResolutionFailed(PeerId(), error);
         return;
