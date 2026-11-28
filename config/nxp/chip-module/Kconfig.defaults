@@ -18,7 +18,7 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
-if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
+if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW || SOC_FAMILY_NXP_IMXRT
 
 if CHIP
 
@@ -110,7 +110,8 @@ config LOG
 if LOG
 
 choice LOG_MODE
-	default LOG_MODE_DEFERRED if SOC_FAMILY_NXP_RW && OPENTHREAD
+	default LOG_MODE_DEFERRED if \
+		((SOC_FAMILY_NXP_RW || SOC_FAMILY_NXP_IMXRT) && OPENTHREAD)
 	default LOG_MODE_MINIMAL
 endchoice
 
@@ -205,6 +206,8 @@ config INIT_STACKS
 config NET_MGMT_EVENT_STACK_SIZE
 	default 2048 if CHIP_WIFI_PAF
 	default 8192 if OPENTHREAD_BORDER_ROUTER
+	default 2048 if SOC_SERIES_RW6XX
+	default 2048 if SOC_FAMILY_NXP_IMXRT
 	default 1024
 
 config NET_TX_STACK_SIZE
@@ -1023,4 +1026,4 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 
 endif # CHIP
 
-endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
+endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW || SOC_FAMILY_NXP_IMXRT
