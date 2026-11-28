@@ -28,7 +28,9 @@ endif()
 
 # Enable default ZCL path to be passed to the zapgen command for all examples.
 # This is only used if the ZCL_PATH argument is not provided in the chip_configure_data_model().
-set(CHIP_ENABLE_ZCL_ARG ON)
+if (NOT CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+    set(CHIP_ENABLE_ZCL_ARG ON)
+endif()
 
 if (CONFIG_CHIP_APP_COMMON)
     target_sources(app PRIVATE
@@ -60,7 +62,7 @@ if (CONFIG_CHIP_APP_COMMON)
     endif()
 endif()
 
-if (CONFIG_CHIP_APP_CLUSTERS)
+if (CONFIG_CHIP_APP_CLUSTERS AND NOT CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/clusters/include
     )
@@ -210,8 +212,12 @@ if (CONFIG_CHIP_APP_CLI)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIBase.cpp
         ${CHIP_ROOT}/examples/shell/shell_common/cmd_misc.cpp
         ${CHIP_ROOT}/examples/shell/shell_common/cmd_otcli.cpp
-        ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
     )
+    if (NOT CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        target_sources(app PRIVATE
+            ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
+        )
+    endif()
     if (CONFIG_APP_FREERTOS_OS)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIFreeRTOS.cpp

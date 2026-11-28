@@ -19,6 +19,8 @@
 
 #include "OTARequestorInitiator.h"
 
+#include <lib/support/CodeUtils.h>
+
 using namespace chip;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
@@ -27,13 +29,23 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
     auto & imageProcessor   = OTAImageProcessorImpl::GetDefaultInstance();
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    VerifyOrDie(otaRequestorInit != nullptr);
+    VerifyOrDie(otaRequestorInit->mCodeDrivenAttributes != nullptr);
+    VerifyOrDie(otaRequestorInit->mCodeDrivenEventGenerator != nullptr);
+    auto & attributes     = *otaRequestorInit->mCodeDrivenAttributes;
+    auto & eventGenerator = *otaRequestorInit->mCodeDrivenEventGenerator;
+#else
+    auto & attributes     = GetOTARequestorAttributes();
+    auto & eventGenerator = GetDefaultOTARequestorEventGenerator();
+#endif
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(
-        chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser,
-        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
+    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
+                                                                   otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader,
+                                                                   attributes, eventGenerator);
     otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
     TEMPORARY_RETURN_IGNORED imageProcessor.Init(&otaRequestorInit->gDownloader);

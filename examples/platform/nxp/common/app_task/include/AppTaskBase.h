@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include <app/data-model-provider/Provider.h>
 #include <app/server/Server.h>
 #include <platform/NetworkCommissioning.h>
 
@@ -60,6 +61,16 @@ public:
      *
      */
     virtual void PostInitMatterServerInstance(void){};
+
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    /**
+     * Prepares the data model provider and endpoints before Server::Init().
+     * Static resources in params have already been initialized.
+     * The provider and registered objects must remain valid while used by the server.
+     * Returns CHIP_NO_ERROR on success, or a preparation error.
+     */
+    virtual CHIP_ERROR PrepareCodeDrivenDataModel(chip::CommonCaseDeviceServerInitParams & params) = 0;
+#endif
 
     /**
      * \brief This function could be overridden in order to execute code before matter stack init function.
@@ -211,6 +222,10 @@ private:
 #endif
 
 protected:
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    chip::CommonCaseDeviceServerInitParams & GetServerInitParams() { return initParams; }
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
     // Each platform provides the border agent base service name, which differs by OpenThread integration.
     virtual chip::CharSpan GetBorderRouterName() = 0;

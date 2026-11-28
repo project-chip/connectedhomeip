@@ -26,8 +26,10 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
+#if !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
+#endif
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -174,11 +176,12 @@ static LastFabricRemovedDelegate sLastFabricRemovedDelegate;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#if CONFIG_OPENTHREAD
+#if CONFIG_OPENTHREAD && !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
 #endif
 
+#if !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
 app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
                                                                             chip::NXP::App::GetAppTask().GetWifiDriverInstance());
@@ -186,6 +189,7 @@ app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
 app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
+#endif // CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 
 #if CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
@@ -240,14 +244,17 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #elif CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
+#if CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+    VerifyOrDie(GetAppTask().PrepareCodeDrivenDataModel(initParams) == CHIP_NO_ERROR);
+#else
 #if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
-
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+#endif // CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
 
 #if CONFIG_OPENTHREAD
     // Init ZCL Data Model and start server
@@ -354,7 +361,10 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
+
+#if !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+#endif
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
@@ -390,14 +400,16 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     chip::NXP::App::BleAppMgr().PostMatterStackInit();
 #endif
 
-#if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if !CONFIG_CHIP_DATA_MODEL_CODEDRIVEN
+#if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
     TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
-#ifdef ENABLE_CHIP_SHELL
+#endif
+#endif
+
+#if defined(ENABLE_CHIP_SHELL) && (CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA)
     Shell::SetWiFiDriver(chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
-#elif CONFIG_CHIP_ETHERNET
-    TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
-#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
     {
@@ -545,7 +557,7 @@ void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()
 #if CONFIG_NETWORK_LAYER_BLE
     auto flags = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
 #else
-    auto flags = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork);
+    auto flags                   = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork);
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
     chip::PayloadContents payload;
