@@ -23,8 +23,8 @@
 #include <app/clusters/ota-provider/OTAProviderUserConsentDelegate.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
+#include <optional>
 #include <ota-provider-common/BdxOtaSender.h>
-
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -125,6 +125,7 @@ public:
     }
     uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
     uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    uint32_t GetQueryImageRequestCount() const { return mQueryImageRequestCount; }
     // Update token that was generated and sent in the most recent QueryImageResponse.
     // Empty string if no UpdateAvailable response has been sent yet.
     const char * GetUpdateToken() const { return mUpdateToken; }
@@ -142,6 +143,8 @@ public:
     const char * GetLocation() const { return mLocation; }
     bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
     uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
+    std::optional<uint16_t> GetRequestedMaxBlockSize() const { return mBdxOtaSender.GetRequestedMaxBlockSize(); }
+    std::optional<bool> GetIsTcpTransport() const { return mBdxOtaSender.GetIsTcpTransport(); }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
@@ -198,10 +201,12 @@ private:
     OTAApplyUpdateAction mApplyUpdateRequestActionSent;
     uint32_t mApplyUpdateRequestDelaySent;
     u_int16_t mApplyUpdateRequestCount = 0;
+    uint32_t mQueryImageRequestCount   = 0;
     // Hex-encoded update token issued in the most recent QueryImageResponse.
     char mUpdateToken[kUpdateTokenStrLen] = { 0 };
     // Hex-encoded update token received in the most recent ApplyUpdateRequest.
     char mApplyUpdateRequestUpdateToken[kUpdateTokenStrLen] = { 0 };
     // NewVersion field received in the most recent ApplyUpdateRequest.
     uint32_t mApplyUpdateRequestNewVersion = 0;
+    std::optional<uint16_t> mRequestedMaxBlockSize;
 };

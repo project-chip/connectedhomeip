@@ -189,6 +189,57 @@ TEST_F(TestBdxOtaSenderPeerBinding, AcceptsTheRequesterItWasArmedFor)
     EXPECT_SUCCESS(DeliverReceiveInitFrom(mArmedSession.Get().Value()));
 }
 
+TEST_F(TestBdxOtaSenderPeerBinding, CapturesUdpTransportFromReceiveInit)
+{
+    ArmForArmedRequester();
+
+    ASSERT_SUCCESS(DeliverReceiveInitFrom(mArmedSession.Get().Value()));
+    mSender->PollForOutput();
+    ASSERT_TRUE(mSender->GetIsTcpTransport().has_value());
+    EXPECT_FALSE(mSender->GetIsTcpTransport().value());
+}
+
+TEST_F(TestBdxOtaSenderPeerBinding, CapturesTcpTransportFromReceiveInit)
+{
+    ArmForArmedRequester();
+    mArmedSession.Get().Value()->AsSecureSession()->SetPeerAddress(Transport::PeerAddress::TCP(Inet::IPAddress::Any));
+
+    ASSERT_SUCCESS(DeliverReceiveInitFrom(mArmedSession.Get().Value()));
+    mSender->PollForOutput();
+    ASSERT_TRUE(mSender->GetIsTcpTransport().has_value());
+    EXPECT_TRUE(mSender->GetIsTcpTransport().value());
+}
+
+TEST_F(TestBdxOtaSenderPeerBinding, RejectedReceiveInitDoesNotReplacePendingTransport)
+{
+    ArmForArmedRequester();
+
+    ASSERT_SUCCESS(DeliverReceiveInitFrom(mArmedSession.Get().Value()));
+    EXPECT_FALSE(mSender->GetIsTcpTransport().has_value());
+
+    mArmedSession.Get().Value()->AsSecureSession()->SetPeerAddress(Transport::PeerAddress::TCP(Inet::IPAddress::Any));
+    EXPECT_EQ(DeliverReceiveInitFrom(mArmedSession.Get().Value()), CHIP_ERROR_INCORRECT_STATE);
+
+    mSender->PollForOutput();
+    ASSERT_TRUE(mSender->GetIsTcpTransport().has_value());
+    EXPECT_FALSE(mSender->GetIsTcpTransport().value());
+}
+
+TEST_F(TestBdxOtaSenderPeerBinding, InitializeTransferClearsCapturedTransport)
+{
+    ArmForArmedRequester();
+    Messaging::ExchangeContext * exchange = NewExchangeFor(mArmedSession.Get().Value());
+
+    ASSERT_SUCCESS(DeliverReceiveInitOn(exchange));
+    mSender->PollForOutput();
+    ASSERT_TRUE(mSender->GetIsTcpTransport().has_value());
+
+    // InitializeTransfer closes the active exchange, so teardown must not retain its pointer.
+    mExchanges.pop_back();
+    ASSERT_SUCCESS(mSender->InitializeTransfer(GetBobFabricIndex(), kArmedRequesterNodeId));
+    EXPECT_FALSE(mSender->GetIsTcpTransport().has_value());
+}
+
 // A peer sharing the armed node id but on a different fabric must be rejected: the
 // fabric-index half of the comparison is what separates it, since BDX consults no ACL.
 TEST_F(TestBdxOtaSenderPeerBinding, RejectsTheSameNodeIdOnADifferentFabric)

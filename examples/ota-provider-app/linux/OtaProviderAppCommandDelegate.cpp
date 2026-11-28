@@ -59,6 +59,36 @@ static std::string ToString(const Json::Value & v)
     return Json::writeString(w, v);
 }
 
+Json::Value OtaProviderAppCommandHandler::BuildBlockSizeSnapshot(uint16_t endpoint)
+{
+    Json::Value payload(Json::objectValue);
+    payload["VendorID"]          = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]         = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]   = GetOtaProviderExample().GetSoftwareVersion();
+    payload["ProviderBlockSize"] = GetOtaProviderExample().GetMaxBlockSize();
+
+    const auto requestedMaxBlockSize = GetOtaProviderExample().GetRequestedMaxBlockSize();
+    if (requestedMaxBlockSize.has_value())
+    {
+        payload["DUTRequestedMaxBlockSize"] = Json::UInt(requestedMaxBlockSize.value());
+    }
+    else
+    {
+        payload["DUTRequestedMaxBlockSize"] = Json::nullValue;
+    }
+
+    const auto isTcpTransport = GetOtaProviderExample().GetIsTcpTransport();
+    if (isTcpTransport.has_value())
+    {
+        payload["IsTCPTransport"] = isTcpTransport.value();
+    }
+    else
+    {
+        payload["IsTCPTransport"] = Json::nullValue;
+    }
+    return payload;
+}
+
 Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -78,15 +108,16 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 {
     Json::Value payload(Json::objectValue);
 
-    payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
-    payload["ProductID"]           = GetOtaProviderExample().GetProductId();
-    payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
-    payload["HardwareVersion"]     = GetOtaProviderExample().GetHardwareVersion();
-    payload["Location"]            = GetOtaProviderExample().GetLocation();
-    payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
-    payload["UserConsentNeeded"]   = GetOtaProviderExample().GetUserConsentNeeded();
-    payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
-    payload["UpdateToken"]         = GetOtaProviderExample().GetUpdateToken();
+    payload["VendorID"]               = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]              = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]        = GetOtaProviderExample().GetSoftwareVersion();
+    payload["HardwareVersion"]        = GetOtaProviderExample().GetHardwareVersion();
+    payload["Location"]               = GetOtaProviderExample().GetLocation();
+    payload["RequestorCanConsent"]    = GetOtaProviderExample().GetRequestorCanConsent();
+    payload["UserConsentNeeded"]      = GetOtaProviderExample().GetUserConsentNeeded();
+    payload["BlockSize"]              = GetOtaProviderExample().GetMaxBlockSize();
+    payload["UpdateToken"]            = GetOtaProviderExample().GetUpdateToken();
+    payload["QueryImageRequestCount"] = Json::UInt(GetOtaProviderExample().GetQueryImageRequestCount());
 
     const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 
@@ -157,6 +188,20 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         out["Cluster"]  = cluster;
         out["Endpoint"] = endpoint;
         out["Payload"]  = self->BuildApplyUpdateRequestSnapshot(endpoint);
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
+        return;
+    }
+    if (name == "GetBlockSizeSnapShot")
+    {
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "BlockSizeSnapshot";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+        out["Payload"]  = self->BuildBlockSizeSnapshot(endpoint);
 
         if (delegate && delegate->GetPipes())
         {
