@@ -34,6 +34,17 @@ constexpr size_t kDynamicLightingMaxClusterCount   = kDynamicLightingFixedCluste
 
 LazyRegisteredServerCluster<DynamicLightingCluster> gServers[kDynamicLightingMaxClusterCount];
 
+class NoEffectsDelegate : public DynamicLightingDelegate
+{
+public:
+    Span<const Structs::EffectStruct::Type> GetAvailableEffects() override { return {}; }
+    CHIP_ERROR StartEffect(const Structs::EffectStruct::Type &, uint16_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void StopEffect() override {}
+    CHIP_ERROR SetEffectSpeed(uint16_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+};
+
+NoEffectsDelegate gNoEffectsDelegate;
+
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -42,7 +53,7 @@ public:
     {
         VerifyOrDie(clusterInstanceIndex < kDynamicLightingMaxClusterCount);
 
-        gServers[clusterInstanceIndex].Create(endpointId);
+        gServers[clusterInstanceIndex].Create(endpointId, gNoEffectsDelegate);
         return gServers[clusterInstanceIndex].Registration();
     }
 
