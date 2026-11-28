@@ -2759,6 +2759,24 @@ TEST_F(TestPushAVStreamTransportServerLogic, MigrationTest_LegacyCurrentConnecti
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestPushAVStreamTransportServerLogic, ResolveCMAFSessionNumberPrefersSuppliedNumber)
+{
+    // Without a delegate, only a supplied session number can be reported.
+    EXPECT_FALSE(mServer.GetLogic().ResolveCMAFSessionNumber(1, NullOptional).HasValue());
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+
+    // The mock delegate reports connectionID + 2000.
+    Optional<uint64_t> fromDelegate = mServer.GetLogic().ResolveCMAFSessionNumber(1, NullOptional);
+    ASSERT_TRUE(fromDelegate.HasValue());
+    EXPECT_EQ(fromDelegate.Value(), 2001u);
+
+    Optional<uint64_t> supplied = mServer.GetLogic().ResolveCMAFSessionNumber(1, MakeOptional(static_cast<uint64_t>(7)));
+    ASSERT_TRUE(supplied.HasValue());
+    EXPECT_EQ(supplied.Value(), 7u);
+}
+
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
