@@ -21,6 +21,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <ctime>
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -44,15 +46,21 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
     softwareFault.id = currentTaskStatus.xTaskNumber;
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
-    char timeChar[50]  = "";
-    std::time_t result = std::time(nullptr);
-    struct std::tm timeInfo;
-    // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
-    if (localtime_r(&result, &timeInfo) != nullptr && std::strftime(timeChar, sizeof(timeChar), "%c", &timeInfo))
+    char timeChar[50];
+    const std::time_t result = std::time(nullptr);
+    if (result != static_cast<std::time_t>(-1))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
+        const std::tm * localTime = std::localtime(&result);
+        if (localTime != nullptr)
+        {
+            // Using size 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
+            const size_t timeLength = std::strftime(timeChar, sizeof(timeChar), "%c", localTime);
+            if (timeLength > 0)
+            {
+                softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), timeLength));
+            }
+        }
     }
-
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 

@@ -69,7 +69,7 @@
 [submodule "ot-stm32"]
 	path = third_party/openthread/ot-stm32
 	url = https://github.com/openthread/openthread
-	branch = eb6377f
+	branch = cbb04be
 	platforms = stm32
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx

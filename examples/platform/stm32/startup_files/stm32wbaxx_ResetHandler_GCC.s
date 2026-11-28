@@ -113,6 +113,8 @@ CPUcontextSave:
         DSB
         WFI                            /* all saved, trigger deep sleep */
 
+  .global CPUcontextRestore
+  .type CPUcontextRestore, %function
 CPUcontextRestore:
   /* Even if we fall through the WFI instruction, we will immediately
    * execute a context restore and end up where we left off with no
@@ -123,6 +125,7 @@ CPUcontextRestore:
         MOV    SP, R4                  /* restore the SP from R4 */
         POP    { R4 - R12, PC }        /* load R4 to R12 and PC (10 words) from C stack */
 
+  .type backup_system_register, %function
 backup_system_register:
 /* R0 -> register_backup_table array current item address */
 /* R1 -> loop counter (from register_backup_table_size to 0) */
@@ -149,6 +152,7 @@ backup_loop_iter:
 backup_loop_end:
         BX LR                                    /* Return to caller */
 
+  .type restore_system_register, %function
 restore_system_register:
 /* R0 -> register_backup_table array current item address */
 /* R1 -> loop counter (from register_backup_table_size to 0) */
@@ -187,3 +191,4 @@ restore_loop_end:
         BX LR                                    /* Return to caller */
 /* end of specific code section for standby */
         .end
+

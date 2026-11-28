@@ -171,6 +171,7 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    constexpr int extDiscTimeoutSecs = 30;
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 

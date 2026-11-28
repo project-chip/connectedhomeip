@@ -23,20 +23,27 @@ from .gn import GnBuilder
 
 class stm32App(Enum):
     LIGHT = auto()
+    LIT = auto()
 
     def ExampleName(self):
         if self == stm32App.LIGHT:
             return 'lighting-app'
+        if self == stm32App.LIT:
+            return 'lit-icd-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
-            return 'chip-stm32-lighting-example'
+            return 'STM32WBA65I-DK1-lighting'
+        if self == stm32App.LIT:
+            return 'STM32WBA65I-DK1-lit-icd-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == stm32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
+        if self == stm32App.LIT:
+            return 'lit_icd_app.flashbundle.txt'
         raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root, stm32_chip):

@@ -64,7 +64,9 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                       --target stm32-STM32WBA65I-DK1-light build \
+                       --target stm32-STM32WBA65I-DK1-light \
+                       --target stm32-STM32WBA65I-DK1-lit \
+                       build \
                      "
 
             - name: Gather size reports
