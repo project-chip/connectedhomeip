@@ -99,7 +99,8 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, IDMBaseTest, WritableAttributeInfo, spec_enum_values
+from support_modules.idm_support import (ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS,
+                                         IDMBaseTest, WritableAttributeInfo, spec_enum_values)
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -121,7 +122,7 @@ class TC_IDM_9_1(IDMBaseTest):
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "For each accepted command of every standard server cluster on every endpoint of the DUT, identify the command fields with spec-defined constraints (min/max value, min/max length, exact length, count), taking the bounds of an enum-typed field from the values its enum defines rather than from a constraint on the field, and excluding commands that are unsafe to invoke automatically (commissioning, credentials, networking, OTA and access-control flows). For every such field, send Invoke Request messages to the DUT from the TH with that field set to a value violating each testable constraint bound and all other fields set to in-range values. Skip bounds that the field's own data type already enforces.",
-                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. In both cases verify that at least one constraint violation was exercised."),
+                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. In both cases verify that at least one constraint violation was exercised for the remaining command fields. GeneralDiagnostics.TestEventTrigger and GeneralDiagnostics.PayloadTestRequest fields are excluded because no safe valid baseline is established. Report each excluded field as not demonstrated; the verdict covers only the executed scope. If no remaining command constraint violation is exercised, report unsupported, never PASS."),
             TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints, taking the bounds of an enum-typed attribute from the values its enum defines rather than from a constraint on the attribute. For every writable attribute read, set the data field to an out of bounds value in the Write Request message to the DUT from the TH.",
                      "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later sends a Status Response Action with a CONSTRAINT_ERROR Status Code for every such write. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only do so for at least one."),
         ]
@@ -146,6 +147,7 @@ class TC_IDM_9_1(IDMBaseTest):
         commands_probed_count = 0
         commands_rejected_count = 0
         accepted_command_fields = []
+        unsupported_command_fields = []
 
         for info in command_field_infos:
             try:
@@ -156,6 +158,8 @@ class TC_IDM_9_1(IDMBaseTest):
                 continue
             if result.probed == 0:
                 commands_skipped_count += 1
+                if (info.cluster_id, info.command_id) in COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS:
+                    unsupported_command_fields.append(info.path_str)
                 continue
             commands_tested_count += 1
             commands_probed_count += result.probed
@@ -166,7 +170,7 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
 
-        if command_field_infos:
+        if len(command_field_infos) > len(unsupported_command_fields):
             asserts.assert_greater(commands_tested_count, 0,
                                    "DUT exposes constrained command fields but no constraint violation could be exercised")
         self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
@@ -249,6 +253,17 @@ class TC_IDM_9_1(IDMBaseTest):
 
         self.enforce_constraint_policy(subject="Writable attribute", accepted_paths=accepted_attributes,
                                        rejected_count=rejected_count, probed_count=probed_count)
+
+        if unsupported_command_fields:
+            log.warning("Constraint coverage: command fields exercised=%s, excluded=%s; command probes=%s, "
+                        "CONSTRAINT_ERROR=%s; writable attributes exercised=%s, probes=%s, CONSTRAINT_ERROR=%s; "
+                        "excluded paths=%s. Verdict covers executed scope only; excluded enforcement is NOT DEMONSTRATED.",
+                        commands_tested_count, len(unsupported_command_fields), commands_probed_count,
+                        commands_rejected_count, tested_count, probed_count, rejected_count,
+                        ", ".join(unsupported_command_fields))
+            if commands_probed_count == 0:
+                asserts.skip("Unsupported constraint coverage: actual constraint enforcement not demonstrated for "
+                             + ", ".join(unsupported_command_fields))
 
 
 if __name__ == "__main__":
