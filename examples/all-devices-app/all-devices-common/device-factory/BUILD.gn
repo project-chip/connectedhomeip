@@ -101,6 +101,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering:simulated",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering-controller",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/src/lib/support",
   ]

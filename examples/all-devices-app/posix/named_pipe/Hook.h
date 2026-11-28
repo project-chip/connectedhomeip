@@ -40,6 +40,7 @@
 #include <device/types/proximity-ranger/NamedPipeTranslators.h>
 #include <device/types/robotic-vacuum-cleaner/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
+#include <device/types/window-covering-controller/NamedPipeTranslators.h>
 
 namespace chip::app::NamedPipe {
 

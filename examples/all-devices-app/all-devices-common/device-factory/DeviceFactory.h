@@ -94,6 +94,7 @@
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering-controller/WindowCoveringController.h>
 #include <device/types/window-covering/WindowCoveringVariants.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
@@ -1455,6 +1456,22 @@ private:
                 });
             }
             RegisterAlias("window-covering-simulated", "window-covering");
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING_CONTROLLER)
+        {
+            RegisterCreator("window-covering-controller", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<WindowCoveringController>(WindowCoveringController::Config{
+                    .bindingTable       = mContext->bindingTable,
+                    .bindingManager     = mContext->bindingManager,
+                    .platformManager    = mContext->platformManager,
+                    .bindingHandler     = mContext->bindingHandler,
+                    .timerDelegate      = mContext->timerDelegate,
+                    .withIdentifyServer = true,
+                    .withIdentifyClient = true,
+                });
+            });
         }
 
         // at least one device type MUST be enabled

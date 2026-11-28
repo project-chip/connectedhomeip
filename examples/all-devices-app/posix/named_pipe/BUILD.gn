@@ -51,6 +51,8 @@ source_set("named_pipe") {
     "translators/ProximityRangingTranslator.h",
     "translators/RvcTranslator.cpp",
     "translators/RvcTranslator.h",
+    "translators/WindowCoveringControllerTranslator.cpp",
+    "translators/WindowCoveringControllerTranslator.h",
   ]
 
   public_deps = [

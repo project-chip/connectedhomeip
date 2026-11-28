@@ -35,6 +35,7 @@
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/ProximityRangingTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
+#include <posix/named_pipe/translators/WindowCoveringControllerTranslator.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -780,6 +781,94 @@ TEST_F(TestNamedPipeTranslators, ClosureControllerTranslator)
     // Unknown action
     Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, WindowCoveringControllerTranslator)
+{
+    WindowCoveringControllerTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 5U);
+
+    constexpr EndpointId kEndpoint = 7;
+
+    // Reads the anonymous structure written by the translator and returns its context-tagged fields.
+    auto decode = [this](std::optional<uint64_t>(&fields)[3]) {
+        TLV::TLVReader reader;
+        reader.Init(mMockAccessor->mLastData.data(), mMockAccessor->mLastData.size());
+        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        TLV::TLVType outerType;
+        ASSERT_EQ(reader.EnterContainer(outerType), CHIP_NO_ERROR);
+        while (reader.Next() == CHIP_NO_ERROR)
+        {
+            uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+            ASSERT_LT(tagNum, 3U);
+            uint64_t value;
+            ASSERT_EQ(reader.Get(value), CHIP_NO_ERROR);
+            fields[tagNum] = value;
+        }
+        ASSERT_EQ(reader.ExitContainer(outerType), CHIP_NO_ERROR);
+    };
+
+    // Parameterless actions: only the endpoint is sent, as tag 1.
+    for (const char * action : { "WindowCoveringUpOrOpen", "WindowCoveringDownOrClose", "WindowCoveringStopMotion" })
+    {
+        Json::Value json = ParseJson(std::string(R"({"Name": ")") + action + R"("})");
+        EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, json, mRegistry), CHIP_NO_ERROR);
+        EXPECT_EQ(mMockAccessor->mLastAction, action);
+        std::optional<uint64_t> fields[3];
+        decode(fields);
+        EXPECT_EQ(fields[1], std::make_optional<uint64_t>(kEndpoint));
+        EXPECT_FALSE(fields[2].has_value());
+    }
+
+    // GoToLiftPercentage: LiftPercent100thsValue -> tag 2
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "WindowCoveringGoToLiftPercentage");
+    {
+        std::optional<uint64_t> fields[3];
+        decode(fields);
+        EXPECT_EQ(fields[1], std::make_optional<uint64_t>(kEndpoint));
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(5000));
+    }
+
+    // GoToTiltPercentage: TiltPercent100thsValue -> tag 2
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 10000})"), mRegistry),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "WindowCoveringGoToTiltPercentage");
+    {
+        std::optional<uint64_t> fields[3];
+        decode(fields);
+        EXPECT_EQ(fields[1], std::make_optional<uint64_t>(kEndpoint));
+        EXPECT_EQ(fields[2], std::make_optional<uint64_t>(10000));
+    }
+
+    // Missing value, value of the wrong type, out of the uint16_t range, and the other action's key.
+    EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage"})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToLiftPercentage", "LiftPercent100thsValue": "half"})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "TiltPercent100thsValue": 65536})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        translator.TranslateAndExecute(
+            kEndpoint, ParseJson(R"({"Name": "WindowCoveringGoToTiltPercentage", "LiftPercent100thsValue": 5000})"), mRegistry),
+        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Missing Name
+    EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, ParseJson(R"({})"), mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Unknown action
+    Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
+    EXPECT_EQ(translator.TranslateAndExecute(kEndpoint, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)

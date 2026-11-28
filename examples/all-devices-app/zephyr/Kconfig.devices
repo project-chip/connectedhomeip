@@ -208,5 +208,7 @@ config ALL_DEVICES_DEVICE_WATER_VALVE
 
 config ALL_DEVICES_DEVICE_WINDOW_COVERING
 	bool "WindowCovering"
-
+	
+config ALL_DEVICES_DEVICE_WINDOW_COVERING_CONTROLLER
+	bool "Window covering controller"
 endmenu

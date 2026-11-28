@@ -155,6 +155,7 @@ The application supports the following device types (specified via the
 -   `water-valve`
 -   `window-covering`
 -   `window-covering-awning`
+-   `window-covering-controller`
 -   `window-covering-curtain`
 -   `window-covering-pergola`
 -   `window-covering-shutter`
