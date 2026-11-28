@@ -151,6 +151,7 @@ public:
         GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(session.mExchangeCtxt->GetReliableMessageContext());
     }
     void BusyReportsRemainingSigma2Time();
+    void BusyWaitMatchesArmedSigma2Deadline();
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     [[nodiscard]] CHIP_ERROR InitCASESessionForTCPConnectionAttempt(SessionManager & sessionManager, CASESession & pairing,
                                                                     SessionEstablishmentDelegate & delegate,
@@ -975,6 +976,8 @@ TEST_F_FROM_FIXTURE(TestCASESession, BusyReportsRemainingSigma2Time)
 
     RecordBusyStatusReport busyRecorder;
     loopback.SetLoopbackTransportDelegate(&busyRecorder);
+    auto resetLoopback  = ScopeExit([&]() { loopback.SetLoopbackTransportDelegate(nullptr); });
+    auto shutdownServer = ScopeExit([&]() { gPairingServer.Shutdown(); });
 
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
@@ -1013,9 +1016,66 @@ TEST_F_FROM_FIXTURE(TestCASESession, BusyReportsRemainingSigma2Time)
     EXPECT_GT(busyRecorder.mBusyWaitTime.count(), 0u);
     EXPECT_LE(System::Clock::Milliseconds32(busyRecorder.mBusyWaitTime.count()), fullTimeout - kElapsed);
 
-    loopback.SetLoopbackTransportDelegate(nullptr);
     pairingCommissioner1.Clear();
-    gPairingServer.Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, BusyWaitMatchesArmedSigma2Deadline)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner1, delegateCommissioner2;
+    CASESession pairingCommissioner1, pairingCommissioner2;
+
+    pairingCommissioner1.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    pairingCommissioner2.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    RecordBusyStatusReport busyRecorder;
+    loopback.SetLoopbackTransportDelegate(&busyRecorder);
+    auto resetLoopback  = ScopeExit([&]() { loopback.SetLoopbackTransportDelegate(nullptr); });
+    auto shutdownServer = ScopeExit([&]() { gPairingServer.Shutdown(); });
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    // The responder arms its Sigma2 response timer when Sigma1 arrives, before
+    // it applies the session parameters Sigma1 carries.  Give the first
+    // initiator much longer retransmission intervals than the defaults, so a
+    // wait computed from them would differ from the armed timer.
+    ReliableMessageProtocolConfig slowInitiator(System::Clock::Milliseconds32(10000), System::Clock::Milliseconds32(10000));
+    pairingCommissioner1.SetStopSigmaHandshakeAt(MakeOptional(CASESession::State::kSentSigma1));
+
+    ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(&pairingCommissioner1);
+    EXPECT_EQ(pairingCommissioner1.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                    nullptr, nullptr, &delegateCommissioner1, MakeOptional(slowInitiator)),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+    ASSERT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+    constexpr auto kElapsed = System::Clock::Milliseconds32(300);
+    GetIOContext().DriveIOUntil(kElapsed, [] { return false; });
+
+    ExchangeContext * contextCommissioner2 = NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
+    EXPECT_SUCCESS(pairingCommissioner2.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                         nullptr, nullptr, &delegateCommissioner2, NullOptional));
+    ServiceEvents();
+    ASSERT_EQ(busyRecorder.mNumBusySent, 1u);
+
+    // The timer that is running was computed from the default parameters the
+    // session had when Sigma1 arrived; the reported wait must not exceed it.
+    auto armedTimeout =
+        std::chrono::duration_cast<System::Clock::Milliseconds32>(CASESession::ComputeSigma2ResponseTimeout(GetDefaultMRPConfig()));
+    auto slowTimeout =
+        std::chrono::duration_cast<System::Clock::Milliseconds32>(CASESession::ComputeSigma2ResponseTimeout(slowInitiator));
+    ASSERT_GT(slowTimeout, armedTimeout);
+    EXPECT_GT(busyRecorder.mBusyWaitTime.count(), 0u);
+    EXPECT_LE(System::Clock::Milliseconds32(busyRecorder.mBusyWaitTime.count()), armedTimeout - kElapsed);
+
+    pairingCommissioner1.Clear();
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
@@ -1033,6 +1093,8 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
 
     RecordBusyStatusReport busyRecorder;
     loopback.SetLoopbackTransportDelegate(&busyRecorder);
+    auto resetLoopback  = ScopeExit([&]() { loopback.SetLoopbackTransportDelegate(nullptr); });
+    auto shutdownServer = ScopeExit([&]() { gPairingServer.Shutdown(); });
 
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
@@ -1072,9 +1134,6 @@ TEST_F(TestCASESession, UnacknowledgedSigma2DoesNotBlockNextSigma1)
     EXPECT_EQ(delegateCommissioner2.mNumBusyResponses, 0u);
     EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 0u);
     EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 1u);
-
-    loopback.SetLoopbackTransportDelegate(nullptr);
-    gPairingServer.Shutdown();
 }
 
 #if CHIP_WITH_NLFAULTINJECTION

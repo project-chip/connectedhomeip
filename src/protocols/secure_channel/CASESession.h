@@ -619,8 +619,10 @@ private:
     State mState;
     bool mDeferSessionRelease = false;
 
-    // When we sent the Sigma2 we are waiting on a response for.
-    System::Clock::Timestamp mSigma2SentTime = System::Clock::kZero;
+    // When we sent the Sigma2 we are waiting on a response for, and the
+    // response timeout the exchange armed for it.
+    System::Clock::Timestamp mSigma2SentTime      = System::Clock::kZero;
+    System::Clock::Timeout mSigma2ResponseTimeout = System::Clock::kZero;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();

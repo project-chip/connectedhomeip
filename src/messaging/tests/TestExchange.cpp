@@ -224,6 +224,62 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
     }
 }
 
+// Sends one message that expects a response on `ec`, then returns.
+static CHIP_ERROR SendExpectingResponse(ExchangeContext * ec)
+{
+    return ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                           System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                           SendFlags(SendMessageFlags::kExpectResponse));
+}
+
+TEST_F(TestExchange, GivenUpRetransmittingOnMRPSessionAfterRetransmissionsStop)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    // Nothing reaches the peer, so the message stays unacknowledged.
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    auto resetLoopback          = ScopeExit([&]() { loopback.Reset(); });
+
+    ExchangeContext * ec = NewUnauthenticatedExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+    ASSERT_TRUE(ec->GetSessionHandle()->AllowsMRP());
+    auto closeExchange = ScopeExit([&]() { ec->Close(); });
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    // MRP runs out of retransmissions; the response timer is still running.
+    GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(ec->GetReliableMessageContext());
+    EXPECT_TRUE(ec->HasGivenUpRetransmittingUnackedMessage());
+}
+
+TEST_F(TestExchange, NeverGivenUpRetransmittingOnSessionWithoutMRP)
+{
+    MockExchangeDelegate delegate;
+    delegate.mKeepExchangeAliveOnMessageReceipt = false;
+
+    // A session to a TCP peer address does not use MRP, so nothing tracks an
+    // acknowledgement for what is sent on it.
+    Transport::PeerAddress tcpPeer  = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+    Optional<SessionHandle> session = GetSecureSessionManager().CreateUnauthenticatedSession(tcpPeer, GetDefaultMRPConfig());
+    ASSERT_TRUE(session.HasValue());
+    ASSERT_FALSE(session.Value()->AllowsMRP());
+
+    ExchangeContext * ec = GetExchangeManager().NewContext(session.Value(), &delegate);
+    ASSERT_NE(ec, nullptr);
+    ec->SetResponseTimeout(System::Clock::Seconds16(30));
+
+    EXPECT_EQ(SendExpectingResponse(ec), CHIP_NO_ERROR);
+    // The message is still in flight: it was never "given up on".
+    EXPECT_FALSE(ec->HasGivenUpRetransmittingUnackedMessage());
+
+    ec->Abort();
+    GetLoopback().Reset();
+    DrainAndServiceIO();
+}
+
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and
 // the resulting DumpToLog() call on the ExchangeContext.
 // TODO: Find a way to automate this test without killing the process.

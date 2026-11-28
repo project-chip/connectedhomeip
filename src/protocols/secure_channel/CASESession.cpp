@@ -1396,8 +1396,9 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2)));
 
-    mState          = State::kSentSigma2;
-    mSigma2SentTime = System::SystemClock().GetMonotonicTimestamp();
+    mState                 = State::kSentSigma2;
+    mSigma2SentTime        = System::SystemClock().GetMonotonicTimestamp();
+    mSigma2ResponseTimeout = mExchangeCtxt->GetResponseTimeout();
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
     MATTER_TRACE_COUNTER("Sigma2");
@@ -2719,7 +2720,9 @@ System::Clock::Milliseconds32 CASESession::RemainingSigma2ResponseTime()
 {
     VerifyOrReturnValue(mState == State::kSentSigma2, System::Clock::kZero);
 
-    auto timeout = std::chrono::duration_cast<System::Clock::Milliseconds32>(ComputeSigma2ResponseTimeout(GetRemoteMRPConfig()));
+    // Report the deadline the exchange's response timer is actually using; the
+    // session parameters from Sigma1 can differ from the ones it was computed with.
+    auto timeout = std::chrono::duration_cast<System::Clock::Milliseconds32>(mSigma2ResponseTimeout);
     auto elapsed =
         std::chrono::duration_cast<System::Clock::Milliseconds32>(System::SystemClock().GetMonotonicTimestamp() - mSigma2SentTime);
     return elapsed < timeout ? timeout - elapsed : System::Clock::kZero;
